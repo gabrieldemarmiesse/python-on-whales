@@ -1,6 +1,7 @@
-from pathlib import Path
-from typing import Union, Optional, List
 import subprocess
+from pathlib import Path
+from typing import List, Optional, Tuple, Union
+
 from typeguard import typechecked
 
 
@@ -21,12 +22,13 @@ def run(args: List[str], stream_output: bool = False) -> str:
     if completed_process.returncode != 0:
         raise DockerException(completed_process)
     stdout = completed_process.stdout.decode()
-    if stdout[-1] == "\n":
+    if len(stdout) != 0 and stdout[-1] == "\n":
         stdout = stdout[:-1]
     return stdout
 
 
 ValidPath = Union[str, Path]
+VolumeDefinition = Union[Tuple[ValidPath, ValidPath, str], Tuple[ValidPath, ValidPath]]
 
 
 class DockerClient:
@@ -66,8 +68,30 @@ class DockerClient:
 
         return result
 
-    def run(self, image: str, command: Optional[List[str]] = None) -> str:
-        full_cmd = self._make_cli_cmd() + ["run", image]
+    @typechecked
+    def run(
+        self,
+        image: str,
+        command: Optional[List[str]] = None,
+        *,
+        remove: bool = False,
+        cpus: Optional[float] = None,
+        runtime: Optional[str] = None,
+        volumes: Optional[List[VolumeDefinition]] = [],
+    ) -> str:
+        full_cmd = self._make_cli_cmd() + ["run"]
+
+        if remove:
+            full_cmd.append("--rm")
+
+        if cpus is not None:
+            full_cmd += ["--cpus", str(cpus)]
+        if runtime is not None:
+            full_cmd += ["--runtime", runtime]
+        for volume_definition in volumes:
+            full_cmd += ["--volume", ":".join(volume_definition)]
+
+        full_cmd.append(image)
         if command is not None:
             full_cmd += command
         return run(full_cmd)
@@ -89,8 +113,11 @@ class VolumeCli:
         return run(full_cmd)
 
     @typechecked
-    def remove(self, volumes_names: List[str]) -> str:
+    def remove(self, x: Union[str, List[str]]) -> str:
         full_cmd = self._make_cli_cmd() + ["remove"]
-        full_cmd += volumes_names
+        if isinstance(x, str):
+            full_cmd.append(x)
+        if isinstance(x, list):
+            full_cmd += x
 
         return run(full_cmd)

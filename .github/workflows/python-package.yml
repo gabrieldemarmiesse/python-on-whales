@@ -9,5 +9,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run all tests
-      run: |
-        docker buildx build -f tests/Dockerfile .
+      run: bash tests/run_tests.sh
