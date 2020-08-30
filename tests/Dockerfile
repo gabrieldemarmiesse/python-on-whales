@@ -7,14 +7,14 @@ RUN tar zxvf /docker.tgz
 
 FROM python:3.7
 
-COPY --from=get_docker /docker/docker /usr/bin/docker
-RUN docker --help
-
 RUN pip install typeguard
 
 COPY tests/test-requirements.txt /tmp/
-
 RUN pip install -r /tmp/test-requirements.txt
+
+COPY --from=get_docker /docker/docker /usr/bin/docker
+RUN docker --help
+
 
 WORKDIR /docker-cli-wrapper
 COPY . .

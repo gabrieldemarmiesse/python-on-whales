@@ -1,7 +1,5 @@
-from docker_cli_wrapper import DockerClient
+from docker_cli_wrapper import docker
 from docker_cli_wrapper.test_utils import random_name
-
-docker = DockerClient()
 
 
 def test_simple_command():
@@ -19,7 +17,7 @@ def test_cpus():
     assert "Hello from Docker!" in output
 
 
-def test_volumes():
+def test_run_volumes():
     volume_name = random_name()
     docker.run(
         "busybox",

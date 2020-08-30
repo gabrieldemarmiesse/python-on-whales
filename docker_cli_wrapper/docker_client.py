@@ -58,7 +58,8 @@ class DockerClient:
         self.tlsverify = tlsverify
         self.version = version
 
-        self.volume = VolumeCli(self)
+        self.volume = VolumeCLI(self)
+        self.image = ImageCLI(self)
 
     def _make_cli_cmd(self) -> List[str]:
         result = ["docker"]
@@ -97,7 +98,7 @@ class DockerClient:
         return run(full_cmd)
 
 
-class VolumeCli:
+class VolumeCLI:
     def __init__(self, docker_client: DockerClient):
         self.docker_client = docker_client
 
@@ -113,11 +114,40 @@ class VolumeCli:
         return run(full_cmd)
 
     @typechecked
-    def remove(self, x: Union[str, List[str]]) -> str:
+    def remove(self, x: Union[str, List[str]]) -> List[str]:
         full_cmd = self._make_cli_cmd() + ["remove"]
         if isinstance(x, str):
             full_cmd.append(x)
         if isinstance(x, list):
             full_cmd += x
 
-        return run(full_cmd)
+        return run(full_cmd).split("\n")
+
+
+class ImageCLI:
+    def __init__(self, docker_client: DockerClient):
+        self.docker_client = docker_client
+
+    def _make_cli_cmd(self) -> List[str]:
+        return self.docker_client._make_cli_cmd() + ["image"]
+
+    def pull(self, image_name, quiet=False):
+        if not quiet:
+            raise NotImplementedError
+        full_cmd = self._make_cli_cmd() + ["pull"]
+
+        if quiet:
+            full_cmd.append("--quiet")
+
+        full_cmd.append(image_name)
+        run(full_cmd)
+
+    @typechecked
+    def remove(self, x: Union[str, List[str]]) -> List[str]:
+        full_cmd = self._make_cli_cmd() + ["remove"]
+        if isinstance(x, str):
+            full_cmd.append(x)
+        if isinstance(x, list):
+            full_cmd += x
+
+        return run(full_cmd).split("\n")
