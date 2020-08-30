@@ -151,3 +151,13 @@ class ImageCLI:
             full_cmd += x
 
         return run(full_cmd).split("\n")
+
+
+class Image:
+    def __init__(self, sha256: str):
+        self.sha256 = sha256
+
+
+class Container:
+    def __init__(self, container_id):
+        self.id = container_id
