@@ -7,7 +7,7 @@ RUN tar zxvf /docker.tgz
 
 FROM python:3.7
 
-RUN pip install typeguard
+RUN pip install typeguard pydantic
 
 COPY tests/test-requirements.txt /tmp/
 RUN pip install -r /tmp/test-requirements.txt
