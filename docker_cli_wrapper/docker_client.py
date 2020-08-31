@@ -1,7 +1,9 @@
 import subprocess
+from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
+import pydantic
 from typeguard import typechecked
 
 
@@ -77,6 +79,7 @@ class DockerClient:
         *,
         remove: bool = False,
         cpus: Optional[float] = None,
+        gpus: Optional[str] = None,
         runtime: Optional[str] = None,
         volumes: Optional[List[VolumeDefinition]] = [],
     ) -> str:
@@ -91,6 +94,9 @@ class DockerClient:
             full_cmd += ["--runtime", runtime]
         for volume_definition in volumes:
             full_cmd += ["--volume", ":".join(volume_definition)]
+
+        if gpus is not None:
+            full_cmd += ["--gpus", gpus]
 
         full_cmd.append(image)
         if command is not None:
@@ -161,3 +167,18 @@ class Image:
 class Container:
     def __init__(self, container_id):
         self.id = container_id
+
+
+class Volume:
+    def __init__(self, volume_id):
+        self.id = volume_id
+
+
+class VolumeInspectResult(pydantic.BaseModel):
+    CreatedAt: datetime
+    Driver: str
+    Labels: Dict[str, str]
+    Mountpoint: Path
+    Name: str
+    Options: Optional[str]
+    Scope: str
