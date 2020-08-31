@@ -1,21 +1,27 @@
 import subprocess
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 
 class DockerException(Exception):
-    def __init__(self, completed_process: subprocess.CompletedProcess):
+    def __init__(
+        self,
+        command_launched: List[str],
+        completed_process: subprocess.CompletedProcess,
+    ):
+        command_launched_str = " ".join(command_launched)
         error_msg = (
-            f"The docker command returned with code {completed_process.returncode}\n"
+            f"The docker command executed was `{command_launched_str}`.\n"
+            f"It returned with code {completed_process.returncode}\n"
         )
         if completed_process.stdout is not None:
             error_msg += (
-                f"The content of stdout is '{completed_process.stdout.decode()}'"
+                f"The content of stdout is '{completed_process.stdout.decode()}'\n"
             )
         else:
             error_msg += (
                 "The content of stdout can be found above the "
-                "stacktrace (it wasn't captured)."
+                "stacktrace (it wasn't captured).\n"
             )
         if completed_process.stderr is not None:
             error_msg += (
@@ -30,7 +36,10 @@ class DockerException(Exception):
 
 
 def run(
-    args: List[str], capture_stdout: bool = True, capture_stderr: bool = True
+    args: List[str],
+    capture_stdout: bool = True,
+    capture_stderr: bool = True,
+    env: Optional[Dict[str, str]] = None,
 ) -> Optional[str]:
     if capture_stdout:
         stdout_dest = subprocess.PIPE
@@ -40,10 +49,12 @@ def run(
         stderr_dest = subprocess.PIPE
     else:
         stderr_dest = None
-    completed_process = subprocess.run(args, stdout=stdout_dest, stderr=stderr_dest)
+    completed_process = subprocess.run(
+        args, stdout=stdout_dest, stderr=stderr_dest, env=env
+    )
 
     if completed_process.returncode != 0:
-        raise DockerException(completed_process)
+        raise DockerException(args, completed_process)
     if completed_process.stdout is None:
         return
     stdout = completed_process.stdout.decode()

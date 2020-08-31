@@ -4,6 +4,8 @@ from typing import List, Optional, Tuple, Union
 
 from typeguard import typechecked
 
+from docker_cli_wrapper.components.buildx import BuildxCLI
+
 from .container import ContainerCLI
 from .image import ImageCLI
 from .utils import ValidPath, run
@@ -40,6 +42,7 @@ class DockerClient:
         self.volume = VolumeCLI(self._make_cli_cmd())
         self.image = ImageCLI(self._make_cli_cmd())
         self.container = ContainerCLI(self._make_cli_cmd())
+        self.buildx = BuildxCLI(self._make_cli_cmd())
         self.run = self.container.run
 
     def _make_cli_cmd(self) -> List[str]:
