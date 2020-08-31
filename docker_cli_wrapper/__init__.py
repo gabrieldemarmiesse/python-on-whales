@@ -1,4 +1,4 @@
-from .docker_client import DockerClient
+from .docker_client import DockerClient, DockerException
 
 # alias
 docker = DockerClient()

@@ -1,10 +1,18 @@
-from docker_cli_wrapper import docker
+from docker_cli_wrapper import DockerException, docker
 from docker_cli_wrapper.test_utils import random_name
 
 
 def test_simple_command():
     output = docker.run("hello-world")
     assert "Hello from Docker!" in output
+
+
+def test_exact_output():
+    try:
+        docker.image.remove("busybox")
+    except DockerException:
+        pass
+    assert docker.run("busybox", ["echo", "dodo"], remove=True) == "dodo"
 
 
 def test_remove():
