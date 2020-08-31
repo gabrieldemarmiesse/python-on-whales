@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from docker_cli_wrapper import docker
-from docker_cli_wrapper.docker_client import VolumeInspectResult
+from docker_cli_wrapper.volume import VolumeInspectResult
 
 
 def test_simple_volume():
