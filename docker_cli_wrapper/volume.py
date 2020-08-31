@@ -1,14 +1,12 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pydantic
 from typeguard import typechecked
 
 from .utils import ValidPath, run
-
-VolumeDefinition = Union[Tuple[ValidPath, ValidPath, str], Tuple[ValidPath, ValidPath]]
 
 
 class Volume:
@@ -17,6 +15,9 @@ class Volume:
         self.name = name
         self._volume_inspect_result: Optional[VolumeInspectResult] = None
         self._last_refreshed_time = datetime.min
+
+    def __str__(self):
+        return self.name
 
     def _needs_reload(self) -> bool:
         return (datetime.now() - self._last_refreshed_time) <= 0.2
@@ -51,11 +52,25 @@ class VolumeCLI:
     def _make_cli_cmd(self) -> List[str]:
         return self._docker_cmd + ["volume"]
 
-    def create(self, volume_name: Optional[str] = None) -> Volume:
+    def create(
+        self,
+        volume_name: Optional[str] = None,
+        driver: Optional[str] = None,
+        labels: Dict[str, str] = {},
+        options: Dict[str, str] = {},
+    ) -> Volume:
         full_cmd = self._make_cli_cmd() + ["create"]
 
         if volume_name is not None:
             full_cmd += [volume_name]
+        if driver is not None:
+            full_cmd += ["--driver", driver]
+
+        for key, value in labels.items():
+            full_cmd += ["--label", f"{key}={value}"]
+
+        for key, value in options.items():
+            full_cmd += ["--opt", f"{key}={value}"]
 
         return Volume(self._docker_cmd, run(full_cmd))
 
@@ -64,16 +79,9 @@ class VolumeCLI:
         full_cmd = self._make_cli_cmd() + ["remove"]
 
         for v in to_list(x):
-            full_cmd.append(_get_name(v))
+            full_cmd.append(str(v))
 
         return run(full_cmd).split("\n")
-
-
-def _get_name(x: Union[Volume, str]) -> str:
-    if isinstance(x, str):
-        return x
-    else:
-        return x.name
 
 
 def to_list(x) -> list:
@@ -91,3 +99,9 @@ class VolumeInspectResult(pydantic.BaseModel):
     Name: str
     Options: Optional[str]
     Scope: str
+
+
+VolumeDefinition = Union[
+    Tuple[Union[Volume, ValidPath], ValidPath],
+    Tuple[Union[Volume, ValidPath], ValidPath, str],
+]

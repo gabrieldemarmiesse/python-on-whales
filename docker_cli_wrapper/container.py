@@ -35,6 +35,7 @@ class ContainerCLI:
         if runtime is not None:
             full_cmd += ["--runtime", runtime]
         for volume_definition in volumes:
+            volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
 
         if gpus is not None:

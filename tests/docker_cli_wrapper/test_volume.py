@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from docker_cli_wrapper import docker
+from docker_cli_wrapper import docker, volume
 from docker_cli_wrapper.volume import VolumeInspectResult
 
 
@@ -15,6 +15,20 @@ def test_multiple_volumes():
 
     volumes_deleted = docker.volume.remove(volumes)
     assert volumes_deleted == [x.name for x in volumes]
+
+
+def test_volume_drivers():
+    some_volume = docker.volume.create(
+        driver="local",
+        options=dict(type="tmpfs", device="tmpfs", o="size=100m,uid=1000"),
+    )
+    docker.run(
+        "busybox",
+        ["touch", "/dodo/dada"],
+        volumes=[(some_volume, "/dodo")],
+        remove=True,
+    )
+    docker.volume.remove(some_volume)
 
 
 json_volume_inspect = """
