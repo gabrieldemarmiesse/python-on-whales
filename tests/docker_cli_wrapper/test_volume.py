@@ -38,6 +38,14 @@ def test_volume_labels():
     docker.volume.remove(some_volume)
 
 
+def test_list():
+    volumes = [docker.volume.create() for _ in range(3)]
+
+    all_volumes = docker.volume.list()
+    for v in volumes:
+        assert v in all_volumes
+
+
 json_volume_inspect = """
 {
     "CreatedAt": "2020-08-27T09:39:50+02:00",

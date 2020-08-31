@@ -41,6 +41,11 @@ class Volume:
         if self._needs_reload():
             self.reload()
 
+    def __eq__(self, other):
+        if not isinstance(other, Volume):
+            raise TypeError(f"Cannot compare a docker volume with {type(other)}.")
+        return self.name == other.name and self._docker_cmd == other._docker_cmd
+
     @property
     def created_at(self) -> datetime:
         self._reload_if_necessary()
@@ -97,6 +102,29 @@ class VolumeCLI:
             full_cmd.append(str(v))
 
         return run(full_cmd).split("\n")
+
+    @typechecked
+    def prune(self, filters: Dict[str, str] = {}, force: bool = False):
+        full_cmd = self._make_cli_cmd() + ["prune"]
+
+        for key, value in filters.items():
+            full_cmd += ["--filter", f"{key}={value}"]
+
+        if force:
+            full_cmd.append("--force")
+
+        return run(full_cmd, capture_stderr=False, capture_stdout=False)
+
+    @typechecked
+    def list(self, filters: Dict[str, str] = {}) -> List[Volume]:
+        full_cmd = self._make_cli_cmd() + ["list", "--quiet"]
+
+        for key, value in filters.items():
+            full_cmd += ["--filter", f"{key}={value}"]
+
+        volumes_names = run(full_cmd).splitlines()
+
+        return [Volume(self._docker_cmd, name=x) for x in volumes_names]
 
 
 def to_list(x) -> list:

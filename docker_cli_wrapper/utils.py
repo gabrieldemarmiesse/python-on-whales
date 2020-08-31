@@ -1,21 +1,37 @@
 import subprocess
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional, Union
 
 
 class DockerException(Exception):
     def __init__(self, completed_process: subprocess.CompletedProcess):
         error_msg = (
             f"The docker command returned with code {completed_process.returncode}\n"
-            f"The content of stderr is '{completed_process.stderr.decode()}'\n"
-            f"The content of stdout is '{completed_process.stdout.decode()}'"
         )
+        if completed_process.stdout is not None:
+            error_msg += (
+                f"The content of stdout is '{completed_process.stdout.decode()}'"
+            )
+        else:
+            error_msg += (
+                "The content of stdout can be found above the "
+                "stacktrace (it wasn't captured)."
+            )
+        if completed_process.stderr is not None:
+            error_msg += (
+                f"The content of stderr is '{completed_process.stderr.decode()}'\n"
+            )
+        else:
+            error_msg += (
+                "The content of stderr can be found above the "
+                "stacktrace (it wasn't captured)."
+            )
         super().__init__(error_msg)
 
 
 def run(
     args: List[str], capture_stdout: bool = True, capture_stderr: bool = True
-) -> str:
+) -> Optional[str]:
     if capture_stdout:
         stdout_dest = subprocess.PIPE
     else:
@@ -28,6 +44,8 @@ def run(
 
     if completed_process.returncode != 0:
         raise DockerException(completed_process)
+    if completed_process.stdout is None:
+        return
     stdout = completed_process.stdout.decode()
     if len(stdout) != 0 and stdout[-1] == "\n":
         stdout = stdout[:-1]
