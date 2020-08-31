@@ -28,4 +28,4 @@ COPY . .
 
 RUN pip install -e .
 
-CMD pytest -v --durations=10 ./tests/docker_cli_wrapper/components/
+CMD pytest -v --durations=10 ./tests
