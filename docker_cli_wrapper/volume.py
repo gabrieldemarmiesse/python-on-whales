@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pydantic
 from typeguard import typechecked
 
-from .utils import ValidPath, run
+from .utils import ValidPath, run, to_list
 
 
 class VolumeInspectResult(pydantic.BaseModel):
@@ -125,13 +125,6 @@ class VolumeCLI:
         volumes_names = run(full_cmd).splitlines()
 
         return [Volume(self._docker_cmd, name=x) for x in volumes_names]
-
-
-def to_list(x) -> list:
-    if isinstance(x, list):
-        return x
-    else:
-        return [x]
 
 
 VolumeDefinition = Union[

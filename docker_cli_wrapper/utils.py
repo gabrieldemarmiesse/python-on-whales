@@ -64,3 +64,10 @@ def run(
 
 
 ValidPath = Union[str, Path]
+
+
+def to_list(x) -> list:
+    if isinstance(x, list):
+        return x
+    else:
+        return [x]
