@@ -14,7 +14,7 @@ def test_multiple_volumes():
     volumes = [docker.volume.create() for _ in range(3)]
 
     volumes_deleted = docker.volume.remove(volumes)
-    assert volumes_deleted == volumes
+    assert volumes_deleted == [x.name for x in volumes]
 
 
 json_volume_inspect = """
