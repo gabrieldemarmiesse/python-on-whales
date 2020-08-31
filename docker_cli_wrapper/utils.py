@@ -13,10 +13,19 @@ class DockerException(Exception):
         super().__init__(error_msg)
 
 
-def run(args: List[str], stream_output: bool = False) -> str:
-    if stream_output:
-        raise NotImplementedError()
-    completed_process = subprocess.run(args, capture_output=True)
+def run(
+    args: List[str], capture_stdout: bool = True, capture_stderr: bool = True
+) -> str:
+    if capture_stdout:
+        stdout_dest = subprocess.PIPE
+    else:
+        stdout_dest = None
+    if capture_stderr:
+        stderr_dest = subprocess.PIPE
+    else:
+        stderr_dest = None
+    completed_process = subprocess.run(args, stdout=stdout_dest, stderr=stderr_dest)
+
     if completed_process.returncode != 0:
         raise DockerException(completed_process)
     stdout = completed_process.stdout.decode()
