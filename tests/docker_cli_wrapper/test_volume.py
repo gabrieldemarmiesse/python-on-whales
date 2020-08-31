@@ -31,6 +31,13 @@ def test_volume_drivers():
     docker.volume.remove(some_volume)
 
 
+def test_volume_labels():
+    some_volume = docker.volume.create(labels=dict(dodo="dada"))
+
+    assert some_volume.labels == dict(dodo="dada")
+    docker.volume.remove(some_volume)
+
+
 json_volume_inspect = """
 {
     "CreatedAt": "2020-08-27T09:39:50+02:00",

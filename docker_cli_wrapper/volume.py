@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -7,6 +7,16 @@ import pydantic
 from typeguard import typechecked
 
 from .utils import ValidPath, run
+
+
+class VolumeInspectResult(pydantic.BaseModel):
+    CreatedAt: datetime
+    Driver: str
+    Labels: Dict[str, str]
+    Mountpoint: Path
+    Name: str
+    Options: Optional[Dict[str, str]]
+    Scope: str
 
 
 class Volume:
@@ -20,7 +30,7 @@ class Volume:
         return self.name
 
     def _needs_reload(self) -> bool:
-        return (datetime.now() - self._last_refreshed_time) <= 0.2
+        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
 
     def reload(self):
         json_str = run(self._docker_cmd + ["volume", "inspect", self.name])
@@ -40,6 +50,11 @@ class Volume:
     def driver(self) -> str:
         self._reload_if_necessary()
         return self._volume_inspect_result.Driver
+
+    @property
+    def labels(self) -> Dict[str, str]:
+        self._reload_if_necessary()
+        return self._volume_inspect_result.Labels
 
 
 VolumeArg = Union[Volume, str]
@@ -89,16 +104,6 @@ def to_list(x) -> list:
         return x
     else:
         return [x]
-
-
-class VolumeInspectResult(pydantic.BaseModel):
-    CreatedAt: datetime
-    Driver: str
-    Labels: Dict[str, str]
-    Mountpoint: Path
-    Name: str
-    Options: Optional[str]
-    Scope: str
 
 
 VolumeDefinition = Union[
