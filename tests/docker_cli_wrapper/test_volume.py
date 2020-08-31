@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from docker_cli_wrapper import docker
 from docker_cli_wrapper.docker_client import VolumeInspectResult
@@ -45,3 +46,7 @@ def test_volume_inspect_result_config():
         second=50,
         tzinfo=timezone(timedelta(hours=2)),
     )
+    assert a.Mountpoint == Path(
+        "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
+    )
+    assert a.Options is None
