@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import pydantic
 from typeguard import typechecked
@@ -57,7 +57,7 @@ class ImageCLI:
         self,
         images: Union[Image, str, List[Union[Image, str]]],
         output: Optional[ValidPath] = None,
-    ):
+    ) -> Optional[Iterator[bytes]]:
         # TODO: save to bytes
 
         full_cmd = self._make_cli_cmd() + ["save"]
@@ -73,7 +73,7 @@ class ImageCLI:
         else:
             run(full_cmd)
 
-    def _save_generator(self, full_cmd):
+    def _save_generator(self, full_cmd) -> Iterator[bytes]:
         p = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
         for line in p.stdout:
             yield line
