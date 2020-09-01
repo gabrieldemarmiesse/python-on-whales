@@ -46,7 +46,7 @@ class ImageCLI:
         return self._docker_cmd + ["image"]
 
     @typechecked
-    def pull(self, image_name: str, quiet: bool = False):
+    def pull(self, image_name: str, quiet: bool = False) -> Image:
         full_cmd = self._make_cli_cmd() + ["pull"]
 
         if quiet:
@@ -54,12 +54,13 @@ class ImageCLI:
 
         full_cmd.append(image_name)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+        return Image(self._docker_cmd, image_name)
 
     @typechecked
-    def push(self, image_or_repo: str, quiet: bool = False):
+    def push(self, tag_or_repo: str, quiet: bool = False):
         full_cmd = self._make_cli_cmd() + ["push"]
 
-        full_cmd.append(image_or_repo)
+        full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     @typechecked

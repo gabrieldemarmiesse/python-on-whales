@@ -86,8 +86,13 @@ def test_image_list_tags():
         raise ValueError("Tag not found in images.")
 
 
-# def testt_pull_not_quiet():
-#    docker.image.pull("busybox:1")
+def test_pull_not_quiet():
+    try:
+        docker.image.remove("busybox:1")
+    except DockerException:
+        pass
+    image = docker.image.pull("busybox:1")
+    assert "busybox:1" in image.repo_tags
 
 
 json_inspect_image = """
