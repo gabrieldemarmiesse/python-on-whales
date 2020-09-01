@@ -1,4 +1,6 @@
+import json
 import subprocess
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -75,3 +77,18 @@ def to_list(x) -> list:
         return x
     else:
         return [x]
+
+
+class ReloadableObject:
+    def __init__(self):
+        self._last_refreshed_time = datetime.min
+
+    def _needs_reload(self) -> bool:
+        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
+
+    def reload(self):
+        raise NotImplementedError
+
+    def _reload_if_necessary(self):
+        if self._needs_reload():
+            self.reload()

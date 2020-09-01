@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pydantic
 from typeguard import typechecked
 
-from .utils import ValidPath, run, to_list
+from .utils import ReloadableObject, ValidPath, run, to_list
 
 
 class VolumeInspectResult(pydantic.BaseModel):
@@ -19,27 +19,20 @@ class VolumeInspectResult(pydantic.BaseModel):
     Scope: str
 
 
-class Volume:
+class Volume(ReloadableObject):
     def __init__(self, docker_cmd: List[str], name: str):
         self._docker_cmd = docker_cmd
         self.name = name
         self._volume_inspect_result: Optional[VolumeInspectResult] = None
-        self._last_refreshed_time = datetime.min
+        super().__init__()
 
     def __str__(self):
         return self.name
-
-    def _needs_reload(self) -> bool:
-        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
 
     def reload(self):
         json_str = run(self._docker_cmd + ["volume", "inspect", self.name])
         json_obj = json.loads(json_str)[0]
         self._volume_inspect_result = VolumeInspectResult.parse_obj(json_obj)
-
-    def _reload_if_necessary(self):
-        if self._needs_reload():
-            self.reload()
 
     def __eq__(self, other):
         if not isinstance(other, Volume):
