@@ -48,6 +48,8 @@ class DockerClient:
         self.run = self.container.run
         self.pull = self.image.pull
         self.push = self.image.push
+        self.save = self.image.save
+        self.load = self.image.load
 
     def _make_cli_cmd(self) -> List[str]:
         result = ["docker"]
