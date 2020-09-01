@@ -8,6 +8,14 @@ def test_image_remove():
     docker.image.remove(["busybox:1", "busybox:1.32"])
 
 
+def test_image_save_load(tmp_path):
+    tar_file = tmp_path / "dodo.tar"
+    docker.image.pull("busybox:1", quiet=True)
+    docker.image.save("busybox:1", output=tar_file)
+    docker.image.remove("busybox:1")
+    docker.image.load(input=tar_file)
+
+
 # def testt_pull_not_quiet():
 #    docker.image.pull("busybox:1")
 
