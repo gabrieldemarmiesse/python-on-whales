@@ -1,11 +1,12 @@
 from datetime import datetime
 from pathlib import Path
+from subprocess import PIPE, STDOUT, Popen
 from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 from typeguard import typechecked
 
-from .utils import ValidPath, run, to_list
+from .utils import DockerException, ValidPath, run, to_list
 
 
 class Image:
@@ -53,15 +54,32 @@ class ImageCLI:
 
     @typechecked
     def save(
-        self, images: Union[Image, str, List[Union[Image, str]]], output: ValidPath
+        self,
+        images: Union[Image, str, List[Union[Image, str]]],
+        output: Optional[ValidPath] = None,
     ):
         # TODO: save to bytes
-        full_cmd = self._make_cli_cmd() + ["save", "--output", str(output)]
+
+        full_cmd = self._make_cli_cmd() + ["save"]
+
+        if output is not None:
+            full_cmd += ["--output", str(output)]
 
         for image in to_list(images):
             full_cmd.append(str(image))
+        if output is None:
+            # we stream the bytes
+            return self._save_generator(full_cmd)
+        else:
+            run(full_cmd)
 
-        run(full_cmd)
+    def _save_generator(self, full_cmd):
+        p = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
+        for line in p.stdout:
+            yield line
+        exit_code = p.wait(0.1)
+        if exit_code != 0:
+            raise DockerException(full_cmd, exit_code, stderr=p.stderr.read())
 
     @typechecked
     def load(self, input: ValidPath, quiet: bool = False):

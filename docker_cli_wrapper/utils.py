@@ -7,26 +7,24 @@ class DockerException(Exception):
     def __init__(
         self,
         command_launched: List[str],
-        completed_process: subprocess.CompletedProcess,
+        return_code: int,
+        stdout: Optional[bytes] = None,
+        stderr: Optional[bytes] = None,
     ):
         command_launched_str = " ".join(command_launched)
         error_msg = (
             f"The docker command executed was `{command_launched_str}`.\n"
-            f"It returned with code {completed_process.returncode}\n"
+            f"It returned with code {return_code}\n"
         )
-        if completed_process.stdout is not None:
-            error_msg += (
-                f"The content of stdout is '{completed_process.stdout.decode()}'\n"
-            )
+        if stdout is not None:
+            error_msg += f"The content of stdout is '{stdout.decode()}'\n"
         else:
             error_msg += (
                 "The content of stdout can be found above the "
                 "stacktrace (it wasn't captured).\n"
             )
-        if completed_process.stderr is not None:
-            error_msg += (
-                f"The content of stderr is '{completed_process.stderr.decode()}'\n"
-            )
+        if stderr is not None:
+            error_msg += f"The content of stderr is '{stderr.decode()}'\n"
         else:
             error_msg += (
                 "The content of stderr can be found above the "
@@ -54,7 +52,12 @@ def run(
     )
 
     if completed_process.returncode != 0:
-        raise DockerException(args, completed_process)
+        raise DockerException(
+            args,
+            completed_process.returncode,
+            completed_process.stdout,
+            completed_process.stderr,
+        )
     if completed_process.stdout is None:
         return
     stdout = completed_process.stdout.decode()

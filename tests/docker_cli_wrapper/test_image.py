@@ -1,4 +1,6 @@
-from docker_cli_wrapper import docker
+import pytest
+
+from docker_cli_wrapper import DockerException, docker
 from docker_cli_wrapper.image import ImageInspectResult
 
 
@@ -14,6 +16,28 @@ def test_image_save_load(tmp_path):
     docker.image.save("busybox:1", output=tar_file)
     docker.image.remove("busybox:1")
     docker.image.load(input=tar_file)
+
+
+def test_save_iterator_bytes():
+    docker.image.pull("busybox:1", quiet=True)
+    iterator = docker.image.save("busybox:1")
+
+    for i, my_bytes in enumerate(iterator):
+        if i == 0:
+            assert len(my_bytes) != 0
+
+    assert i != 0
+
+
+def test_save_iterator_bytes_fails():
+    docker.image.pull("busybox:1", quiet=True)
+    iterator = docker.image.save("busybox:42")
+
+    with pytest.raises(DockerException) as err:
+        for _ in iterator:
+            pass
+    assert "docker image save busybox:42" in str(err.value)
+    assert "Error response from daemon: reference does not exist" in str(err.value)
 
 
 # def testt_pull_not_quiet():
