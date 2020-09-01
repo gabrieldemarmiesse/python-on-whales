@@ -53,6 +53,15 @@ def test_save_iterator_bytes_and_load():
     docker.image.remove(image_name)  # TODO: use list instead.
 
 
+def test_save_iterator_bytes_and_load_from_iterator():
+    image_name = "busybox:1"
+    docker.image.pull(image_name, quiet=True)
+    iterator = docker.image.save(image_name)
+
+    docker.image.load(iterator)
+    docker.image.remove(image_name)  # TODO: use list instead.
+
+
 # def testt_pull_not_quiet():
 #    docker.image.pull("busybox:1")
 

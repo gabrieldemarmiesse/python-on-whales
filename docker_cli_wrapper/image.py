@@ -97,9 +97,18 @@ class ImageCLI:
         elif isinstance(input, bytes):
             run(full_cmd, input=input)
         elif inspect.isgenerator(input):
-            raise NotImplementedError
-
+            self._load_from_generator(full_cmd, input)
         # TODO: return images
+
+    def _load_from_generator(self, full_cmd: List[str], input: Iterator[bytes]):
+        p = Popen(full_cmd, stdin=PIPE)
+        for buffer_bytes in input:
+            p.stdin.write(buffer_bytes)
+            p.stdin.flush()
+        p.stdin.close()
+        exit_code = p.wait()
+        if exit_code != 0:
+            raise DockerException(full_cmd, exit_code)
 
     @typechecked
     def remove(self, x: Union[str, List[str]]) -> List[str]:
