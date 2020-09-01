@@ -15,13 +15,21 @@ class ImageCLI:
     def _make_cli_cmd(self) -> List[str]:
         return self.docker_cmd + ["image"]
 
-    def pull(self, image_name, quiet=False):
+    @typechecked
+    def pull(self, image_name: str, quiet: bool = False):
         full_cmd = self._make_cli_cmd() + ["pull"]
 
         if quiet:
             full_cmd.append("--quiet")
 
         full_cmd.append(image_name)
+        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+
+    @typechecked
+    def push(self, image_or_repo: str, quiet: bool = False):
+        full_cmd = self._make_cli_cmd() + ["push"]
+
+        full_cmd.append(image_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     @typechecked
