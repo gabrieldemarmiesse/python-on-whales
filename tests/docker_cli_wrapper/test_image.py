@@ -1,7 +1,7 @@
 import pytest
 
 from docker_cli_wrapper import DockerException, docker
-from docker_cli_wrapper.image import ImageInspectResult
+from docker_cli_wrapper.image import ImageInspectResult, bulk_reload
 
 
 def test_image_remove():
@@ -60,6 +60,30 @@ def test_save_iterator_bytes_and_load_from_iterator():
 
     docker.image.load(iterator)
     docker.image.remove(image_name)  # TODO: use list instead.
+
+
+def test_image_list():
+    for image in docker.image.list():
+        image.reload()
+        assert image.id == image._image_inspect_result.Id
+
+
+def test_image_list_bulk_reload():
+    all_images = docker.image.list()
+    bulk_reload(all_images)
+    for image in all_images:
+        assert image.id == image._image_inspect_result.Id
+
+
+def test_image_list_tags():
+    image_name = "busybox:1"
+    docker.image.pull(image_name, quiet=True)
+    all_images = docker.image.list()
+    for image in all_images:
+        if image_name in image.repo_tags:
+            return
+    else:
+        raise ValueError("Tag not found in images.")
 
 
 # def testt_pull_not_quiet():

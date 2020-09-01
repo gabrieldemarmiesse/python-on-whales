@@ -86,9 +86,28 @@ class ReloadableObject:
     def _needs_reload(self) -> bool:
         return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
 
-    def reload(self):
+    def reload(self, *args, **kwargs):
+        self._reload(*args, **kwargs)
+        self._last_refreshed_time = datetime.now()
+
+    def _reload(self, *args, **kwargs):
         raise NotImplementedError
 
     def _reload_if_necessary(self):
         if self._needs_reload():
             self.reload()
+
+
+# backport of https://docs.python.org/3.9/library/stdtypes.html#str.removesuffix
+def removesuffix(string: str, suffix: str) -> str:
+    if string.endswith(suffix):
+        return string[: -len(suffix)]
+    else:
+        return string
+
+
+def removeprefix(string: str, prefix: str) -> str:
+    if string.startswith(prefix):
+        return string[len(prefix) :]
+    else:
+        return string

@@ -1,4 +1,5 @@
 import inspect
+import json
 from datetime import datetime
 from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
@@ -7,34 +8,42 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 import pydantic
 from typeguard import typechecked
 
-from .utils import DockerException, ValidPath, run, to_list
+from .utils import DockerException, ReloadableObject, ValidPath, run, to_list
 
 
-class Image:
-    def __init__(self, id_sha256: Optional[str] = None, tag: Optional[str] = None):
-
-        if id_sha256 is not None and tag is not None:
-            raise ValueError("id_sha256 and tag cannot be used together.")
-
-        if id_sha256 is None and tag is None:
-            raise ValueError("At lease one of the id or tag must be specified.")
-
-        if id_sha256 is not None:
-            self.sha256 = id_sha256
-
-        if tag is not None:
-            raise NotImplementedError
+class Image(ReloadableObject):
+    def __init__(self, docker_cmd: List[str], inspect_str: [str], is_id: bool = False):
+        super().__init__()
+        self._docker_cmd = docker_cmd
+        self._image_inspect_result: Optional[ImageInspectResult] = None
+        if is_id:
+            self.id = inspect_str
+        else:
+            self.reload(inspect_str)
+            self.id = self._image_inspect_result.Id
 
     def __str__(self):
-        return self.sha256
+        return self.id
+
+    def _reload(self, override: str = None, json_obj: dict = None):
+        if json_obj is None:
+            key = override or self.id
+            json_str = run(self._docker_cmd + ["image", "inspect", key])
+            json_obj = json.loads(json_str)[0]
+        self._image_inspect_result = ImageInspectResult.parse_obj(json_obj)
+
+    @property
+    def repo_tags(self) -> List[str]:
+        self._reload_if_necessary()
+        return self._image_inspect_result.RepoTags
 
 
 class ImageCLI:
     def __init__(self, docker_cmd: List[str]):
-        self.docker_cmd = docker_cmd
+        self._docker_cmd = docker_cmd
 
     def _make_cli_cmd(self) -> List[str]:
-        return self.docker_cmd + ["image"]
+        return self._docker_cmd + ["image"]
 
     @typechecked
     def pull(self, image_name: str, quiet: bool = False):
@@ -120,6 +129,12 @@ class ImageCLI:
 
         return run(full_cmd).split("\n")
 
+    def list(self) -> List[Image]:
+        full_cmd = self._make_cli_cmd() + ["list", "--quiet", "--no-trunc"]
+        return [
+            Image(self._docker_cmd, x, is_id=True) for x in run(full_cmd).splitlines()
+        ]
+
 
 class ContainerConfigClass(pydantic.BaseModel):
     Hostname: str
@@ -131,14 +146,14 @@ class ContainerConfigClass(pydantic.BaseModel):
     Tty: bool
     OpenStdin: bool
     StdinOnce: bool
-    Env: List[str]
-    Cmd: List[str]
+    Env: Optional[List[str]]
+    Cmd: Optional[List[str]]
     Image: str
     Volume: Optional[List[str]]
     WorkingDir: Path
-    Entrypoint: List[str]
-    OnBuild: List[str]
-    Labels: Optional[List[str]]
+    Entrypoint: Optional[List[str]]
+    OnBuild: Optional[List[str]]
+    Labels: Optional[Dict[str, str]]
 
 
 class ImageConfigClass(pydantic.BaseModel):
@@ -179,3 +194,12 @@ class ImageInspectResult(pydantic.BaseModel):
     GraphDriver: Dict[str, Any]
     RootFS: Dict[str, Any]
     Metadata: Dict[str, str]
+
+
+def bulk_reload(image_list: List[Image]):
+    assert len(set(tuple(x._docker_cmd) for x in image_list)) == 1
+    all_ids = [x.id for x in image_list]
+    full_cmd = image_list[0]._docker_cmd + ["image", "inspect"] + all_ids
+    json_str = run(full_cmd)
+    for json_obj, image in zip(json.loads(json_str), image_list):
+        image.reload(json_obj=json_obj)
