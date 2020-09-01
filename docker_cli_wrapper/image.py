@@ -5,7 +5,26 @@ from typing import Any, Dict, List, Optional, Union
 import pydantic
 from typeguard import typechecked
 
-from .utils import run
+from .utils import ValidPath, run, to_list
+
+
+class Image:
+    def __init__(self, id_sha256: Optional[str] = None, tag: Optional[str] = None):
+
+        if id_sha256 is not None and tag is not None:
+            raise ValueError("id_sha256 and tag cannot be used together.")
+
+        if id_sha256 is None and tag is None:
+            raise ValueError("At lease one of the id or tag must be specified.")
+
+        if id_sha256 is not None:
+            self.sha256 = id_sha256
+
+        if tag is not None:
+            raise NotImplementedError
+
+    def __str__(self):
+        return self.sha256
 
 
 class ImageCLI:
@@ -33,6 +52,29 @@ class ImageCLI:
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     @typechecked
+    def save(
+        self, images: Union[Image, str, List[Union[Image, str]]], output: ValidPath
+    ):
+        # TODO: save to bytes
+        full_cmd = self._make_cli_cmd() + ["save", "--output", str(output)]
+
+        for image in to_list(images):
+            full_cmd.append(str(image))
+
+        run(full_cmd)
+
+    @typechecked
+    def load(self, input: ValidPath, quiet: bool = False):
+        # TODO: load from bytes
+        full_cmd = self._make_cli_cmd() + ["load", "--input", str(input)]
+
+        if quiet:
+            full_cmd.append("--quiet")
+
+        run(full_cmd)
+        # TODO: return images
+
+    @typechecked
     def remove(self, x: Union[str, List[str]]) -> List[str]:
         full_cmd = self._make_cli_cmd() + ["remove"]
         if isinstance(x, str):
@@ -41,22 +83,6 @@ class ImageCLI:
             full_cmd += x
 
         return run(full_cmd).split("\n")
-
-
-class Image:
-    def __init__(self, id_sha256: Optional[str] = None, tag: Optional[str] = None):
-
-        if id_sha256 is not None and tag is not None:
-            raise ValueError("id_sha256 and tag cannot be used together.")
-
-        if id_sha256 is None and tag is None:
-            raise ValueError("At lease one of the id or tag must be specified.")
-
-        if id_sha256 is not None:
-            self.sha256 = id_sha256
-
-        if tag is not None:
-            pass
 
 
 class ContainerConfigClass(pydantic.BaseModel):

@@ -43,7 +43,11 @@ class DockerClient:
         self.image = ImageCLI(self._make_cli_cmd())
         self.container = ContainerCLI(self._make_cli_cmd())
         self.buildx = BuildxCLI(self._make_cli_cmd())
+
+        # aliases
         self.run = self.container.run
+        self.pull = self.image.pull
+        self.push = self.image.push
 
     def _make_cli_cmd(self) -> List[str]:
         result = ["docker"]
