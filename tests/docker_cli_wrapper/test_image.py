@@ -40,6 +40,19 @@ def test_save_iterator_bytes_fails():
     assert "Error response from daemon: reference does not exist" in str(err.value)
 
 
+def test_save_iterator_bytes_and_load():
+    image_name = "busybox:1"
+    docker.image.pull(image_name, quiet=True)
+    iterator = docker.image.save(image_name)
+
+    my_tar_as_bytes = b"".join(iterator)
+
+    docker.image.remove(image_name)
+
+    docker.image.load(my_tar_as_bytes)
+    docker.image.remove(image_name)  # TODO: use list instead.
+
+
 # def testt_pull_not_quiet():
 #    docker.image.pull("busybox:1")
 

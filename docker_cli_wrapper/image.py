@@ -1,3 +1,4 @@
+import inspect
 from datetime import datetime
 from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
@@ -58,8 +59,6 @@ class ImageCLI:
         images: Union[Image, str, List[Union[Image, str]]],
         output: Optional[ValidPath] = None,
     ) -> Optional[Iterator[bytes]]:
-        # TODO: save to bytes
-
         full_cmd = self._make_cli_cmd() + ["save"]
 
         if output is not None:
@@ -82,14 +81,24 @@ class ImageCLI:
             raise DockerException(full_cmd, exit_code, stderr=p.stderr.read())
 
     @typechecked
-    def load(self, input: ValidPath, quiet: bool = False):
-        # TODO: load from bytes
-        full_cmd = self._make_cli_cmd() + ["load", "--input", str(input)]
+    def load(
+        self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
+    ):
+        full_cmd = self._make_cli_cmd() + ["load"]
+
+        if isinstance(input, (str, Path)):
+            full_cmd += ["--input", str(input)]
 
         if quiet:
             full_cmd.append("--quiet")
 
-        run(full_cmd)
+        if isinstance(input, (str, Path)):
+            run(full_cmd)
+        elif isinstance(input, bytes):
+            run(full_cmd, input=input)
+        elif inspect.isgenerator(input):
+            raise NotImplementedError
+
         # TODO: return images
 
     @typechecked

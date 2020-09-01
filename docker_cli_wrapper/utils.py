@@ -38,6 +38,7 @@ def run(
     capture_stdout: bool = True,
     capture_stderr: bool = True,
     env: Optional[Dict[str, str]] = None,
+    input: bytes = None,
 ) -> Optional[str]:
     if capture_stdout:
         stdout_dest = subprocess.PIPE
@@ -48,7 +49,7 @@ def run(
     else:
         stderr_dest = None
     completed_process = subprocess.run(
-        args, stdout=stdout_dest, stderr=stderr_dest, env=env
+        args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=env
     )
 
     if completed_process.returncode != 0:
