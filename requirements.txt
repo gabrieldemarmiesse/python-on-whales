@@ -1,0 +1,5 @@
+typeguard
+pydantic
+requests
+tqdm
+typer
