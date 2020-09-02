@@ -16,7 +16,8 @@ FROM python:3.7
 RUN pip install typeguard pydantic requests tqdm
 
 COPY tests/test-requirements.txt /tmp/
-RUN pip install -r /tmp/test-requirements.txt
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/test-requirements.txt -r /tmp/requirements.txt
 
 COPY --from=get_docker /docker/docker /usr/bin/docker
 RUN docker --help
