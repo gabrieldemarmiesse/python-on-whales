@@ -91,3 +91,8 @@ class ContainerCLI:
             return Container(run(full_cmd))
         else:
             return run(full_cmd)
+
+    def logs(self, container: Union[Container, str]) -> str:
+        full_cmd = self._make_cli_cmd() + ["logs"]
+
+        return run(full_cmd + [str(container)])

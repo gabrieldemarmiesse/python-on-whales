@@ -46,6 +46,9 @@ class DockerClient:
         self.push = self.image.push
         self.save = self.image.save
         self.load = self.image.load
+        self.build = self.buildx.build
+        self.images = self.image.list
+        self.logs = self.container.logs
 
     def _make_cli_cmd(self) -> List[str]:
         result = ["docker"]

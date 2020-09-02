@@ -13,6 +13,12 @@ def test_buildx_build(tmp_path):
     docker.buildx.build(tmp_path)
 
 
+def test_buildx_build_aliases(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.build(tmp_path)
+    docker.image.build(tmp_path)
+
+
 def test_buildx_error(tmp_path):
     with pytest.raises(DockerException) as e:
         docker.buildx.build(tmp_path)

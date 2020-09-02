@@ -16,6 +16,8 @@ from docker_cli_wrapper.utils import (
     to_list,
 )
 
+from .buildx import BuildxCLI
+
 
 class Image(ReloadableObject):
     def __init__(self, docker_cmd: List[str], inspect_str: [str], is_id: bool = False):
@@ -47,6 +49,7 @@ class Image(ReloadableObject):
 class ImageCLI:
     def __init__(self, docker_cmd: List[str]):
         self._docker_cmd = docker_cmd
+        self.build = BuildxCLI(docker_cmd).build
 
     def _make_cli_cmd(self) -> List[str]:
         return self._docker_cmd + ["image"]
@@ -141,6 +144,10 @@ class ImageCLI:
         return [
             Image(self._docker_cmd, x, is_id=True) for x in run(full_cmd).splitlines()
         ]
+
+    def tag(self, source_image: Union[Image, str], new_tag: str):
+        full_cmd = self._make_cli_cmd() + ["tag", str(source_image), new_tag]
+        run(full_cmd)
 
 
 class ContainerConfigClass(pydantic.BaseModel):
