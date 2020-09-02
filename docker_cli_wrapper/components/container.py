@@ -1,8 +1,9 @@
-from typing import List, Optional, Union
+import inspect
+from typing import Iterator, List, Optional, Tuple, Union
 
 from typeguard import typechecked
 
-from docker_cli_wrapper.utils import run, to_list
+from docker_cli_wrapper.utils import ValidPath, run, to_list
 
 from .volume import VolumeDefinition
 
@@ -16,6 +17,9 @@ class Container:
 
     def __str__(self):
         return self.id
+
+
+ContainerPath = Tuple[Union[Container, str], ValidPath]
 
 
 class ContainerCLI:
@@ -96,3 +100,27 @@ class ContainerCLI:
         full_cmd = self._make_cli_cmd() + ["logs"]
 
         return run(full_cmd + [str(container)])
+
+    def cp(
+        self,
+        source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
+        destination: Union[None, ValidPath, ContainerPath],
+    ):
+        # TODO: tests and handling bytes streams.
+        full_cmd = self._make_cli_cmd() + ["cp"]
+
+        if isinstance(source, bytes) or inspect.isgenerator(source):
+            source = "-"
+        elif isinstance(source, tuple):
+            source = f"{str(source[0])}:{source[1]}"
+        else:
+            source = str(source)
+
+        if destination is None:
+            destination = "-"
+        elif isinstance(destination, tuple):
+            destination = f"{str(destination[0])}:{destination[1]}"
+        else:
+            destination = str(destination)
+
+        run(full_cmd + [source, destination])
