@@ -1,4 +1,5 @@
 import inspect
+from datetime import timedelta
 from typing import Iterator, List, Optional, Tuple, Union
 
 from typeguard import typechecked
@@ -20,6 +21,7 @@ class Container:
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
+ValidContainer = Union[Container, str]
 
 
 class ContainerCLI:
@@ -124,3 +126,35 @@ class ContainerCLI:
             destination = str(destination)
 
         run(full_cmd + [source, destination])
+
+    def kill(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]],
+        signal: str = None,
+    ):
+        full_cmd = self._make_cli_cmd() + ["kill"]
+
+        if signal is not None:
+            full_cmd += ["--signal", signal]
+
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
+        run(full_cmd)
+
+    def stop(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]],
+        time: Union[int, timedelta] = None,
+    ):
+        full_cmd = self._make_cli_cmd() + ["kill"]
+        if isinstance(time, timedelta):
+            time = time.total_seconds()
+
+        if time is not None:
+            full_cmd += ["--time", str(time)]
+
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
+        run(full_cmd)
