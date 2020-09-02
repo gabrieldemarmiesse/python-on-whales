@@ -22,3 +22,19 @@ def test_download_cli():
     ]
     output = run(simple_command, capture_stdout=True, capture_stderr=True)
     assert "Hello from Docker!" in output
+
+
+def test_download_cli_from_cli():
+    try:
+        download_binaries.DOCKER_BINARY_PATH.unlink()
+    except FileNotFoundError:
+        pass
+    run(["docker-cli-wrapper", "download-cli"])
+    simple_command = [
+        download_binaries.DOCKER_BINARY_PATH,
+        "run",
+        "--rm",
+        "hello-world",
+    ]
+    output = run(simple_command, capture_stdout=True, capture_stderr=True)
+    assert "Hello from Docker!" in output
