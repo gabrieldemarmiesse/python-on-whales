@@ -1,12 +1,17 @@
 import platform
+import shutil
+import tempfile
+from pathlib import Path
 
 import requests
 from tqdm import tqdm
 
 DOCKER_VERSION = "19.03.12"
 
+CACHE_DIR = Path.home() / ".cache" / "docker-cli-wrapper"
 
 TEMPLATE = "https://download.docker.com/{os}/static/stable/{arch}/docker-{version}.tgz"
+DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 
 
 def download_docker_cli():
@@ -14,12 +19,22 @@ def download_docker_cli():
     arch = get_arch()
     file_to_download = TEMPLATE.format(os=user_os, arch=arch, version=DOCKER_VERSION)
 
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_dir = Path(tmp_dir)
+        tar_file = tmp_dir / "docker.tgz"
+        download_from_url(file_to_download, tar_file)
+        extract_dir = tmp_dir / "extracted"
+        shutil.unpack_archive(tar_file, extract_dir)
+
+        DOCKER_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
+        shutil.move(extract_dir / "docker" / "docker", DOCKER_BINARY_PATH)
+
 
 def download_from_url(url, dst):
     # Streaming, so we can iterate over the response.
     response = requests.get(url, stream=True)
     total_size_in_bytes = int(response.headers.get("content-length", 0))
-    block_size = 1024  # 1 Kibibyte
+    block_size = 1024
     progress_bar = tqdm(total=total_size_in_bytes, unit="iB", unit_scale=True)
     with open(dst, "wb") as file:
         for data in response.iter_content(block_size):
