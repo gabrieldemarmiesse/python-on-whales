@@ -10,8 +10,8 @@ def test_download_from_url(tmp_path):
 
 def test_download_cli():
     try:
-        download_binaries.DOCKER_BINARY_PATH.remove()
-    except ValueError:
+        download_binaries.DOCKER_BINARY_PATH.unlink()
+    except FileNotFoundError:
         pass
     download_binaries.download_docker_cli()
     simple_command = [
