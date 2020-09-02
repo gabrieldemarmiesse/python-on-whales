@@ -8,7 +8,13 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 import pydantic
 from typeguard import typechecked
 
-from .utils import DockerException, ReloadableObject, ValidPath, run, to_list
+from docker_cli_wrapper.utils import (
+    DockerException,
+    ReloadableObject,
+    ValidPath,
+    run,
+    to_list,
+)
 
 
 class Image(ReloadableObject):

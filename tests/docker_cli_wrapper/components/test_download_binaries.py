@@ -1,4 +1,4 @@
-from docker_cli_wrapper.components import download_binaries
+from docker_cli_wrapper import download_binaries
 from docker_cli_wrapper.utils import run
 
 
