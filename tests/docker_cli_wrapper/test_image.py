@@ -1,7 +1,7 @@
 import pytest
 
 from docker_cli_wrapper import DockerException, docker
-from docker_cli_wrapper.image import ImageInspectResult, bulk_reload
+from docker_cli_wrapper.components.image import ImageInspectResult, bulk_reload
 
 
 def test_image_remove():

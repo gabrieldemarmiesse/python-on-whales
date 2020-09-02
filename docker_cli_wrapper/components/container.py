@@ -2,7 +2,8 @@ from typing import List, Optional, Union
 
 from typeguard import typechecked
 
-from .utils import run, to_list
+from docker_cli_wrapper.utils import run, to_list
+
 from .volume import VolumeDefinition
 
 
