@@ -257,3 +257,6 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(str(container))
 
         run(full_cmd)
+
+    def port(self, container: ValidContainer, private_port: Union[str, int] = None):
+        raise NotImplementedError
