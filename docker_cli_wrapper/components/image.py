@@ -8,24 +8,21 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 import pydantic
 from typeguard import typechecked
 
-from docker_cli_wrapper.docker_command import DockerCommand
-from docker_cli_wrapper.utils import (
-    DockerException,
+from docker_cli_wrapper.client_config import (
+    ClientConfig,
+    DockerCLICaller,
     ReloadableObject,
-    ValidPath,
-    run,
-    to_list,
 )
+from docker_cli_wrapper.utils import DockerException, ValidPath, run, to_list
 
 from .buildx import BuildxCLI
 
 
 class Image(ReloadableObject):
     def __init__(
-        self, docker_cmd: DockerCommand, inspect_str: [str], is_id: bool = False
+        self, client_config: ClientConfig, inspect_str: [str], is_id: bool = False
     ):
-        super().__init__()
-        self.docker_cmd = docker_cmd
+        super().__init__(client_config)
         self._image_inspect_result: Optional[ImageInspectResult] = None
         if is_id:
             self.id = inspect_str
@@ -39,7 +36,7 @@ class Image(ReloadableObject):
     def _reload(self, override: str = None, json_obj: dict = None):
         if json_obj is None:
             key = override or self.id
-            json_str = run(self.docker_cmd.as_list() + ["image", "inspect", key])
+            json_str = run(self.docker_cmd + ["image", "inspect", key])
             json_obj = json.loads(json_str)[0]
         self._image_inspect_result = ImageInspectResult.parse_obj(json_obj)
 
@@ -49,25 +46,25 @@ class Image(ReloadableObject):
         return self._image_inspect_result.RepoTags
 
 
-class ImageCLI:
-    def __init__(self, docker_cmd: DockerCommand):
-        self.docker_cmd = docker_cmd
-        self.build = BuildxCLI(docker_cmd).build
+class ImageCLI(DockerCLICaller):
+    def __init__(self, client_config: ClientConfig):
+        super().__init__(client_config)
+        self.build = BuildxCLI(client_config).build
 
     @typechecked
     def pull(self, image_name: str, quiet: bool = False) -> Image:
-        full_cmd = self.docker_cmd.as_list() + ["image", "pull"]
+        full_cmd = self.docker_cmd + ["image", "pull"]
 
         if quiet:
             full_cmd.append("--quiet")
 
         full_cmd.append(image_name)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
-        return Image(self.docker_cmd, image_name)
+        return Image(self.client_config, image_name)
 
     @typechecked
     def push(self, tag_or_repo: str, quiet: bool = False):
-        full_cmd = self.docker_cmd.as_list() + ["image", "push"]
+        full_cmd = self.docker_cmd + ["image", "push"]
 
         full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
@@ -78,7 +75,7 @@ class ImageCLI:
         images: Union[Image, str, List[Union[Image, str]]],
         output: Optional[ValidPath] = None,
     ) -> Optional[Iterator[bytes]]:
-        full_cmd = self.docker_cmd.as_list() + ["image", "save"]
+        full_cmd = self.docker_cmd + ["image", "save"]
 
         if output is not None:
             full_cmd += ["--output", str(output)]
@@ -103,7 +100,7 @@ class ImageCLI:
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
     ):
-        full_cmd = self.docker_cmd.as_list() + ["image", "load"]
+        full_cmd = self.docker_cmd + ["image", "load"]
 
         if isinstance(input, (str, Path)):
             full_cmd += ["--input", str(input)]
@@ -131,7 +128,7 @@ class ImageCLI:
 
     @typechecked
     def remove(self, x: Union[str, List[str]]) -> List[str]:
-        full_cmd = self.docker_cmd.as_list() + ["image", "remove"]
+        full_cmd = self.docker_cmd + ["image", "remove"]
         if isinstance(x, str):
             full_cmd.append(x)
         if isinstance(x, list):
@@ -140,18 +137,18 @@ class ImageCLI:
         return run(full_cmd).split("\n")
 
     def list(self) -> List[Image]:
-        full_cmd = self.docker_cmd.as_list() + [
+        full_cmd = self.docker_cmd + [
             "image",
             "list",
             "--quiet",
             "--no-trunc",
         ]
         return [
-            Image(self.docker_cmd, x, is_id=True) for x in run(full_cmd).splitlines()
+            Image(self.client_config, x, is_id=True) for x in run(full_cmd).splitlines()
         ]
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
-        full_cmd = self.docker_cmd.as_list() + [
+        full_cmd = self.docker_cmd + [
             "image",
             "tag",
             str(source_image),
@@ -223,7 +220,7 @@ class ImageInspectResult(pydantic.BaseModel):
 def bulk_reload(image_list: List[Image]):
     assert len(set(x.docker_cmd for x in image_list)) == 1
     all_ids = [x.id for x in image_list]
-    full_cmd = image_list[0].docker_cmd.as_list() + ["image", "inspect"] + all_ids
+    full_cmd = image_list[0].docker_cmd + ["image", "inspect"] + all_ids
     json_str = run(full_cmd)
     for json_obj, image in zip(json.loads(json_str), image_list):
         image.reload(json_obj=json_obj)

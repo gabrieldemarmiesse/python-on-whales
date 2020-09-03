@@ -6,8 +6,12 @@ from typing import Dict, List, Optional, Tuple, Union
 import pydantic
 from typeguard import typechecked
 
-from docker_cli_wrapper.docker_command import DockerCommand
-from docker_cli_wrapper.utils import ReloadableObject, ValidPath, run, to_list
+from docker_cli_wrapper.client_config import (
+    ClientConfig,
+    DockerCLICaller,
+    ReloadableObject,
+)
+from docker_cli_wrapper.utils import ValidPath, run, to_list
 
 
 class VolumeInspectResult(pydantic.BaseModel):
@@ -21,17 +25,17 @@ class VolumeInspectResult(pydantic.BaseModel):
 
 
 class Volume(ReloadableObject):
-    def __init__(self, docker_cmd: DockerCommand, name: str):
-        self.docker_cmd = docker_cmd
+    def __init__(self, client_config: ClientConfig, name: str):
+
         self.name = name
         self._volume_inspect_result: Optional[VolumeInspectResult] = None
-        super().__init__()
+        super().__init__(client_config)
 
     def __str__(self):
         return self.name
 
     def reload(self):
-        json_str = run(self.docker_cmd.as_list() + ["volume", "inspect", self.name])
+        json_str = run(self.docker_cmd + ["volume", "inspect", self.name])
         json_obj = json.loads(json_str)[0]
         self._volume_inspect_result = VolumeInspectResult.parse_obj(json_obj)
 
@@ -59,10 +63,7 @@ class Volume(ReloadableObject):
 VolumeArg = Union[Volume, str]
 
 
-class VolumeCLI:
-    def __init__(self, docker_cmd: DockerCommand):
-        self.docker_cmd = docker_cmd
-
+class VolumeCLI(DockerCLICaller):
     def create(
         self,
         volume_name: Optional[str] = None,
@@ -70,7 +71,7 @@ class VolumeCLI:
         labels: Dict[str, str] = {},
         options: Dict[str, str] = {},
     ) -> Volume:
-        full_cmd = self.docker_cmd.as_list() + ["volume", "create"]
+        full_cmd = self.docker_cmd + ["volume", "create"]
 
         if volume_name is not None:
             full_cmd += [volume_name]
@@ -83,11 +84,11 @@ class VolumeCLI:
         for key, value in options.items():
             full_cmd += ["--opt", f"{key}={value}"]
 
-        return Volume(self.docker_cmd, run(full_cmd))
+        return Volume(self.client_config, run(full_cmd))
 
     @typechecked
     def remove(self, x: Union[VolumeArg, List[VolumeArg]]) -> List[str]:
-        full_cmd = self.docker_cmd.as_list() + ["volume", "remove"]
+        full_cmd = self.docker_cmd + ["volume", "remove"]
 
         for v in to_list(x):
             full_cmd.append(str(v))
@@ -96,7 +97,7 @@ class VolumeCLI:
 
     @typechecked
     def prune(self, filters: Dict[str, str] = {}, force: bool = False):
-        full_cmd = self.docker_cmd.as_list() + ["volume", "prune"]
+        full_cmd = self.docker_cmd + ["volume", "prune"]
 
         for key, value in filters.items():
             full_cmd += ["--filter", f"{key}={value}"]
@@ -108,14 +109,14 @@ class VolumeCLI:
 
     @typechecked
     def list(self, filters: Dict[str, str] = {}) -> List[Volume]:
-        full_cmd = self.docker_cmd.as_list() + ["volume", "list", "--quiet"]
+        full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
 
         for key, value in filters.items():
             full_cmd += ["--filter", f"{key}={value}"]
 
         volumes_names = run(full_cmd).splitlines()
 
-        return [Volume(self.docker_cmd, name=x) for x in volumes_names]
+        return [Volume(self.client_config, name=x) for x in volumes_names]
 
 
 VolumeDefinition = Union[

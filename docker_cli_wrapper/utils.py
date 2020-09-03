@@ -79,25 +79,6 @@ def to_list(x) -> list:
         return [x]
 
 
-class ReloadableObject:
-    def __init__(self):
-        self._last_refreshed_time = datetime.min
-
-    def _needs_reload(self) -> bool:
-        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
-
-    def reload(self, *args, **kwargs):
-        self._reload(*args, **kwargs)
-        self._last_refreshed_time = datetime.now()
-
-    def _reload(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def _reload_if_necessary(self):
-        if self._needs_reload():
-            self.reload()
-
-
 # backport of https://docs.python.org/3.9/library/stdtypes.html#str.removesuffix
 def removesuffix(string: str, suffix: str) -> str:
     if string.endswith(suffix):

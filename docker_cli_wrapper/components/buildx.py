@@ -2,22 +2,24 @@ from typing import Dict, List, Optional, Union
 
 from typeguard import typechecked
 
-from docker_cli_wrapper.docker_command import DockerCommand
+from docker_cli_wrapper.client_config import (
+    ClientConfig,
+    DockerCLICaller,
+    ReloadableObject,
+)
 from docker_cli_wrapper.utils import ValidPath, run, to_list
 
 
-class Builder:
-    def __init__(self, name: str):
+class Builder(ReloadableObject):
+    def __init__(self, client_config: ClientConfig, name: str):
+        super().__init__(client_config)
         self.name = name
 
     def __str__(self):
         return self.name
 
 
-class BuildxCLI:
-    def __init__(self, docker_cmd: DockerCommand):
-        self.docker_cmd = docker_cmd
-
+class BuildxCLI(DockerCLICaller):
     @typechecked
     def bake(
         self,
@@ -27,7 +29,7 @@ class BuildxCLI:
         pull: bool = False,
         push: bool = False,
     ) -> None:
-        full_cmd = self.docker_cmd.as_list() + ["buildx", "bake"]
+        full_cmd = self.docker_cmd + ["buildx", "bake"]
         if not cache:
             full_cmd.append("--no-cache")
         if load:
@@ -41,7 +43,7 @@ class BuildxCLI:
 
     @typechecked
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
-        full_cmd = self.docker_cmd.as_list() + ["buildx", "create"]
+        full_cmd = self.docker_cmd + ["buildx", "create"]
 
         if use:
             full_cmd.append("--use")
@@ -54,7 +56,7 @@ class BuildxCLI:
     def use(
         self, builder: Union[Builder, str], default: bool = False, global_: bool = False
     ):
-        full_cmd = self.docker_cmd.as_list() + ["buildx", "use"]
+        full_cmd = self.docker_cmd + ["buildx", "use"]
 
         if default:
             full_cmd.append("--use")
@@ -67,7 +69,7 @@ class BuildxCLI:
 
     @typechecked
     def remove(self, builder: Union[Builder, str]) -> str:
-        full_cmd = self.docker_cmd.as_list() + ["buildx", "rm"]
+        full_cmd = self.docker_cmd + ["buildx", "rm"]
 
         full_cmd.append(str(builder))
         return run(full_cmd)
@@ -86,7 +88,7 @@ class BuildxCLI:
         target: Optional[str] = None,
     ) -> None:
 
-        full_cmd = self.docker_cmd.as_list() + ["buildx", "build"]
+        full_cmd = self.docker_cmd + ["buildx", "build"]
 
         if progress != "auto":
             full_cmd += ["--progress", progress]

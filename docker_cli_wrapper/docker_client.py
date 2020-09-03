@@ -1,15 +1,15 @@
 from typing import List, Optional
 
+from docker_cli_wrapper.client_config import ClientConfig, DockerCLICaller
 from docker_cli_wrapper.components.buildx import BuildxCLI
 from docker_cli_wrapper.components.container import ContainerCLI
 from docker_cli_wrapper.components.image import ImageCLI
 from docker_cli_wrapper.components.volume import VolumeCLI
-from docker_cli_wrapper.docker_command import DockerCommand
 
 from .utils import ValidPath
 
 
-class DockerClient:
+class DockerClient(DockerCLICaller):
     def __init__(
         self,
         config: Optional[ValidPath] = None,
@@ -22,21 +22,24 @@ class DockerClient:
         tlscert: Optional[ValidPath] = None,
         tlskey: Optional[ValidPath] = None,
         tlsverify: Optional[bool] = None,
-        version: bool = False,
+        version: Optional[bool] = False,
+        client_config: Optional[ClientConfig] = None,
     ):
-        self.docker_cmd = DockerCommand(
-            config=config,
-            context=context,
-            debug=debug,
-            host=host,
-            log_level=log_level,
-            tls=tls,
-            tlscacert=tlscacert,
-            tlscert=tlscert,
-            tlskey=tlskey,
-            tlsverify=tlsverify,
-            version=version,
-        )
+        if client_config is None:
+            client_config = ClientConfig(
+                config=config,
+                context=context,
+                debug=debug,
+                host=host,
+                log_level=log_level,
+                tls=tls,
+                tlscacert=tlscacert,
+                tlscert=tlscert,
+                tlskey=tlskey,
+                tlsverify=tlsverify,
+                version=version,
+            )
+        super().__init__(client_config)
 
         self.volume = VolumeCLI(self.docker_cmd)
         self.image = ImageCLI(self.docker_cmd)
