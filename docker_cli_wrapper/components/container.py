@@ -48,7 +48,6 @@ class Container(ReloadableObject):
     def __init__(self, client_config: ClientConfig, container_id: str):
         super().__init__(client_config)
         self.id = container_id
-        self._container_inspect_result: Optional[ContainerInspectResult] = None
 
     def __eq__(self, other):
         return self.id == other.id and self.client_config == other.client_config
@@ -59,17 +58,15 @@ class Container(ReloadableObject):
     def _reload(self):
         json_str = run(self.docker_cmd + ["container", "inspect", self.id])
         json_obj = json.loads(json_str)[0]
-        self._container_inspect_result = ContainerInspectResult.parse_obj(json_obj)
+        self._inspect_result = ContainerInspectResult.parse_obj(json_obj)
 
     @property
     def name(self):
-        self._reload_if_necessary()
-        return removeprefix(self._container_inspect_result.name, "/")
+        return removeprefix(self.get_inspect_result().name, "/")
 
     @property
     def state(self) -> ContainerState:
-        self._reload_if_necessary()
-        return self._container_inspect_result.state
+        return self.get_inspect_result().state
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]

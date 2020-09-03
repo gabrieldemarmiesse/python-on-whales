@@ -27,7 +27,6 @@ class Volume(ReloadableObject):
     def __init__(self, client_config: ClientConfig, name: str):
 
         self.name = name
-        self._volume_inspect_result: Optional[VolumeInspectResult] = None
         super().__init__(client_config)
 
     def __str__(self):
@@ -36,7 +35,7 @@ class Volume(ReloadableObject):
     def _reload(self):
         json_str = run(self.docker_cmd + ["volume", "inspect", self.name])
         json_obj = json.loads(json_str)[0]
-        self._volume_inspect_result = VolumeInspectResult.parse_obj(json_obj)
+        self._inspect_result = VolumeInspectResult.parse_obj(json_obj)
 
     def __eq__(self, other):
         if not isinstance(other, Volume):
@@ -46,17 +45,17 @@ class Volume(ReloadableObject):
     @property
     def created_at(self) -> datetime:
         self._reload_if_necessary()
-        return self._volume_inspect_result.CreatedAt
+        return self.get_inspect_result().CreatedAt
 
     @property
     def driver(self) -> str:
         self._reload_if_necessary()
-        return self._volume_inspect_result.Driver
+        return self.get_inspect_result().Driver
 
     @property
     def labels(self) -> Dict[str, str]:
         self._reload_if_necessary()
-        return self._volume_inspect_result.Labels
+        return self.get_inspect_result().Labels
 
 
 VolumeArg = Union[Volume, str]

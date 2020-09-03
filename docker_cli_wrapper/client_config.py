@@ -45,6 +45,7 @@ class ReloadableObject(DockerCLICaller):
     def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
         self._last_refreshed_time = datetime.min
+        self._inspect_result = None
 
     def _needs_reload(self) -> bool:
         return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
@@ -59,3 +60,7 @@ class ReloadableObject(DockerCLICaller):
     def _reload_if_necessary(self):
         if self._needs_reload():
             self.reload()
+
+    def get_inspect_result(self):
+        self._reload_if_necessary()
+        return self._inspect_result

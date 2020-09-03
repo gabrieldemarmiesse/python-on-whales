@@ -22,12 +22,11 @@ class Image(ReloadableObject):
         self, client_config: ClientConfig, inspect_str: [str], is_id: bool = False
     ):
         super().__init__(client_config)
-        self._image_inspect_result: Optional[ImageInspectResult] = None
         if is_id:
             self.id = inspect_str
         else:
             self.reload(inspect_str)
-            self.id = self._image_inspect_result.Id
+            self.id = self._inspect_result.Id
 
     def __str__(self):
         return self.id
@@ -37,12 +36,11 @@ class Image(ReloadableObject):
             key = override or self.id
             json_str = run(self.docker_cmd + ["image", "inspect", key])
             json_obj = json.loads(json_str)[0]
-        self._image_inspect_result = ImageInspectResult.parse_obj(json_obj)
+        self._inspect_result = ImageInspectResult.parse_obj(json_obj)
 
     @property
     def repo_tags(self) -> List[str]:
-        self._reload_if_necessary()
-        return self._image_inspect_result.RepoTags
+        return self.get_inspect_result().RepoTags
 
 
 class ImageCLI(DockerCLICaller):
