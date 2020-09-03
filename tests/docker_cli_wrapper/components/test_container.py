@@ -1,6 +1,8 @@
 import time
+from datetime import datetime, timedelta, timezone
 
 from docker_cli_wrapper import DockerException, docker
+from docker_cli_wrapper.components.container import ContainerState
 from docker_cli_wrapper.test_utils import random_name
 
 
@@ -62,3 +64,41 @@ def test_rename():
 
     assert container.name == new_name
     docker.container.remove(container)
+
+
+json_state = """
+{
+    "Status": "running",
+    "Running": true,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 1462,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2020-09-02T20:14:54.3151689Z",
+    "FinishedAt": "2020-09-02T22:14:50.4625972+02:00"
+}
+"""
+
+
+def test_container_state():
+    a = ContainerState.parse_raw(json_state)
+
+    assert a.status == "running"
+    assert a.running == True
+    assert a.exit_code == 0
+    assert a.finished_at == datetime(
+        2020, 9, 2, 22, 14, 50, 462597, tzinfo=timezone(timedelta(hours=2))
+    )
+
+
+def test_restart():
+    cmd = ["sleep", "infinity"]
+    containers = [docker.run("busybox:1", cmd, detach=True) for _ in range(3)]
+    docker.kill(containers)
+
+    docker.restart(containers)
+    for container in containers:
+        assert container.state.running

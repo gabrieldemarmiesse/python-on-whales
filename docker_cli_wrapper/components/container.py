@@ -10,24 +10,45 @@ from docker_cli_wrapper.client_config import (
     DockerCLICaller,
     ReloadableObject,
 )
-from docker_cli_wrapper.utils import ValidPath, removeprefix, run, to_list
+from docker_cli_wrapper.utils import (
+    DockerCamelModel,
+    ValidPath,
+    removeprefix,
+    run,
+    to_list,
+)
 
 from .image import Image
 from .volume import VolumeDefinition
 
 
-class ContainerInspectResult(pydantic.BaseModel):
-    Id: str
-    Created: datetime
-    Image: str
-    Name: str
+class ContainerState(DockerCamelModel):
+    status: str
+    running: bool
+    paused: bool
+    restarting: bool
+    OOM_killed: bool
+    dead: bool
+    pid: int
+    exit_code: int
+    error: str
+    started_at: datetime
+    finished_at: datetime
+
+
+class ContainerInspectResult(DockerCamelModel):
+    id: str
+    created: datetime
+    image: str
+    name: str
+    state: ContainerState
 
 
 class Container(ReloadableObject):
     def __init__(self, client_config: ClientConfig, container_id: str):
         super().__init__(client_config)
         self.id = container_id
-        self._container_inspect_result = None
+        self._container_inspect_result: Optional[ContainerInspectResult] = None
 
     def __eq__(self, other):
         return self.id == other.id and self.client_config == other.client_config
@@ -43,7 +64,12 @@ class Container(ReloadableObject):
     @property
     def name(self):
         self._reload_if_necessary()
-        return removeprefix(self._container_inspect_result.Name, "/")
+        return removeprefix(self._container_inspect_result.name, "/")
+
+    @property
+    def state(self) -> ContainerState:
+        self._reload_if_necessary()
+        return self._container_inspect_result.state
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
@@ -206,4 +232,21 @@ class ContainerCLI(DockerCLICaller):
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
         full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
+        run(full_cmd)
+
+    def restart(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]],
+        time: Optional[Union[int, timedelta]] = None,
+    ):
+        full_cmd = self.docker_cmd + ["restart"]
+
+        if time is not None:
+            if isinstance(time, timedelta):
+                time = time.total_seconds()
+            full_cmd += ["--time", str(time)]
+
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
         run(full_cmd)

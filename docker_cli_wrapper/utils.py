@@ -4,6 +4,25 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
+import pydantic
+
+
+def title_if_necessary(string: str):
+    if string.isupper():
+        return string
+    else:
+        return string.title()
+
+
+def to_docker_camel(string):
+    return "".join(title_if_necessary(x) for x in string.split("_"))
+
+
+class DockerCamelModel(pydantic.BaseModel):
+    class Config:
+        alias_generator = to_docker_camel
+        allow_population_by_field_name = True
+
 
 class DockerException(Exception):
     def __init__(
