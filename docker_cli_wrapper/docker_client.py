@@ -41,15 +41,22 @@ class DockerClient:
         self.buildx = BuildxCLI(self._make_cli_cmd())
 
         # aliases
-        self.run = self.container.run
+        self.build = self.buildx.build
+        self.commit = self.container.commit
+        self.cp = self.container.cp
+        self.images = self.image.list
+        self.kill = self.container.kill
+        self.load = self.image.load
+        self.logs = self.container.logs
+        self.ps = self.container.list
         self.pull = self.image.pull
         self.push = self.image.push
+        self.rm = self.container.remove
+        self.rmi = self.image.remove
+        self.run = self.container.run
         self.save = self.image.save
-        self.load = self.image.load
-        self.build = self.buildx.build
-        self.images = self.image.list
-        self.logs = self.container.logs
-        self.cp = self.container.cp
+        self.stop = self.container.stop
+        self.tag = self.image.tag
 
     def _make_cli_cmd(self) -> List[str]:
         result = ["docker"]

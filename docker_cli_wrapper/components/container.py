@@ -6,6 +6,7 @@ from typeguard import typechecked
 
 from docker_cli_wrapper.utils import ValidPath, run, to_list
 
+from .image import Image
 from .volume import VolumeDefinition
 
 
@@ -98,11 +99,13 @@ class ContainerCLI:
         else:
             return run(full_cmd)
 
+    @typechecked
     def logs(self, container: Union[Container, str]) -> str:
         full_cmd = self._make_cli_cmd() + ["logs"]
 
         return run(full_cmd + [str(container)])
 
+    @typechecked
     def cp(
         self,
         source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
@@ -127,6 +130,7 @@ class ContainerCLI:
 
         run(full_cmd + [source, destination])
 
+    @typechecked
     def kill(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
@@ -142,12 +146,13 @@ class ContainerCLI:
 
         run(full_cmd)
 
+    @typechecked
     def stop(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
         time: Union[int, timedelta] = None,
     ):
-        full_cmd = self._make_cli_cmd() + ["kill"]
+        full_cmd = self._make_cli_cmd() + ["stop"]
         if isinstance(time, timedelta):
             time = time.total_seconds()
 
@@ -158,3 +163,28 @@ class ContainerCLI:
             full_cmd.append(str(container))
 
         run(full_cmd)
+
+    @typechecked
+    def commit(
+        self,
+        container: ValidContainer,
+        tag: Optional[str] = None,
+        author: Optional[str] = None,
+        message: Optional[str] = None,
+        pause: bool = True,
+    ):
+        full_cmd = self._make_cli_cmd() + ["commit"]
+
+        if author is not None:
+            full_cmd += ["--author", author]
+
+        if message is not None:
+            full_cmd += ["--message", message]
+
+        full_cmd += ["--pause", str(pause).lower()]
+
+        full_cmd.append(str(container))
+        if tag is not None:
+            full_cmd.append(tag)
+
+        return Image(self.docker_cmd, run(full_cmd), is_id=True)
