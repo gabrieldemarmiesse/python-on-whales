@@ -82,3 +82,11 @@ class DockerClient(DockerCLICaller):
             full_cmd.append(password)
 
         run(full_cmd, capture_stderr=False, capture_stdout=False)
+
+    def logout(self, server: Optional[str] = None):
+        full_cmd = self.docker_cmd + ["logout"]
+
+        if server is not None:
+            full_cmd.append(server)
+
+        run(full_cmd, capture_stdout=False, capture_stderr=False)
