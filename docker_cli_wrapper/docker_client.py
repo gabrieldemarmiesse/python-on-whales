@@ -55,6 +55,7 @@ class DockerClient(DockerCLICaller):
         self.load = self.image.load
         self.logs = self.container.logs
         self.pause = self.container.pause
+        self.port = self.container.port
         self.ps = self.container.list
         self.pull = self.image.pull
         self.push = self.image.push
