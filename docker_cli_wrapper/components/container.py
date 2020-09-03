@@ -250,3 +250,10 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(str(container))
 
         run(full_cmd)
+
+    def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
+        full_cmd = self.docker_cmd + ["pause"]
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
+        run(full_cmd)
