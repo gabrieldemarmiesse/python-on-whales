@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Union
 
 from typeguard import typechecked
 
+from docker_cli_wrapper.docker_command import DockerCommand
 from docker_cli_wrapper.utils import ValidPath, run, to_list
 
 
@@ -14,11 +15,8 @@ class Builder:
 
 
 class BuildxCLI:
-    def __init__(self, docker_cmd: List[str]):
+    def __init__(self, docker_cmd: DockerCommand):
         self.docker_cmd = docker_cmd
-
-    def _make_cli_cmd(self) -> List[str]:
-        return self.docker_cmd + ["buildx"]
 
     @typechecked
     def bake(
@@ -29,7 +27,7 @@ class BuildxCLI:
         pull: bool = False,
         push: bool = False,
     ) -> None:
-        full_cmd = self._make_cli_cmd() + ["bake"]
+        full_cmd = self.docker_cmd.as_list() + ["buildx", "bake"]
         if not cache:
             full_cmd.append("--no-cache")
         if load:
@@ -43,7 +41,7 @@ class BuildxCLI:
 
     @typechecked
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
-        full_cmd = self._make_cli_cmd() + ["create"]
+        full_cmd = self.docker_cmd.as_list() + ["buildx", "create"]
 
         if use:
             full_cmd.append("--use")
@@ -56,7 +54,7 @@ class BuildxCLI:
     def use(
         self, builder: Union[Builder, str], default: bool = False, global_: bool = False
     ):
-        full_cmd = self._make_cli_cmd() + ["use"]
+        full_cmd = self.docker_cmd.as_list() + ["buildx", "use"]
 
         if default:
             full_cmd.append("--use")
@@ -69,7 +67,7 @@ class BuildxCLI:
 
     @typechecked
     def remove(self, builder: Union[Builder, str]) -> str:
-        full_cmd = self._make_cli_cmd() + ["rm"]
+        full_cmd = self.docker_cmd.as_list() + ["buildx", "rm"]
 
         full_cmd.append(str(builder))
         return run(full_cmd)
@@ -88,7 +86,7 @@ class BuildxCLI:
         target: Optional[str] = None,
     ) -> None:
 
-        full_cmd = self._make_cli_cmd() + ["build"]
+        full_cmd = self.docker_cmd.as_list() + ["buildx", "build"]
 
         if progress != "auto":
             full_cmd += ["--progress", progress]

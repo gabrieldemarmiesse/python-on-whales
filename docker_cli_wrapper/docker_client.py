@@ -4,6 +4,7 @@ from docker_cli_wrapper.components.buildx import BuildxCLI
 from docker_cli_wrapper.components.container import ContainerCLI
 from docker_cli_wrapper.components.image import ImageCLI
 from docker_cli_wrapper.components.volume import VolumeCLI
+from docker_cli_wrapper.docker_command import DockerCommand
 
 from .utils import ValidPath
 
@@ -23,22 +24,24 @@ class DockerClient:
         tlsverify: Optional[bool] = None,
         version: bool = False,
     ):
-        self.config = config
-        self.context = context
-        self.debug = debug
-        self.host = host
-        self.log_level = log_level
-        self.tls = tls
-        self.tlscacert = tlscacert
-        self.tlscert = tlscert
-        self.tlskey = tlskey
-        self.tlsverify = tlsverify
-        self.version = version
+        self.docker_cmd = DockerCommand(
+            config=config,
+            context=context,
+            debug=debug,
+            host=host,
+            log_level=log_level,
+            tls=tls,
+            tlscacert=tlscacert,
+            tlscert=tlscert,
+            tlskey=tlskey,
+            tlsverify=tlsverify,
+            version=version,
+        )
 
-        self.volume = VolumeCLI(self._make_cli_cmd())
-        self.image = ImageCLI(self._make_cli_cmd())
-        self.container = ContainerCLI(self._make_cli_cmd())
-        self.buildx = BuildxCLI(self._make_cli_cmd())
+        self.volume = VolumeCLI(self.docker_cmd)
+        self.image = ImageCLI(self.docker_cmd)
+        self.container = ContainerCLI(self.docker_cmd)
+        self.buildx = BuildxCLI(self.docker_cmd)
 
         # aliases
         self.build = self.buildx.build
@@ -57,11 +60,3 @@ class DockerClient:
         self.save = self.image.save
         self.stop = self.container.stop
         self.tag = self.image.tag
-
-    def _make_cli_cmd(self) -> List[str]:
-        result = ["docker"]
-
-        if self.config is not None:
-            result += ["--config", self.config]
-
-        return result

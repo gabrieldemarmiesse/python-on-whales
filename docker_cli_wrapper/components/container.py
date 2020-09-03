@@ -4,6 +4,7 @@ from typing import Iterator, List, Optional, Tuple, Union
 
 from typeguard import typechecked
 
+from docker_cli_wrapper.docker_command import DockerCommand
 from docker_cli_wrapper.utils import ValidPath, run, to_list
 
 from .image import Image
@@ -26,15 +27,13 @@ ValidContainer = Union[Container, str]
 
 
 class ContainerCLI:
-    def __init__(self, docker_cmd: List[str]):
+    def __init__(self, docker_cmd: DockerCommand):
         self.docker_cmd = docker_cmd
-
-    def _make_cli_cmd(self) -> List[str]:
-        return self.docker_cmd + ["container"]
 
     @typechecked
     def list(self, all: bool = False) -> List[Container]:
-        full_cmd = self._make_cli_cmd() + ["list", "-q", "--no-trunc"]
+        full_cmd = self.docker_cmd.as_list()
+        full_cmd += ["container", "list", "-q", "--no-trunc"]
         if all:
             full_cmd.append("--all")
 
@@ -47,7 +46,7 @@ class ContainerCLI:
         force: bool = False,
         volumes=False,
     ) -> List[str]:
-        full_cmd = self._make_cli_cmd() + ["rm"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "rm"]
 
         if force:
             full_cmd.append("--force")
@@ -72,7 +71,7 @@ class ContainerCLI:
         runtime: Optional[str] = None,
         volumes: Optional[List[VolumeDefinition]] = [],
     ) -> Union[Container, str]:
-        full_cmd = self._make_cli_cmd() + ["run"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "run"]
 
         if remove:
             full_cmd.append("--rm")
@@ -101,7 +100,7 @@ class ContainerCLI:
 
     @typechecked
     def logs(self, container: Union[Container, str]) -> str:
-        full_cmd = self._make_cli_cmd() + ["logs"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "logs"]
 
         return run(full_cmd + [str(container)])
 
@@ -112,7 +111,7 @@ class ContainerCLI:
         destination: Union[None, ValidPath, ContainerPath],
     ):
         # TODO: tests and handling bytes streams.
-        full_cmd = self._make_cli_cmd() + ["cp"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "cp"]
 
         if isinstance(source, bytes) or inspect.isgenerator(source):
             source = "-"
@@ -136,7 +135,7 @@ class ContainerCLI:
         containers: Union[ValidContainer, List[ValidContainer]],
         signal: str = None,
     ):
-        full_cmd = self._make_cli_cmd() + ["kill"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "kill"]
 
         if signal is not None:
             full_cmd += ["--signal", signal]
@@ -152,7 +151,7 @@ class ContainerCLI:
         containers: Union[ValidContainer, List[ValidContainer]],
         time: Union[int, timedelta] = None,
     ):
-        full_cmd = self._make_cli_cmd() + ["stop"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "stop"]
         if isinstance(time, timedelta):
             time = time.total_seconds()
 
@@ -173,7 +172,7 @@ class ContainerCLI:
         message: Optional[str] = None,
         pause: bool = True,
     ):
-        full_cmd = self._make_cli_cmd() + ["commit"]
+        full_cmd = self.docker_cmd.as_list() + ["container", "commit"]
 
         if author is not None:
             full_cmd += ["--author", author]
