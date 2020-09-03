@@ -6,7 +6,7 @@ from docker_cli_wrapper.components.container import ContainerCLI
 from docker_cli_wrapper.components.image import ImageCLI
 from docker_cli_wrapper.components.volume import VolumeCLI
 
-from .utils import ValidPath
+from .utils import ValidPath, run
 
 
 class DockerClient(DockerCLICaller):
@@ -63,3 +63,22 @@ class DockerClient(DockerCLICaller):
         self.save = self.image.save
         self.stop = self.container.stop
         self.tag = self.image.tag
+
+    def login(
+        self,
+        server: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+    ):
+        full_cmd = self.docker_cmd + ["login"]
+
+        if username is not None:
+            full_cmd += ["--username", username]
+
+        if password is not None:
+            full_cmd += ["--password", password]
+
+        if server is not None:
+            full_cmd.append(password)
+
+        run(full_cmd, capture_stderr=False, capture_stdout=False)
