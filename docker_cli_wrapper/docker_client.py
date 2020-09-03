@@ -1,14 +1,15 @@
 from typing import List, Optional
 
+from docker_cli_wrapper.client_config import ClientConfig, DockerCLICaller
 from docker_cli_wrapper.components.buildx import BuildxCLI
 from docker_cli_wrapper.components.container import ContainerCLI
 from docker_cli_wrapper.components.image import ImageCLI
 from docker_cli_wrapper.components.volume import VolumeCLI
 
-from .utils import ValidPath
+from .utils import ValidPath, run
 
 
-class DockerClient:
+class DockerClient(DockerCLICaller):
     def __init__(
         self,
         config: Optional[ValidPath] = None,
@@ -21,24 +22,29 @@ class DockerClient:
         tlscert: Optional[ValidPath] = None,
         tlskey: Optional[ValidPath] = None,
         tlsverify: Optional[bool] = None,
-        version: bool = False,
+        version: Optional[bool] = False,
+        client_config: Optional[ClientConfig] = None,
     ):
-        self.config = config
-        self.context = context
-        self.debug = debug
-        self.host = host
-        self.log_level = log_level
-        self.tls = tls
-        self.tlscacert = tlscacert
-        self.tlscert = tlscert
-        self.tlskey = tlskey
-        self.tlsverify = tlsverify
-        self.version = version
+        if client_config is None:
+            client_config = ClientConfig(
+                config=config,
+                context=context,
+                debug=debug,
+                host=host,
+                log_level=log_level,
+                tls=tls,
+                tlscacert=tlscacert,
+                tlscert=tlscert,
+                tlskey=tlskey,
+                tlsverify=tlsverify,
+                version=version,
+            )
+        super().__init__(client_config)
 
-        self.volume = VolumeCLI(self._make_cli_cmd())
-        self.image = ImageCLI(self._make_cli_cmd())
-        self.container = ContainerCLI(self._make_cli_cmd())
-        self.buildx = BuildxCLI(self._make_cli_cmd())
+        self.volume = VolumeCLI(self.client_config)
+        self.image = ImageCLI(self.client_config)
+        self.container = ContainerCLI(self.client_config)
+        self.buildx = BuildxCLI(self.client_config)
 
         # aliases
         self.build = self.buildx.build
@@ -58,10 +64,21 @@ class DockerClient:
         self.stop = self.container.stop
         self.tag = self.image.tag
 
-    def _make_cli_cmd(self) -> List[str]:
-        result = ["docker"]
+    def login(
+        self,
+        server: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+    ):
+        full_cmd = self.docker_cmd + ["login"]
 
-        if self.config is not None:
-            result += ["--config", self.config]
+        if username is not None:
+            full_cmd += ["--username", username]
 
-        return result
+        if password is not None:
+            full_cmd += ["--password", password]
+
+        if server is not None:
+            full_cmd.append(password)
+
+        run(full_cmd, capture_stderr=False, capture_stdout=False)
