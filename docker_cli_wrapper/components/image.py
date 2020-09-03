@@ -6,7 +6,6 @@ from subprocess import PIPE, STDOUT, Popen
 from typing import Any, Dict, Iterator, List, Optional, Union
 
 import pydantic
-from typeguard import typechecked
 
 from docker_cli_wrapper.client_config import (
     ClientConfig,
@@ -51,7 +50,6 @@ class ImageCLI(DockerCLICaller):
         super().__init__(client_config)
         self.build = BuildxCLI(client_config).build
 
-    @typechecked
     def pull(self, image_name: str, quiet: bool = False) -> Image:
         full_cmd = self.docker_cmd + ["image", "pull"]
 
@@ -62,14 +60,12 @@ class ImageCLI(DockerCLICaller):
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
         return Image(self.client_config, image_name)
 
-    @typechecked
     def push(self, tag_or_repo: str, quiet: bool = False):
         full_cmd = self.docker_cmd + ["image", "push"]
 
         full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
-    @typechecked
     def save(
         self,
         images: Union[Image, str, List[Union[Image, str]]],
@@ -96,7 +92,6 @@ class ImageCLI(DockerCLICaller):
         if exit_code != 0:
             raise DockerException(full_cmd, exit_code, stderr=p.stderr.read())
 
-    @typechecked
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
     ):
@@ -126,7 +121,6 @@ class ImageCLI(DockerCLICaller):
         if exit_code != 0:
             raise DockerException(full_cmd, exit_code)
 
-    @typechecked
     def remove(self, x: Union[str, List[str]]) -> List[str]:
         full_cmd = self.docker_cmd + ["image", "remove"]
         if isinstance(x, str):

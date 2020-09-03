@@ -57,6 +57,7 @@ class DockerClient(DockerCLICaller):
         self.ps = self.container.list
         self.pull = self.image.pull
         self.push = self.image.push
+        self.rename = self.container.rename
         self.rm = self.container.remove
         self.rmi = self.image.remove
         self.run = self.container.run

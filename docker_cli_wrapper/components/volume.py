@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 import pydantic
-from typeguard import typechecked
 
 from docker_cli_wrapper.client_config import (
     ClientConfig,
@@ -34,7 +33,7 @@ class Volume(ReloadableObject):
     def __str__(self):
         return self.name
 
-    def reload(self):
+    def _reload(self):
         json_str = run(self.docker_cmd + ["volume", "inspect", self.name])
         json_obj = json.loads(json_str)[0]
         self._volume_inspect_result = VolumeInspectResult.parse_obj(json_obj)
@@ -86,7 +85,6 @@ class VolumeCLI(DockerCLICaller):
 
         return Volume(self.client_config, run(full_cmd))
 
-    @typechecked
     def remove(self, x: Union[VolumeArg, List[VolumeArg]]) -> List[str]:
         full_cmd = self.docker_cmd + ["volume", "remove"]
 
@@ -95,7 +93,6 @@ class VolumeCLI(DockerCLICaller):
 
         return run(full_cmd).split("\n")
 
-    @typechecked
     def prune(self, filters: Dict[str, str] = {}, force: bool = False):
         full_cmd = self.docker_cmd + ["volume", "prune"]
 
@@ -107,7 +104,6 @@ class VolumeCLI(DockerCLICaller):
 
         return run(full_cmd, capture_stderr=False, capture_stdout=False)
 
-    @typechecked
     def list(self, filters: Dict[str, str] = {}) -> List[Volume]:
         full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
 

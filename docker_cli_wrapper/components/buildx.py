@@ -1,7 +1,5 @@
 from typing import Dict, List, Optional, Union
 
-from typeguard import typechecked
-
 from docker_cli_wrapper.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -20,7 +18,6 @@ class Builder(ReloadableObject):
 
 
 class BuildxCLI(DockerCLICaller):
-    @typechecked
     def bake(
         self,
         targets: Union[str, List[str]],
@@ -41,7 +38,6 @@ class BuildxCLI(DockerCLICaller):
 
         run(full_cmd + to_list(targets), capture_stderr=False)
 
-    @typechecked
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
@@ -52,7 +48,6 @@ class BuildxCLI(DockerCLICaller):
             full_cmd.append(context_or_endpoint)
         return Builder(self.client_config, run(full_cmd))
 
-    @typechecked
     def use(
         self, builder: Union[Builder, str], default: bool = False, global_: bool = False
     ):
@@ -67,14 +62,12 @@ class BuildxCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    @typechecked
     def remove(self, builder: Union[Builder, str]) -> str:
         full_cmd = self.docker_cmd + ["buildx", "rm"]
 
         full_cmd.append(str(builder))
         return run(full_cmd)
 
-    @typechecked
     def build(
         self,
         context_path: ValidPath,

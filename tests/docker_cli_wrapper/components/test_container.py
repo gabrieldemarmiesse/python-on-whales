@@ -51,3 +51,14 @@ def test_simple_logs():
     time.sleep(0.3)
     output = docker.container.logs(container)
     assert output == "dodo"
+
+
+def test_rename():
+    name = random_name()
+    new_name = random_name()
+    assert name != new_name
+    container = docker.container.run("hello-world", name=name, detach=True)
+    docker.container.rename(container, new_name)
+
+    assert container.name == new_name
+    docker.container.remove(container)

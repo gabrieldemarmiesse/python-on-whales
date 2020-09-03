@@ -1,30 +1,49 @@
 import inspect
-from datetime import timedelta
+import json
+from datetime import datetime, timedelta
 from typing import Iterator, List, Optional, Tuple, Union
 
-from typeguard import typechecked
+import pydantic
 
 from docker_cli_wrapper.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObject,
 )
-from docker_cli_wrapper.utils import ValidPath, run, to_list
+from docker_cli_wrapper.utils import ValidPath, removeprefix, run, to_list
 
 from .image import Image
 from .volume import VolumeDefinition
+
+
+class ContainerInspectResult(pydantic.BaseModel):
+    Id: str
+    Created: datetime
+    Image: str
+    Name: str
 
 
 class Container(ReloadableObject):
     def __init__(self, client_config: ClientConfig, container_id: str):
         super().__init__(client_config)
         self.id = container_id
+        self._container_inspect_result = None
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.id == other.id and self.client_config == other.client_config
 
     def __str__(self):
         return self.id
+
+    def _reload(self):
+        json_str = run(self.docker_cmd + ["container", "inspect", self.id])
+        json_obj = json.loads(json_str)[0]
+        self._container_inspect_result = ContainerInspectResult.parse_obj(json_obj)
+
+    @property
+    def name(self):
+        self._reload_if_necessary()
+        return removeprefix(self._container_inspect_result.Name, "/")
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
@@ -32,7 +51,6 @@ ValidContainer = Union[Container, str]
 
 
 class ContainerCLI(DockerCLICaller):
-    @typechecked
     def list(self, all: bool = False) -> List[Container]:
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
@@ -41,7 +59,6 @@ class ContainerCLI(DockerCLICaller):
 
         return [Container(self.client_config, x) for x in run(full_cmd).splitlines()]
 
-    @typechecked
     def remove(
         self,
         containers: Union[Container, str, List[Union[Container, str]]],
@@ -60,12 +77,12 @@ class ContainerCLI(DockerCLICaller):
 
         return run(full_cmd).splitlines()
 
-    @typechecked
     def run(
         self,
         image: str,
         command: Optional[List[str]] = None,
         *,
+        name: Optional[str] = None,
         detach: bool = False,
         remove: bool = False,
         cpus: Optional[float] = None,
@@ -79,6 +96,8 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append("--rm")
         if detach:
             full_cmd.append("--detach")
+        if name is not None:
+            full_cmd += ["--name", name]
 
         if cpus is not None:
             full_cmd += ["--cpus", str(cpus)]
@@ -100,13 +119,11 @@ class ContainerCLI(DockerCLICaller):
         else:
             return run(full_cmd)
 
-    @typechecked
     def logs(self, container: Union[Container, str]) -> str:
         full_cmd = self.docker_cmd + ["container", "logs"]
 
         return run(full_cmd + [str(container)])
 
-    @typechecked
     def cp(
         self,
         source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
@@ -131,7 +148,6 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd + [source, destination])
 
-    @typechecked
     def kill(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
@@ -147,7 +163,6 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    @typechecked
     def stop(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
@@ -165,7 +180,6 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    @typechecked
     def commit(
         self,
         container: ValidContainer,
@@ -189,3 +203,7 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(tag)
 
         return Image(self.client_config, run(full_cmd), is_id=True)
+
+    def rename(self, container: ValidContainer, new_name: str) -> None:
+        full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
+        run(full_cmd)
