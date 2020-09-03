@@ -41,10 +41,10 @@ class DockerClient(DockerCLICaller):
             )
         super().__init__(client_config)
 
-        self.volume = VolumeCLI(self.docker_cmd)
-        self.image = ImageCLI(self.docker_cmd)
-        self.container = ContainerCLI(self.docker_cmd)
-        self.buildx = BuildxCLI(self.docker_cmd)
+        self.volume = VolumeCLI(self.client_config)
+        self.image = ImageCLI(self.client_config)
+        self.container = ContainerCLI(self.client_config)
+        self.buildx = BuildxCLI(self.client_config)
 
         # aliases
         self.build = self.buildx.build

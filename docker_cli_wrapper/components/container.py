@@ -96,7 +96,7 @@ class ContainerCLI(DockerCLICaller):
             full_cmd += command
 
         if detach:
-            return Container(run(full_cmd))
+            return Container(self.client_config, run(full_cmd))
         else:
             return run(full_cmd)
 

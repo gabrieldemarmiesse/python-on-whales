@@ -50,7 +50,7 @@ class BuildxCLI(DockerCLICaller):
 
         if context_or_endpoint is not None:
             full_cmd.append(context_or_endpoint)
-        return Builder(run(full_cmd))
+        return Builder(self.client_config, run(full_cmd))
 
     @typechecked
     def use(
