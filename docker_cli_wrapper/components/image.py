@@ -221,7 +221,7 @@ class ImageInspectResult(pydantic.BaseModel):
 
 
 def bulk_reload(image_list: List[Image]):
-    assert len(set(tuple(x.docker_cmd) for x in image_list)) == 1
+    assert len(set(x.docker_cmd for x in image_list)) == 1
     all_ids = [x.id for x in image_list]
     full_cmd = image_list[0].docker_cmd.as_list() + ["image", "inspect"] + all_ids
     json_str = run(full_cmd)
