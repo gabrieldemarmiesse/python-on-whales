@@ -47,7 +47,6 @@ class ContainerInspectResult(DockerCamelModel):
 class Container(ReloadableObject):
     def __init__(self, client_config: ClientConfig, container_id: str):
         super().__init__(client_config)
-        self.id = container_id
 
     def __eq__(self, other):
         return self.id == other.id and self.client_config == other.client_config
@@ -55,18 +54,18 @@ class Container(ReloadableObject):
     def __str__(self):
         return self.id
 
-    def _reload(self):
-        json_str = run(self.docker_cmd + ["container", "inspect", self.id])
+    def fetch_and_parse_inspect_result(self, reference: str):
+        json_str = run(self.docker_cmd + ["container", "inspect", reference])
         json_obj = json.loads(json_str)[0]
-        self.set_inspect_result(ContainerInspectResult.parse_obj(json_obj))
+        return ContainerInspectResult.parse_obj(json_obj)
 
     @property
     def name(self):
-        return removeprefix(self.get_inspect_result().name, "/")
+        return removeprefix(self._get_inspect_result().name, "/")
 
     @property
     def state(self) -> ContainerState:
-        return self.get_inspect_result().state
+        return self._get_inspect_result().state
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]

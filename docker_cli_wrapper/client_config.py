@@ -46,15 +46,15 @@ class ReloadableObject(DockerCLICaller):
         client_config: ClientConfig,
         id_in_inspect: str,
         reference_or_id: str,
-        is_id: bool = False,
+        is_immutable_id: bool = False,
     ):
         super().__init__(client_config)
         self._last_refreshed_time = datetime.min
         self._inspect_result = None
-        self._id = None
+        self._immutable_id = None
         self._reference = None
-        if is_id:
-            self._id = reference_or_id
+        if is_immutable_id:
+            self._immutable_id = reference_or_id
         else:
             self._reference = reference_or_id
         self._id_in_inspect = id_in_inspect
@@ -63,17 +63,18 @@ class ReloadableObject(DockerCLICaller):
         return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
 
     def reload(self):
-        if self._id is not None:
-            self._set_inspect_result(self.stuff(self._id))
+        if self._immutable_id is not None:
+            self._set_inspect_result(
+                self.fetch_and_parse_inspect_result(self._immutable_id)
+            )
         else:
-            self._set_inspect_result(self.stuff(self._reference))
-            self._id = getattr(self._inspect_result, self._id_in_inspect)
+            self._set_inspect_result(
+                self.fetch_and_parse_inspect_result(self._reference)
+            )
+            self._immutable_id = getattr(self._inspect_result, self._id_in_inspect)
 
-    def stuff(self, reference: str):
-        # to implement
-        json_str = run(self.docker_cmd + ["container", "inspect", reference])
-        json_obj = json.loads(json_str)[0]
-        return xxxxxx.parse_obj(json_obj)
+    def fetch_and_parse_inspect_result(self, reference: str):
+        raise NotImplementedError
 
     def _get_inspect_result(self):
         if self._needs_reload():
