@@ -30,4 +30,7 @@ jobs:
         pip install -r tests/test-requirements.txt
         pip install -e .
     - name: Run all tests
-      run: pytest -v ./tests
+      run: |
+        eval "$(docker-machine env default)"
+        docker run hello-world
+        pytest -v ./tests
