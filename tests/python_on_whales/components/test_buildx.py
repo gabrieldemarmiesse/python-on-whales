@@ -1,7 +1,7 @@
 import pytest
 
-from docker_cli_wrapper import DockerException, docker
-from docker_cli_wrapper.components.buildx import BuilderInspectResult
+from python_on_whales import DockerException, docker
+from python_on_whales.components.buildx import BuilderInspectResult
 
 dockerfile_content1 = """
 FROM busybox

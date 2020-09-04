@@ -7,12 +7,12 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 
 import pydantic
 
-from docker_cli_wrapper.client_config import (
+from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from docker_cli_wrapper.utils import DockerException, ValidPath, run, to_list
+from python_on_whales.utils import DockerException, ValidPath, run, to_list
 
 from .buildx import BuildxCLI
 

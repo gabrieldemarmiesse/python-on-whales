@@ -3,12 +3,12 @@ import json
 from datetime import datetime, timedelta
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
-from docker_cli_wrapper.client_config import (
+from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from docker_cli_wrapper.utils import (
+from python_on_whales.utils import (
     DockerCamelModel,
     ValidPath,
     removeprefix,
