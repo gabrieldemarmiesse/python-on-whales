@@ -22,7 +22,6 @@ class DockerClient(DockerCLICaller):
         tlscert: Optional[ValidPath] = None,
         tlskey: Optional[ValidPath] = None,
         tlsverify: Optional[bool] = None,
-        version: Optional[bool] = False,
         client_config: Optional[ClientConfig] = None,
     ):
         if client_config is None:
@@ -37,7 +36,6 @@ class DockerClient(DockerCLICaller):
                 tlscert=tlscert,
                 tlskey=tlskey,
                 tlsverify=tlsverify,
-                version=version,
             )
         super().__init__(client_config)
 

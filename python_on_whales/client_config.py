@@ -19,7 +19,6 @@ class ClientConfig:
     tlscert: Optional[ValidPath] = None
     tlskey: Optional[ValidPath] = None
     tlsverify: Optional[bool] = None
-    version: bool = False
 
     @property
     def docker_cmd(self) -> List[str]:
@@ -27,6 +26,33 @@ class ClientConfig:
 
         if self.config is not None:
             result += ["--config", self.config]
+
+        if self.context is not None:
+            result += ["--context", self.context]
+
+        if self.debug:
+            result.append("--debug")
+
+        if self.host is not None:
+            result += ["--host", self.host]
+
+        if self.log_level is not None:
+            result += ["--log-level", self.log_level]
+
+        if self.tls:
+            result.append("--tls")
+
+        if self.tlscacert is not None:
+            result += ["--tlscacert", self.tlscacert]
+
+        if self.tlscert is not None:
+            result += ["--tlscert", self.tlscert]
+
+        if self.tlskey is not None:
+            result += ["--tlskey", self.tlskey]
+
+        if self.tlsverify:
+            result.append("--tlsverify")
 
         return result
 
