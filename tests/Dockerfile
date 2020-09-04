@@ -24,7 +24,7 @@ RUN docker --help
 COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/
 RUN docker buildx build --help
 
-WORKDIR /docker-cli-wrapper
+WORKDIR /python-on-whales
 COPY . .
 
 RUN pip install -e .

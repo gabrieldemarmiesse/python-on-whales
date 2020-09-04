@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 DOCKER_VERSION = "19.03.12"
 
-CACHE_DIR = Path.home() / ".cache" / "docker-cli-wrapper"
+CACHE_DIR = Path.home() / ".cache" / "python-on-whales"
 
 TEMPLATE = "https://download.docker.com/{os}/static/stable/{arch}/docker-{version}.tgz"
 DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
@@ -53,7 +53,7 @@ def get_user_os():
         return "mac"
     elif user_os == "Windows":
         raise NotImplementedError(
-            "docker-cli-wrapper cannot automatically download the Docker CLI binary "
+            "python-on-whales cannot automatically download the Docker CLI binary "
             "file because there is no binary available for Windows at "
             "https://download.docker.com/ . \n"
             "Please install Docker Desktop for Windows. "
@@ -65,8 +65,8 @@ def get_user_os():
             f"Unknown OS: {user_os}, cannot determine which Docker CLI binary file to "
             f"download. \n"
             f"Please open an issue at \n"
-            f"https://github.com/gabrieldemarmiesse/docker-cli-wrapper/issues \n"
-            f"and in the meantime, install Docker manually to make docker-cli-wrapper "
+            f"https://github.com/gabrieldemarmiesse/python-on-whales/issues \n"
+            f"and in the meantime, install Docker manually to make python-on-whales "
             f"work."
         )
 
@@ -93,7 +93,7 @@ def get_arch():
             f"The architecture detected on your system is `{arch}`, the list of "
             f"available architectures is {list(arch_mapping.values())}. \n"
             f"Please open an issue at \n"
-            f"https://github.com/gabrieldemarmiesse/docker-cli-wrapper/issues "
+            f"https://github.com/gabrieldemarmiesse/python-on-whales/issues "
             f"and make sure to copy past this error message. \n"
             f"In the meantime, install Docker manually on your system."
         )
