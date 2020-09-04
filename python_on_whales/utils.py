@@ -2,7 +2,7 @@ import json
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 
@@ -55,12 +55,13 @@ class DockerException(Exception):
 
 
 def run(
-    args: List[str],
+    args: List[Any],
     capture_stdout: bool = True,
     capture_stderr: bool = True,
     env: Optional[Dict[str, str]] = None,
     input: bytes = None,
 ) -> Optional[str]:
+    args = [str(x) for x in args]
     if capture_stdout:
         stdout_dest = subprocess.PIPE
     else:
