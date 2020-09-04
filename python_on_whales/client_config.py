@@ -1,12 +1,16 @@
 import json
+import shutil
+import warnings
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+from python_on_whales.download_binaries import download_docker_cli
+
 from .utils import ValidPath, run
 
 
-@dataclass(frozen=True)
+@dataclass
 class ClientConfig:
 
     config: Optional[ValidPath] = None
@@ -19,10 +23,34 @@ class ClientConfig:
     tlscert: Optional[ValidPath] = None
     tlskey: Optional[ValidPath] = None
     tlsverify: Optional[bool] = None
+    client_binary_path: Optional[ValidPath] = None
+
+    def get_docker_path(self) -> ValidPath:
+        if self.client_binary_path is None:
+            docker_sys = shutil.which("docker")
+            if docker_sys is not None:
+                self.client_binary_path = docker_sys
+            else:
+                warnings.warn(
+                    "The docker client binary was not found on your system. Docker on "
+                    "whales will try to download it for you. (don't worry, it "
+                    "won't be in the PATH and won't have anything to do with "
+                    "the package manager of your system). \n"
+                    "Note: We are not installing the docker daemon, which is a lot "
+                    "heavier and harder to install. We're just downloading a single "
+                    "standalone binary file for the client.\n"
+                    "If you want to trigger the download of the client binary file "
+                    "manually (for example if you want to do it in a Dockerfile), "
+                    "you can run the following command:\n "
+                    "$ docker-on-whales download-cli \n"
+                )
+                self.client_binary_path = download_docker_cli()
+        return self.client_binary_path
 
     @property
     def docker_cmd(self) -> List[str]:
-        result = ["docker"]
+
+        result = [self.get_docker_path()]
 
         if self.config is not None:
             result += ["--config", self.config]

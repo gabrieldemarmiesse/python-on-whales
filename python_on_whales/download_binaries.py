@@ -1,6 +1,7 @@
 import platform
 import shutil
 import tempfile
+import warnings
 from pathlib import Path
 
 import requests
@@ -14,7 +15,7 @@ TEMPLATE = "https://download.docker.com/{os}/static/stable/{arch}/docker-{versio
 DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 
 
-def download_docker_cli():
+def download_docker_cli() -> Path:
     user_os = get_user_os()
     arch = get_arch()
     file_to_download = TEMPLATE.format(os=user_os, arch=arch, version=DOCKER_VERSION)
@@ -28,6 +29,14 @@ def download_docker_cli():
 
         DOCKER_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
         shutil.move(extract_dir / "docker" / "docker", DOCKER_BINARY_PATH)
+
+    warnings.warn(
+        f"The docker client binary file {DOCKER_VERSION} was downloaded and put "
+        f"in `{DOCKER_BINARY_PATH.absolute()}`. \n"
+        f"You can feel free to remove it if you wish, Python on whales will download "
+        f"it again if needed."
+    )
+    return DOCKER_BINARY_PATH
 
 
 def download_from_url(url, dst):
