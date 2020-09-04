@@ -73,6 +73,10 @@ class Container(ReloadableObject):
     def state(self) -> ContainerState:
         return self._get_inspect_result().state
 
+    @property
+    def image(self) -> Image:
+        return Image(self.client_config, ...)
+
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
 ValidContainer = Union[Container, str]
