@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from python_on_whales.download_binaries import download_docker_cli
+from python_on_whales.download_binaries import DOCKER_BINARY_PATH, download_docker_cli
 
 from .utils import ValidPath, run
 
@@ -30,6 +30,8 @@ class ClientConfig:
             docker_sys = shutil.which("docker")
             if docker_sys is not None:
                 self.client_binary_path = docker_sys
+            elif DOCKER_BINARY_PATH.exists():
+                self.client_binary_path = DOCKER_BINARY_PATH
             else:
                 warnings.warn(
                     "The docker client binary file was not found on your system. \n"
@@ -45,7 +47,8 @@ class ClientConfig:
                     "you can run the following command:\n "
                     "$ docker-on-whales download-cli \n"
                 )
-                self.client_binary_path = download_docker_cli()
+                download_docker_cli()
+                self.client_binary_path = DOCKER_BINARY_PATH
         return self.client_binary_path
 
     @property

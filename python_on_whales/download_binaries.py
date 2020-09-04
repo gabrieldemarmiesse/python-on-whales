@@ -17,7 +17,7 @@ DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 # TODO: windows too with https://github.com/StefanScherer/docker-cli-builder/releases/download/19.03.12/docker.exe
 
 
-def download_docker_cli() -> Path:
+def download_docker_cli():
     user_os = get_user_os()
     arch = get_arch()
     file_to_download = TEMPLATE.format(os=user_os, arch=arch, version=DOCKER_VERSION)
@@ -38,7 +38,6 @@ def download_docker_cli() -> Path:
         f"You can feel free to remove it if you wish, Python on whales will download "
         f"it again if needed."
     )
-    return DOCKER_BINARY_PATH
 
 
 def download_from_url(url, dst):
