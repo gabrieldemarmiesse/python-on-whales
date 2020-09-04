@@ -29,19 +29,11 @@ class Volume(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "Name", reference, is_immutable_id)
 
-    def __str__(self):
-        return self.name
-
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["volume", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
         return VolumeInspectResult.parse_obj(json_object)
-
-    def __eq__(self, other):
-        if not isinstance(other, Volume):
-            raise TypeError(f"Cannot compare a docker volume with {type(other)}.")
-        return self.name == other.name and self.docker_cmd == other.docker_cmd
 
     @property
     def name(self) -> str:

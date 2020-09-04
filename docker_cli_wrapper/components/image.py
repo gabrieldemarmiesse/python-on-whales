@@ -83,9 +83,6 @@ class Image(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "Id", reference, is_immutable_id)
 
-    def __str__(self):
-        return self.id
-
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["image", "inspect", reference])
 
