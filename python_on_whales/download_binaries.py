@@ -14,6 +14,8 @@ CACHE_DIR = Path.home() / ".cache" / "python-on-whales"
 TEMPLATE = "https://download.docker.com/{os}/static/stable/{arch}/docker-{version}.tgz"
 DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 
+# TODO: windows too with https://github.com/StefanScherer/docker-cli-builder/releases/download/19.03.12/docker.exe
+
 
 def download_docker_cli() -> Path:
     user_os = get_user_os()
