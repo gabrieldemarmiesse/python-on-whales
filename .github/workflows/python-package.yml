@@ -3,10 +3,35 @@ name: Run tests
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-linux:
 
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Run all tests
       run: bash tests/run_tests.sh
+
+#  cost too much at the moment.
+#  build-macos:
+#    runs-on: macos-latest
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Install docker
+#      run: |
+#        mkdir -p ~/.docker/machine/cache
+#        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
+#        brew install docker docker-machine
+#        docker-machine create --driver virtualbox default
+#        docker-machine env default
+#    - uses: actions/setup-python@v2
+#      with:
+#        python-version: 3.7
+#    - name: prepare
+#      run: |
+#        pip install -r tests/test-requirements.txt
+#        pip install -e .
+#    - name: Run all tests
+#      run: |
+#        eval "$(docker-machine env default)"
+#        docker run hello-world
+#        pytest -v ./tests
