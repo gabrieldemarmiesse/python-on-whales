@@ -1,17 +1,10 @@
-FROM busybox as get_docker
-
-WORKDIR /
-RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-19.03.9.tgz -O /docker.tgz
-RUN tar zxvf /docker.tgz
-
-#-----------------------------------------------------------------------------
 FROM busybox as get_buildx
 
 RUN wget -O /docker-buildx https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-amd64
 RUN chmod a+x /docker-buildx
 
 #-----------------------------------------------------------------------------
-FROM python:3.7
+FROM python:3.7 as all_dependencies_except_cli
 
 RUN pip install typeguard pydantic requests tqdm
 
@@ -19,11 +12,21 @@ COPY tests/test-requirements.txt /tmp/
 COPY requirements.txt /tmp/
 RUN pip install -r /tmp/test-requirements.txt -r /tmp/requirements.txt
 
-COPY --from=get_docker /docker/docker /usr/bin/docker
-RUN docker --help
 COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/
-RUN docker buildx build --help
 
+#-----------------------------------------------------------------------------
+FROM all_dependencies_except_cli as tests_with_cli
+COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
+WORKDIR /python-on-whales
+COPY . .
+
+RUN pip install -e .
+
+CMD pytest -v --durations=10 ./tests
+
+
+#-----------------------------------------------------------------------------
+FROM all_dependencies_except_cli as tests_without_cli
 WORKDIR /python-on-whales
 COPY . .
 
