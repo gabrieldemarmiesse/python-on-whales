@@ -32,10 +32,11 @@ class ClientConfig:
                 self.client_binary_path = docker_sys
             else:
                 warnings.warn(
-                    "The docker client binary was not found on your system. Docker on "
-                    "whales will try to download it for you. (don't worry, it "
+                    "The docker client binary file was not found on your system. \n"
+                    "Docker on whales will try to download it for you. \n"
+                    "Don't worry, it "
                     "won't be in the PATH and won't have anything to do with "
-                    "the package manager of your system). \n"
+                    "the package manager of your system. \n"
                     "Note: We are not installing the docker daemon, which is a lot "
                     "heavier and harder to install. We're just downloading a single "
                     "standalone binary file for the client.\n"
