@@ -65,15 +65,15 @@ class ReloadableObject(DockerCLICaller):
     def reload(self):
         if self._immutable_id is not None:
             self._set_inspect_result(
-                self.fetch_and_parse_inspect_result(self._immutable_id)
+                self._fetch_and_parse_inspect_result(self._immutable_id)
             )
         else:
             self._set_inspect_result(
-                self.fetch_and_parse_inspect_result(self._reference)
+                self._fetch_and_parse_inspect_result(self._reference)
             )
             self._immutable_id = getattr(self._inspect_result, self._id_in_inspect)
 
-    def fetch_and_parse_inspect_result(self, reference: str):
+    def _fetch_and_parse_inspect_result(self, reference: str):
         raise NotImplementedError
 
     def _get_inspect_result(self):
@@ -84,3 +84,8 @@ class ReloadableObject(DockerCLICaller):
     def _set_inspect_result(self, inspect_result):
         self._inspect_result = inspect_result
         self._last_refreshed_time = datetime.now()
+
+    def _get_immutable_id(self):
+        if self._immutable_id is None:
+            self.reload()
+        return self._immutable_id

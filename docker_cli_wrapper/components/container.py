@@ -45,8 +45,10 @@ class ContainerInspectResult(DockerCamelModel):
 
 
 class Container(ReloadableObject):
-    def __init__(self, client_config: ClientConfig, container_id: str):
-        super().__init__(client_config)
+    def __init__(
+        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+    ):
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def __eq__(self, other):
         return self.id == other.id and self.client_config == other.client_config
@@ -54,10 +56,14 @@ class Container(ReloadableObject):
     def __str__(self):
         return self.id
 
-    def fetch_and_parse_inspect_result(self, reference: str):
+    def _fetch_and_parse_inspect_result(self, reference: str):
         json_str = run(self.docker_cmd + ["container", "inspect", reference])
         json_obj = json.loads(json_str)[0]
         return ContainerInspectResult.parse_obj(json_obj)
+
+    @property
+    def id(self):
+        return self._get_immutable_id()
 
     @property
     def name(self):
