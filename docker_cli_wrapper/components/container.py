@@ -58,7 +58,7 @@ class Container(ReloadableObject):
     def _reload(self):
         json_str = run(self.docker_cmd + ["container", "inspect", self.id])
         json_obj = json.loads(json_str)[0]
-        self._inspect_result = ContainerInspectResult.parse_obj(json_obj)
+        self.set_inspect_result(ContainerInspectResult.parse_obj(json_obj))
 
     @property
     def name(self):
