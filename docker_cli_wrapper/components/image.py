@@ -10,37 +10,95 @@ import pydantic
 from docker_cli_wrapper.client_config import (
     ClientConfig,
     DockerCLICaller,
-    ReloadableObject,
+    ReloadableObjectFromJson,
 )
 from docker_cli_wrapper.utils import DockerException, ValidPath, run, to_list
 
 from .buildx import BuildxCLI
 
 
-class Image(ReloadableObject):
+class ContainerConfigClass(pydantic.BaseModel):
+    Hostname: str
+    Domainname: str
+    User: str
+    AttachStdin: bool
+    AttachStdout: bool
+    AttachStderr: bool
+    Tty: bool
+    OpenStdin: bool
+    StdinOnce: bool
+    Env: Optional[List[str]]
+    Cmd: Optional[List[str]]
+    Image: str
+    Volume: Optional[List[str]]
+    WorkingDir: Path
+    Entrypoint: Optional[List[str]]
+    OnBuild: Optional[List[str]]
+    Labels: Optional[Dict[str, str]]
+
+
+class ImageConfigClass(pydantic.BaseModel):
+    Hostname: str
+    Domainname: str
+    User: str
+    AttachStdin: bool
+    AttachStdout: bool
+    AttachStderr: bool
+    Tty: bool
+    OpenStdin: bool
+    StdinOnce: bool
+    Env: List[str]
+    Cmd: List[str]
+    Image: str
+    Volume: Optional[List[str]]
+    WorkingDir: Path
+    Entrypoint: List[str]
+    OnBuild: List[str]
+    Labels: Optional[List[str]]
+
+
+class ImageInspectResult(pydantic.BaseModel):
+    Id: str
+    RepoTags: List[str]
+    RepoDigests: List[str]
+    Parent: str
+    Comment: str
+    Created: datetime
+    Container: str
+    ContainerConfig: ContainerConfigClass
+    DockerVersion: str
+    Author: str
+    Architecture: str
+    Os: str
+    Size: int
+    VirtualSize: int
+    GraphDriver: Dict[str, Any]
+    RootFS: Dict[str, Any]
+    Metadata: Dict[str, str]
+
+
+class Image(ReloadableObjectFromJson):
     def __init__(
-        self, client_config: ClientConfig, inspect_str: [str], is_id: bool = False
+        self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config)
-        if is_id:
-            self.id = inspect_str
-        else:
-            self.reload(inspect_str)
-            self.id = self._inspect_result.Id
+        super().__init__(client_config, "Id", reference, is_immutable_id)
 
     def __str__(self):
         return self.id
 
-    def _reload(self, override: str = None, json_obj: dict = None):
-        if json_obj is None:
-            key = override or self.id
-            json_str = run(self.docker_cmd + ["image", "inspect", key])
-            json_obj = json.loads(json_str)[0]
-        self._inspect_result = ImageInspectResult.parse_obj(json_obj)
+    def _fetch_inspect_result_json(self, reference):
+        return run(self.docker_cmd + ["image", "inspect", reference])
+
+    def _parse_json_object(self, json_object: Dict[str, Any]) -> ImageInspectResult:
+        return ImageInspectResult.parse_obj(json_object)
+
+    @property
+    def id(self) -> str:
+        return self._get_immutable_id()
 
     @property
     def repo_tags(self) -> List[str]:
-        return self.get_inspect_result().RepoTags
+        return self._get_inspect_result().RepoTags
 
 
 class ImageCLI(DockerCLICaller):
@@ -135,9 +193,12 @@ class ImageCLI(DockerCLICaller):
             "--quiet",
             "--no-trunc",
         ]
-        return [
-            Image(self.client_config, x, is_id=True) for x in run(full_cmd).splitlines()
-        ]
+
+        ids = run(full_cmd).splitlines()
+        # the list of tags is bigger than the number of images. We uniquify
+        ids = set(ids)
+
+        return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
         full_cmd = self.docker_cmd + [
@@ -147,72 +208,3 @@ class ImageCLI(DockerCLICaller):
             new_tag,
         ]
         run(full_cmd)
-
-
-class ContainerConfigClass(pydantic.BaseModel):
-    Hostname: str
-    Domainname: str
-    User: str
-    AttachStdin: bool
-    AttachStdout: bool
-    AttachStderr: bool
-    Tty: bool
-    OpenStdin: bool
-    StdinOnce: bool
-    Env: Optional[List[str]]
-    Cmd: Optional[List[str]]
-    Image: str
-    Volume: Optional[List[str]]
-    WorkingDir: Path
-    Entrypoint: Optional[List[str]]
-    OnBuild: Optional[List[str]]
-    Labels: Optional[Dict[str, str]]
-
-
-class ImageConfigClass(pydantic.BaseModel):
-    Hostname: str
-    Domainname: str
-    User: str
-    AttachStdin: bool
-    AttachStdout: bool
-    AttachStderr: bool
-    Tty: bool
-    OpenStdin: bool
-    StdinOnce: bool
-    Env: List[str]
-    Cmd: List[str]
-    Image: str
-    Volume: Optional[List[str]]
-    WorkingDir: Path
-    Entrypoint: List[str]
-    OnBuild: List[str]
-    Labels: Optional[List[str]]
-
-
-class ImageInspectResult(pydantic.BaseModel):
-    Id: str
-    RepoTags: List[str]
-    RepoDigests: List[str]
-    Parent: str
-    Comment: str
-    Created: datetime
-    Container: str
-    ContainerConfig: ContainerConfigClass
-    DockerVersion: str
-    Author: str
-    Architecture: str
-    Os: str
-    Size: int
-    VirtualSize: int
-    GraphDriver: Dict[str, Any]
-    RootFS: Dict[str, Any]
-    Metadata: Dict[str, str]
-
-
-def bulk_reload(image_list: List[Image]):
-    assert len(set(x.client_config for x in image_list)) == 1
-    all_ids = [x.id for x in image_list]
-    full_cmd = image_list[0].docker_cmd + ["image", "inspect"] + all_ids
-    json_str = run(full_cmd)
-    for json_obj, image in zip(json.loads(json_str), image_list):
-        image.reload(json_obj=json_obj)

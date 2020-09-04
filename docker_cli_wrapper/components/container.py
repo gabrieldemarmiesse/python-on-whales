@@ -1,14 +1,12 @@
 import inspect
 import json
 from datetime import datetime, timedelta
-from typing import Iterator, List, Optional, Tuple, Union
-
-import pydantic
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from docker_cli_wrapper.client_config import (
     ClientConfig,
     DockerCLICaller,
-    ReloadableObject,
+    ReloadableObjectFromJson,
 )
 from docker_cli_wrapper.utils import (
     DockerCamelModel,
@@ -44,7 +42,7 @@ class ContainerInspectResult(DockerCamelModel):
     state: ContainerState
 
 
-class Container(ReloadableObject):
+class Container(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
@@ -56,10 +54,11 @@ class Container(ReloadableObject):
     def __str__(self):
         return self.id
 
-    def _fetch_and_parse_inspect_result(self, reference: str):
-        json_str = run(self.docker_cmd + ["container", "inspect", reference])
-        json_obj = json.loads(json_str)[0]
-        return ContainerInspectResult.parse_obj(json_obj)
+    def _fetch_inspect_result_json(self, reference):
+        return run(self.docker_cmd + ["container", "inspect", reference])
+
+    def _parse_json_object(self, json_object: Dict[str, Any]):
+        return ContainerInspectResult.parse_obj(json_object)
 
     @property
     def id(self):

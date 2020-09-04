@@ -1,6 +1,7 @@
 import pytest
 
 from docker_cli_wrapper import DockerException, docker
+from docker_cli_wrapper.components.buildx import BuilderInspectResult
 
 dockerfile_content1 = """
 FROM busybox
@@ -40,3 +41,21 @@ def test_buildx_create_remove():
     builder = docker.buildx.create()
 
     docker.buildx.remove(builder)
+
+
+some_builder_info = """
+Name:   blissful_swartz
+Driver: docker-container
+
+Nodes:
+Name:      blissful_swartz0
+Endpoint:  unix:///var/run/docker.sock
+Status:    inactive
+Platforms:
+"""
+
+
+def test_builder_inspect_result_from_string():
+    a = BuilderInspectResult.from_str(some_builder_info)
+    assert a.name == "blissful_swartz"
+    assert a.driver == "docker-container"

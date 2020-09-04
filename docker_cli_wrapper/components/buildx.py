@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List, Optional, Union
 
 from docker_cli_wrapper.client_config import (
@@ -8,13 +9,44 @@ from docker_cli_wrapper.client_config import (
 from docker_cli_wrapper.utils import ValidPath, run, to_list
 
 
+@dataclass
+class BuilderInspectResult:
+    name: str
+    driver: str
+
+    @classmethod
+    def from_str(cls, string):
+        string = string.strip()
+        result_dict = {}
+        for line in string.splitlines():
+            if line.startswith("Name:") and "name" not in result_dict:
+                result_dict["name"] = line.split(":")[1].strip()
+            if line.startswith("Driver:"):
+                result_dict["driver"] = line.split(":")[1].strip()
+
+        return cls(**result_dict)
+
+
 class Builder(ReloadableObject):
-    def __init__(self, client_config: ClientConfig, name: str):
-        super().__init__(client_config)
-        self.name = name
+    def __init__(
+        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+    ):
+        super().__init__(client_config, "name", reference, is_immutable_id)
+
+    def _fetch_and_parse_inspect_result(self, reference: str) -> BuilderInspectResult:
+        inspect_str = run(self.docker_cmd + ["buildx", "inspect", reference])
+        return BuilderInspectResult.from_str(inspect_str)
 
     def __str__(self):
         return self.name
+
+    @property
+    def name(self) -> str:
+        return self._get_immutable_id()
+
+    @property
+    def driver(self) -> str:
+        return self._get_inspect_result().driver
 
 
 class BuildxCLI(DockerCLICaller):

@@ -61,6 +61,7 @@ def test_rename():
     assert name != new_name
     container = docker.container.run("hello-world", name=name, detach=True)
     docker.container.rename(container, new_name)
+    container.reload()
 
     assert container.name == new_name
     docker.container.remove(container)

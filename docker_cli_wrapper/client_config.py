@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from .utils import ValidPath, run
 
@@ -60,7 +60,7 @@ class ReloadableObject(DockerCLICaller):
         self._id_in_inspect = id_in_inspect
 
     def _needs_reload(self) -> bool:
-        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.2)
+        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.05)
 
     def reload(self):
         if self._immutable_id is not None:
@@ -89,3 +89,25 @@ class ReloadableObject(DockerCLICaller):
         if self._immutable_id is None:
             self.reload()
         return self._immutable_id
+
+
+class ReloadableObjectFromJson(ReloadableObject):
+    def _fetch_inspect_result_json(self, reference):
+        raise NotImplementedError
+
+    def _parse_json_object(self, json_object: Dict[str, Any]):
+        raise NotImplementedError
+
+    def _fetch_and_parse_inspect_result(self, reference: str):
+        json_str = self._fetch_inspect_result_json(reference)
+        json_object = json.loads(json_str)[0]
+        return self._parse_json_object(json_object)
+
+
+def bulk_reload(docker_objects: List[ReloadableObjectFromJson]):
+    assert len(set(x.client_config for x in docker_objects)) == 1
+    all_ids = [x._get_immutable_id() for x in docker_objects]
+    full_cmd = docker_objects[0].docker_cmd + ["inspect"] + all_ids
+    json_str = run(full_cmd)
+    for json_obj, docker_object in zip(json.loads(json_str), docker_objects):
+        docker_object._set_inspect_result(docker_object._parse_json_object(json_obj))

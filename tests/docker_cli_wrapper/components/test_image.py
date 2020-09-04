@@ -1,7 +1,8 @@
 import pytest
 
 from docker_cli_wrapper import DockerException, docker
-from docker_cli_wrapper.components.image import ImageInspectResult, bulk_reload
+from docker_cli_wrapper.client_config import bulk_reload
+from docker_cli_wrapper.components.image import ImageInspectResult
 
 
 def test_image_remove():
@@ -63,16 +64,14 @@ def test_save_iterator_bytes_and_load_from_iterator():
 
 
 def test_image_list():
-    for image in docker.image.list():
-        image.reload()
-        assert image.id == image._image_inspect_result.Id
+    image_list = docker.image.list()
+    all_ids = [x.id for x in image_list]
+    all_ids_uniquified = set(all_ids)
+    assert len(set(all_ids_uniquified)) == len(image_list)
 
 
-def test_image_list_bulk_reload():
-    all_images = docker.image.list()
-    bulk_reload(all_images)
-    for image in all_images:
-        assert image.id == image._image_inspect_result.Id
+def test_image_bulk_reload():
+    pass
 
 
 def test_image_list_tags():
