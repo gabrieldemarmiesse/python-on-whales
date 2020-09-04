@@ -39,7 +39,7 @@ class ClientConfig:
                     "the package manager of your system. \n"
                     "Note: We are not installing the docker daemon, which is a lot "
                     "heavier and harder to install. We're just downloading a single "
-                    "standalone binary file for the client.\n"
+                    "standalone binary file.\n"
                     "If you want to trigger the download of the client binary file "
                     "manually (for example if you want to do it in a Dockerfile), "
                     "you can run the following command:\n "
