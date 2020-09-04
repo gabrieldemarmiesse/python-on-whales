@@ -29,7 +29,7 @@ def test_download_cli_from_cli():
         download_binaries.DOCKER_BINARY_PATH.unlink()
     except FileNotFoundError:
         pass
-    run(["docker-cli-wrapper", "download-cli"])
+    run(["python-on-whales", "download-cli"])
     simple_command = [
         download_binaries.DOCKER_BINARY_PATH,
         "run",
