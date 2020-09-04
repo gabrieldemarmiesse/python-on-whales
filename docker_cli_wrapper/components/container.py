@@ -48,12 +48,6 @@ class Container(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
-    def __eq__(self, other):
-        return self.id == other.id and self.client_config == other.client_config
-
-    def __str__(self):
-        return self.id
-
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["container", "inspect", reference])
 

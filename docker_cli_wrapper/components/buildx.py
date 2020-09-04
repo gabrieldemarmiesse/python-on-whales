@@ -37,9 +37,6 @@ class Builder(ReloadableObject):
         inspect_str = run(self.docker_cmd + ["buildx", "inspect", reference])
         return BuilderInspectResult.from_str(inspect_str)
 
-    def __str__(self):
-        return self.name
-
     @property
     def name(self) -> str:
         return self._get_immutable_id()

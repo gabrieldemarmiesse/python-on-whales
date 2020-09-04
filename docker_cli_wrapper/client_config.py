@@ -59,6 +59,15 @@ class ReloadableObject(DockerCLICaller):
             self._reference = reference_or_id
         self._id_in_inspect = id_in_inspect
 
+    def __eq__(self, other):
+        return (
+            self._get_immutable_id() == other._get_immutable_id()
+            and self.client_config == other.client_config
+        )
+
+    def __str__(self):
+        return self._get_immutable_id()
+
     def _needs_reload(self) -> bool:
         return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.05)
 
