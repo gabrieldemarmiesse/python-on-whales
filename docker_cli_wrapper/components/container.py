@@ -1,14 +1,12 @@
 import inspect
 import json
 from datetime import datetime, timedelta
-from typing import Iterator, List, Optional, Tuple, Union
-
-import pydantic
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from docker_cli_wrapper.client_config import (
     ClientConfig,
     DockerCLICaller,
-    ReloadableObject,
+    ReloadableObjectFromJson,
 )
 from docker_cli_wrapper.utils import (
     DockerCamelModel,
@@ -44,11 +42,11 @@ class ContainerInspectResult(DockerCamelModel):
     state: ContainerState
 
 
-class Container(ReloadableObject):
-    def __init__(self, client_config: ClientConfig, container_id: str):
-        super().__init__(client_config)
-        self.id = container_id
-        self._container_inspect_result: Optional[ContainerInspectResult] = None
+class Container(ReloadableObjectFromJson):
+    def __init__(
+        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+    ):
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def __eq__(self, other):
         return self.id == other.id and self.client_config == other.client_config
@@ -56,20 +54,27 @@ class Container(ReloadableObject):
     def __str__(self):
         return self.id
 
-    def _reload(self):
-        json_str = run(self.docker_cmd + ["container", "inspect", self.id])
-        json_obj = json.loads(json_str)[0]
-        self._container_inspect_result = ContainerInspectResult.parse_obj(json_obj)
+    def _fetch_inspect_result_json(self, reference):
+        return run(self.docker_cmd + ["container", "inspect", reference])
+
+    def _parse_json_object(self, json_object: Dict[str, Any]):
+        return ContainerInspectResult.parse_obj(json_object)
+
+    @property
+    def id(self):
+        return self._get_immutable_id()
 
     @property
     def name(self):
-        self._reload_if_necessary()
-        return removeprefix(self._container_inspect_result.name, "/")
+        return removeprefix(self._get_inspect_result().name, "/")
 
     @property
     def state(self) -> ContainerState:
-        self._reload_if_necessary()
-        return self._container_inspect_result.state
+        return self._get_inspect_result().state
+
+    @property
+    def image(self) -> Image:
+        return Image(self.client_config, ...)
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]

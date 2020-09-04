@@ -1,14 +1,14 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pydantic
 
 from docker_cli_wrapper.client_config import (
     ClientConfig,
     DockerCLICaller,
-    ReloadableObject,
+    ReloadableObjectFromJson,
 )
 from docker_cli_wrapper.utils import ValidPath, run, to_list
 
@@ -23,20 +23,20 @@ class VolumeInspectResult(pydantic.BaseModel):
     Scope: str
 
 
-class Volume(ReloadableObject):
-    def __init__(self, client_config: ClientConfig, name: str):
-
-        self.name = name
-        self._volume_inspect_result: Optional[VolumeInspectResult] = None
-        super().__init__(client_config)
+class Volume(ReloadableObjectFromJson):
+    def __init__(
+        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+    ):
+        super().__init__(client_config, "Name", reference, is_immutable_id)
 
     def __str__(self):
         return self.name
 
-    def _reload(self):
-        json_str = run(self.docker_cmd + ["volume", "inspect", self.name])
-        json_obj = json.loads(json_str)[0]
-        self._volume_inspect_result = VolumeInspectResult.parse_obj(json_obj)
+    def _fetch_inspect_result_json(self, reference):
+        return run(self.docker_cmd + ["volume", "inspect", reference])
+
+    def _parse_json_object(self, json_object: Dict[str, Any]):
+        return VolumeInspectResult.parse_obj(json_object)
 
     def __eq__(self, other):
         if not isinstance(other, Volume):
@@ -44,22 +44,23 @@ class Volume(ReloadableObject):
         return self.name == other.name and self.docker_cmd == other.docker_cmd
 
     @property
+    def name(self) -> str:
+        return self._get_immutable_id()
+
+    @property
     def created_at(self) -> datetime:
-        self._reload_if_necessary()
-        return self._volume_inspect_result.CreatedAt
+        return self._get_inspect_result().CreatedAt
 
     @property
     def driver(self) -> str:
-        self._reload_if_necessary()
-        return self._volume_inspect_result.Driver
+        return self._get_inspect_result().Driver
 
     @property
     def labels(self) -> Dict[str, str]:
-        self._reload_if_necessary()
-        return self._volume_inspect_result.Labels
+        return self._get_inspect_result().Labels
 
 
-VolumeArg = Union[Volume, str]
+ValidVolume = Union[Volume, str]
 
 
 class VolumeCLI(DockerCLICaller):
@@ -85,7 +86,7 @@ class VolumeCLI(DockerCLICaller):
 
         return Volume(self.client_config, run(full_cmd))
 
-    def remove(self, x: Union[VolumeArg, List[VolumeArg]]) -> List[str]:
+    def remove(self, x: Union[ValidVolume, List[ValidVolume]]) -> List[str]:
         full_cmd = self.docker_cmd + ["volume", "remove"]
 
         for v in to_list(x):
@@ -112,7 +113,9 @@ class VolumeCLI(DockerCLICaller):
 
         volumes_names = run(full_cmd).splitlines()
 
-        return [Volume(self.client_config, name=x) for x in volumes_names]
+        return [
+            Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
+        ]
 
 
 VolumeDefinition = Union[
