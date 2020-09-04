@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
-from docker_cli_wrapper.client_config import (
+from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObject,
 )
-from docker_cli_wrapper.utils import ValidPath, run, to_list
+from python_on_whales.utils import ValidPath, run, to_list
 
 
 @dataclass

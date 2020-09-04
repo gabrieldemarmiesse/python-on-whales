@@ -1,9 +1,9 @@
 import time
 from datetime import datetime, timedelta, timezone
 
-from docker_cli_wrapper import DockerException, docker
-from docker_cli_wrapper.components.container import ContainerState
-from docker_cli_wrapper.test_utils import random_name
+from python_on_whales import DockerException, docker
+from python_on_whales.components.container import ContainerState
+from python_on_whales.test_utils import random_name
 
 
 def test_simple_command():

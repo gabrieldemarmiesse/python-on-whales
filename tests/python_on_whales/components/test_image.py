@@ -1,8 +1,8 @@
 import pytest
 
-from docker_cli_wrapper import DockerException, docker
-from docker_cli_wrapper.client_config import bulk_reload
-from docker_cli_wrapper.components.image import ImageInspectResult
+from python_on_whales import DockerException, docker
+from python_on_whales.client_config import bulk_reload
+from python_on_whales.components.image import ImageInspectResult
 
 
 def test_image_remove():

@@ -1,10 +1,10 @@
 from typing import List, Optional
 
-from docker_cli_wrapper.client_config import ClientConfig, DockerCLICaller
-from docker_cli_wrapper.components.buildx import BuildxCLI
-from docker_cli_wrapper.components.container import ContainerCLI
-from docker_cli_wrapper.components.image import ImageCLI
-from docker_cli_wrapper.components.volume import VolumeCLI
+from python_on_whales.client_config import ClientConfig, DockerCLICaller
+from python_on_whales.components.buildx import BuildxCLI
+from python_on_whales.components.container import ContainerCLI
+from python_on_whales.components.image import ImageCLI
+from python_on_whales.components.volume import VolumeCLI
 
 from .utils import ValidPath, run
 

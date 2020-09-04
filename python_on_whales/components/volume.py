@@ -5,12 +5,12 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pydantic
 
-from docker_cli_wrapper.client_config import (
+from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from docker_cli_wrapper.utils import ValidPath, run, to_list
+from python_on_whales.utils import ValidPath, run, to_list
 
 
 class VolumeInspectResult(pydantic.BaseModel):

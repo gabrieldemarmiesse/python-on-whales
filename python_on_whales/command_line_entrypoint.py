@@ -1,6 +1,6 @@
 import typer
 
-from docker_cli_wrapper.download_binaries import download_docker_cli
+from python_on_whales.download_binaries import download_docker_cli
 
 app = typer.Typer()
 
