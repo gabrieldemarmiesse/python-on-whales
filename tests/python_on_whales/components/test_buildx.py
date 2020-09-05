@@ -2,6 +2,7 @@ import pytest
 
 from python_on_whales import DockerException, docker
 from python_on_whales.components.buildx import BuilderInspectResult
+from python_on_whales.test_utils import set_cache_validity_period
 
 dockerfile_content1 = """
 FROM busybox
@@ -25,6 +26,19 @@ def test_buildx_build_multiple_tags(tmp_path):
     image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
     assert "hello1:latest" in image.repo_tags
     assert "hello2:latest" in image.repo_tags
+
+
+def test_cache_invalidity(tmp_path):
+
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with set_cache_validity_period(100):
+        image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
+        docker.image.remove("hello1")
+        docker.pull("hello-world")
+        docker.tag("hello-world", "hello1")
+        image.reload()
+        assert "hello1:latest" not in image.repo_tags
+        assert "hello2:latest" in image.repo_tags
 
 
 def test_buildx_build_aliases(tmp_path):
