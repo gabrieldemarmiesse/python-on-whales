@@ -12,6 +12,19 @@ from .utils import ValidPath, run
 CACHE_VALIDITY_PERIOD = 0.05
 
 
+class Command(list):
+    def add_simple_arg(self, name: str, value: Any):
+        if value is not None:
+            self.extend([name, value])
+
+    def add_flag(self, name: str, value: bool):
+        if value:
+            self.append(name)
+
+    def __add__(self, other) -> "Command":
+        return Command(super().__add__(other))
+
+
 @dataclass
 class ClientConfig:
 
@@ -54,9 +67,9 @@ class ClientConfig:
         return self.client_binary_path
 
     @property
-    def docker_cmd(self) -> List[str]:
+    def docker_cmd(self) -> Command:
 
-        result = [self.get_docker_path()]
+        result = Command([self.get_docker_path()])
 
         if self.config is not None:
             result += ["--config", self.config]
@@ -96,7 +109,7 @@ class DockerCLICaller:
         self.client_config = client_config
 
     @property
-    def docker_cmd(self) -> List[str]:
+    def docker_cmd(self) -> Command:
         return self.client_config.docker_cmd
 
 

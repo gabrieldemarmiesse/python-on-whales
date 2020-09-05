@@ -206,59 +206,35 @@ class ContainerCLI(DockerCLICaller):
     ) -> Union[Container, str]:
         full_cmd = self.docker_cmd + ["container", "run"]
 
-        if rm:
-            full_cmd.append("--rm")
-        if detach:
-            full_cmd.append("--detach")
-        if name is not None:
-            full_cmd += ["--name", name]
+        full_cmd.add_flag("--rm", rm)
+        full_cmd.add_flag("--detach", detach)
+        full_cmd.add_simple_arg("--name", name)
 
         for env_file in to_list(env_files):
             full_cmd += ["--env-file", env_file]
 
-        if healthcheck is False:
-            full_cmd.append("--no-healthcheck")
-
-        if oom_kill is False:
-            full_cmd.append("--oom-kill-disable")
+        full_cmd.add_flag("--no-healthcheck", not healthcheck)
+        full_cmd.add_flag("--oom-kill-disable", not oom_kill)
 
         for env_name, env_value in envs.items():
             full_cmd += ["--env", env_name + "=" + env_value]
 
-        if cpus is not None:
-            full_cmd += ["--cpus", str(cpus)]
-        if runtime is not None:
-            full_cmd += ["--runtime", runtime]
+        full_cmd.add_simple_arg("--cpus", cpus)
+        full_cmd.add_simple_arg("--runtime", runtime)
+
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
 
-        if shm_size is not None:
-            full_cmd += ["--shm-size", shm_size]
-
-        if memory is not None:
-            full_cmd += ["--memory", memory]
-
-        if memory_reservation is not None:
-            full_cmd += ["--memory-reservation", memory_reservation]
-
-        if memory_swap is not None:
-            full_cmd += ["--memory-swap", memory_swap]
-
-        if stop_timeout is not None:
-            full_cmd += ["--stop-timeout", stop_timeout]
-
-        if gpus is not None:
-            full_cmd += ["--gpus", gpus]
-
-        if read_only:
-            full_cmd.append("--read-only")
-
-        if user is not None:
-            full_cmd += ["--user", user]
-
-        if workdir is not None:
-            full_cmd += ["--workdir", workdir]
+        full_cmd.add_simple_arg("--shm-size", shm_size)
+        full_cmd.add_simple_arg("--memory", memory)
+        full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
+        full_cmd.add_simple_arg("--memory-swap", memory_swap)
+        full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
+        full_cmd.add_simple_arg("--gpus", gpus)
+        full_cmd.add_flag("--read-only", read_only)
+        full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(image)
         if command is not None:
@@ -352,7 +328,7 @@ class ContainerCLI(DockerCLICaller):
         if tag is not None:
             full_cmd.append(tag)
 
-        return Image(self.client_config, run(full_cmd), is_id=True)
+        return Image(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
         full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]

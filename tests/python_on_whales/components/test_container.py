@@ -67,6 +67,13 @@ def test_rename():
     docker.container.remove(container)
 
 
+def test_name():
+    name = random_name()
+    container = docker.container.run("hello-world", name=name, detach=True)
+    assert container.name == name
+    docker.container.remove(container)
+
+
 json_state = """
 {
     "Status": "running",
