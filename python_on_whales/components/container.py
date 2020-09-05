@@ -140,7 +140,7 @@ class ContainerCLI(DockerCLICaller):
         # domainname: Any = None,
         # entrypoint: Any = None,
         # env: Any = None,
-        # env_file: Any = None,
+        env_files: Union[ValidPath, List[ValidPath]] = [],
         # expose: Any = None,
         gpus: Optional[str] = None,
         # group_add: Any = None,
@@ -212,6 +212,9 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append("--detach")
         if name is not None:
             full_cmd += ["--name", name]
+
+        for env_file in to_list(env_files):
+            full_cmd += ["--env-file", env_file]
 
         if cpus is not None:
             full_cmd += ["--cpus", str(cpus)]
