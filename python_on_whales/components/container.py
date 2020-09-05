@@ -149,12 +149,11 @@ class ContainerCLI(DockerCLICaller):
         # health_retries: Any = None,
         # health_start_period: Any = None,
         # health_timeout: Any = None,
-        # help: Any = None,
-        # hostname: Any = None,
+        hostname: Optional[str] = None,
         # init: Any = None,
         # interactive: Any = None,
-        # ip: Any = None,
-        # ip6: Any = None,
+        ip: Optional[str] = None,
+        ip6: Optional[str] = None,
         # ipc: Any = None,
         # isolation: Any = None,
         # kernel_memory: Any = None,
@@ -222,6 +221,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--mac-address", mac_address)
         full_cmd.add_simple_arg("--cpus", cpus)
         full_cmd.add_simple_arg("--runtime", runtime)
+        full_cmd.add_simple_arg("--hostname", hostname)
+        full_cmd.add_simple_arg("--ip", ip)
+        full_cmd.add_simple_arg("--ip6", ip6)
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
