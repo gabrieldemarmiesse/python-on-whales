@@ -182,7 +182,7 @@ class ContainerCLI(DockerCLICaller):
         # publish: Any = None,
         # publish_all: Any = None,
         read_only: bool = False,
-        # restart: Any = None,
+        restart: Optional[str] = None,
         rm: bool = False,
         runtime: Optional[str] = None,
         # security_opt: Any = None,
@@ -224,6 +224,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--hostname", hostname)
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
+        full_cmd.add_simple_arg("--restart", restart)
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
