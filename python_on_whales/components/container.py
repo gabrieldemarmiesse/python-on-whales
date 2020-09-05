@@ -165,9 +165,9 @@ class ContainerCLI(DockerCLICaller):
         # log_driver: Any = None,
         # log_opt: Any = None,
         # mac_address: Any = None,
-        # memory: Any = None,
-        # memory_reservation: Any = None,
-        # memory_swap: Any = None,
+        memory: Union[int, str, None] = None,
+        memory_reservation: Union[int, str, None] = None,
+        memory_swap: Union[int, str, None] = None,
         # memory_swappiness: Any = None,
         # mount: Any = None,
         name: Optional[str] = None,
@@ -235,6 +235,15 @@ class ContainerCLI(DockerCLICaller):
 
         if shm_size is not None:
             full_cmd += ["--shm-size", shm_size]
+
+        if memory is not None:
+            full_cmd += ["--memory", memory]
+
+        if memory_reservation is not None:
+            full_cmd += ["--memory-reservation", memory_reservation]
+
+        if memory_swap is not None:
+            full_cmd += ["--memory-swap", memory_swap]
 
         if stop_timeout is not None:
             full_cmd += ["--stop-timeout", stop_timeout]
