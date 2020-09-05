@@ -182,7 +182,7 @@ class ContainerCLI(DockerCLICaller):
         # privileged: Any = None,
         # publish: Any = None,
         # publish_all: Any = None,
-        # read_only: Any = None,
+        read_only: bool = False,
         # restart: Any = None,
         rm: bool = False,
         runtime: Optional[str] = None,
@@ -196,13 +196,13 @@ class ContainerCLI(DockerCLICaller):
         # tmpfs: Any = None,
         # tty: Any = None,
         # ulimit: Any = None,
-        # user: Any = None,
+        user: Optional[str] = None,
         # userns: Any = None,
         # uts: Any = None,
         volumes: Optional[List[VolumeDefinition]] = [],
         # volume_driver: Any = None,
         # volumes_from: Any = None,
-        # workdir: Any = None,
+        workdir: Optional[ValidPath] = None,
     ) -> Union[Container, str]:
         full_cmd = self.docker_cmd + ["container", "run"]
 
@@ -223,6 +223,15 @@ class ContainerCLI(DockerCLICaller):
 
         if gpus is not None:
             full_cmd += ["--gpus", gpus]
+
+        if read_only:
+            full_cmd.append("--read-only")
+
+        if user is not None:
+            full_cmd += ["--user", user]
+
+        if workdir is not None:
+            full_cmd += ["--workdir", workdir]
 
         full_cmd.append(image)
         if command is not None:
