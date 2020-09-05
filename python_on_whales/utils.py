@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 
+from python_on_whales.download_binaries import download_buildx
+
 
 def title_if_necessary(string: str):
     if string.isupper():
@@ -62,6 +64,7 @@ def run(
 ) -> Optional[str]:
     args = [str(x) for x in args]
     if args[1] == "buildx":
+        install_buildx_if_needed(args[0])
         env = {"DOCKER_CLI_EXPERIMENTAL": "enabled"}
     else:
         env = None
@@ -115,3 +118,24 @@ def removeprefix(string: str, prefix: str) -> str:
         return string[len(prefix) :]
     else:
         return string
+
+
+def install_buildx_if_needed(docker_binary: str):
+    completed_process = subprocess.run(
+        [docker_binary, "buildx"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env={"DOCKER_CLI_EXPERIMENTAL": "enabled"},
+    )
+    if completed_process.returncode == 0:
+        return
+
+    stderr = completed_process.stderr.decode()
+    if "is not a docker command" in stderr:
+        download_buildx()
+    else:
+        raise RuntimeError(
+            f"It seems buildx is not properly installed. When running "
+            f"'docker buildx', here is the result:\n"
+            f"{stderr}"
+        )
