@@ -1,5 +1,7 @@
+import os
 import platform
 import shutil
+import stat
 import tempfile
 import warnings
 from pathlib import Path
@@ -42,6 +44,9 @@ def get_buildx_url():
 def download_buildx():
     BUILDX_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
     download_from_url(get_buildx_url(), BUILDX_BINARY_PATH)
+
+    st = os.stat(BUILDX_BINARY_PATH)
+    os.chmod(BUILDX_BINARY_PATH, st.st_mode | stat.S_IEXEC)
     warnings.warn(
         f"The docker buildx binary file {BUILDX_VERSION} was downloaded and put "
         f"in `{BUILDX_BINARY_PATH.absolute()}`. \n"
