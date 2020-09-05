@@ -19,6 +19,7 @@ TEMPLATE_BUILDX = "https://github.com/docker/buildx/releases/download/v{version}
 
 
 DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
+BUILDX_BINARY_PATH = Path.home() / ".docker" / "cli-plugins" / "docker-buildx"
 
 # TODO: windows too with https://github.com/StefanScherer/docker-cli-builder/releases/download/19.03.12/docker.exe
 
@@ -36,6 +37,17 @@ def get_buildx_url():
     if user_os == "windows":
         url += ".exe"
     return url
+
+
+def download_buildx():
+    BUILDX_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
+    download_from_url(get_buildx_url(), BUILDX_BINARY_PATH)
+    warnings.warn(
+        f"The docker buildx binary file {BUILDX_VERSION} was downloaded and put "
+        f"in `{BUILDX_BINARY_PATH.absolute()}`. \n"
+        f"You can feel free to remove it if you wish, Python on whales will download "
+        f"it again if needed."
+    )
 
 
 def download_docker_cli():
