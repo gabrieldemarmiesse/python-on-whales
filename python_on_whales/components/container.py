@@ -139,7 +139,7 @@ class ContainerCLI(DockerCLICaller):
         # dns_search: Any = None,
         # domainname: Any = None,
         # entrypoint: Any = None,
-        # env: Any = None,
+        envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
         # expose: Any = None,
         gpus: Optional[str] = None,
@@ -221,6 +221,9 @@ class ContainerCLI(DockerCLICaller):
 
         if oom_kill is False:
             full_cmd.append("--oom-kill-disable")
+
+        for env_name, env_value in envs.items():
+            full_cmd += ["--env", env_name + "=" + env_value]
 
         if cpus is not None:
             full_cmd += ["--cpus", str(cpus)]
