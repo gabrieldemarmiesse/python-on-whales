@@ -16,11 +16,11 @@ def test_exact_output():
         docker.image.remove("busybox")
     except DockerException:
         pass
-    assert docker.run("busybox", ["echo", "dodo"], remove=True) == "dodo"
+    assert docker.run("busybox", ["echo", "dodo"], rm=True) == "dodo"
 
 
 def test_remove():
-    output = docker.run("hello-world", remove=True)
+    output = docker.run("hello-world", rm=True)
     assert "Hello from Docker!" in output
 
 
@@ -35,7 +35,7 @@ def test_run_volumes():
         "busybox",
         ["touch", "/some/path/dodo"],
         volumes=[(volume_name, "/some/path")],
-        remove=True,
+        rm=True,
     )
     docker.volume.remove(volume_name)
 

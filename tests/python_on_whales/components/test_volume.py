@@ -26,7 +26,7 @@ def test_volume_drivers():
         "busybox",
         ["touch", "/dodo/dada"],
         volumes=[(some_volume, "/dodo")],
-        remove=True,
+        rm=True,
     )
     docker.volume.remove(some_volume)
 
