@@ -7,14 +7,13 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 
 import pydantic
 
+import python_on_whales.components.buildx
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.utils import DockerException, ValidPath, run, to_list
-
-from .buildx import BuildxCLI
 
 
 class ContainerConfigClass(pydantic.BaseModel):
@@ -101,7 +100,7 @@ class Image(ReloadableObjectFromJson):
 class ImageCLI(DockerCLICaller):
     def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
-        self.build = BuildxCLI(client_config).build
+        self.build = python_on_whales.components.buildx.BuildxCLI(client_config).build
 
     def pull(self, image_name: str, quiet: bool = False) -> Image:
         full_cmd = self.docker_cmd + ["image", "pull"]

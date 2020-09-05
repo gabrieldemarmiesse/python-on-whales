@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
+import python_on_whales.components.image
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -108,7 +109,12 @@ class BuildxCLI(DockerCLICaller):
         pull: bool = False,
         push: bool = False,
         target: Optional[str] = None,
-    ) -> None:
+        tags: Union[str, List[str]] = [],
+    ) -> Optional[python_on_whales.components.image.Image]:
+        """
+        A `python_on_whales.Image` is returned, even when using multiple tags.
+        That is because it will produce a single image with multiple tags.
+        """
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
 
@@ -132,6 +138,15 @@ class BuildxCLI(DockerCLICaller):
         if not cache:
             full_cmd.append("--no-cache")
 
+        for tag in to_list(tags):
+            full_cmd += ["--tag", tag]
+
         full_cmd.append(str(context_path))
 
         run(full_cmd, capture_stderr=False)
+        if tags == []:
+            return None
+        else:
+            return python_on_whales.components.image.Image(
+                self.client_config, to_list(tags)[0]
+            )

@@ -9,6 +9,8 @@ from python_on_whales.download_binaries import DOCKER_BINARY_PATH, download_dock
 
 from .utils import ValidPath, run
 
+CACHE_VALIDITY_PERIOD = 0.05
+
 
 @dataclass
 class ClientConfig:
@@ -111,11 +113,14 @@ class ReloadableObject(DockerCLICaller):
         self._inspect_result = None
         self._immutable_id = None
         self._reference = None
+        self._id_in_inspect = id_in_inspect
         if is_immutable_id:
             self._immutable_id = reference_or_id
         else:
-            self._reference = reference_or_id
-        self._id_in_inspect = id_in_inspect
+            self._set_inspect_result(
+                self._fetch_and_parse_inspect_result(reference_or_id)
+            )
+            self._immutable_id = getattr(self._inspect_result, self._id_in_inspect)
 
     def __eq__(self, other):
         return (
@@ -127,18 +132,14 @@ class ReloadableObject(DockerCLICaller):
         return self._get_immutable_id()
 
     def _needs_reload(self) -> bool:
-        return (datetime.now() - self._last_refreshed_time) >= timedelta(seconds=0.05)
+        return (datetime.now() - self._last_refreshed_time) >= timedelta(
+            seconds=CACHE_VALIDITY_PERIOD
+        )
 
     def reload(self):
-        if self._immutable_id is not None:
-            self._set_inspect_result(
-                self._fetch_and_parse_inspect_result(self._immutable_id)
-            )
-        else:
-            self._set_inspect_result(
-                self._fetch_and_parse_inspect_result(self._reference)
-            )
-            self._immutable_id = getattr(self._inspect_result, self._id_in_inspect)
+        self._set_inspect_result(
+            self._fetch_and_parse_inspect_result(self._immutable_id)
+        )
 
     def _fetch_and_parse_inspect_result(self, reference: str):
         raise NotImplementedError

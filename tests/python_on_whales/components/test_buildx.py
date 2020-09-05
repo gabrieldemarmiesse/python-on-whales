@@ -14,6 +14,19 @@ def test_buildx_build(tmp_path):
     docker.buildx.build(tmp_path)
 
 
+def test_buildx_build_single_tag(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    image = docker.buildx.build(tmp_path, tags="hello1")
+    assert "hello1:latest" in image.repo_tags
+
+
+def test_buildx_build_multiple_tags(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
+    assert "hello1:latest" in image.repo_tags
+    assert "hello2:latest" in image.repo_tags
+
+
 def test_buildx_build_aliases(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.build(tmp_path)
