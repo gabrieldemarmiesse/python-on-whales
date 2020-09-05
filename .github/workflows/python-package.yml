@@ -11,6 +11,23 @@ jobs:
     - name: Run all tests
       run: bash tests/run_tests.sh
 
+
+    build-windows:
+      runs-on: windows-latest
+      steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: prepare
+        run: |
+          pip install -r tests/test-requirements.txt
+          pip install -e .
+      - name: Run all tests
+        run: |
+            docker run hello-world
+            pytest -v ./tests/python_on_whales/components/test_volume.py::test_simple_volume
+
 #  cost too much at the moment.
 #  build-macos:
 #    runs-on: macos-latest
