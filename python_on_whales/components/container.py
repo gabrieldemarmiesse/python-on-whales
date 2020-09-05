@@ -164,7 +164,7 @@ class ContainerCLI(DockerCLICaller):
         # link_local_ip: Any = None,
         # log_driver: Any = None,
         # log_opt: Any = None,
-        # mac_address: Any = None,
+        mac_address: Optional[str] = None,
         memory: Union[int, str, None] = None,
         memory_reservation: Union[int, str, None] = None,
         memory_swap: Union[int, str, None] = None,
@@ -176,7 +176,7 @@ class ContainerCLI(DockerCLICaller):
         healthcheck: bool = True,
         oom_kill: bool = True,
         # oom_score_adj: Any = None,
-        # pid: Any = None,
+        pid: Optional[str] = None,
         # pids_limit: Any = None,
         # platform: Any = None,
         # privileged: Any = None,
@@ -209,6 +209,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--rm", rm)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
+        full_cmd.add_simple_arg("--pid", pid)
 
         for env_file in to_list(env_files):
             full_cmd += ["--env-file", env_file]
@@ -218,7 +219,7 @@ class ContainerCLI(DockerCLICaller):
 
         for env_name, env_value in envs.items():
             full_cmd += ["--env", env_name + "=" + env_value]
-
+        full_cmd.add_simple_arg("--mac-address", mac_address)
         full_cmd.add_simple_arg("--cpus", cpus)
         full_cmd.add_simple_arg("--runtime", runtime)
 
