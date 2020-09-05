@@ -13,74 +13,80 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerException, ValidPath, run, to_list
+from python_on_whales.utils import (
+    DockerCamelModel,
+    DockerException,
+    ValidPath,
+    run,
+    to_list,
+)
 
 
-class ContainerConfigClass(pydantic.BaseModel):
-    Hostname: str
-    Domainname: str
-    User: str
-    AttachStdin: bool
-    AttachStdout: bool
-    AttachStderr: bool
-    Tty: bool
-    OpenStdin: bool
-    StdinOnce: bool
-    Env: Optional[List[str]]
-    Cmd: Optional[List[str]]
-    Image: str
-    Volume: Optional[List[str]]
-    WorkingDir: Path
-    Entrypoint: Optional[List[str]]
-    OnBuild: Optional[List[str]]
-    Labels: Optional[Dict[str, str]]
+class ContainerConfigClass(DockerCamelModel):
+    hostname: str
+    domainname: str
+    user: str
+    attach_stdin: bool
+    attach_stdout: bool
+    attach_stderr: bool
+    tty: bool
+    open_stdin: bool
+    stdin_once: bool
+    env: Optional[List[str]]
+    cmd: Optional[List[str]]
+    image: str
+    volume: Optional[List[str]]
+    working_dir: Path
+    entrypoint: Optional[List[str]]
+    on_build: Optional[List[str]]
+    labels: Optional[Dict[str, str]]
 
 
-class ImageConfigClass(pydantic.BaseModel):
-    Hostname: str
-    Domainname: str
-    User: str
-    AttachStdin: bool
-    AttachStdout: bool
-    AttachStderr: bool
-    Tty: bool
-    OpenStdin: bool
-    StdinOnce: bool
-    Env: List[str]
-    Cmd: List[str]
-    Image: str
-    Volume: Optional[List[str]]
-    WorkingDir: Path
-    Entrypoint: List[str]
-    OnBuild: List[str]
-    Labels: Optional[List[str]]
+class ImageConfigClass(DockerCamelModel):
+    hostname: str
+    domainname: str
+    user: str
+    attach_stdin: bool
+    attach_stdout: bool
+    attach_stderr: bool
+    tty: bool
+    open_stdin: bool
+    stdin_once: bool
+    env: Optional[List[str]]
+    cmd: Optional[List[str]]
+    image: str
+    volume: Optional[List[str]]
+    working_dir: Path
+    entrypoint: Optional[List[str]]
+    on_build: Optional[List[str]]
+    labels: Optional[Dict[str, str]]
 
 
-class ImageInspectResult(pydantic.BaseModel):
-    Id: str
-    RepoTags: List[str]
-    RepoDigests: List[str]
-    Parent: str
-    Comment: str
-    Created: datetime
-    Container: str
-    ContainerConfig: ContainerConfigClass
-    DockerVersion: str
-    Author: str
-    Architecture: str
-    Os: str
-    Size: int
-    VirtualSize: int
-    GraphDriver: Dict[str, Any]
-    RootFS: Dict[str, Any]
-    Metadata: Dict[str, str]
+class ImageInspectResult(DockerCamelModel):
+    id: str
+    repo_tags: List[str]
+    repo_digests: List[str]
+    parent: str
+    comment: str
+    created: datetime
+    container: str
+    container_config: ContainerConfigClass
+    docker_version: str
+    author: str
+    architecture: str
+    os: str
+    size: int
+    virtual_size: int
+    graph_driver: Dict[str, Any]
+    root_FS: Dict[str, Any]
+    metadata: Dict[str, str]
 
 
 class Image(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "Id", reference, is_immutable_id)
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["image", "inspect", reference])
@@ -94,7 +100,7 @@ class Image(ReloadableObjectFromJson):
 
     @property
     def repo_tags(self) -> List[str]:
-        return self._get_inspect_result().RepoTags
+        return self._get_inspect_result().repo_tags
 
 
 class ImageCLI(DockerCLICaller):

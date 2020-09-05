@@ -10,24 +10,24 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import ValidPath, run, to_list
+from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
 
 
-class VolumeInspectResult(pydantic.BaseModel):
-    CreatedAt: datetime
-    Driver: str
-    Labels: Dict[str, str]
-    Mountpoint: Path
-    Name: str
-    Options: Optional[Dict[str, str]]
-    Scope: str
+class VolumeInspectResult(DockerCamelModel):
+    created_at: datetime
+    driver: str
+    labels: Dict[str, str]
+    mountpoint: Path
+    name: str
+    options: Optional[Dict[str, str]]
+    scope: str
 
 
 class Volume(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "Name", reference, is_immutable_id)
+        super().__init__(client_config, "name", reference, is_immutable_id)
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["volume", "inspect", reference])
@@ -41,15 +41,15 @@ class Volume(ReloadableObjectFromJson):
 
     @property
     def created_at(self) -> datetime:
-        return self._get_inspect_result().CreatedAt
+        return self._get_inspect_result().created_at
 
     @property
     def driver(self) -> str:
-        return self._get_inspect_result().Driver
+        return self._get_inspect_result().driver
 
     @property
     def labels(self) -> Dict[str, str]:
-        return self._get_inspect_result().Labels
+        return self._get_inspect_result().labels
 
 
 ValidVolume = Union[Volume, str]
