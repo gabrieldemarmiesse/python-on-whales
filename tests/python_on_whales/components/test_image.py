@@ -201,4 +201,4 @@ json_inspect_image = """
 def test_parse_inspect():
     some_object = ImageInspectResult.parse_raw(json_inspect_image)
 
-    assert some_object.RepoTags == ["progrium/stress:latest"]
+    assert some_object.repo_tags == ["progrium/stress:latest"]

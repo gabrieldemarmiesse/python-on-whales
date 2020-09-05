@@ -66,7 +66,7 @@ json_volume_inspect = """
 def test_volume_inspect_result_config():
 
     a = VolumeInspectResult.parse_raw(json_volume_inspect)
-    assert a.CreatedAt == datetime(
+    assert a.created_at == datetime(
         year=2020,
         month=8,
         day=27,
@@ -75,7 +75,7 @@ def test_volume_inspect_result_config():
         second=50,
         tzinfo=timezone(timedelta(hours=2)),
     )
-    assert a.Mountpoint == Path(
+    assert a.mountpoint == Path(
         "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
     )
-    assert a.Options is None
+    assert a.options is None
