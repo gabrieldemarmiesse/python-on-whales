@@ -173,8 +173,8 @@ class ContainerCLI(DockerCLICaller):
         name: Optional[str] = None,
         # network: Any = None,
         # network_alias: Any = None,
-        # no_healthcheck: Any = None,
-        # oom_kill_disable: Any = None,
+        healthcheck: bool = True,
+        oom_kill: bool = True,
         # oom_score_adj: Any = None,
         # pid: Any = None,
         # pids_limit: Any = None,
@@ -215,6 +215,12 @@ class ContainerCLI(DockerCLICaller):
 
         for env_file in to_list(env_files):
             full_cmd += ["--env-file", env_file]
+
+        if healthcheck is False:
+            full_cmd.append("--no-healthcheck")
+
+        if oom_kill is False:
+            full_cmd.append("--oom-kill-disable")
 
         if cpus is not None:
             full_cmd += ["--cpus", str(cpus)]
