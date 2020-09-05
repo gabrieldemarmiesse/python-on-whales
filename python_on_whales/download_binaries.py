@@ -17,17 +17,18 @@ CACHE_DIR = Path.home() / ".cache" / "python-on-whales"
 TEMPLATE_CLI = (
     "https://download.docker.com/{os}/static/stable/{arch}/docker-{version}.tgz"
 )
+WINDOWS_CLI_URL = "https://github.com/StefanScherer/docker-cli-builder/releases/download/{version}/docker.exe"
 TEMPLATE_BUILDX = "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.{os}-{arch}"
 
 
 DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 BUILDX_BINARY_PATH = Path.home() / ".docker" / "cli-plugins" / "docker-buildx"
 
-# TODO: windows too with https://github.com/StefanScherer/docker-cli-builder/releases/download/19.03.12/docker.exe
-
 
 def get_docker_cli_url():
     user_os = get_user_os()
+    if user_os == "windows":
+        return WINDOWS_CLI_URL.format(version=DOCKER_VERSION)
     arch = get_arch_for_docker_cli_url()
     return TEMPLATE_CLI.format(os=user_os, arch=arch, version=DOCKER_VERSION)
 
@@ -106,14 +107,7 @@ def get_user_os():
     elif user_os == "Darwin":
         return "mac"
     elif user_os == "Windows":
-        raise NotImplementedError(
-            "python-on-whales cannot automatically download the Docker CLI binary "
-            "file because there is no binary available for Windows at "
-            "https://download.docker.com/ . \n"
-            "Please install Docker Desktop for Windows. "
-            "You can find the instructions here:  \n"
-            "https://docs.docker.com/docker-for-windows/install/"
-        )
+        return "windows"
     else:
         raise NotImplementedError(
             f"Unknown OS: {user_os}, cannot determine which Docker CLI binary file to "
