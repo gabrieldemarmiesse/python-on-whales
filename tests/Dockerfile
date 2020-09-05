@@ -14,7 +14,7 @@ RUN pip install -r /tmp/test-requirements.txt -r /tmp/requirements.txt
 
 
 #-----------------------------------------------------------------------------
-FROM python_dependencies as tests_with_cli
+FROM python_dependencies as tests_with_binaries
 COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
 COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/
 WORKDIR /python-on-whales
@@ -32,7 +32,7 @@ COPY . .
 
 RUN pip install -e .
 
-CMD pytest -v --durations=10 ./tests
+CMD pytest -v --durations=10 ./tests/python_on_whales/components/test_buildx.py
 
 
 #-----------------------------------------------------------------------------

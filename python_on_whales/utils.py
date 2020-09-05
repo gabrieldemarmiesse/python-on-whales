@@ -1,5 +1,6 @@
 import json
 import subprocess
+import warnings
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
@@ -132,6 +133,12 @@ def install_buildx_if_needed(docker_binary: str):
 
     stderr = completed_process.stderr.decode()
     if "is not a docker command" in stderr:
+        warnings.warn(
+            "It seems that docker buildx is not installed on your system. \n"
+            "It's going to be downloaded for you. It's only a one time thing."
+            "The next calls to the buildx command won't trigger the "
+            "download again."
+        )
         download_buildx()
     else:
         raise RuntimeError(
