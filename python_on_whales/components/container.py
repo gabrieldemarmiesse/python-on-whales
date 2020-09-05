@@ -187,10 +187,10 @@ class ContainerCLI(DockerCLICaller):
         rm: bool = False,
         runtime: Optional[str] = None,
         # security_opt: Any = None,
-        # shm_size: Any = None,
+        shm_size: Union[int, str, None] = None,
         # sig_proxy: Any = None,
         # stop_signal: Any = None,
-        # stop_timeout: Any = None,
+        stop_timeout: Optional[int] = None,
         # storage_opt: Any = None,
         # sysctl: Any = None,
         # tmpfs: Any = None,
@@ -223,6 +223,12 @@ class ContainerCLI(DockerCLICaller):
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
+
+        if shm_size is not None:
+            full_cmd += ["--shm-size", shm_size]
+
+        if stop_timeout is not None:
+            full_cmd += ["--stop-timeout", stop_timeout]
 
         if gpus is not None:
             full_cmd += ["--gpus", gpus]
