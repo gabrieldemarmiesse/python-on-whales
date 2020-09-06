@@ -156,7 +156,7 @@ class ContainerCLI(DockerCLICaller):
         ip6: Optional[str] = None,
         ipc: Optional[str] = None,
         isolation: Optional[str] = None,
-        # kernel_memory: Any = None,
+        kernel_memory: Union[int, str, None] = None,
         # label: Any = None,
         # label_file: Any = None,
         # link: Any = None,
@@ -238,6 +238,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--pids-limit", pids_limit)
         full_cmd.add_flag("--privileged", privileged)
         full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
