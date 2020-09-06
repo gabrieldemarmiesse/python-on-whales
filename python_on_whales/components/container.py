@@ -199,7 +199,7 @@ class ContainerCLI(DockerCLICaller):
         # userns: Any = None,
         # uts: Any = None,
         volumes: Optional[List[VolumeDefinition]] = [],
-        # volume_driver: Any = None,
+        volume_driver: Optional[str] = None,
         # volumes_from: Any = None,
         workdir: Optional[ValidPath] = None,
     ) -> Union[Container, str]:
@@ -239,6 +239,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--gpus", gpus)
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--volume-driver", volume_driver)
         full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(image)
