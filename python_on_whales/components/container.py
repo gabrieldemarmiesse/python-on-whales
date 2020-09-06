@@ -117,11 +117,11 @@ class ContainerCLI(DockerCLICaller):
         # cap_drop: Any = None,
         # cgroup_parent: Any = None,
         # cidfile: Any = None,
-        # cpu_period: Any = None,
-        # cpu_quota: Any = None,
-        # cpu_rt_period: Any = None,
-        # cpu_rt_runtime: Any = None,
-        # cpu_shares: Any = None,
+        cpu_period: Optional[int] = None,
+        cpu_quota: Optional[int] = None,
+        cpu_rt_period: Optional[int] = None,
+        cpu_rt_runtime: Optional[int] = None,
+        cpu_shares: Optional[int] = None,
         cpus: Optional[float] = None,
         # cpuset_cpus: Any = None,
         # cpuset_mems: Any = None,
@@ -206,6 +206,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["container", "run"]
 
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
+        full_cmd.add_simple_arg("--cpu-period", cpu_period)
+        full_cmd.add_simple_arg("--cpu-quota", cpu_quota)
+        full_cmd.add_simple_arg("--cpu-rt-period", cpu_rt_period)
+        full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
+        full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
         full_cmd.add_flag("--rm", rm)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
