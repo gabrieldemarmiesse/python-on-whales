@@ -196,8 +196,8 @@ class ContainerCLI(DockerCLICaller):
         # tty: Any = None,
         # ulimit: Any = None,
         user: Optional[str] = None,
-        # userns: Any = None,
-        # uts: Any = None,
+        userns: Optional[str] = None,
+        uts: Optional[str] = None,
         volumes: Optional[List[VolumeDefinition]] = [],
         volume_driver: Optional[str] = None,
         # volumes_from: Any = None,
@@ -239,6 +239,8 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--gpus", gpus)
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--userns", userns)
+        full_cmd.add_simple_arg("--uts", uts)
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
         full_cmd.add_simple_arg("--workdir", workdir)
 
