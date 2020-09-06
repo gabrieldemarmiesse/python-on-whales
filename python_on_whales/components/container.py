@@ -154,8 +154,8 @@ class ContainerCLI(DockerCLICaller):
         # interactive: Any = None,
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
-        # ipc: Any = None,
-        # isolation: Any = None,
+        ipc: Optional[str] = None,
+        isolation: Optional[str] = None,
         # kernel_memory: Any = None,
         # label: Any = None,
         # label_file: Any = None,
@@ -180,7 +180,7 @@ class ContainerCLI(DockerCLICaller):
         platform: Optional[str] = None,
         privileged: bool = False,
         # publish: Any = None,
-        # publish_all: Any = None,
+        publish_all: bool = False,
         read_only: bool = False,
         restart: Optional[str] = None,
         rm: bool = False,
@@ -215,6 +215,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
         full_cmd.add_simple_arg("--pid", pid)
+        full_cmd.add_flag("--publish-all", publish_all)
+        full_cmd.add_simple_arg("--isolation", isolation)
+        full_cmd.add_simple_arg("--ipc", ipc)
 
         for env_file in to_list(env_files):
             full_cmd += ["--env-file", env_file]
