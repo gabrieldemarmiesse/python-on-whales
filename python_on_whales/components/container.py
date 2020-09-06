@@ -176,9 +176,9 @@ class ContainerCLI(DockerCLICaller):
         oom_kill: bool = True,
         # oom_score_adj: Any = None,
         pid: Optional[str] = None,
-        # pids_limit: Any = None,
-        # platform: Any = None,
-        # privileged: Any = None,
+        pids_limit: Optional[int] = None,
+        platform: Optional[str] = None,
+        privileged: bool = False,
         # publish: Any = None,
         # publish_all: Any = None,
         read_only: bool = False,
@@ -226,6 +226,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
         full_cmd.add_simple_arg("--restart", restart)
+        full_cmd.add_simple_arg("--pids-limit", pids_limit)
+        full_cmd.add_flag("--privileged", privileged)
+        full_cmd.add_simple_arg("--platform", platform)
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
