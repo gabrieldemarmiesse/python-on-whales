@@ -111,7 +111,7 @@ class ContainerCLI(DockerCLICaller):
         *,
         # add_host: Any = None,
         # attach: Any = None,
-        # blkio_weight: Any = None,
+        blkio_weight: Optional[int] = None,
         # blkio_weight_device: Any = None,
         # cap_add: Any = None,
         # cap_drop: Any = None,
@@ -205,6 +205,7 @@ class ContainerCLI(DockerCLICaller):
     ) -> Union[Container, str]:
         full_cmd = self.docker_cmd + ["container", "run"]
 
+        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
         full_cmd.add_flag("--rm", rm)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
