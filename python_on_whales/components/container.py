@@ -161,7 +161,7 @@ class ContainerCLI(DockerCLICaller):
         # label_file: Any = None,
         # link: Any = None,
         # link_local_ip: Any = None,
-        # log_driver: Any = None,
+        log_driver: Optional[str] = None,
         # log_opt: Any = None,
         mac_address: Optional[str] = None,
         memory: Union[int, str, None] = None,
@@ -226,6 +226,7 @@ class ContainerCLI(DockerCLICaller):
             full_cmd += ["--env", env_name + "=" + env_value]
         full_cmd.add_simple_arg("--mac-address", mac_address)
         full_cmd.add_simple_arg("--cpus", cpus)
+        full_cmd.add_simple_arg("--log-driver", log_driver)
         full_cmd.add_simple_arg("--runtime", runtime)
         full_cmd.add_simple_arg("--hostname", hostname)
         full_cmd.add_simple_arg("--ip", ip)
