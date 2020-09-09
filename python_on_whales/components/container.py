@@ -77,6 +77,86 @@ ValidContainer = Union[Container, str]
 
 
 class ContainerCLI(DockerCLICaller):
+    def commit(
+        self,
+        container: ValidContainer,
+        tag: Optional[str] = None,
+        author: Optional[str] = None,
+        message: Optional[str] = None,
+        pause: bool = True,
+    ):
+        full_cmd = self.docker_cmd + ["container", "commit"]
+
+        if author is not None:
+            full_cmd += ["--author", author]
+
+        if message is not None:
+            full_cmd += ["--message", message]
+
+        full_cmd += ["--pause", str(pause).lower()]
+
+        full_cmd.append(str(container))
+        if tag is not None:
+            full_cmd.append(tag)
+
+        return Image(self.client_config, run(full_cmd), is_immutable_id=True)
+
+    def cp(
+        self,
+        source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
+        destination: Union[None, ValidPath, ContainerPath],
+    ):
+        # TODO: tests and handling bytes streams.
+        full_cmd = self.docker_cmd + ["container", "cp"]
+
+        if isinstance(source, bytes) or inspect.isgenerator(source):
+            source = "-"
+        elif isinstance(source, tuple):
+            source = f"{str(source[0])}:{source[1]}"
+        else:
+            source = str(source)
+
+        if destination is None:
+            destination = "-"
+        elif isinstance(destination, tuple):
+            destination = f"{str(destination[0])}:{destination[1]}"
+        else:
+            destination = str(destination)
+
+        run(full_cmd + [source, destination])
+
+    def create(self):
+        raise NotImplementedError
+
+    def diff(self, container: ValidContainer) -> Dict[str, str]:
+        full_cmd = self.docker_cmd + ["diff", container]
+
+        result_dict = {}
+        result = run(full_cmd)
+        for line in result.splitlines():
+            result_dict[line[2:]] = line[0]
+        return result_dict
+
+    def exec(
+        self,
+        container: ValidContainer,
+        command: Union[str, List[str]],
+        detach: bool = False,
+    ) -> Optional[str]:
+        full_cmd = self.docker_cmd + ["exec"]
+
+        full_cmd.add_flag("--detach", detach)
+
+        full_cmd.append(container)
+        for arg in to_list(command):
+            full_cmd.append(arg)
+
+        result = run(full_cmd)
+        if detach:
+            return None
+        else:
+            return result
+
     def list(self, all: bool = False) -> List[Container]:
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
@@ -270,30 +350,6 @@ class ContainerCLI(DockerCLICaller):
 
         return run(full_cmd + [str(container)])
 
-    def cp(
-        self,
-        source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
-        destination: Union[None, ValidPath, ContainerPath],
-    ):
-        # TODO: tests and handling bytes streams.
-        full_cmd = self.docker_cmd + ["container", "cp"]
-
-        if isinstance(source, bytes) or inspect.isgenerator(source):
-            source = "-"
-        elif isinstance(source, tuple):
-            source = f"{str(source[0])}:{source[1]}"
-        else:
-            source = str(source)
-
-        if destination is None:
-            destination = "-"
-        elif isinstance(destination, tuple):
-            destination = f"{str(destination[0])}:{destination[1]}"
-        else:
-            destination = str(destination)
-
-        run(full_cmd + [source, destination])
-
     def kill(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
@@ -326,30 +382,6 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def commit(
-        self,
-        container: ValidContainer,
-        tag: Optional[str] = None,
-        author: Optional[str] = None,
-        message: Optional[str] = None,
-        pause: bool = True,
-    ):
-        full_cmd = self.docker_cmd + ["container", "commit"]
-
-        if author is not None:
-            full_cmd += ["--author", author]
-
-        if message is not None:
-            full_cmd += ["--message", message]
-
-        full_cmd += ["--pause", str(pause).lower()]
-
-        full_cmd.append(str(container))
-        if tag is not None:
-            full_cmd.append(tag)
-
-        return Image(self.client_config, run(full_cmd), is_immutable_id=True)
-
     def rename(self, container: ValidContainer, new_name: str) -> None:
         full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
         run(full_cmd)
@@ -377,6 +409,3 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(str(container))
 
         run(full_cmd)
-
-    def port(self, container: ValidContainer, private_port: Union[str, int] = None):
-        raise NotImplementedError

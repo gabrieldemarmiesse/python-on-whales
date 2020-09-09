@@ -1,6 +1,7 @@
 from python_on_whales import docker
-from python_on_whales.test_utils import random_name
 from python_on_whales.components.network import NetworkInspectResult
+from python_on_whales.test_utils import random_name
+
 
 def test_network_create_remove():
     my_name = random_name()
@@ -42,6 +43,7 @@ network_inspect_str = """
     "Labels": {}
 }
 """
+
 
 def test_parse_inspection():
     network_parsed = NetworkInspectResult.parse_raw(network_inspect_str)

@@ -110,3 +110,22 @@ def test_restart():
     docker.restart(containers)
     for container in containers:
         assert container.state.running
+
+
+def test_exec():
+    my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True, rm=True)
+    exec_result = docker.exec(my_container, ["echo", "dodo"])
+    assert exec_result == "dodo"
+    docker.kill(my_container)
+
+
+def test_diff():
+    my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True, rm=True)
+
+    docker.exec(my_container, ["mkdir", "/some_path"])
+    docker.exec(my_container, ["touch", "/some_file"])
+    docker.exec(my_container, ["rm", "-rf", "/tmp"])
+
+    diff = docker.diff(my_container)
+    assert diff == {"/some_path": "A", "/some_file": "A", "/tmp": "D"}
+    docker.kill(my_container)

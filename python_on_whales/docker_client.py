@@ -52,12 +52,13 @@ class DockerClient(DockerCLICaller):
         self.build = self.buildx.build
         self.commit = self.container.commit
         self.cp = self.container.cp
+        self.diff = self.container.diff
+        self.exec = self.container.exec
         self.images = self.image.list
         self.kill = self.container.kill
         self.load = self.image.load
         self.logs = self.container.logs
         self.pause = self.container.pause
-        self.port = self.container.port
         self.ps = self.container.list
         self.pull = self.image.pull
         self.push = self.image.push
