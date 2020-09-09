@@ -4,8 +4,9 @@ from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.buildx import BuildxCLI
 from python_on_whales.components.container import ContainerCLI
 from python_on_whales.components.image import ImageCLI
-from python_on_whales.components.volume import VolumeCLI
 from python_on_whales.components.network import NetworkCLI
+from python_on_whales.components.system import SystemCLI
+from python_on_whales.components.volume import VolumeCLI
 
 from .utils import ValidPath, run
 
@@ -45,6 +46,7 @@ class DockerClient(DockerCLICaller):
         self.container = ContainerCLI(self.client_config)
         self.buildx = BuildxCLI(self.client_config)
         self.network = NetworkCLI(self.client_config)
+        self.system = SystemCLI(self.client_config)
 
         # aliases
         self.build = self.buildx.build

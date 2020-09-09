@@ -21,8 +21,7 @@ from python_on_whales.utils import (
 
 class NetworkInspectResult(DockerCamelModel):
     id: str
-    name : str
-
+    name: str
 
 
 class Network(ReloadableObjectFromJson):
@@ -45,10 +44,11 @@ class Network(ReloadableObjectFromJson):
     def name(self) -> List[str]:
         return self._get_inspect_result().name
 
+
 ValidNetwork = Union[Network, str]
 
-class NetworkCLI(DockerCLICaller):
 
+class NetworkCLI(DockerCLICaller):
     def create(self, name: str):
         full_cmd = self.docker_cmd + ["network", "create"]
         full_cmd.append(name)
@@ -59,5 +59,3 @@ class NetworkCLI(DockerCLICaller):
         for network in to_list(networks):
             full_cmd.append(network)
         run(full_cmd)
-
-
