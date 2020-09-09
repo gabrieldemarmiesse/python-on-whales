@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.buildx import BuildxCLI

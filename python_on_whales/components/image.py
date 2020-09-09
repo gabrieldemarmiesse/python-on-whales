@@ -1,11 +1,8 @@
 import inspect
-import json
 from datetime import datetime
 from pathlib import Path
-from subprocess import PIPE, STDOUT, Popen
+from subprocess import PIPE, Popen
 from typing import Any, Dict, Iterator, List, Optional, Union
-
-import pydantic
 
 import python_on_whales.components.buildx
 from python_on_whales.client_config import (

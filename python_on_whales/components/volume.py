@@ -1,9 +1,6 @@
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
-
-import pydantic
 
 from python_on_whales.client_config import (
     ClientConfig,
