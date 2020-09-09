@@ -22,6 +22,18 @@ from python_on_whales.utils import (
 class NetworkInspectResult(DockerCamelModel):
     id: str
     name: str
+    created: datetime
+    scope: str
+    driver: str
+    enable_I_pv6: bool
+    internal: bool
+    attachable: bool
+    ingress: bool
+    config_from: dict
+    config_only: bool
+    containers: dict
+    options: dict
+    labels: dict
 
 
 class Network(ReloadableObjectFromJson):
