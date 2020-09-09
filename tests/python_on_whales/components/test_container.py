@@ -129,3 +129,10 @@ def test_diff():
     diff = docker.diff(my_container)
     assert diff == {"/some_path": "A", "/some_file": "A", "/tmp": "D"}
     docker.kill(my_container)
+
+
+def test_methods():
+    my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True)
+    my_container.kill()
+    assert my_container.state.running == False
+    my_container.remove()

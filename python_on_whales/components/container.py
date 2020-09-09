@@ -71,6 +71,12 @@ class Container(ReloadableObjectFromJson):
             self.client_config, self._get_inspect_result().image, is_immutable_id=True
         )
 
+    def kill(self, signal: str = None):
+        return ContainerCLI(self.client_config).kill(self, signal)
+
+    def remove(self, force: bool = False, volumes=False):
+        return ContainerCLI(self.client_config).remove(self, force, volumes)
+
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
 ValidContainer = Union[Container, str]
