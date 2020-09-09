@@ -163,6 +163,46 @@ class ContainerCLI(DockerCLICaller):
         else:
             return result
 
+    def export(
+        self, container: ValidContainer, output: Optional[ValidPath] = None
+    ) -> Optional[Iterator[bytes]]:
+        if output is None:
+            raise NotImplementedError(
+                "Returning the bytestream isn't supported yet. Pull request welcome :)"
+            )
+        full_cmd = self.docker_cmd + [
+            "container",
+            "--output",
+            output,
+            "export",
+            container,
+        ]
+        run(full_cmd)
+        return None
+
+    def inspect(self, reference: str):
+        return Container(self.client_config, reference)
+
+    def kill(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]],
+        signal: str = None,
+    ):
+        full_cmd = self.docker_cmd + ["container", "kill"]
+
+        if signal is not None:
+            full_cmd += ["--signal", signal]
+
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
+        run(full_cmd)
+
+    def logs(self, container: Union[Container, str]) -> str:
+        full_cmd = self.docker_cmd + ["container", "logs"]
+
+        return run(full_cmd + [str(container)])
+
     def list(self, all: bool = False) -> List[Container]:
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
@@ -170,6 +210,40 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append("--all")
 
         return [Container(self.client_config, x) for x in run(full_cmd).splitlines()]
+
+    def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
+        full_cmd = self.docker_cmd + ["pause"]
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
+        run(full_cmd)
+
+    def prune(self, filters: Union[str, List[str]] = []) -> None:
+        full_cmd = self.docker_cmd + ["container", "prune", "--force"]
+        for filter_ in to_list(filters):
+            full_cmd += ["--filter", filter_]
+        run(full_cmd)
+
+    def rename(self, container: ValidContainer, new_name: str) -> None:
+        full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
+        run(full_cmd)
+
+    def restart(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]],
+        time: Optional[Union[int, timedelta]] = None,
+    ):
+        full_cmd = self.docker_cmd + ["restart"]
+
+        if time is not None:
+            if isinstance(time, timedelta):
+                time = time.total_seconds()
+            full_cmd += ["--time", str(time)]
+
+        for container in to_list(containers):
+            full_cmd.append(str(container))
+
+        run(full_cmd)
 
     def remove(
         self,
@@ -351,24 +425,10 @@ class ContainerCLI(DockerCLICaller):
         else:
             return run(full_cmd)
 
-    def logs(self, container: Union[Container, str]) -> str:
-        full_cmd = self.docker_cmd + ["container", "logs"]
-
-        return run(full_cmd + [str(container)])
-
-    def kill(
-        self,
-        containers: Union[ValidContainer, List[ValidContainer]],
-        signal: str = None,
-    ):
-        full_cmd = self.docker_cmd + ["container", "kill"]
-
-        if signal is not None:
-            full_cmd += ["--signal", signal]
-
+    def start(self, containers: Union[ValidContainer, List[ValidContainer]]):
+        full_cmd = self.docker_cmd + ["container", "start"]
         for container in to_list(containers):
-            full_cmd.append(str(container))
-
+            full_cmd.append(container)
         run(full_cmd)
 
     def stop(
@@ -383,34 +443,6 @@ class ContainerCLI(DockerCLICaller):
         if time is not None:
             full_cmd += ["--time", str(time)]
 
-        for container in to_list(containers):
-            full_cmd.append(str(container))
-
-        run(full_cmd)
-
-    def rename(self, container: ValidContainer, new_name: str) -> None:
-        full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
-        run(full_cmd)
-
-    def restart(
-        self,
-        containers: Union[ValidContainer, List[ValidContainer]],
-        time: Optional[Union[int, timedelta]] = None,
-    ):
-        full_cmd = self.docker_cmd + ["restart"]
-
-        if time is not None:
-            if isinstance(time, timedelta):
-                time = time.total_seconds()
-            full_cmd += ["--time", str(time)]
-
-        for container in to_list(containers):
-            full_cmd.append(str(container))
-
-        run(full_cmd)
-
-    def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
-        full_cmd = self.docker_cmd + ["pause"]
         for container in to_list(containers):
             full_cmd.append(str(container))
 

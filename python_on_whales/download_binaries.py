@@ -63,7 +63,7 @@ def download_docker_cli():
         tar_file = tmp_dir / "docker.tgz"
         download_from_url(file_to_download, tar_file)
         extract_dir = tmp_dir / "extracted"
-        shutil.unpack_archive(tar_file, extract_dir)
+        shutil.unpack_archive(str(tar_file), str(extract_dir))
 
         DOCKER_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
         shutil.move(extract_dir / "docker" / "docker", DOCKER_BINARY_PATH)
