@@ -100,6 +100,9 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().repo_tags
 
 
+ValidImage = Union[str, Image]
+
+
 class ImageCLI(DockerCLICaller):
     def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
@@ -123,7 +126,7 @@ class ImageCLI(DockerCLICaller):
 
     def save(
         self,
-        images: Union[Image, str, List[Union[Image, str]]],
+        images: Union[ValidImage, List[ValidImage]],
         output: Optional[ValidPath] = None,
     ) -> Optional[Iterator[bytes]]:
         full_cmd = self.docker_cmd + ["image", "save"]
