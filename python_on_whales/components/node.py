@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -34,4 +34,23 @@ ValidNode = Union[Node, str]
 
 
 class NodeCLI(DockerCLICaller):
-    pass
+    def update(
+        self,
+        node: ValidNode,
+        availability: Optional[str] = None,
+        labels_add: Dict[str, str] = {},
+        rm_labels: List[str] = [],
+        role: Optional[str] = None,
+    ):
+        full_cmd = self.docker_cmd + ["node", "update"]
+
+        full_cmd.add_simple_arg("--availability", availability)
+        for label_name, label_value in labels_add.items():
+            full_cmd += ["--label-add", f"{label_name}={label_value}"]
+
+        for label in rm_labels:
+            full_cmd += ["--rm-label", label]
+
+        full_cmd.add_simple_arg("--role", role)
+        full_cmd.append(node)
+        run(full_cmd)
