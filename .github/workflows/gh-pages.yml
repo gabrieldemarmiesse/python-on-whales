@@ -11,7 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: prepare
-        run: docker buildx bake docs
+        run: |
+          docker buildx bake docs
+          mv docs/generated_sources/* ./docs/
+          mv docs/mkdocs.yml ./
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
