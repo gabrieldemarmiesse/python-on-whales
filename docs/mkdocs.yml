@@ -1,7 +1,7 @@
 
 
 site_name: Python on whales
-docs_dir: sources
+docs_dir: generated_sources
 site_description: 'Python on whales docs'
 
 nav:

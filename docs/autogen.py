@@ -27,4 +27,4 @@ class MyDocumentationGenerator(DocumentationGenerator):
 
 
 doc_generator = MyDocumentationGenerator(pages, template_dir="./template")
-doc_generator.generate("./sources")
+doc_generator.generate("./generated_sources")

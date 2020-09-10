@@ -12,4 +12,4 @@ RUN cd docs && python autogen.py
 
 FROM scratch
 
-COPY --from=make-sources /python-on-whales/docs/sources /
+COPY --from=make-sources /python-on-whales/docs/generated_sources /

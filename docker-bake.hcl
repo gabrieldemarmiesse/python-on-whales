@@ -4,5 +4,5 @@ group "default" {
 
 target "docs" {
 	dockerfile = "docs/Dockerfile"
-    output = ["docs/sources"]
+    output = ["docs/generated_sources"]
 }
