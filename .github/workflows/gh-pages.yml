@@ -13,7 +13,7 @@ jobs:
       - name: prepare
         run: |
           docker buildx bake docs
-          mv docs/generated_sources/* ./docs/
+          mv docs/generated_sources ./generated_sources
           mv docs/mkdocs.yml ./
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
