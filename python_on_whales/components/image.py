@@ -109,6 +109,13 @@ class ImageCLI(DockerCLICaller):
         self.build = python_on_whales.components.buildx.BuildxCLI(client_config).build
 
     def pull(self, image_name: str, quiet: bool = False) -> Image:
+        """Pull a docker image
+
+        # Arguments
+            image_name: The image name
+            quiet: If you don't want to see the progress bars.
+
+        """
         full_cmd = self.docker_cmd + ["image", "pull"]
 
         if quiet:

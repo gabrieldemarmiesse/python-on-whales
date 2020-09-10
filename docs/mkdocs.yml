@@ -1,0 +1,14 @@
+
+
+site_name: Python on whales
+docs_dir: sources
+site_description: 'Python on whales docs'
+
+nav:
+  - index: index.md
+  - Docker client: docker_client.md
+  - Buildx: components/buildx.md
+  - Container: components/container.md
+  - Image: components/image.md
+  - Network: components/network.md
+  - Volume: components/volume.md

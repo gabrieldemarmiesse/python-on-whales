@@ -23,10 +23,7 @@ def test_volume_drivers():
         options=dict(type="tmpfs", device="tmpfs", o="size=100m,uid=1000"),
     )
     docker.run(
-        "busybox",
-        ["touch", "/dodo/dada"],
-        volumes=[(some_volume, "/dodo")],
-        rm=True,
+        "busybox", ["touch", "/dodo/dada"], volumes=[(some_volume, "/dodo")], rm=True,
     )
     docker.volume.remove(some_volume)
 
