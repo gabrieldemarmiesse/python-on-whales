@@ -77,6 +77,9 @@ class Container(ReloadableObjectFromJson):
     def remove(self, force: bool = False, volumes=False):
         return ContainerCLI(self.client_config).remove(self, force, volumes)
 
+    def exec(self, command: Union[str, List[str]], detach: bool = False):
+        return ContainerCLI(self.client_config).exec(self, command, detach)
+
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
 ValidContainer = Union[Container, str]

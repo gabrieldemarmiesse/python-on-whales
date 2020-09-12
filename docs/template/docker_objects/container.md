@@ -1,4 +1,4 @@
-# Container objects
+# Containers
 
 Don't use the constructor directly. Instead use 
 ```python

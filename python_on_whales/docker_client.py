@@ -14,6 +14,33 @@ from .utils import ValidPath, run
 
 
 class DockerClient(DockerCLICaller):
+    """Creates a Docker client
+
+    Note that
+    ```python
+    from python_on_whales import docker
+    print(docker.run("hello-world"))
+    ```
+    is equivalent to
+    ```python
+    from python_on_whales import DockerClient
+    docker = DockerClient()
+    print(docker.run("hello-world")
+    ```
+
+    # Arguments
+        config: Location of client config files (default "~/.docker")
+        context: Name of the context to use to connect to the
+            daemon (overrides DOCKER_HOST env var
+            and default context set with "docker context use")
+        debug: Enable debug mode
+        host: Daemon socket(s) to connect to
+        log_level: Set the logging level ("debug"|"info"|"warn"|"error"|"fatal")
+           (default "info")
+        tls:  Use TLS; implied by `tlsverify`
+        tlscacert: Trust certs signed only by this CA (default "~/.docker/ca.pem")
+    """
+
     def __init__(
         self,
         config: Optional[ValidPath] = None,
@@ -28,6 +55,7 @@ class DockerClient(DockerCLICaller):
         tlsverify: Optional[bool] = None,
         client_config: Optional[ClientConfig] = None,
     ):
+
         if client_config is None:
             client_config = ClientConfig(
                 config=config,
