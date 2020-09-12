@@ -14,5 +14,5 @@ nav:
     - Network: components/network.md
     - Volume: components/volume.md
   - Docker objects:
-    - Containers: docker_objects/container.md
-    - Images: docker_objects/image.md
+    - Containers: docker_objects/containers.md
+    - Images: docker_objects/images.md

@@ -12,8 +12,8 @@ pages = {
         "python_on_whales.components.network.NetworkCLI"
     ),
     "components/volume.md": get_methods("python_on_whales.components.volume.VolumeCLI"),
-    "docker_objects/image.md": get_methods("python_on_whales.Image"),
-    "docker_objects/container.md": get_methods("python_on_whales.Container"),
+    "docker_objects/images.md": get_methods("python_on_whales.Image"),
+    "docker_objects/containers.md": get_methods("python_on_whales.Container"),
 }
 
 
