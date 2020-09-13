@@ -8,11 +8,18 @@ nav:
   - index: index.md
   - Docker client: docker_client.md
   - Sub-commands:
-    - Buildx: components/buildx.md
-    - Container: components/container.md
-    - Image: components/image.md
-    - Network: components/network.md
-    - Volume: components/volume.md
+    - Buildx: sub-commands/buildx.md
+    - Container: sub-commands/container.md
+    - Image: sub-commands/image.md
+    - Node: sub-commands/node.md
+    - Network: sub-commands/network.md
+    - Service: sub-commands/service.md
+    - Volume: sub-commands/volume.md
   - Docker objects:
+    - Builders: docker_objects/builders.md
     - Containers: docker_objects/containers.md
     - Images: docker_objects/images.md
+    - Networks: docker_objects/networks.md
+    - Nodes: docker_objects/nodes.md
+    - Services: docker_objects/services.md
+    - Volumes: docker_objects/volumes.md

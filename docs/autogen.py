@@ -3,17 +3,30 @@ from keras_autodoc import DocumentationGenerator, get_methods
 pages = {
     "docker_client.md": ["python_on_whales.DockerClient"]
     + get_methods("python_on_whales.docker_client.DockerClient"),
-    "components/buildx.md": get_methods("python_on_whales.components.buildx.BuildxCLI"),
-    "components/container.md": get_methods(
+    "sub-commands/buildx.md": get_methods(
+        "python_on_whales.components.buildx.BuildxCLI"
+    ),
+    "sub-commands/container.md": get_methods(
         "python_on_whales.components.container.ContainerCLI"
     ),
-    "components/image.md": get_methods("python_on_whales.components.image.ImageCLI"),
-    "components/network.md": get_methods(
+    "sub-commands/image.md": get_methods("python_on_whales.components.image.ImageCLI"),
+    "sub-commands/network.md": get_methods(
         "python_on_whales.components.network.NetworkCLI"
     ),
-    "components/volume.md": get_methods("python_on_whales.components.volume.VolumeCLI"),
-    "docker_objects/images.md": get_methods("python_on_whales.Image"),
+    "sub-commands/node.md": get_methods("python_on_whales.components.node.NodeCLI"),
+    "sub-commands/service.md": get_methods(
+        "python_on_whales.components.service.ServiceCLI"
+    ),
+    "sub-commands/volume.md": get_methods(
+        "python_on_whales.components.volume.VolumeCLI"
+    ),
+    "docker_objects/builders.md": get_methods("python_on_whales.Builder"),
     "docker_objects/containers.md": get_methods("python_on_whales.Container"),
+    "docker_objects/images.md": get_methods("python_on_whales.Image"),
+    "docker_objects/networks.md": get_methods("python_on_whales.Network"),
+    "docker_objects/nodes.md": get_methods("python_on_whales.Node"),
+    "docker_objects/services.md": get_methods("python_on_whales.Service"),
+    "docker_objects/volumes.md": get_methods("python_on_whales.Volume"),
 }
 
 
