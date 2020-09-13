@@ -115,6 +115,8 @@ class ImageCLI(DockerCLICaller):
             image_name: The image name
             quiet: If you don't want to see the progress bars.
 
+        # Returns:
+            The Docker image loaded (`python_on_whales.Image` object).
         """
         full_cmd = self.docker_cmd + ["image", "pull"]
 
@@ -126,6 +128,12 @@ class ImageCLI(DockerCLICaller):
         return Image(self.client_config, image_name)
 
     def push(self, tag_or_repo: str, quiet: bool = False):
+        """Push a tag or a repository to a registry
+
+        # Arguments
+            tag_or_repo: Tag or repo to push
+            quiet: If you don't want to see the progress bars.
+        """
         full_cmd = self.docker_cmd + ["image", "push"]
 
         full_cmd.append(tag_or_repo)
@@ -136,6 +144,36 @@ class ImageCLI(DockerCLICaller):
         images: Union[ValidImage, List[ValidImage]],
         output: Optional[ValidPath] = None,
     ) -> Optional[Iterator[bytes]]:
+        """Save one or more images to a tar archive. Returns a stream if output is `None`
+
+        # Arguments
+            images: Single docker image or list of docker images to save
+            output: Path of the tar archive to produce. If `output` is None, a generator
+                of bytes is produced. It can be used to stream those bytes elsewhere,
+                to another Docker daemon for example.
+
+        # Returns
+            `Optional[Iterator[bytes]]`. If output is a path, nothing is returned.
+
+        An example of transfer of an image from a local Docker daemon to a remote Docker
+        daemon. We assume that the remote machine has an ssh access:
+
+        ```python
+        from python_on_whales import DockerClient
+
+        local_docker = DockerClient()
+        remote_docker = DockerClient(host="ssh://my_user@186.167.32.84")
+
+        image_name = "busybox:1"
+        local_docker.pull(image_name)
+        bytes_iterator = local_docker.image.save(image_name)
+
+        remote_docker.image.load(bytes_iterator)
+        ```
+
+        Of course the best solution is to use a registry to transfer image but
+        it's a cool example nonetheless.
+        """
         full_cmd = self.docker_cmd + ["image", "save"]
 
         if output is not None:
@@ -161,6 +199,16 @@ class ImageCLI(DockerCLICaller):
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
     ):
+        """ Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
+
+        # Arguments
+            input: Path or input stream to load the images from.
+            quiet: If you don't want to display the progress bars.
+
+        # Returns
+            `None` at the moment, but should return the Docker images loaded (not
+            implemented yet).
+        """
         full_cmd = self.docker_cmd + ["image", "load"]
 
         if isinstance(input, (str, Path)):
@@ -187,16 +235,30 @@ class ImageCLI(DockerCLICaller):
         if exit_code != 0:
             raise DockerException(full_cmd, exit_code)
 
-    def remove(self, x: Union[str, List[str]]) -> List[str]:
+    def remove(self, x: Union[ValidImage, List[ValidImage]]):
+        """Remove one or more docker images.
+
+        # Arguments
+            x: Single image or list of Docker images to remove. You can use tags or
+            `python_on_whales.Image` objects.
+        """
+
         full_cmd = self.docker_cmd + ["image", "remove"]
         if isinstance(x, str):
             full_cmd.append(x)
         if isinstance(x, list):
             full_cmd += x
 
-        return run(full_cmd).split("\n")
+        run(full_cmd).split("\n")
 
     def list(self) -> List[Image]:
+        """Returns the list of Docker images present on the machine.
+
+        Note that each image may have multiple tags.
+
+        # Returns
+            A `List[python_on_whales.Image]` object.
+        """
         full_cmd = self.docker_cmd + [
             "image",
             "list",
@@ -211,6 +273,12 @@ class ImageCLI(DockerCLICaller):
         return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
+        """Adds a tag to a Docker image.
+
+        # Arguments
+            source_image: The Docker image to tag. You can use a tag to reference it.
+            new_tag: The tag to add to the Docker image.
+        """
         full_cmd = self.docker_cmd + [
             "image",
             "tag",

@@ -41,5 +41,17 @@ class MyDocumentationGenerator(DocumentationGenerator):
         return signature
 
 
-doc_generator = MyDocumentationGenerator(pages, template_dir="./template")
+doc_generator = MyDocumentationGenerator(
+    pages,
+    template_dir="./template",
+    extra_aliases=[
+        "python_on_whales.Builder",
+        "python_on_whales.Container",
+        "python_on_whales.Image",
+        "python_on_whales.Network",
+        "python_on_whales.Node",
+        "python_on_whales.Service",
+        "python_on_whales.Volume",
+    ],
+)
 doc_generator.generate("./generated_sources")
