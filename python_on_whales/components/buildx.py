@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import python_on_whales.components.image
 from python_on_whales.client_config import (
@@ -104,16 +104,34 @@ class BuildxCLI(DockerCLICaller):
         file: Optional[ValidPath] = None,
         network: Optional[str] = None,
         cache: bool = True,
-        platform: Optional[str] = None,
+        output: Optional[Dict[str, str]] = None,
+        platforms: Optional[List[str]] = None,
         progress: str = "auto",
         pull: bool = False,
         push: bool = False,
-        target: Optional[str] = None,
         tags: Union[str, List[str]] = [],
+        target: Optional[str] = None,
     ) -> Optional[python_on_whales.components.image.Image]:
-        """
+        """Build a Docker image with builkit as backend.
+
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
+
+        # Arguments
+            context_path: The path of the build context.
+            file: The path of the Dockerfile
+            network: which network to use when building the Docker image
+            cache: Whether or not to use the cache
+            output: Output destination
+                (format: `output={"type": "local", "dest": "path"}`
+            platforms: List of target platforms when building the image. Ex:
+                `platforms=["linux/amd64", "linux/arm64"]`
+            progress:Set type of progress output (auto, plain, tty).
+                Use plain to keep the container output on screen
+            pull: Always attempt to pull a newer version of the image
+            push: Shorthand for `output={"type": "registry"}`.
+            target: Set the target build stage to build.
+            tags: Tag or tags to put on the resulting image.
         """
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
@@ -121,27 +139,21 @@ class BuildxCLI(DockerCLICaller):
         if progress != "auto":
             full_cmd += ["--progress", progress]
 
-        if pull:
-            full_cmd.append("--pull")
-        if push:
-            full_cmd.append("--push")
-
-        if file is not None:
-            full_cmd += ["--file", str(file)]
-
-        if target is not None:
-            full_cmd += ["--target", target]
-        if platform is not None:
-            full_cmd += ["--platform", platform]
-        if network is not None:
-            full_cmd += ["--network", network]
-        if not cache:
-            full_cmd.append("--no-cache")
+        full_cmd.add_flag("--pull", pull)
+        full_cmd.add_flag("--push", push)
+        full_cmd.add_simple_arg("--file", file)
+        full_cmd.add_simple_arg("--target", target)
+        if output is not None:
+            full_cmd += ["--output", ",".join(output)]
+        if platforms is not None:
+            full_cmd += ["--platform", ",".join(platforms)]
+        full_cmd.add_simple_arg("--network", network)
+        full_cmd.add_flag("--no-cache", not cache)
 
         for tag in to_list(tags):
             full_cmd += ["--tag", tag]
 
-        full_cmd.append(str(context_path))
+        full_cmd.append(context_path)
 
         run(full_cmd, capture_stderr=False)
         if tags == []:
