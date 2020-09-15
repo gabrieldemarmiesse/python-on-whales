@@ -121,8 +121,8 @@ class ContainerCLI(DockerCLICaller):
 
     def cp(
         self,
-        source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
-        destination: Union[None, ValidPath, ContainerPath],
+        source: Union[ValidPath, ContainerPath],
+        destination: Union[ValidPath, ContainerPath],
     ):
         """Copy files/folders between a container and the local filesystem
 
