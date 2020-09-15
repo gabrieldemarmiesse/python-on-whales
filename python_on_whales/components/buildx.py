@@ -51,21 +51,39 @@ class BuildxCLI(DockerCLICaller):
     def bake(
         self,
         targets: Union[str, List[str]],
+        files: Union[ValidPath, List[ValidPath]] = [],
         cache: bool = True,
         load: bool = False,
         pull: bool = False,
         push: bool = False,
+        set: List[str] = [],
     ) -> None:
-        full_cmd = self.docker_cmd + ["buildx", "bake"]
-        if not cache:
-            full_cmd.append("--no-cache")
-        if load:
-            full_cmd.append("--load")
-        if pull:
-            full_cmd.append("--pull")
-        if push:
-            full_cmd.append("--push")
+        """Bake is similar to make, it allows you to build things declared in a file.
 
+        For example it allows you to build multiple docker image in parallel.
+
+        The CLI docs is [here](https://github.com/docker/buildx#buildx-bake-options-target)
+        and it contains a lot more information.
+
+        # Arguments
+            targets: Targets or groups of targets to build.
+            files: Build definition file(s)
+            cache: Whether to use the cache or not.
+            load: Shorthand for `set=["*.output=type=docker"]`
+            pull: Always try to pull the newer version of the image
+            push: Shorthand for `set=["*.output=type=registry"]`
+            set: A list of overrides in the form `"targetpattern.key=value"`.
+        """
+        full_cmd = self.docker_cmd + ["buildx", "bake"]
+
+        full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_flag("--load", load)
+        full_cmd.add_flag("--pull", pull)
+        full_cmd.add_flag("--push", push)
+        for file in to_list(files):
+            full_cmd.add_simple_arg("--file", file)
+        for override in set:
+            full_cmd.add_simple_arg("--set", override)
         run(full_cmd + to_list(targets), capture_stderr=False)
 
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
@@ -92,11 +110,16 @@ class BuildxCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def remove(self, builder: Union[Builder, str]) -> str:
+    def remove(self, builder: Union[Builder, str]):
+        """Remove a builder
+
+        # Arguments
+            builder: The builder to remove
+        """
         full_cmd = self.docker_cmd + ["buildx", "rm"]
 
         full_cmd.append(str(builder))
-        return run(full_cmd)
+        run(full_cmd)
 
     def build(
         self,
