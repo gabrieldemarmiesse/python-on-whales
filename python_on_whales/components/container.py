@@ -94,6 +94,15 @@ class ContainerCLI(DockerCLICaller):
         message: Optional[str] = None,
         pause: bool = True,
     ):
+        """Create a new image from a container's changes
+
+        # Arguments
+            container: The container to create the image from
+            tag: tag to apply on the image produced
+            author: Author (e.g., "John Hannibal Smith <hannibal@a-team.com>")
+            message: Commit message
+            pause: Pause container during commit
+        """
         full_cmd = self.docker_cmd + ["container", "commit"]
 
         if author is not None:
@@ -115,6 +124,18 @@ class ContainerCLI(DockerCLICaller):
         source: Union[bytes, Iterator[bytes], ValidPath, ContainerPath],
         destination: Union[None, ValidPath, ContainerPath],
     ):
+        """Copy files/folders between a container and the local filesystem
+
+        Doesn't yet support sending or receiving iterators of Python bytes.
+
+        # Arguments
+            source: Local path or tuple. When using a tuple, the first element
+                of the tuple is the container, the second element is the path in
+                the container. ex: `source=("my-container", "/usr/bin/something")`.
+            destination: Local path or tuple. When using a tuple, the first element
+                of the tuple is the container, the second element is the path in
+                the container. ex: `source=("my-container", "/usr/bin/something")`.
+        """
         # TODO: tests and handling bytes streams.
         full_cmd = self.docker_cmd + ["container", "cp"]
 
