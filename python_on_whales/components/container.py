@@ -159,6 +159,16 @@ class ContainerCLI(DockerCLICaller):
         raise NotImplementedError
 
     def diff(self, container: ValidContainer) -> Dict[str, str]:
+        """List all the files modified, added or deleted since the container started.
+
+        # Arguments
+            container: The container to inspect
+
+        # Returns
+            `Dict[str, str]` Something like
+            `{"/some_path": "A", "/some_file": "M", "/tmp": "D"}` for example.
+
+        """
         full_cmd = self.docker_cmd + ["diff", container]
 
         result_dict = {}
@@ -173,6 +183,17 @@ class ContainerCLI(DockerCLICaller):
         command: Union[str, List[str]],
         detach: bool = False,
     ) -> Optional[str]:
+        """Execute a command inside a container
+
+        # Arguments
+            container: The container to execute the command in.
+            command: The command to execute.
+            detach: if `True`, returns immediately with `None`. If `False`,
+                returns the command stdout as string.
+
+        # Returns:
+            Optional[str]
+        """
         full_cmd = self.docker_cmd + ["exec"]
 
         full_cmd.add_flag("--detach", detach)
@@ -204,7 +225,16 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
         return None
 
-    def inspect(self, reference: str):
+    def inspect(self, reference: str) -> Container:
+        """Returns a container object from a name or ID.
+
+        # Arguments
+            reference: A container name or ID.
+
+        # Returns:
+            A `python_on_whales.Container` object.
+
+        """
         return Container(self.client_config, reference)
 
     def kill(
@@ -212,6 +242,12 @@ class ContainerCLI(DockerCLICaller):
         containers: Union[ValidContainer, List[ValidContainer]],
         signal: str = None,
     ):
+        """Kill a container.
+
+        # Arguments
+            containers: One or more containers to kill
+            signal: The signal to send the container
+        """
         full_cmd = self.docker_cmd + ["container", "kill"]
 
         if signal is not None:
@@ -228,6 +264,14 @@ class ContainerCLI(DockerCLICaller):
         return run(full_cmd + [str(container)])
 
     def list(self, all: bool = False) -> List[Container]:
+        """List the containers on the host.
+
+        # Arguments
+            all: If `True`, also returns containers that are not running.
+
+        # Returns
+            A `List[python_on_whales.Container]`
+        """
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
         if all:
@@ -236,6 +280,11 @@ class ContainerCLI(DockerCLICaller):
         return [Container(self.client_config, x) for x in run(full_cmd).splitlines()]
 
     def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
+        """Pauses one or more containers
+
+        # Arguments
+            containers: One or more containers to pause
+        """
         full_cmd = self.docker_cmd + ["pause"]
         for container in to_list(containers):
             full_cmd.append(str(container))
@@ -243,12 +292,23 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     def prune(self, filters: Union[str, List[str]] = []) -> None:
+        """Remove containers that are not running.
+
+        # Arguments
+            filters: Filters as strings or list of strings
+        """
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
         for filter_ in to_list(filters):
             full_cmd += ["--filter", filter_]
         run(full_cmd)
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
+        """Changes the name of a container.
+
+        # Arguments
+            container: The container to rename
+            new_name: The new name of the container.
+        """
         full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
         run(full_cmd)
 
@@ -257,6 +317,13 @@ class ContainerCLI(DockerCLICaller):
         containers: Union[ValidContainer, List[ValidContainer]],
         time: Optional[Union[int, timedelta]] = None,
     ):
+        """Restarts one or more container.
+
+        # Arguments
+            containers: One or more containers to restart
+            time: Amount of to wait for stop before killing the container (default 10s).
+                If `int`, the unit is seconds.
+        """
         full_cmd = self.docker_cmd + ["restart"]
 
         if time is not None:
@@ -386,6 +453,48 @@ class ContainerCLI(DockerCLICaller):
         # volumes_from: Any = None,
         workdir: Optional[ValidPath] = None,
     ) -> Union[Container, str]:
+        """Runs a container
+
+        For a deeper dive into the arguments and what they do, visit
+        https://docs.docker.com/engine/reference/run/
+
+        ```python
+        >>> from python_on_whales import docker
+        >>> returned_string = docker.run("hello-world")
+        >>> print(returned_string)
+
+        Hello from Docker!
+        This message shows that your installation appears to be working correctly.
+
+        To generate this message, Docker took the following steps:
+         1. The Docker client contacted the Docker daemon.
+         2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+            (amd64)
+         3. The Docker daemon created a new container from that image which runs the
+            executable that produces the output you are currently reading.
+         4. The Docker daemon streamed that output to the Docker client, which sent it
+            to your terminal.
+
+        To try something more ambitious, you can run an Ubuntu container with:
+         $ docker run -it ubuntu bash
+
+        Share images, automate workflows, and more with a free Docker ID:
+         https://hub.docker.com/
+
+        For more examples and ideas, visit:
+         https://docs.docker.com/get-started/
+        ```
+
+        # Arguments
+            image: The docker image to use for the container
+            command: List of arguments to provide to the container.
+            cpus: The maximal amount of cpu the container can use.
+                `1` means one cpu core.
+
+        # Returns
+            The container output as a string if detach is `False` (the default),
+            and a `python_on_whales.Container` if detach is `True`.
+        """
         full_cmd = self.docker_cmd + ["container", "run"]
 
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)

@@ -199,7 +199,7 @@ class ImageCLI(DockerCLICaller):
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
     ):
-        """ Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
+        """Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
 
         # Arguments
             input: Path or input stream to load the images from.
