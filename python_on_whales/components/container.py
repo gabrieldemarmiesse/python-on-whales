@@ -456,7 +456,7 @@ class ContainerCLI(DockerCLICaller):
         """Runs a container
 
         For a deeper dive into the arguments and what they do, visit
-        https://docs.docker.com/engine/reference/run/
+        <https://docs.docker.com/engine/reference/run/>
 
         ```python
         >>> from python_on_whales import docker
@@ -485,11 +485,47 @@ class ContainerCLI(DockerCLICaller):
          https://docs.docker.com/get-started/
         ```
 
+        ```python
+        >>> from python_on_whales import docker
+        >>> result_string = docker.run("ubuntu", ["ls", "/host"], volumes=[("/", "/host", "ro")])
+        >>> print(result_string)
+        bin
+        boot
+        dev
+        etc
+        home
+        init
+        lib
+        lib64
+        lost+found
+        media
+        mnt
+        opt
+        proc
+        projects
+        root
+        run
+        sbin
+        snap
+        srv
+        sys
+        tmp
+        usr
+        var
+        ```
+
         # Arguments
             image: The docker image to use for the container
             command: List of arguments to provide to the container.
             cpus: The maximal amount of cpu the container can use.
                 `1` means one cpu core.
+            user: Username or UID (format: <name|uid>[:<group|gid>])
+            userns:  User namespace to use
+            uts:  UTS namespace to use
+            volumes:  Bind mount a volume. Some examples:
+                `[("/", "/host"), ("/etc/hosts", "/etc/hosts", "rw")]`.
+            volume_driver: Optional volume driver for the container
+            workdir: The directory in the container where the process will be executed.
 
         # Returns
             The container output as a string if detach is `False` (the default),
