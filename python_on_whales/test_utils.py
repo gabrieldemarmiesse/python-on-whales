@@ -6,7 +6,7 @@ from python_on_whales import client_config
 
 
 def random_name() -> str:
-    return "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=20))
 
 
 @contextmanager
