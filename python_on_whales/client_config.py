@@ -171,6 +171,10 @@ class ReloadableObject(DockerCLICaller):
             self.reload()
         return self._immutable_id
 
+    def __hash__(self):
+        # maybe we can do better.
+        return hash(self._get_immutable_id())
+
 
 class ReloadableObjectFromJson(ReloadableObject):
     def _fetch_inspect_result_json(self, reference):
