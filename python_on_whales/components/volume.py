@@ -109,12 +109,17 @@ class VolumeCLI(DockerCLICaller):
         container = python_on_whales.components.container.ContainerCLI(
             self.client_config
         )
-        volume_name = str(source[0])
-        volume_in_container = Path("/volume")
-        dummy_container = container.create(
-            dummy_image, volumes=[(volume_name, volume_in_container)]
-        )
-        container.cp((dummy_container, volume_in_container / source[1]), destination)
+        if isinstance(source, tuple):
+            volume_name = str(source[0])
+            volume_in_container = Path("/volume")
+            dummy_container = container.create(
+                dummy_image, volumes=[(volume_name, volume_in_container)]
+            )
+            container.cp(
+                (dummy_container, volume_in_container / source[1]), destination
+            )
+        else:
+            raise NotImplementedError
         dummy_container.remove()
         dummy_image.remove()
 
