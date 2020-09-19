@@ -79,3 +79,16 @@ def test_volume_inspect_result_config():
         "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
     )
     assert a.options is None
+
+
+def test_copy_to_volume(tmp_path):
+    some_volume = docker.volume.create()
+    docker.run(
+        "busybox",
+        ["touch", "/volume/dodo.txt"],
+        rm=True,
+        volumes=[(some_volume, "/volume")],
+    )
+
+    docker.volume.cp((some_volume, "dodo.txt"), tmp_path)
+    assert (tmp_path / "dodo.txt").exists()

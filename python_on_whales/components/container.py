@@ -172,6 +172,15 @@ class ContainerCLI(DockerCLICaller):
     ):
         """Copy files/folders between a container and the local filesystem
 
+        ```python
+        from python_on_whales import docker
+
+        docker.run("ubuntu", ["sleep", "infinity"], name="dodo", rm=True)
+
+        docker.cp("/tmp/my_local_file.txt", ("dodo", "/path/in/container.txt"))
+        docker.cp(("dodo", "/path/in/container.txt"), "/tmp/my_local_file2.txt")
+        ```
+
         Doesn't yet support sending or receiving iterators of Python bytes.
 
         # Arguments
@@ -200,6 +209,25 @@ class ContainerCLI(DockerCLICaller):
             destination = str(destination)
 
         run(full_cmd + [source, destination])
+
+    def create(
+        self,
+        image: str,
+        volumes: Optional[List[VolumeDefinition]] = [],
+    ) -> Container:
+        """Creates a container.
+
+        # Arguments
+            image: The docker image to create the container from.
+        """
+        full_cmd = self.docker_cmd + ["create"]
+
+        for volume_definition in volumes:
+            volume_definition = tuple(str(x) for x in volume_definition)
+            full_cmd += ["--volume", ":".join(volume_definition)]
+
+        full_cmd.append(image)
+        return Container(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def diff(self, container: ValidContainer) -> Dict[str, str]:
         """List all the files modified, added or deleted since the container started.
