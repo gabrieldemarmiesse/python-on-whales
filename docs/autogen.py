@@ -53,5 +53,6 @@ doc_generator = MyDocumentationGenerator(
         "python_on_whales.Service",
         "python_on_whales.Volume",
     ],
+    titles_size="##"
 )
 doc_generator.generate("./generated_sources")

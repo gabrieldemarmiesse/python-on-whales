@@ -5,7 +5,6 @@ docs_dir: generated_sources
 site_description: 'Python on whales docs'
 
 nav:
-  - index: index.md
   - Docker client: docker_client.md
   - Sub-commands:
     - Buildx: sub-commands/buildx.md
