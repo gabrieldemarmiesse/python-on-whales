@@ -92,7 +92,7 @@ class VolumeCLI(DockerCLICaller):
     def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
         """Removes one or more volumes
 
-        # Arguments:
+        # Arguments
             x: A volume or a list of volumes.
         """
 
@@ -111,6 +111,18 @@ class VolumeCLI(DockerCLICaller):
         labels: Dict[str, str] = {},
         options: Dict[str, str] = {},
     ) -> Volume:
+        """Clone a volume.
+
+        # Arguments
+            source: The volume to clone
+            new_volume_name: The new volume name. If not given, a random name is chosen.
+            driver: Specify volume driver name (default "local")
+            labels: Set metadata for a volume
+            options: Set driver specific options
+
+        # Returns
+            A `python_on_whales.Volume`, the new volume.
+        """
         new_volume = self.create(new_volume_name, driver, labels, options)
         with tempfile.TemporaryDirectory() as temp_dir:
             self.cp((source, "."), temp_dir)
@@ -129,7 +141,8 @@ class VolumeCLI(DockerCLICaller):
                 a tuple `(my_volume, path_in_volume)` must be provided. The volume
                 can be a `python_on_whales.Volume` or a volume name as `str`. The path
                 can be a `pathlib.Path` or a `str`. If `source` is  a local directory,
-                a `pathlib.Path` or `str` should be provided.
+                a `pathlib.Path` or `str` should be provided. End the source path with
+                `/.` if you want to copy the directory content in another directory.
             destination: Same as `source`.
         """
         with tempfile.TemporaryDirectory() as temp_dir:
