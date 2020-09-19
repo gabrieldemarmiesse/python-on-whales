@@ -71,14 +71,60 @@ class Container(ReloadableObjectFromJson):
             self.client_config, self._get_inspect_result().image, is_immutable_id=True
         )
 
-    def kill(self, signal: str = None):
-        return ContainerCLI(self.client_config).kill(self, signal)
+    def commit(
+        self,
+        tag: Optional[str] = None,
+        author: Optional[str] = None,
+        message: Optional[str] = None,
+        pause: bool = True,
+    ) -> Image:
+        """Create a new image from the container's changes.
 
-    def remove(self, force: bool = False, volumes=False):
-        return ContainerCLI(self.client_config).remove(self, force, volumes)
+        See [The `docker.container.commit`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
+        return ContainerCLI(self.client_config).commit(
+            self, tag, author, message, pause
+        )
+
+    def copy_from(self, container_path: ValidPath, local_path: ValidPath):
+        return ContainerCLI(self.client_config).cp((self, container_path), local_path)
+
+    def copy_to(self, local_path: ValidPath, container_path: ValidPath):
+        return ContainerCLI(self.client_config).cp(local_path, (self, container_path))
+
+    def diff(self) -> Dict[str, str]:
+        return ContainerCLI(self.client_config).diff(self)
 
     def exec(self, command: Union[str, List[str]], detach: bool = False):
         return ContainerCLI(self.client_config).exec(self, command, detach)
+
+    def export(self, output: ValidPath) -> None:
+        return ContainerCLI(self.client_config).export(self, output)
+
+    def kill(self, signal: str = None):
+        return ContainerCLI(self.client_config).kill(self, signal)
+
+    def logs(self) -> str:
+        return ContainerCLI(self.client_config).logs(self)
+
+    def pause(self) -> None:
+        return ContainerCLI(self.client_config).pause(self)
+
+    def rename(self, new_name: str) -> None:
+        return ContainerCLI(self.client_config).rename(self, new_name)
+
+    def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
+        return ContainerCLI(self.client_config).restart(self, time)
+
+    def remove(self, force: bool = False, volumes: bool = False) -> None:
+        return ContainerCLI(self.client_config).remove(self, force, volumes)
+
+    def start(self) -> None:
+        return ContainerCLI(self.client_config).start(self)
+
+    def stop(self, time: Union[int, timedelta] = None) -> None:
+        return ContainerCLI(self.client_config).stop(self, time)
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
@@ -93,7 +139,7 @@ class ContainerCLI(DockerCLICaller):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ):
+    ) -> Image:
         """Create a new image from a container's changes
 
         # Arguments
@@ -155,9 +201,6 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd + [source, destination])
 
-    def create(self):
-        raise NotImplementedError
-
     def diff(self, container: ValidContainer) -> Dict[str, str]:
         """List all the files modified, added or deleted since the container started.
 
@@ -208,13 +251,7 @@ class ContainerCLI(DockerCLICaller):
         else:
             return result
 
-    def export(
-        self, container: ValidContainer, output: Optional[ValidPath] = None
-    ) -> Optional[Iterator[bytes]]:
-        if output is None:
-            raise NotImplementedError(
-                "Returning the bytestream isn't supported yet. Pull request welcome :)"
-            )
+    def export(self, container: ValidContainer, output: ValidPath) -> None:
         full_cmd = self.docker_cmd + [
             "container",
             "--output",
@@ -223,7 +260,6 @@ class ContainerCLI(DockerCLICaller):
             container,
         ]
         run(full_cmd)
-        return None
 
     def inspect(self, reference: str) -> Container:
         """Returns a container object from a name or ID.
@@ -340,19 +376,16 @@ class ContainerCLI(DockerCLICaller):
         self,
         containers: Union[Container, str, List[Union[Container, str]]],
         force: bool = False,
-        volumes=False,
-    ) -> List[str]:
+        volumes: bool = False,
+    ) -> None:
         full_cmd = self.docker_cmd + ["container", "rm"]
-
-        if force:
-            full_cmd.append("--force")
-        if volumes:
-            full_cmd.append("--volumes")
+        full_cmd.add_flag("--force", force)
+        full_cmd.add_flag("--volumes", volumes)
 
         for container in to_list(containers):
             full_cmd.append(str(container))
 
-        return run(full_cmd).splitlines()
+        run(full_cmd).splitlines()
 
     def run(
         self,
@@ -621,7 +654,15 @@ class ContainerCLI(DockerCLICaller):
         else:
             return run(full_cmd)
 
-    def start(self, containers: Union[ValidContainer, List[ValidContainer]]):
+    def start(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
+        """Starts one or more stopped containers.
+
+        Aliases: `docker.start`, `docker.container.start`,
+        `python_on_whales.Container.start`.
+
+        # Arguments
+            containers: One or a list of containers.
+        """
         full_cmd = self.docker_cmd + ["container", "start"]
         for container in to_list(containers):
             full_cmd.append(container)
@@ -632,6 +673,15 @@ class ContainerCLI(DockerCLICaller):
         containers: Union[ValidContainer, List[ValidContainer]],
         time: Union[int, timedelta] = None,
     ):
+        """Stops one or more running containers
+
+        Aliases: `docker.stop`, `docker.container.stop`,
+        `python_on_whales.Container.stop`.
+
+        # Arguments
+            containers: One or a list of containers.
+            time: Seconds to wait for stop before killing a container (default 10)
+        """
         full_cmd = self.docker_cmd + ["container", "stop"]
         if isinstance(time, timedelta):
             time = time.total_seconds()
