@@ -392,7 +392,7 @@ class ContainerCLI(DockerCLICaller):
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
         # expose: Any = None,
-        gpus: Optional[str] = None,
+        gpus: Union[int, str, None] = None,
         # group_add: Any = None,
         # health_cmd: Any = None,
         # health_interval: Any = None,
@@ -454,6 +454,8 @@ class ContainerCLI(DockerCLICaller):
         workdir: Optional[ValidPath] = None,
     ) -> Union[Container, str]:
         """Runs a container
+
+        You can use `docker.run` or `docker.container.run` to call this function.
 
         For a deeper dive into the arguments and what they do, visit
         <https://docs.docker.com/engine/reference/run/>
@@ -517,9 +519,34 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             image: The docker image to use for the container
             command: List of arguments to provide to the container.
+            blkio_weight:Block IO (relative weight), between 10 and 1000,
+                or 0 to disable (default 0)
+            cpu_period: Limit CPU CFS (Completely Fair Scheduler) period
+            cpu_quota: Limit CPU CFS (Completely Fair Scheduler) quota
+            cpu_rt_period: Limit CPU real-time period in microseconds
+            cpu_rt_runtime: Limit CPU real-time runtime in microseconds
+            cpu_shares: CPU shares (relative weight)
             cpus: The maximal amount of cpu the container can use.
                 `1` means one cpu core.
-            user: Username or UID (format: <name|uid>[:<group|gid>])
+            detach: If `False`, returns the ouput of the container as a string.
+                If `True`, returns a `python_on_whales.Container` object.
+            envs: Environment variables as a `dict`.
+                For example: `{"OMP_NUM_THREADS": 3}`
+            env_files: One or a list of env files.
+            gpus: For this to work, you need the
+                [Nvidia container runtime](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#install-guide)
+                The value needed is a `str` or `int`. Some examples of valid argument
+                are `"all"` or `"device=GPU-3a23c669-1f69-c64e-cf85-44e9b07e7a2a"` or
+                `"device=0,2"`. If you want 3 gpus, just write `gpus=3`.
+            hostname: Container host name
+            ip: IPv4 address (e.g., 172.30.100.104)
+            ip6: IPv6 address (e.g., 2001:db8::33)
+            ipc: IPC mode to use
+            isolation: Container isolation technology
+            kernel_memory: Kernel memory limit. `int` represents the number of bytes,
+                but you can use `"4k"` or `2g` for example.
+            log_driver: Logging driver for the container
+            user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
             volumes:  Bind mount a volume. Some examples:
