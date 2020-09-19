@@ -17,6 +17,9 @@ pages = {
     "sub-commands/service.md": get_methods(
         "python_on_whales.components.service.ServiceCLI"
     ),
+    "sub-commands/system.md": get_methods(
+        "python_on_whales.components.system.SystemCLI"
+    ),
     "sub-commands/volume.md": get_methods(
         "python_on_whales.components.volume.VolumeCLI"
     ),
@@ -53,6 +56,6 @@ doc_generator = MyDocumentationGenerator(
         "python_on_whales.Service",
         "python_on_whales.Volume",
     ],
-    titles_size="##"
+    titles_size="##",
 )
 doc_generator.generate("./generated_sources")

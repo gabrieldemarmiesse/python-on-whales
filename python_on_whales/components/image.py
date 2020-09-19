@@ -99,6 +99,9 @@ class Image(ReloadableObjectFromJson):
     def repo_tags(self) -> List[str]:
         return self._get_inspect_result().repo_tags
 
+    def remove(self):
+        ImageCLI(self.client_config).remove(self)
+
 
 ValidImage = Union[str, Image]
 
@@ -244,12 +247,10 @@ class ImageCLI(DockerCLICaller):
         """
 
         full_cmd = self.docker_cmd + ["image", "remove"]
-        if isinstance(x, str):
-            full_cmd.append(x)
-        if isinstance(x, list):
-            full_cmd += x
+        for image in to_list(x):
+            full_cmd.append(image)
 
-        run(full_cmd).split("\n")
+        run(full_cmd)
 
     def list(self) -> List[Image]:
         """Returns the list of Docker images present on the machine.

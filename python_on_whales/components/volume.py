@@ -1,7 +1,10 @@
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import python_on_whales.components.buildx
+import python_on_whales.components.container
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -50,6 +53,7 @@ class Volume(ReloadableObjectFromJson):
 
 
 ValidVolume = Union[Volume, str]
+VolumePath = Tuple[Union[Volume, str], ValidPath]
 
 
 class VolumeCLI(DockerCLICaller):
@@ -75,13 +79,44 @@ class VolumeCLI(DockerCLICaller):
 
         return Volume(self.client_config, run(full_cmd))
 
-    def remove(self, x: Union[ValidVolume, List[ValidVolume]]) -> List[str]:
+    def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
+        """Removes one or more volumes
+
+        # Arguments:
+            x: A volume or a list of volumes.
+        """
+
         full_cmd = self.docker_cmd + ["volume", "remove"]
 
         for v in to_list(x):
             full_cmd.append(str(v))
 
-        return run(full_cmd).split("\n")
+        run(full_cmd)
+
+    def cp(
+        self,
+        source: Union[ValidPath, VolumePath],
+        destination: Union[ValidPath, VolumePath],
+    ):
+        """Copy files/folders between a volume and the local filesystem."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir = Path(temp_dir)
+            content = "FROM scratch\nCOPY Dockerfile /\nCMD /Dockerfile"
+            (temp_dir / "Dockerfile").write_text(content)
+            buildx = python_on_whales.components.buildx.BuildxCLI(self.client_config)
+            dummy_image = buildx.build(temp_dir, tags="python-on-whales-temp-image")
+
+        container = python_on_whales.components.container.ContainerCLI(
+            self.client_config
+        )
+        volume_name = str(source[0])
+        volume_in_container = Path("/volume")
+        dummy_container = container.create(
+            dummy_image, volumes=[(volume_name, volume_in_container)]
+        )
+        container.cp((dummy_container, volume_in_container / source[1]), destination)
+        dummy_container.remove()
+        dummy_image.remove()
 
     def prune(self, filters: Dict[str, str] = {}, force: bool = False):
         full_cmd = self.docker_cmd + ["volume", "prune"]

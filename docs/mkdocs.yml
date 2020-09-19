@@ -13,6 +13,7 @@ nav:
     - Node: sub-commands/node.md
     - Network: sub-commands/network.md
     - Service: sub-commands/service.md
+    - System: sub-commands/system.md
     - Volume: sub-commands/volume.md
   - Docker objects:
     - Builders: docker_objects/builders.md

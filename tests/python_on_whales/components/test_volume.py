@@ -13,8 +13,10 @@ def test_simple_volume():
 def test_multiple_volumes():
     volumes = [docker.volume.create() for _ in range(3)]
 
-    volumes_deleted = docker.volume.remove(volumes)
-    assert volumes_deleted == [x.name for x in volumes]
+    docker.volume.remove(volumes)
+
+    for v in volumes:
+        assert v not in docker.volume.list()
 
 
 def test_volume_drivers():
@@ -79,3 +81,16 @@ def test_volume_inspect_result_config():
         "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
     )
     assert a.options is None
+
+
+def test_copy_to_volume(tmp_path):
+    some_volume = docker.volume.create()
+    docker.run(
+        "busybox",
+        ["touch", "/volume/dodo.txt"],
+        rm=True,
+        volumes=[(some_volume, "/volume")],
+    )
+
+    docker.volume.cp((some_volume, "dodo.txt"), tmp_path)
+    assert (tmp_path / "dodo.txt").exists()
