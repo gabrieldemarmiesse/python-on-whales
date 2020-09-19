@@ -129,7 +129,7 @@ class BuildxCLI(DockerCLICaller):
         cache: bool = True,
         output: Optional[Dict[str, str]] = None,
         platforms: Optional[List[str]] = None,
-        progress: str = "auto",
+        progress: Union[str, bool] = "auto",
         pull: bool = False,
         push: bool = False,
         tags: Union[str, List[str]] = [],
@@ -149,7 +149,7 @@ class BuildxCLI(DockerCLICaller):
                 (format: `output={"type": "local", "dest": "path"}`
             platforms: List of target platforms when building the image. Ex:
                 `platforms=["linux/amd64", "linux/arm64"]`
-            progress:Set type of progress output (auto, plain, tty).
+            progress:Set type of progress output (auto, plain, tty, or False).
                 Use plain to keep the container output on screen
             pull: Always attempt to pull a newer version of the image
             push: Shorthand for `output={"type": "registry"}`.
@@ -159,7 +159,7 @@ class BuildxCLI(DockerCLICaller):
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
 
-        if progress != "auto":
+        if progress != "auto" and isinstance(progress, str):
             full_cmd += ["--progress", progress]
 
         full_cmd.add_flag("--pull", pull)
@@ -178,7 +178,7 @@ class BuildxCLI(DockerCLICaller):
 
         full_cmd.append(context_path)
 
-        run(full_cmd, capture_stderr=False)
+        run(full_cmd, capture_stderr=progress is False)
         if tags == []:
             return None
         else:
