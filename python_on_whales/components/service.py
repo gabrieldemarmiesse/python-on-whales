@@ -57,9 +57,15 @@ ValidService = Union[str, Service]
 class ServiceCLI(DockerCLICaller):
     def create(
         self,
-        image: python_on_whales.components.image.ValidImage,
+        image: str,
         command: Union[str, List[str], None],
     ):
+        """Creates a Docker swarm service.
+
+        # Arguments:
+            image: The image to use as the base for the service.
+            command: The command to execute in the container(s).
+        """
         full_cmd = self.docker_cmd + ["service", "create", "--quiet"]
 
         full_cmd.append(image)
@@ -71,6 +77,11 @@ class ServiceCLI(DockerCLICaller):
         return Service(self.client_config, service_id, is_immutable_id=True)
 
     def remove(self, services: Union[ValidService, List[ValidService]]):
+        """Removes a service
+
+        # Arguments
+            services: One or a list of services to remove.
+        """
         full_cmd = self.docker_cmd + ["service", "remove"]
 
         for service in to_list(services):
@@ -78,14 +89,28 @@ class ServiceCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def scale(self, new_scales: List[Tuple[ValidService, int]], detach=False):
+    def scale(self, new_scales: Dict[ValidService, int], detach=False):
+        """Scale one or more services.
+
+        # Arguments
+            new_scales: Mapping between services and the desired scales. For example
+                you can provide `new_scale={"service1": 4, "service2": 8}`
+            detach: If True, does not wait for the services to converge and return
+                immediately.
+        """
+
         full_cmd = self.docker_cmd + ["service", "scale"]
         full_cmd.add_flag("--detach", detach)
-        for service, new_scale in new_scales:
+        for service, new_scale in new_scales.items():
             full_cmd.append(f"{str(service)}={new_scale}")
         run(full_cmd, capture_stderr=False, capture_stdout=False)
 
     def list(self) -> List[Service]:
+        """Returns the list of services
+
+        # Returns
+            A `List[python_on_whales.Services]`
+        """
         full_cmd = self.docker_cmd + ["service", "list", "--quiet"]
 
         ids = run(full_cmd).splitlines()

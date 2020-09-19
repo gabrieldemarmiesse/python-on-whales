@@ -9,6 +9,7 @@
 * [`docker.image`](sub-commands/image.md)
 * [`docker.network`](sub-commands/network.md)
 * [`docker.node`](sub-commands/node.md)
+* [`docker.service`](sub-commands/service.md)
 * [`docker.system`](sub-commands/system.md)
 * [`docker.volume`](sub-commands/volume.md)
 
