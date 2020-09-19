@@ -94,3 +94,19 @@ def test_copy_to_volume(tmp_path):
 
     docker.volume.cp((some_volume, "dodo.txt"), tmp_path)
     assert (tmp_path / "dodo.txt").exists()
+
+
+def test_copy_to_and_from_volume(tmp_path):
+    return
+    # TODO: fixme.
+    some_volume = docker.volume.create()
+
+    text_file = tmp_path / "some_dir" / "dodo.txt"
+    text_file.parent.mkdir(parents=True)
+    text_file.write_text("Hello\nWorld!")
+    docker.volume.cp(tmp_path, (some_volume, "subdir"))
+
+    text_file.unlink()
+    docker.volume.cp((some_volume, "subdir/"), tmp_path)
+
+    assert text_file.read_text() == "Hello\nWorld!"

@@ -5,11 +5,13 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import python_on_whales.components.buildx
 import python_on_whales.components.container
+import python_on_whales.components.image
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
+from python_on_whales.test_utils import random_name
 from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
 
 
@@ -64,18 +66,25 @@ class VolumeCLI(DockerCLICaller):
         labels: Dict[str, str] = {},
         options: Dict[str, str] = {},
     ) -> Volume:
+        """Creates a volume
+
+        # Arguments
+            volume_name: The volume name, if not provided, a long random
+                string will be used instead.
+            driver: Specify volume driver name (default "local")
+            labels: Set metadata for a volume
+            options: Set driver specific options
+        """
         full_cmd = self.docker_cmd + ["volume", "create"]
 
-        if volume_name is not None:
-            full_cmd += [volume_name]
-        if driver is not None:
-            full_cmd += ["--driver", driver]
-
+        full_cmd.add_simple_arg("--driver", driver)
         for key, value in labels.items():
             full_cmd += ["--label", f"{key}={value}"]
-
         for key, value in options.items():
             full_cmd += ["--opt", f"{key}={value}"]
+
+        if volume_name is not None:
+            full_cmd.append(volume_name)
 
         return Volume(self.client_config, run(full_cmd))
 
@@ -98,43 +107,79 @@ class VolumeCLI(DockerCLICaller):
         source: Union[ValidPath, VolumePath],
         destination: Union[ValidPath, VolumePath],
     ):
-        """Copy files/folders between a volume and the local filesystem."""
+        """Copy files/folders between a volume and the local filesystem.
+
+        # Arguments
+            source: If `source` is a directory/file inside a Docker volume,
+                a tuple `(my_volume, path_in_volume)` must be provided. The volume
+                can be a `python_on_whales.Volume` or a volume name as `str`. The path
+                can be a `pathlib.Path` or a `str`. If `source` is  a local directory,
+                a `pathlib.Path` or `str` should be provided.
+            destination: Same as `source`.
+        """
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
             content = "FROM scratch\nCOPY Dockerfile /\nCMD /Dockerfile"
             (temp_dir / "Dockerfile").write_text(content)
             buildx = python_on_whales.components.buildx.BuildxCLI(self.client_config)
-            dummy_image = buildx.build(temp_dir, tags="python-on-whales-temp-image")
+            image_name = random_name()
+            dummy_image = buildx.build(temp_dir, tags=image_name)
 
         container = python_on_whales.components.container.ContainerCLI(
             self.client_config
         )
+        volume_in_container = Path("/volume")
         if isinstance(source, tuple):
             volume_name = str(source[0])
-            volume_in_container = Path("/volume")
+
             dummy_container = container.create(
                 dummy_image, volumes=[(volume_name, volume_in_container)]
             )
             container.cp(
                 (dummy_container, volume_in_container / source[1]), destination
             )
+        elif isinstance(destination, tuple):
+            volume_name = str(destination[0])
+            dummy_container = container.create(
+                dummy_image, volumes=[(volume_name, volume_in_container)]
+            )
+            container.cp(
+                source, (dummy_container, volume_in_container / destination[1])
+            )
         else:
-            raise NotImplementedError
+            raise ValueError("source or destination should be a tuple.")
         dummy_container.remove()
-        dummy_image.remove()
+        python_on_whales.components.image.ImageCLI(self.client_config).remove(
+            image_name
+        )
 
-    def prune(self, filters: Dict[str, str] = {}, force: bool = False):
-        full_cmd = self.docker_cmd + ["volume", "prune"]
+    def prune(self, filters: Dict[str, Union[str, int]] = {}) -> None:
+        """Remove volumes
+
+        # Arguments
+            filters: See the [Docker documentation page about filtering
+                ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
+                An example `filters=dict(dangling=1, driver="local")`.
+        """
+        full_cmd = self.docker_cmd + ["volume", "prune", "--force"]
 
         for key, value in filters.items():
             full_cmd += ["--filter", f"{key}={value}"]
 
-        if force:
-            full_cmd.append("--force")
+        run(full_cmd, capture_stderr=False, capture_stdout=False)
 
-        return run(full_cmd, capture_stderr=False, capture_stdout=False)
+    def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
+        """List volumes
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Volume]:
+        # Arguments
+            filters: See the [Docker documentation page about filtering
+                ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
+                An example `filters=dict(dangling=1, driver="local")`.
+
+        # Returns
+            `List[python_on_whales.Volume]`
+        """
+
         full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
 
         for key, value in filters.items():
