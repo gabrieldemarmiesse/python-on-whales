@@ -125,3 +125,59 @@ def test_copy_to_and_from_volume(tmp_path):
     docker.volume.cp((some_volume, "subdir/"), tmp_path)
 
     assert (tmp_path / "subdir/some_dir/dodo.txt").read_text() == "Hello\nWorld!"
+
+
+def test_volume_cp_from_in_dir(tmp_path):
+    some_volume = docker.volume.create()
+    docker.run(
+        "busybox",
+        ["touch", "/volume/dodo.txt"],
+        rm=True,
+        volumes=[(some_volume, "/volume")],
+    )
+
+    docker.volume.cp((some_volume, "."), tmp_path)
+    assert (tmp_path / "dodo.txt").exists()
+
+
+def test_volume_cp_to_in_dir(tmp_path):
+    dodo = tmp_path / "dada" / "dodo.txt"
+    dodo.parent.mkdir()
+    dodo.touch()
+    some_volume = docker.volume.create()
+    docker.volume.cp(str(tmp_path) + "/.", (some_volume, ""))
+    files = docker.run(
+        "busybox",
+        ["ls", "/volume/dada/"],
+        rm=True,
+        volumes=[(some_volume, "/volume")],
+    )
+
+    assert files == "dodo.txt"
+
+
+def test_clone():
+    some_volume = docker.volume.create()
+    docker.run(
+        "busybox",
+        [
+            "sh",
+            "-c",
+            "mkdir -p /volume/subdir/subdir2 && touch /volume/subdir/subdir2/dodo.txt",
+        ],
+        rm=True,
+        volumes=[(some_volume, "/volume")],
+    )
+
+    new_volume = docker.volume.clone(some_volume)
+    files = docker.run(
+        "busybox",
+        [
+            "sh",
+            "-c",
+            "ls /volume/subdir/subdir2",
+        ],
+        rm=True,
+        volumes=[(new_volume, "/volume")],
+    )
+    assert files == "dodo.txt"

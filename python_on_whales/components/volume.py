@@ -1,3 +1,4 @@
+import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -91,7 +92,7 @@ class VolumeCLI(DockerCLICaller):
     def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
         """Removes one or more volumes
 
-        # Arguments:
+        # Arguments
             x: A volume or a list of volumes.
         """
 
@@ -101,6 +102,32 @@ class VolumeCLI(DockerCLICaller):
             full_cmd.append(str(v))
 
         run(full_cmd)
+
+    def clone(
+        self,
+        source: ValidVolume,
+        new_volume_name: Optional[str] = None,
+        driver: Optional[str] = None,
+        labels: Dict[str, str] = {},
+        options: Dict[str, str] = {},
+    ) -> Volume:
+        """Clone a volume.
+
+        # Arguments
+            source: The volume to clone
+            new_volume_name: The new volume name. If not given, a random name is chosen.
+            driver: Specify volume driver name (default "local")
+            labels: Set metadata for a volume
+            options: Set driver specific options
+
+        # Returns
+            A `python_on_whales.Volume`, the new volume.
+        """
+        new_volume = self.create(new_volume_name, driver, labels, options)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            self.cp((source, "."), temp_dir)
+            self.cp(str(temp_dir) + "/.", (new_volume, ""))
+        return new_volume
 
     def cp(
         self,
@@ -114,7 +141,8 @@ class VolumeCLI(DockerCLICaller):
                 a tuple `(my_volume, path_in_volume)` must be provided. The volume
                 can be a `python_on_whales.Volume` or a volume name as `str`. The path
                 can be a `pathlib.Path` or a `str`. If `source` is  a local directory,
-                a `pathlib.Path` or `str` should be provided.
+                a `pathlib.Path` or `str` should be provided. End the source path with
+                `/.` if you want to copy the directory content in another directory.
             destination: Same as `source`.
         """
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -123,7 +151,7 @@ class VolumeCLI(DockerCLICaller):
             (temp_dir / "Dockerfile").write_text(content)
             buildx = python_on_whales.components.buildx.BuildxCLI(self.client_config)
             image_name = random_name()
-            dummy_image = buildx.build(temp_dir, tags=image_name)
+            dummy_image = buildx.build(temp_dir, tags=image_name, progress=False)
 
         container = python_on_whales.components.container.ContainerCLI(
             self.client_config
@@ -136,7 +164,8 @@ class VolumeCLI(DockerCLICaller):
                 dummy_image, volumes=[(volume_name, volume_in_container)]
             )
             container.cp(
-                (dummy_container, volume_in_container / source[1]), destination
+                (dummy_container, os.path.join(volume_in_container, source[1])),
+                destination,
             )
         elif isinstance(destination, tuple):
             volume_name = str(destination[0])
@@ -144,7 +173,8 @@ class VolumeCLI(DockerCLICaller):
                 dummy_image, volumes=[(volume_name, volume_in_container)]
             )
             container.cp(
-                source, (dummy_container, volume_in_container / destination[1])
+                source,
+                (dummy_container, os.path.join(volume_in_container, destination[1])),
             )
         else:
             raise ValueError("source or destination should be a tuple.")
