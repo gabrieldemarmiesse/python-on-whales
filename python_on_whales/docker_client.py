@@ -96,7 +96,7 @@ class DockerClient(DockerCLICaller):
         self.push = self.image.push
         self.rename = self.container.rename
         self.restart = self.container.restart
-        self.rm = self.container.remove
+        self.rm = self.container.rm
         self.rmi = self.image.remove
         self.run = self.container.run
         self.save = self.image.save
@@ -109,6 +109,16 @@ class DockerClient(DockerCLICaller):
         username: Optional[str] = None,
         password: Optional[str] = None,
     ):
+        """Log in to a Docker registry.
+
+        If no server is specified, the default is defined by the daemon.
+
+        # Arguments
+            server: The server to log into. For example, with a self-hosted registry
+                it might be something like `server="192.168.0.10:5000"`
+            username: The username
+            password: The password
+        """
         full_cmd = self.docker_cmd + ["login"]
 
         if username is not None:
@@ -123,6 +133,12 @@ class DockerClient(DockerCLICaller):
         run(full_cmd, capture_stderr=False, capture_stdout=False)
 
     def logout(self, server: Optional[str] = None):
+        """Logout from a Docker registry
+
+        # Arguments
+            server: The server to logout from. For example, with a self-hosted registry
+                it might be something like `server="192.168.0.10:5000"`
+        """
         full_cmd = self.docker_cmd + ["logout"]
 
         if server is not None:

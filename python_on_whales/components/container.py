@@ -116,9 +116,10 @@ class Container(ReloadableObjectFromJson):
 
     def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
         return ContainerCLI(self.client_config).restart(self, time)
+        return ContainerCLI(self.client_config).restart(self, time)
 
-    def remove(self, force: bool = False, volumes: bool = False) -> None:
-        return ContainerCLI(self.client_config).remove(self, force, volumes)
+    def rm(self, force: bool = False, volumes: bool = False) -> None:
+        return ContainerCLI(self.client_config).rm(self, force, volumes)
 
     def start(self) -> None:
         return ContainerCLI(self.client_config).start(self)
@@ -284,6 +285,12 @@ class ContainerCLI(DockerCLICaller):
             return result
 
     def export(self, container: ValidContainer, output: ValidPath) -> None:
+        """Export a container's filesystem as a tar archive
+
+        # Arguments
+            container: The container to export.
+            output: The path of the output tar archive.
+        """
         full_cmd = self.docker_cmd + [
             "container",
             "--output",
@@ -404,12 +411,19 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def remove(
+    def rm(
         self,
         containers: Union[Container, str, List[Union[Container, str]]],
         force: bool = False,
         volumes: bool = False,
     ) -> None:
+        """Removes a container
+
+        # Arguments
+            containers: One or more containers.
+            force: Force the removal of a running container (uses SIGKILL)
+            volumes: Remove anonymous volumes associated with the container
+        """
         full_cmd = self.docker_cmd + ["container", "rm"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--volumes", volumes)
