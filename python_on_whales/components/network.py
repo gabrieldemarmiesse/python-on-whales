@@ -46,17 +46,34 @@ class Network(ReloadableObjectFromJson):
     def name(self) -> List[str]:
         return self._get_inspect_result().name
 
+    def remove(self) -> None:
+        """Removes this Docker network."""
+        NetworkCLI(self.client_config).remove(self)
+
 
 ValidNetwork = Union[Network, str]
 
 
 class NetworkCLI(DockerCLICaller):
-    def create(self, name: str):
+    def create(self, name: str) -> Network:
+        """Creates a Docker network.
+
+        # Arguments
+            name: The name of the network
+
+        # Returns
+            A `python_on_whales.Network`.
+        """
         full_cmd = self.docker_cmd + ["network", "create"]
         full_cmd.append(name)
         return Network(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
+        """Removes a Docker network
+
+        # Arguments
+            networks: One or more networks.
+        """
         full_cmd = self.docker_cmd + ["network", "remove"]
         for network in to_list(networks):
             full_cmd.append(network)

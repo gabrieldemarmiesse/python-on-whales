@@ -29,6 +29,22 @@ class Node(ReloadableObjectFromJson):
     def id(self) -> str:
         return self._get_immutable_id()
 
+    def update(
+        self,
+        availability: Optional[str] = None,
+        labels_add: Dict[str, str] = {},
+        rm_labels: List[str] = [],
+        role: Optional[str] = None,
+    ) -> None:
+        """Updates this Swarm node.
+
+        See [`docker.node.update`](../sub-commands/node.md#update) for more information
+        about the arguments.
+        """
+        NodeCLI(self.client_config).update(
+            self, availability, labels_add, rm_labels, role
+        )
+
 
 ValidNode = Union[Node, str]
 
@@ -41,7 +57,17 @@ class NodeCLI(DockerCLICaller):
         labels_add: Dict[str, str] = {},
         rm_labels: List[str] = [],
         role: Optional[str] = None,
-    ):
+    ) -> None:
+        """Updates a Swarm node.
+
+        # Arguments
+            node: The node to update, you can use a string or a `python_on_whales.Node`
+                object.
+            availability: Availability of the node ("active"|"pause"|"drain")
+            labels_add: Remove a node label if exists
+            rm_labels: Labels to remove from the node.
+            role: Role of the node ("worker"|"manager")
+        """
         full_cmd = self.docker_cmd + ["node", "update"]
 
         full_cmd.add_simple_arg("--availability", availability)
