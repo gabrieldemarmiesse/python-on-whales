@@ -129,6 +129,10 @@ class Container(ReloadableObjectFromJson):
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
 ValidContainer = Union[Container, str]
+ValidPortMapping = Union[
+    Tuple[Union[str, int], Union[str, int]],
+    Tuple[Union[str, int], Union[str, int], str],
+]
 
 
 class ContainerCLI(DockerCLICaller):
@@ -490,7 +494,7 @@ class ContainerCLI(DockerCLICaller):
         pids_limit: Optional[int] = None,
         platform: Optional[str] = None,
         privileged: bool = False,
-        # publish: Any = None,
+        publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
         read_only: bool = False,
         restart: Optional[str] = None,
@@ -607,6 +611,9 @@ class ContainerCLI(DockerCLICaller):
             kernel_memory: Kernel memory limit. `int` represents the number of bytes,
                 but you can use `"4k"` or `2g` for example.
             log_driver: Logging driver for the container
+            publish: Ports to publish, same as the `-p` argument in the Docker CLI.
+                example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
+                `[("127.0.0.1:3000", 2000, "udp")]`.
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
@@ -655,6 +662,15 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--privileged", privileged)
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
+
+        for port_mapping in publish:
+            if len(port_mapping) == 2:
+                full_cmd += ["-p", f"{port_mapping[0]}:{port_mapping[1]}"]
+            else:
+                full_cmd += [
+                    "-p",
+                    f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
+                ]
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
