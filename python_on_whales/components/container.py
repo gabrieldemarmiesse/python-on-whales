@@ -482,7 +482,7 @@ class ContainerCLI(DockerCLICaller):
         memory: Union[int, str, None] = None,
         memory_reservation: Union[int, str, None] = None,
         memory_swap: Union[int, str, None] = None,
-        # memory_swappiness: Any = None,
+        memory_swappiness: Optional[int] = None,
         # mount: Any = None,
         name: Optional[str] = None,
         # network: Any = None,
@@ -611,9 +611,32 @@ class ContainerCLI(DockerCLICaller):
             kernel_memory: Kernel memory limit. `int` represents the number of bytes,
                 but you can use `"4k"` or `2g` for example.
             log_driver: Logging driver for the container
+            mac_adress: Container MAC address (e.g., `"92:d0:c6:0a:29:33"`)
+            memory:  Memory limit, valid values are `1024` (ints are bytes) or
+                `"43m"` or `"6g"`.
+            memory_reservation: Memory soft limit
+            memory_swap: Swap limit equal to memory plus swap: '-1'
+                to enable unlimited swap.
+            memory_swappiness: Tune container memory swappiness (0 to 100) (default -1)
+            name: The container name. If not provided, one is automatically genrated for
+                you.
+            healthcheck: Set to `False` to disable container periodic healthcheck.
+            oom_kill: Set to `False` to disable the OOM killer for this container.
+            pid: PID namespace to use
+            pids_limit: Tune container pids limit (set `-1` for unlimited)
+            platform: Set platform if server is multi-platform capable.
+            privileged: Give extended privileges to this container.
             publish: Ports to publish, same as the `-p` argument in the Docker CLI.
                 example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
                 `[("127.0.0.1:3000", 2000, "udp")]`.
+            publish_all: Publish all exposed ports to random ports.
+            read_only: Mount the container's root filesystem as read only.
+            restart: Restart policy to apply when a container exits (default "no")
+            rm: Automatically remove the container when it exits.
+            runtime: Runtime to use for this container.
+            shm_size: Size of /dev/shm. `int` is for bytes. But you can use `"512m"` or
+                `"4g"` for example.
+            stop_timeout: Signal to stop a container (default "SIGTERM")
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
@@ -680,6 +703,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory", memory)
         full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
+        full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
         full_cmd.add_simple_arg("--gpus", gpus)
         full_cmd.add_flag("--read-only", read_only)
