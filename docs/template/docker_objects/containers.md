@@ -12,7 +12,7 @@ For type hints, use this
 from python_on_whales import Container
 
 def print_dodo(container: Container):
-    print(container.exec(["echo", "dodo"]))
+    print(container.execute(["echo", "dodo"]))
 ```
 
 

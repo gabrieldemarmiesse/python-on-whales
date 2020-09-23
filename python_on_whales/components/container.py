@@ -102,13 +102,13 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).diff(self)
 
-    def exec(self, command: Union[str, List[str]], detach: bool = False):
+    def execute(self, command: Union[str, List[str]], detach: bool = False):
         """Execute a command in this container
 
-        See the [`docker.container.exec`](../sub-commands/container.md) command for
-        information about the arguments.
+        See the [`docker.container.execute`](../sub-commands/container.md#execute)
+        command for information about the arguments.
         """
-        return ContainerCLI(self.client_config).exec(self, command, detach)
+        return ContainerCLI(self.client_config).execute(self, command, detach)
 
     def export(self, output: ValidPath) -> None:
         """Export this container filesystem.
@@ -307,7 +307,7 @@ class ContainerCLI(DockerCLICaller):
             result_dict[line[2:]] = line[0]
         return result_dict
 
-    def exec(
+    def execute(
         self,
         container: ValidContainer,
         command: Union[str, List[str]],
