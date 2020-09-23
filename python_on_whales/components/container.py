@@ -46,6 +46,7 @@ class Container(ReloadableObjectFromJson):
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
+        self.remove = self.rm
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["container", "inspect", reference])
@@ -186,6 +187,10 @@ ValidPortMapping = Union[
 
 
 class ContainerCLI(DockerCLICaller):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.remove = self.rm
+
     def commit(
         self,
         container: ValidContainer,
