@@ -132,6 +132,7 @@ class BuildxCLI(DockerCLICaller):
         progress: Union[str, bool] = "auto",
         pull: bool = False,
         push: bool = False,
+        secrets: Union[str, List[str]] = [],
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
     ) -> Optional[python_on_whales.components.image.Image]:
@@ -153,6 +154,8 @@ class BuildxCLI(DockerCLICaller):
                 Use plain to keep the container output on screen
             pull: Always attempt to pull a newer version of the image
             push: Shorthand for `output={"type": "registry"}`.
+            secrets: One or more secrets passed as string(s). For example
+                `secrets="id=aws,src=/home/my_user/.aws/credentials"`
             target: Set the target build stage to build.
             tags: Tag or tags to put on the resulting image.
         """
@@ -166,6 +169,8 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--push", push)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
+        for secret in to_list(secrets):
+            full_cmd += ["--secret", secret]
         if output is not None:
             full_cmd += ["--output", ",".join(output)]
         if platforms is not None:
