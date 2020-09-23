@@ -80,7 +80,7 @@ class Container(ReloadableObjectFromJson):
     ) -> Image:
         """Create a new image from the container's changes.
 
-        See [The `docker.container.commit`](../sub-commands/container.md) command for
+        See the [`docker.container.commit`](../sub-commands/container.md) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).commit(
@@ -94,37 +94,86 @@ class Container(ReloadableObjectFromJson):
         return ContainerCLI(self.client_config).cp(local_path, (self, container_path))
 
     def diff(self) -> Dict[str, str]:
+        """Returns the diff of this container filesystem.
+
+        See the [`docker.container.diff`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).diff(self)
 
     def exec(self, command: Union[str, List[str]], detach: bool = False):
+        """Execute a command in this container
+
+        See the [`docker.container.exec`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).exec(self, command, detach)
 
     def export(self, output: ValidPath) -> None:
+        """Export this container filesystem.
+
+        See the [`docker.container.export`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).export(self, output)
 
     def kill(self, signal: str = None):
+        """Kill this container
+
+        See the [`docker.container.kill`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).kill(self, signal)
 
     def logs(self) -> str:
         return ContainerCLI(self.client_config).logs(self)
 
     def pause(self) -> None:
+        """Pause this container.
+
+        See the [`docker.container.pause`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).pause(self)
 
     def rename(self, new_name: str) -> None:
+        """Rename this container
+
+        See the [`docker.container.rename`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).rename(self, new_name)
 
     def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
-        return ContainerCLI(self.client_config).restart(self, time)
+        """Restarts this container.
+
+        See the [`docker.container.restart`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).restart(self, time)
 
     def rm(self, force: bool = False, volumes: bool = False) -> None:
+        """Remove this container.
+
+        See the [`docker.container.rm`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).rm(self, force, volumes)
 
     def start(self) -> None:
+        """Starts this container.
+
+        See the [`docker.container.start`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).start(self)
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
+        """Stops this container.
+
+        See the [`docker.container.stop`](../sub-commands/container.md) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).stop(self, time)
 
 

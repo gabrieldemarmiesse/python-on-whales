@@ -178,7 +178,7 @@ class VolumeCLI(DockerCLICaller):
             )
         else:
             raise ValueError("source or destination should be a tuple.")
-        dummy_container.remove()
+        dummy_container.rm()
         python_on_whales.components.image.ImageCLI(self.client_config).remove(
             image_name
         )
