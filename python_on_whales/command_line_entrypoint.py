@@ -10,13 +10,13 @@ volume_app = typer.Typer()
 
 
 @volume_app.command()
-def cp(source: str, destination: str):
+def copy(source: str, destination: str):
     if ":" in source:
         source_volume, source_path = source.split(":")
-        docker.volume.cp((source_volume, source_path), destination)
+        docker.volume.copy((source_volume, source_path), destination)
     elif ":" in destination:
         destination_volume, destination_path = destination.split(":")
-        docker.volume.cp(source, (destination_volume, destination_path))
+        docker.volume.copy(source, (destination_volume, destination_path))
     else:
         raise ValueError("No volume was specified. The format is 'volume:path'")
 

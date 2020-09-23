@@ -1,4 +1,8 @@
+import shutil
+
 from keras_autodoc import DocumentationGenerator, get_methods
+
+from python_on_whales.utils import PROJECT_ROOT
 
 pages = {
     "docker_client.md": ["python_on_whales.DockerClient"]
@@ -58,4 +62,7 @@ doc_generator = MyDocumentationGenerator(
     ],
     titles_size="##",
 )
-doc_generator.generate("./generated_sources")
+destination = PROJECT_ROOT / "docs" / "generated_sources"
+doc_generator.generate(destination)
+shutil.copyfile(PROJECT_ROOT / "README.md", destination / "index.md")
+shutil.copyfile(PROJECT_ROOT / "logo.png", destination / "logo.png")

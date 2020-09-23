@@ -20,7 +20,7 @@ They're actually aliases
 
 * [`docker.build`](sub-commands/buildx.md#build)
 * [`docker.commit`](sub-commands/container.md#commit)
-* [`docker.cp`](sub-commands/container.md#cp)
+* [`docker.copy`](sub-commands/container.md#cp)
 * [`docker.diff`](sub-commands/container.md#diff)
 * [`docker.exec`](sub-commands/container.md#exec)
 * [`docker.images`](sub-commands/image.md#list)
@@ -33,8 +33,7 @@ They're actually aliases
 * [`docker.push`](sub-commands/image.md#push)
 * [`docker.rename`](sub-commands/container.md#rename)
 * [`docker.restart`](sub-commands/container.md#restart)
-* [`docker.rm`](sub-commands/container.md#remove)
-* [`docker.rmi`](sub-commands/image.md#remove)
+* [`docker.remove`](sub-commands/container.md#remove)
 * [`docker.run`](sub-commands/container.md#run)
 * [`docker.save`](sub-commands/image.md#save)
 * [`docker.stop`](sub-commands/container.md#stop)

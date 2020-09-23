@@ -125,11 +125,11 @@ class VolumeCLI(DockerCLICaller):
         """
         new_volume = self.create(new_volume_name, driver, labels, options)
         with tempfile.TemporaryDirectory() as temp_dir:
-            self.cp((source, "."), temp_dir)
-            self.cp(str(temp_dir) + "/.", (new_volume, ""))
+            self.copy((source, "."), temp_dir)
+            self.copy(str(temp_dir) + "/.", (new_volume, ""))
         return new_volume
 
-    def cp(
+    def copy(
         self,
         source: Union[ValidPath, VolumePath],
         destination: Union[ValidPath, VolumePath],
@@ -163,7 +163,7 @@ class VolumeCLI(DockerCLICaller):
             dummy_container = container.create(
                 dummy_image, volumes=[(volume_name, volume_in_container)]
             )
-            container.cp(
+            container.copy(
                 (dummy_container, os.path.join(volume_in_container, source[1])),
                 destination,
             )
@@ -172,13 +172,13 @@ class VolumeCLI(DockerCLICaller):
             dummy_container = container.create(
                 dummy_image, volumes=[(volume_name, volume_in_container)]
             )
-            container.cp(
+            container.copy(
                 source,
                 (dummy_container, os.path.join(volume_in_container, destination[1])),
             )
         else:
             raise ValueError("source or destination should be a tuple.")
-        dummy_container.rm()
+        dummy_container.remove()
         python_on_whales.components.image.ImageCLI(self.client_config).remove(
             image_name
         )

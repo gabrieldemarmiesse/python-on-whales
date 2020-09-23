@@ -46,7 +46,7 @@ class Container(ReloadableObjectFromJson):
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
-        self.remove = self.rm
+        self.remove = self.remove
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["container", "inspect", reference])
@@ -89,10 +89,10 @@ class Container(ReloadableObjectFromJson):
         )
 
     def copy_from(self, container_path: ValidPath, local_path: ValidPath):
-        return ContainerCLI(self.client_config).cp((self, container_path), local_path)
+        return ContainerCLI(self.client_config).copy((self, container_path), local_path)
 
     def copy_to(self, local_path: ValidPath, container_path: ValidPath):
-        return ContainerCLI(self.client_config).cp(local_path, (self, container_path))
+        return ContainerCLI(self.client_config).copy(local_path, (self, container_path))
 
     def diff(self) -> Dict[str, str]:
         """Returns the diff of this container filesystem.
@@ -153,13 +153,13 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).restart(self, time)
 
-    def rm(self, force: bool = False, volumes: bool = False) -> None:
+    def remove(self, force: bool = False, volumes: bool = False) -> None:
         """Remove this container.
 
         See the [`docker.container.rm`](../sub-commands/container.md) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).rm(self, force, volumes)
+        return ContainerCLI(self.client_config).remove(self, force, volumes)
 
     def start(self) -> None:
         """Starts this container.
@@ -189,7 +189,7 @@ ValidPortMapping = Union[
 class ContainerCLI(DockerCLICaller):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.remove = self.rm
+        self.remove = self.remove
 
     def commit(
         self,
@@ -224,7 +224,7 @@ class ContainerCLI(DockerCLICaller):
 
         return Image(self.client_config, run(full_cmd), is_immutable_id=True)
 
-    def cp(
+    def copy(
         self,
         source: Union[ValidPath, ContainerPath],
         destination: Union[ValidPath, ContainerPath],
@@ -236,8 +236,8 @@ class ContainerCLI(DockerCLICaller):
 
         docker.run("ubuntu", ["sleep", "infinity"], name="dodo", rm=True)
 
-        docker.cp("/tmp/my_local_file.txt", ("dodo", "/path/in/container.txt"))
-        docker.cp(("dodo", "/path/in/container.txt"), "/tmp/my_local_file2.txt")
+        docker.copy("/tmp/my_local_file.txt", ("dodo", "/path/in/container.txt"))
+        docker.copy(("dodo", "/path/in/container.txt"), "/tmp/my_local_file2.txt")
         ```
 
         Doesn't yet support sending or receiving iterators of Python bytes.
@@ -465,7 +465,7 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def rm(
+    def remove(
         self,
         containers: Union[Container, str, List[Union[Container, str]]],
         force: bool = False,

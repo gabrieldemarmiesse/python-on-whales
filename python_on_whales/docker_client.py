@@ -83,7 +83,7 @@ class DockerClient(DockerCLICaller):
         # aliases
         self.build = self.buildx.build
         self.commit = self.container.commit
-        self.cp = self.container.cp
+        self.copy = self.container.copy
         self.diff = self.container.diff
         self.exec = self.container.exec
         self.images = self.image.list
@@ -96,8 +96,7 @@ class DockerClient(DockerCLICaller):
         self.push = self.image.push
         self.rename = self.container.rename
         self.restart = self.container.restart
-        self.rm = self.container.rm
-        self.rmi = self.image.remove
+        self.remove = self.container.remove
         self.run = self.container.run
         self.save = self.image.save
         self.stop = self.container.stop

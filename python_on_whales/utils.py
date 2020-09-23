@@ -7,6 +7,8 @@ import pydantic
 
 from python_on_whales.download_binaries import download_buildx
 
+PROJECT_ROOT = Path(__file__).parents[1]
+
 
 def title_if_necessary(string: str):
     if string.isupper():
