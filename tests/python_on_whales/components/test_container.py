@@ -1,6 +1,8 @@
 import time
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from python_on_whales import DockerException, docker
 from python_on_whales.components.container import ContainerState
 from python_on_whales.test_utils import random_name
@@ -140,3 +142,25 @@ def test_methods():
     my_container.kill()
     assert my_container.state.running == False
     my_container.remove()
+
+
+def test_context_manager():
+    container_name = random_name()
+    with pytest.raises(ArithmeticError):
+        with docker.run(
+            "busybox:1", ["sleep", "infinity"], detach=True, name=container_name
+        ) as c:
+            raise ArithmeticError
+
+    assert container_name not in [x.name for x in docker.container.list(all=True)]
+
+
+def test_context_manager_with_create():
+    container_name = random_name()
+    with pytest.raises(ArithmeticError):
+        with docker.container.create(
+            "busybox:1", ["sleep", "infinity"], name=container_name
+        ) as c:
+            raise ArithmeticError
+
+    assert container_name not in [x.name for x in docker.container.list(all=True)]
