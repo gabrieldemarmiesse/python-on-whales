@@ -7,14 +7,15 @@ site_description: 'Python on whales docs'
 nav:
   - Docker client: docker_client.md
   - Sub-commands:
-    - Buildx: sub-commands/buildx.md
-    - Container: sub-commands/container.md
-    - Image: sub-commands/image.md
-    - Node: sub-commands/node.md
-    - Network: sub-commands/network.md
-    - Service: sub-commands/service.md
-    - System: sub-commands/system.md
-    - Volume: sub-commands/volume.md
+    - docker buildx: sub-commands/buildx.md
+    - docker container: sub-commands/container.md
+    - docker image: sub-commands/image.md
+    - docker node: sub-commands/node.md
+    - docker network: sub-commands/network.md
+    - docker service: sub-commands/service.md
+    - docker swarm: sub-commands/swarm.md
+    - docker system: sub-commands/system.md
+    - docker volume: sub-commands/volume.md
   - Docker objects:
     - Builders: docker_objects/builders.md
     - Containers: docker_objects/containers.md
