@@ -33,12 +33,17 @@ class ContainerState(DockerCamelModel):
     finished_at: datetime
 
 
+class ContainerHostConfig(DockerCamelModel):
+    auto_remove: bool
+
+
 class ContainerInspectResult(DockerCamelModel):
     id: str
     created: datetime
     image: str
     name: str
     state: ContainerState
+    host_config: ContainerHostConfig
 
 
 class Container(ReloadableObjectFromJson):
@@ -47,6 +52,16 @@ class Container(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
         self.remove = self.remove
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        autoremove = self.host_config.auto_remove
+        if self.state.running:
+            self.stop()
+        if not autoremove:
+            self.remove()
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["container", "inspect", reference])
@@ -65,6 +80,10 @@ class Container(ReloadableObjectFromJson):
     @property
     def state(self) -> ContainerState:
         return self._get_inspect_result().state
+
+    @property
+    def host_config(self) -> ContainerHostConfig:
+        return self._get_inspect_result().host_config
 
     @property
     def image(self) -> Image:
@@ -277,21 +296,31 @@ class ContainerCLI(DockerCLICaller):
     def create(
         self,
         image: str,
+        command: List[str] = [],
         envs: Dict[str, str] = {},
+        name: Optional[str] = None,
         publish: List[ValidPortMapping] = [],
         remove: bool = False,
         volumes: Optional[List[VolumeDefinition]] = [],
     ) -> Container:
-        """Creates a container.
+        """Creates a container, but does not start it.
 
-        # Arguments
-            image: The docker image to create the container from.
+        Start it then with the `.start()` method.
+
+        It might be useful if you want to delay the start of a container,
+        to do some preparations beforehand. For example, it's common to do this
+        workflow: `docker create` -> `docker cp` -> `docker start` to put files
+        in the container before starting.
+
+        There is no `detach` argument since it's a runtime option.
+
+        The arguments are the same as [`docker.run`](#run).
         """
         full_cmd = self.docker_cmd + ["create"]
 
         for env_name, env_value in envs.items():
             full_cmd += ["--env", env_name + "=" + env_value]
-
+        full_cmd.add_simple_arg("--name", name)
         for port_mapping in publish:
             if len(port_mapping) == 2:
                 full_cmd += ["-p", f"{port_mapping[0]}:{port_mapping[1]}"]
@@ -308,6 +337,7 @@ class ContainerCLI(DockerCLICaller):
             full_cmd += ["--volume", ":".join(volume_definition)]
 
         full_cmd.append(image)
+        full_cmd += command
         return Container(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def diff(self, container: ValidContainer) -> Dict[str, str]:
@@ -517,7 +547,7 @@ class ContainerCLI(DockerCLICaller):
     def run(
         self,
         image: str,
-        command: Optional[List[str]] = None,
+        command: List[str] = [],
         *,
         # add_host: Any = None,
         # attach: Any = None,
@@ -809,8 +839,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(image)
-        if command is not None:
-            full_cmd += command
+        full_cmd += command
 
         if detach:
             return Container(self.client_config, run(full_cmd))

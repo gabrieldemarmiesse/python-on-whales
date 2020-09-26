@@ -84,6 +84,7 @@ class DockerClient(DockerCLICaller):
         self.build = self.buildx.build
         self.commit = self.container.commit
         self.copy = self.container.copy
+        self.create = self.container.create
         self.diff = self.container.diff
         self.execute = self.container.execute
         self.images = self.image.list
