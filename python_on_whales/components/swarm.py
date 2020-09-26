@@ -1,9 +1,15 @@
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
+from typing import Optional
 
 
 class SwarmCLI(DockerCLICaller):
-    def init(self) -> None:
+    def init(self,
+             advertise_address: Optional[str] = None,
+             autolock: bool = False,
+             availability: str = "active",
+             data_path_address: Optional[str] = None
+             ) -> None:
         """Initialize a Swarm.
 
         If you need the token to join the new swarm from another node,
@@ -23,8 +29,20 @@ class SwarmCLI(DockerCLICaller):
         my_token = docker.swarm.join_token("worker")  # you can set manager too
         worker_docker.swarm.join("manager_hostname:2377", token=my_token)
         ```
+
+        # Arguments
+            advertise_address: Advertised address (format: `<ip|interface>[:port]`)
+            autolock: Enable manager autolocking (requiring an unlock key to start a
+                stopped manager)
+            availability: Availability of the node ("active"|"pause"|"drain")
+            data_path_address: Address or interface to use for data path
+                traffic (format is `<ip|interface>`)
         """
         full_cmd = self.docker_cmd + ["swarm", "init"]
+        full_cmd.add_simple_arg("--advertise-addr", advertise_address)
+        full_cmd.add_flag("--autolock", autolock)
+        full_cmd.add_simple_arg("--availability", availability)
+        full_cmd.add_simple_arg("--data-path-addr", data_path_address)
         run(full_cmd)
 
     def join(
