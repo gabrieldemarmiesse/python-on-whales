@@ -9,7 +9,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run all tests
-      run: bash tests/run_tests.sh
+      run: |
+        cat /etc/docker/daemon.json
+        echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        sleep 2
+        bash tests/run_tests.sh
 
   build-windows:
     runs-on: windows-latest

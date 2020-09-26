@@ -16,11 +16,11 @@ def test_exact_output():
         docker.image.remove("busybox")
     except DockerException:
         pass
-    assert docker.run("busybox", ["echo", "dodo"], rm=True) == "dodo"
+    assert docker.run("busybox", ["echo", "dodo"], remove=True) == "dodo"
 
 
 def test_remove():
-    output = docker.run("hello-world", rm=True)
+    output = docker.run("hello-world", remove=True)
     assert "Hello from Docker!" in output
 
 
@@ -35,7 +35,7 @@ def test_run_volumes():
         "busybox",
         ["touch", "/some/path/dodo"],
         volumes=[(volume_name, "/some/path")],
-        rm=True,
+        remove=True,
     )
     docker.volume.remove(volume_name)
 
@@ -113,14 +113,18 @@ def test_restart():
 
 
 def test_execute():
-    my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True, rm=True)
+    my_container = docker.run(
+        "busybox:1", ["sleep", "infinity"], detach=True, remove=True
+    )
     exec_result = docker.execute(my_container, ["echo", "dodo"])
     assert exec_result == "dodo"
     docker.kill(my_container)
 
 
 def test_diff():
-    my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True, rm=True)
+    my_container = docker.run(
+        "busybox:1", ["sleep", "infinity"], detach=True, remove=True
+    )
 
     docker.execute(my_container, ["mkdir", "/some_path"])
     docker.execute(my_container, ["touch", "/some_file"])

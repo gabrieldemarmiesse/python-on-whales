@@ -239,7 +239,7 @@ class ContainerCLI(DockerCLICaller):
         ```python
         from python_on_whales import docker
 
-        docker.run("ubuntu", ["sleep", "infinity"], name="dodo", rm=True)
+        docker.run("ubuntu", ["sleep", "infinity"], name="dodo", remove=True)
 
         docker.copy("/tmp/my_local_file.txt", ("dodo", "/path/in/container.txt"))
         docker.copy(("dodo", "/path/in/container.txt"), "/tmp/my_local_file2.txt")
@@ -277,6 +277,9 @@ class ContainerCLI(DockerCLICaller):
     def create(
         self,
         image: str,
+        envs: Dict[str, str] = {},
+        publish: List[ValidPortMapping] = [],
+        remove: bool = False,
         volumes: Optional[List[VolumeDefinition]] = [],
     ) -> Container:
         """Creates a container.
@@ -285,6 +288,20 @@ class ContainerCLI(DockerCLICaller):
             image: The docker image to create the container from.
         """
         full_cmd = self.docker_cmd + ["create"]
+
+        for env_name, env_value in envs.items():
+            full_cmd += ["--env", env_name + "=" + env_value]
+
+        for port_mapping in publish:
+            if len(port_mapping) == 2:
+                full_cmd += ["-p", f"{port_mapping[0]}:{port_mapping[1]}"]
+            else:
+                full_cmd += [
+                    "-p",
+                    f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
+                ]
+
+        full_cmd.add_flag("--rm", remove)
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
@@ -576,7 +593,7 @@ class ContainerCLI(DockerCLICaller):
         publish_all: bool = False,
         read_only: bool = False,
         restart: Optional[str] = None,
-        rm: bool = False,
+        remove: bool = False,
         runtime: Optional[str] = None,
         # security_opt: Any = None,
         shm_size: Union[int, str, None] = None,
@@ -710,7 +727,7 @@ class ContainerCLI(DockerCLICaller):
             publish_all: Publish all exposed ports to random ports.
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
-            rm: Automatically remove the container when it exits.
+            remove: Automatically remove the container when it exits.
             runtime: Runtime to use for this container.
             shm_size: Size of /dev/shm. `int` is for bytes. But you can use `"512m"` or
                 `"4g"` for example.
@@ -735,7 +752,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cpu-rt-period", cpu_rt_period)
         full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
         full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
-        full_cmd.add_flag("--rm", rm)
+        full_cmd.add_flag("--rm", remove)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
         full_cmd.add_simple_arg("--pid", pid)
