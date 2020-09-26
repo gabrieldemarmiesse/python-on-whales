@@ -120,14 +120,10 @@ class DockerClient(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["login"]
 
-        if username is not None:
-            full_cmd += ["--username", username]
-
-        if password is not None:
-            full_cmd += ["--password", password]
-
+        full_cmd.add_simple_arg("--username", username)
+        full_cmd.add_simple_arg("--password", password)
         if server is not None:
-            full_cmd.append(password)
+            full_cmd.append(server)
 
         run(full_cmd, capture_stderr=False, capture_stdout=False)
 

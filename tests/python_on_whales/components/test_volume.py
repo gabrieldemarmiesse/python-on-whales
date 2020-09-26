@@ -28,7 +28,7 @@ def test_volume_drivers():
         "busybox",
         ["touch", "/dodo/dada"],
         volumes=[(some_volume, "/dodo")],
-        rm=True,
+        remove=True,
     )
     docker.volume.remove(some_volume)
 
@@ -88,7 +88,7 @@ def test_copy_to_volume(tmp_path):
     docker.run(
         "busybox",
         ["touch", "/volume/dodo.txt"],
-        rm=True,
+        remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
@@ -105,7 +105,7 @@ def test_copy_to_volume_subdirectory(tmp_path):
             "-c",
             "mkdir -p /volume/subdir/subdir2 && touch /volume/subdir/subdir2/dodo.txt",
         ],
-        rm=True,
+        remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
@@ -132,7 +132,7 @@ def test_volume_cp_from_in_dir(tmp_path):
     docker.run(
         "busybox",
         ["touch", "/volume/dodo.txt"],
-        rm=True,
+        remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
@@ -149,7 +149,7 @@ def test_volume_cp_to_in_dir(tmp_path):
     files = docker.run(
         "busybox",
         ["ls", "/volume/dada/"],
-        rm=True,
+        remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
@@ -165,7 +165,7 @@ def test_clone():
             "-c",
             "mkdir -p /volume/subdir/subdir2 && touch /volume/subdir/subdir2/dodo.txt",
         ],
-        rm=True,
+        remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
@@ -177,7 +177,7 @@ def test_clone():
             "-c",
             "ls /volume/subdir/subdir2",
         ],
-        rm=True,
+        remove=True,
         volumes=[(new_volume, "/volume")],
     )
     assert files == "dodo.txt"

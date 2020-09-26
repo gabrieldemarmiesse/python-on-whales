@@ -99,13 +99,13 @@ class Image(ReloadableObjectFromJson):
     def repo_tags(self) -> List[str]:
         return self._get_inspect_result().repo_tags
 
-    def remove(self):
+    def remove(self, force: bool = False, prune: bool = True):
         """Remove this Docker image.
 
         See the [`docker.image.remove`](../sub-commands/container.md#remove) command for
         information about the arguments.
         """
-        ImageCLI(self.client_config).remove(self)
+        ImageCLI(self.client_config).remove(self, force, prune)
 
     def save(self, output: Optional[ValidPath] = None) -> Optional[Iterator[bytes]]:
         """Saves this Docker image in a tar.
@@ -259,15 +259,24 @@ class ImageCLI(DockerCLICaller):
         if exit_code != 0:
             raise DockerException(full_cmd, exit_code)
 
-    def remove(self, x: Union[ValidImage, List[ValidImage]]):
+    def remove(
+        self,
+        x: Union[ValidImage, List[ValidImage]],
+        force: bool = False,
+        prune: bool = True,
+    ):
         """Remove one or more docker images.
 
         # Arguments
             x: Single image or list of Docker images to remove. You can use tags or
-            `python_on_whales.Image` objects.
+                `python_on_whales.Image` objects.
+            force: Force removal of the image
+            prune: Delete untagged parents
         """
 
         full_cmd = self.docker_cmd + ["image", "remove"]
+        full_cmd.add_flag("--force", force)
+        full_cmd.add_flag("--no-prune", not prune)
         for image in to_list(x):
             full_cmd.append(image)
 
