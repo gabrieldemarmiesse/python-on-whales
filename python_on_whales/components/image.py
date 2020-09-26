@@ -100,7 +100,28 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().repo_tags
 
     def remove(self):
+        """Remove this Docker image.
+
+        See the [`docker.image.remove`](../sub-commands/container.md#remove) command for
+        information about the arguments.
+        """
         ImageCLI(self.client_config).remove(self)
+
+    def save(self, output: Optional[ValidPath] = None) -> Optional[Iterator[bytes]]:
+        """Saves this Docker image in a tar.
+
+        See the [`docker.image.save`](../sub-commands/container.md#save) command for
+        information about the arguments.
+        """
+        return ImageCLI(self.client_config).save(self, output)
+
+    def tag(self, new_tag: str) -> None:
+        """Add a tag to a Docker image.
+
+        See the [`docker.image.tag`](../sub-commands/container.md#tag) command for
+        information about the arguments.
+        """
+        return ImageCLI(self.client_config).tag(self, new_tag)
 
 
 ValidImage = Union[str, Image]

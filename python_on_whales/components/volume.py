@@ -54,6 +54,26 @@ class Volume(ReloadableObjectFromJson):
     def labels(self) -> Dict[str, str]:
         return self._get_inspect_result().labels
 
+    def remove(self) -> None:
+        """Removes this volume"""
+        VolumeCLI(self.client_config).remove(self)
+
+    def clone(
+        self,
+        new_volume_name: Optional[str] = None,
+        driver: Optional[str] = None,
+        labels: Dict[str, str] = {},
+        options: Dict[str, str] = {},
+    ) -> "Volume":
+        """Creates a new volume and copy all the data inside.
+
+        See the [`docker.volume.clone`](../sub-commands/volume.md#clone) command for
+        information about the arguments.
+        """
+        return VolumeCLI(self.client_config).clone(
+            self, new_volume_name, driver, labels, options
+        )
+
 
 ValidVolume = Union[Volume, str]
 VolumePath = Tuple[Union[Volume, str], ValidPath]

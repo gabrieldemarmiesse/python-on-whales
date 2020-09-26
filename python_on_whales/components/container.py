@@ -121,18 +121,23 @@ class Container(ReloadableObjectFromJson):
     def kill(self, signal: str = None):
         """Kill this container
 
-        See the [`docker.container.kill`](../sub-commands/container.md) command for
+        See the [`docker.container.kill`](../sub-commands/container.md#kill) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).kill(self, signal)
 
     def logs(self) -> str:
+        """Returns the logs of the container
+
+        See the [`docker.container.logs`](../sub-commands/container.md#logs) command for
+        information about the arguments.
+        """
         return ContainerCLI(self.client_config).logs(self)
 
     def pause(self) -> None:
         """Pause this container.
 
-        See the [`docker.container.pause`](../sub-commands/container.md) command for
+        See the [`docker.container.pause`](../sub-commands/container.md#pause) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).pause(self)
@@ -140,7 +145,7 @@ class Container(ReloadableObjectFromJson):
     def rename(self, new_name: str) -> None:
         """Rename this container
 
-        See the [`docker.container.rename`](../sub-commands/container.md) command for
+        See the [`docker.container.rename`](../sub-commands/container.md#rename) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).rename(self, new_name)
@@ -148,7 +153,7 @@ class Container(ReloadableObjectFromJson):
     def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
         """Restarts this container.
 
-        See the [`docker.container.restart`](../sub-commands/container.md) command for
+        See the [`docker.container.restart`](../sub-commands/container.md#restart) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).restart(self, time)
@@ -156,7 +161,7 @@ class Container(ReloadableObjectFromJson):
     def remove(self, force: bool = False, volumes: bool = False) -> None:
         """Remove this container.
 
-        See the [`docker.container.rm`](../sub-commands/container.md) command for
+        See the [`docker.container.remove`](../sub-commands/container.md#remove) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).remove(self, force, volumes)
@@ -164,7 +169,7 @@ class Container(ReloadableObjectFromJson):
     def start(self) -> None:
         """Starts this container.
 
-        See the [`docker.container.start`](../sub-commands/container.md) command for
+        See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).start(self)
@@ -172,7 +177,7 @@ class Container(ReloadableObjectFromJson):
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
 
-        See the [`docker.container.stop`](../sub-commands/container.md) command for
+        See the [`docker.container.stop`](../sub-commands/container.md#stop) command for
         information about the arguments.
         """
         return ContainerCLI(self.client_config).stop(self, time)
@@ -388,6 +393,11 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     def logs(self, container: Union[Container, str]) -> str:
+        """Returns the logs of a container as a string.
+
+        # Returns
+            `str`
+        """
         full_cmd = self.docker_cmd + ["container", "logs"]
 
         return run(full_cmd + [str(container)])
