@@ -145,13 +145,22 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).kill(self, signal)
 
-    def logs(self) -> str:
+    def logs(
+        self,
+        details: bool = False,
+        since: Union[None, datetime, timedelta] = None,
+        tail: Optional[int] = None,
+        timestamps: bool = False,
+        until: Union[None, datetime, timedelta] = None,
+    ) -> str:
         """Returns the logs of the container
 
         See the [`docker.container.logs`](../sub-commands/container.md#logs) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).logs(self)
+        return ContainerCLI(self.client_config).logs(
+            self, details, since, tail, timestamps, until
+        )
 
     def pause(self) -> None:
         """Pause this container.
@@ -431,23 +440,44 @@ class ContainerCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["container", "kill"]
 
-        if signal is not None:
-            full_cmd += ["--signal", signal]
+        full_cmd.add_simple_arg("--signal", signal)
 
         for container in to_list(containers):
-            full_cmd.append(str(container))
+            full_cmd.append(container)
 
         run(full_cmd)
 
-    def logs(self, container: Union[Container, str]) -> str:
+    def logs(
+        self,
+        container: Union[Container, str],
+        details: bool = False,
+        since: Union[None, datetime, timedelta] = None,
+        tail: Optional[int] = None,
+        timestamps: bool = False,
+        until: Union[None, datetime, timedelta] = None,
+    ) -> str:
         """Returns the logs of a container as a string.
+
+        # Arguments
+            container: The container to get the logs of
+            details: Show extra details provided to logs
+            since: Use a datetime or timedelta to specify the lower
+                date limit for the logs.
+            tail: Number of lines to show from the end of the logs (default all)
+            timestamps: Put timestamps next to lines.
+            until: Use a datetime or a timedelta to specify the upper date
+                limit for the logs.
 
         # Returns
             `str`
         """
         full_cmd = self.docker_cmd + ["container", "logs"]
-
-        return run(full_cmd + [str(container)])
+        full_cmd.add_flag("--details", details)
+        full_cmd.add_simple_arg("--since", format_time_arg(since))
+        full_cmd.add_simple_arg("--tail", tail)
+        full_cmd.add_flag("--timestamps", timestamps)
+        full_cmd.add_simple_arg("--until", format_time_arg(until))
+        return run(full_cmd + [container])
 
     def list(self, all: bool = False) -> List[Container]:
         """List the containers on the host.
@@ -882,6 +912,20 @@ class ContainerCLI(DockerCLICaller):
             full_cmd += ["--time", str(time)]
 
         for container in to_list(containers):
-            full_cmd.append(str(container))
+            full_cmd.append(container)
 
         run(full_cmd)
+
+
+def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
+    if isinstance(time_object, datetime):
+        return time_object.strftime("%Y-%m-%dT%H:%M:%S")
+    elif isinstance(time_object, timedelta):
+        return f"{time_object.total_seconds()}s"
+
+
+def format_time_arg(time_object):
+    if time_object is None:
+        return None
+    else:
+        return format_time_for_docker(time_object)

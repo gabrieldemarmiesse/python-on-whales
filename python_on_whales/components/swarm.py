@@ -1,15 +1,17 @@
+from typing import Optional
+
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
-from typing import Optional
 
 
 class SwarmCLI(DockerCLICaller):
-    def init(self,
-             advertise_address: Optional[str] = None,
-             autolock: bool = False,
-             availability: str = "active",
-             data_path_address: Optional[str] = None
-             ) -> None:
+    def init(
+        self,
+        advertise_address: Optional[str] = None,
+        autolock: bool = False,
+        availability: str = "active",
+        data_path_address: Optional[str] = None,
+    ) -> None:
         """Initialize a Swarm.
 
         If you need the token to join the new swarm from another node,
