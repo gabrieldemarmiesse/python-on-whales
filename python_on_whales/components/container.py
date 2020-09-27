@@ -655,12 +655,12 @@ class ContainerCLI(DockerCLICaller):
         restart: Optional[str] = None,
         remove: bool = False,
         runtime: Optional[str] = None,
-        # security_opt: Any = None,
+        security_options: List[str] = [],
         shm_size: Union[int, str, None] = None,
         # sig_proxy: Any = None,
         # stop_signal: Any = None,
         stop_timeout: Optional[int] = None,
-        # storage_opt: Any = None,
+        storage_options: List[str] = [],
         # sysctl: Any = None,
         # tmpfs: Any = None,
         # tty: Any = None,
@@ -794,9 +794,11 @@ class ContainerCLI(DockerCLICaller):
             restart: Restart policy to apply when a container exits (default "no")
             remove: Automatically remove the container when it exits.
             runtime: Runtime to use for this container.
+            security_options: Security options
             shm_size: Size of /dev/shm. `int` is for bytes. But you can use `"512m"` or
                 `"4g"` for example.
             stop_timeout: Signal to stop a container (default "SIGTERM")
+            storage_options: Storage driver options for the container
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
@@ -866,7 +868,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
         full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
+        full_cmd.add_args_list("--security-opt", security_options)
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
+        full_cmd.add_args_list("--storage-opt", storage_options)
         full_cmd.add_simple_arg("--gpus", gpus)
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--user", user)
