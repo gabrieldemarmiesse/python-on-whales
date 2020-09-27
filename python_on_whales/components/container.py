@@ -579,7 +579,7 @@ class ContainerCLI(DockerCLICaller):
         image: str,
         command: List[str] = [],
         *,
-        # add_host: Any = None,
+        add_hosts: List[Tuple[str, str]] = [],
         # attach: Any = None,
         blkio_weight: Optional[int] = None,
         # blkio_weight_device: Any = None,
@@ -739,6 +739,8 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             image: The docker image to use for the container
             command: List of arguments to provide to the container.
+            add_hosts: hosts to add in the format of a tuple. For example,
+                `add_hosts=[("my_host_1", "192.168.30.31"), ("host2", "192.168.80.81")]`
             blkio_weight:Block IO (relative weight), between 10 and 1000,
                 or 0 to disable (default 0)
             cpu_period: Limit CPU CFS (Completely Fair Scheduler) period
@@ -809,6 +811,8 @@ class ContainerCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["container", "run"]
 
+        add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
+        full_cmd.add_args_list("--add-host", add_hosts)
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
         full_cmd.add_simple_arg("--cpu-quota", cpu_quota)
