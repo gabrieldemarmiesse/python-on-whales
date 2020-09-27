@@ -606,9 +606,9 @@ class ContainerCLI(DockerCLICaller):
         # disable_content_trust: Any = None,
         # dns: Any = None,
         # dns_option: Any = None,
-        # dns_search: Any = None,
-        # domainname: Any = None,
-        # entrypoint: Any = None,
+        dns_search: List[str] = [],
+        domainname: Optional[str] = None,
+        entrypoint: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
         # expose: Any = None,
@@ -750,6 +750,9 @@ class ContainerCLI(DockerCLICaller):
                 `1` means one cpu core.
             detach: If `False`, returns the ouput of the container as a string.
                 If `True`, returns a `python_on_whales.Container` object.
+            dns_search: Set custom DNS search domains
+            domainname: Container NIS domain name
+            entrypoint: Overwrite the default ENTRYPOINT of the image
             envs: Environment variables as a `dict`.
                 For example: `{"OMP_NUM_THREADS": 3}`
             env_files: One or a list of env files.
@@ -819,10 +822,10 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--publish-all", publish_all)
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--ipc", ipc)
-
-        for env_file in to_list(env_files):
-            full_cmd += ["--env-file", env_file]
-
+        full_cmd.add_args_list("--dns-search", dns_search)
+        full_cmd.add_simple_arg("--domainname", domainname)
+        full_cmd.add_simple_arg("--entrypoint", entrypoint)
+        full_cmd.add_args_list("--env-file", env_files)
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
 

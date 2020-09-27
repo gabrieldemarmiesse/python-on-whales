@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from python_on_whales.download_binaries import DOCKER_BINARY_PATH, download_docker_cli
+from python_on_whales.utils import to_list
 
 from .utils import ValidPath, run
 
@@ -20,6 +21,10 @@ class Command(list):
     def add_flag(self, name: str, value: bool):
         if value:
             self.append(name)
+
+    def add_args_list(self, arg_name: str, list_values: list):
+        for value in to_list(list_values):
+            self.extend([arg_name, value])
 
     def __add__(self, other) -> "Command":
         return Command(super().__add__(other))
