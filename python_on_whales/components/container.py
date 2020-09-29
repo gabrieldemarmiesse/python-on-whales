@@ -639,7 +639,7 @@ class ContainerCLI(DockerCLICaller):
         memory_reservation: Union[int, str, None] = None,
         memory_swap: Union[int, str, None] = None,
         memory_swappiness: Optional[int] = None,
-        # mount: Any = None,
+        mounts: List[List[str]] = None,
         name: Optional[str] = None,
         networks: List[python_on_whales.components.network.ValidNetwork] = [],
         network_aliases: List[str] = [],
