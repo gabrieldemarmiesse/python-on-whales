@@ -16,6 +16,6 @@ jobs:
           mv docs/generated_sources ./generated_sources
           mv docs/mkdocs.yml ./
       - name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        uses: mhausenblas/mkdocs-deploy-gh-pages@5498449191fe448fd9aa1c74969a6bf2c2a8bc49
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
