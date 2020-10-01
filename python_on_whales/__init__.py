@@ -11,3 +11,4 @@ from .components.network import Network
 from .components.node import Node
 from .components.service import Service
 from .components.volume import Volume
+from .components.stack import Stack

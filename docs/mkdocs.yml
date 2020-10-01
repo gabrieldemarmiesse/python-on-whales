@@ -13,6 +13,7 @@ nav:
     - docker node: sub-commands/node.md
     - docker network: sub-commands/network.md
     - docker service: sub-commands/service.md
+    - docker stack: sub-commands/stack.md
     - docker swarm: sub-commands/swarm.md
     - docker system: sub-commands/system.md
     - docker volume: sub-commands/volume.md
@@ -23,4 +24,5 @@ nav:
     - Networks: docker_objects/networks.md
     - Nodes: docker_objects/nodes.md
     - Services: docker_objects/services.md
+    - Stacks: docker_objects/stacks.md
     - Volumes: docker_objects/volumes.md
