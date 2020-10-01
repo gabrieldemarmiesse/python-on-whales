@@ -21,6 +21,7 @@ pages = {
     "sub-commands/service.md": get_methods(
         "python_on_whales.components.service.ServiceCLI"
     ),
+    "sub-commands/stack.md": get_methods("python_on_whales.components.stack.StackCLI"),
     "sub-commands/swarm.md": get_methods("python_on_whales.components.swarm.SwarmCLI"),
     "sub-commands/system.md": get_methods(
         "python_on_whales.components.system.SystemCLI"
@@ -34,6 +35,7 @@ pages = {
     "docker_objects/networks.md": get_methods("python_on_whales.Network"),
     "docker_objects/nodes.md": get_methods("python_on_whales.Node"),
     "docker_objects/services.md": get_methods("python_on_whales.Service"),
+    "docker_objects/stacks.md": get_methods("python_on_whales.Stack"),
     "docker_objects/volumes.md": get_methods("python_on_whales.Volume"),
 }
 
@@ -45,6 +47,8 @@ class MyDocumentationGenerator(DocumentationGenerator):
         signature = signature.replace("ContainerCLI.", "docker.container.")
         signature = signature.replace("ImageCLI.", "docker.image.")
         signature = signature.replace("NetworkCLI.", "docker.network.")
+        signature = signature.replace("ServiceCLI.", "docker.service.")
+        signature = signature.replace("StackCLI.", "docker.stack.")
         signature = signature.replace("SwarmCLI.", "docker.swarm.")
         signature = signature.replace("VolumeCLI.", "docker.volume.")
         return signature
@@ -60,6 +64,7 @@ doc_generator = MyDocumentationGenerator(
         "python_on_whales.Network",
         "python_on_whales.Node",
         "python_on_whales.Service",
+        "python_on_whales.Stack",
         "python_on_whales.Volume",
     ],
     titles_size="##",
