@@ -639,7 +639,7 @@ class ContainerCLI(DockerCLICaller):
         memory_reservation: Union[int, str, None] = None,
         memory_swap: Union[int, str, None] = None,
         memory_swappiness: Optional[int] = None,
-        mounts: List[List[str]] = None,
+        mounts: List[List[str]] = [],
         name: Optional[str] = None,
         networks: List[python_on_whales.components.network.ValidNetwork] = [],
         network_aliases: List[str] = [],
@@ -877,6 +877,16 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--userns", userns)
         full_cmd.add_simple_arg("--uts", uts)
+        full_cmd.add_args_list("--log-opt", log_options)
+        mounts = [",".join(x) for x in mounts]
+        full_cmd.add_args_list("--mount", mounts)
+        full_cmd.add_args_list("--network", networks)
+        full_cmd.add_args_list("--network-aliases", network_aliases)
+        full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
+        full_cmd.add_flag("--sig-proxy", sig_proxy)
+        full_cmd.add_simple_arg("--stop-signal", stop_signal)
+        full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_args_list("--ulimit", ulimit)
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
         full_cmd.add_simple_arg("--workdir", workdir)
 
