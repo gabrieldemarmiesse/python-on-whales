@@ -7,6 +7,7 @@ from python_on_whales.components.image import ImageCLI
 from python_on_whales.components.network import NetworkCLI
 from python_on_whales.components.node import NodeCLI
 from python_on_whales.components.service import ServiceCLI
+from python_on_whales.components.stack import StackCLI
 from python_on_whales.components.swarm import SwarmCLI
 from python_on_whales.components.system import SystemCLI
 from python_on_whales.components.volume import VolumeCLI
@@ -79,6 +80,7 @@ class DockerClient(DockerCLICaller):
         self.network = NetworkCLI(self.client_config)
         self.service = ServiceCLI(self.client_config)
         self.node = NodeCLI(self.client_config)
+        self.stack = StackCLI(self.client_config)
         self.swarm = SwarmCLI(self.client_config)
         self.system = SystemCLI(self.client_config)
 

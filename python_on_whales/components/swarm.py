@@ -11,6 +11,8 @@ class SwarmCLI(DockerCLICaller):
         autolock: bool = False,
         availability: str = "active",
         data_path_address: Optional[str] = None,
+        data_path_port: Optional[int] = None,
+        listen_address: Optional[str] = None,
     ) -> None:
         """Initialize a Swarm.
 
@@ -45,6 +47,8 @@ class SwarmCLI(DockerCLICaller):
         full_cmd.add_flag("--autolock", autolock)
         full_cmd.add_simple_arg("--availability", availability)
         full_cmd.add_simple_arg("--data-path-addr", data_path_address)
+        full_cmd.add_simple_arg("--data-path-port", data_path_port)
+        full_cmd.add_simple_arg("--listen-addr", listen_address)
         run(full_cmd)
 
     def join(
@@ -71,7 +75,7 @@ class SwarmCLI(DockerCLICaller):
                 the node enters the swarm as a manager or a worker.
         """
         full_cmd = self.docker_cmd + ["swarm", "join"]
-        full_cmd.add_simple_arg("--advertize-addr", advertise_address)
+        full_cmd.add_simple_arg("--advertise-addr", advertise_address)
         full_cmd.add_simple_arg("--availability", availability)
         full_cmd.add_simple_arg("--data-path-addr", data_path_address)
         full_cmd.add_simple_arg("--listen-addr", listen_address)
@@ -89,7 +93,7 @@ class SwarmCLI(DockerCLICaller):
             node_type: `"manager"` or `"worker"`
             rotate: Rotate join token
         """
-        full_cmd = self.docker_cmd + ["swarm", "join-token"]
+        full_cmd = self.docker_cmd + ["swarm", "join-token", "--quiet"]
         full_cmd.add_flag("--rotate", rotate)
         full_cmd.append(node_type)
         return run(full_cmd)

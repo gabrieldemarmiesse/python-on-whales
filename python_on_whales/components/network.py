@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -55,7 +55,15 @@ ValidNetwork = Union[Network, str]
 
 
 class NetworkCLI(DockerCLICaller):
-    def create(self, name: str) -> Network:
+    def create(
+        self,
+        name: str,
+        attachable: bool = False,
+        driver: Optional[str] = None,
+        gateway: Optional[str] = None,
+        subnet: Optional[str] = None,
+        options: List[str] = [],
+    ) -> Network:
         """Creates a Docker network.
 
         # Arguments
@@ -65,6 +73,11 @@ class NetworkCLI(DockerCLICaller):
             A `python_on_whales.Network`.
         """
         full_cmd = self.docker_cmd + ["network", "create"]
+        full_cmd.add_flag("--attachable", attachable)
+        full_cmd.add_simple_arg("--driver", driver)
+        full_cmd.add_simple_arg("--gateway", gateway)
+        full_cmd.add_simple_arg("--subnet", subnet)
+        full_cmd.add_args_list("--opt", options)
         full_cmd.append(name)
         return Network(self.client_config, run(full_cmd), is_immutable_id=True)
 
