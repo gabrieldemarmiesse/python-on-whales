@@ -1,6 +1,6 @@
 # Python on whales!
 
-![alt text](logo.png "Title")
+<img src="img/whale.png" alt="logo" height="400">
 
 An awesome Python wrapper for an awesome Docker CLI!
 
