@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import inspect
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import python_on_whales.components.image
 import python_on_whales.components.network
+import python_on_whales.components.volume
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -16,9 +20,6 @@ from python_on_whales.utils import (
     run,
     to_list,
 )
-
-from .image import Image
-from .volume import VolumeDefinition
 
 
 class ContainerState(DockerCamelModel):
@@ -88,8 +89,8 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().host_config
 
     @property
-    def image(self) -> Image:
-        return Image(
+    def image(self) -> python_on_whales.components.image.Image:
+        return python_on_whales.components.image.Image(
             self.client_config, self._get_inspect_result().image, is_immutable_id=True
         )
 
@@ -99,7 +100,7 @@ class Container(ReloadableObjectFromJson):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ) -> Image:
+    ) -> python_on_whales.components.image.Image:
         """Create a new image from the container's changes.
 
         See the [`docker.container.commit`](../sub-commands/container.md) command for
@@ -233,7 +234,7 @@ class ContainerCLI(DockerCLICaller):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ) -> Image:
+    ) -> python_on_whales.components.image.Image:
         """Create a new image from a container's changes
 
         # Arguments
@@ -257,7 +258,9 @@ class ContainerCLI(DockerCLICaller):
         if tag is not None:
             full_cmd.append(tag)
 
-        return Image(self.client_config, run(full_cmd), is_immutable_id=True)
+        return python_on_whales.components.image.Image(
+            self.client_config, run(full_cmd), is_immutable_id=True
+        )
 
     def copy(
         self,
@@ -312,7 +315,9 @@ class ContainerCLI(DockerCLICaller):
         name: Optional[str] = None,
         publish: List[ValidPortMapping] = [],
         remove: bool = False,
-        volumes: Optional[List[VolumeDefinition]] = [],
+        volumes: Optional[
+            List[python_on_whales.components.volume.VolumeDefinition]
+        ] = [],
     ) -> Container:
         """Creates a container, but does not start it.
 
@@ -670,7 +675,9 @@ class ContainerCLI(DockerCLICaller):
         user: Optional[str] = None,
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: Optional[List[VolumeDefinition]] = [],
+        volumes: Optional[
+            List[python_on_whales.components.volume.VolumeDefinition]
+        ] = [],
         volume_driver: Optional[str] = None,
         volumes_from: List[ValidContainer] = [],
         workdir: Optional[ValidPath] = None,

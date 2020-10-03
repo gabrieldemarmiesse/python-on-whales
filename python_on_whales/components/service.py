@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Union
 
-import python_on_whales.components.image
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,

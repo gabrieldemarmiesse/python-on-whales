@@ -4,7 +4,7 @@
 
 An awesome Python wrapper for an awesome Docker CLI!
 
-Works on Linux, MacOS and Windows.
+Works on Linux, MacOS and Windows, for Python 3.7 and above. 
 
 The docs can be found at this address: <https://gabrieldemarmiesse.github.io/python-on-whales/>
 
