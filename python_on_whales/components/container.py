@@ -829,6 +829,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
         full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
         full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(cpuset_mems))
+        full_cmd.add_args_list("--device-cgroup-rule", device_cgroup_rules)
+        full_cmd.add_args_list("--device-read-bps", device_read_bps)
+        full_cmd.add_args_list("--device-read-iops", device_read_iops)
+        full_cmd.add_args_list("--device-write-bps", device_write_bps)
+        full_cmd.add_args_list("--device-write-iops", device_write_iops)
         full_cmd.add_flag("--rm", remove)
         if content_trust:
             full_cmd += ["--disable-content-trust", "false"]
