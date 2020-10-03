@@ -615,6 +615,7 @@ class ContainerCLI(DockerCLICaller):
         expose: Union[int, List[int]] = [],
         gpus: Union[int, str, None] = None,
         groups_add: List[str] = [],
+        healthcheck: bool = True,
         health_cmd: Optional[str] = None,
         health_interval: Union[None, int, timedelta] = None,
         health_retries: Optional[int] = None,
@@ -643,7 +644,6 @@ class ContainerCLI(DockerCLICaller):
         name: Optional[str] = None,
         networks: List[python_on_whales.components.network.ValidNetwork] = [],
         network_aliases: List[str] = [],
-        healthcheck: bool = True,
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
         pid: Optional[str] = None,
@@ -816,71 +816,104 @@ class ContainerCLI(DockerCLICaller):
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
         full_cmd.add_args_list("--add-host", add_hosts)
+
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
         full_cmd.add_args_list("--blkio-weight-device", blkio_weight_device)
+
         full_cmd.add_args_list("--cap-add", cap_add)
         full_cmd.add_args_list("--cap-drop", cap_drop)
+
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cidfile", cidfile)
+
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
         full_cmd.add_simple_arg("--cpu-quota", cpu_quota)
         full_cmd.add_simple_arg("--cpu-rt-period", cpu_rt_period)
         full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
         full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
+        full_cmd.add_simple_arg("--cpus", cpus)
         full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
         full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(cpuset_mems))
+
+        full_cmd.add_flag("--detach", detach)
+
+        full_cmd.add_args_list("--device", devices)
         full_cmd.add_args_list("--device-cgroup-rule", device_cgroup_rules)
         full_cmd.add_args_list("--device-read-bps", device_read_bps)
         full_cmd.add_args_list("--device-read-iops", device_read_iops)
         full_cmd.add_args_list("--device-write-bps", device_write_bps)
         full_cmd.add_args_list("--device-write-iops", device_write_iops)
-        full_cmd.add_flag("--rm", remove)
+
         if content_trust:
             full_cmd += ["--disable-content-trust", "false"]
-        full_cmd.add_flag("--detach", detach)
-        full_cmd.add_args_list("--device", devices)
+
         full_cmd.add_args_list("--dns", dns)
         full_cmd.add_args_list("--dns-option", dns_options)
-        full_cmd.add_simple_arg("--name", name)
-        full_cmd.add_simple_arg("--pid", pid)
-        full_cmd.add_flag("--publish-all", publish_all)
-        full_cmd.add_simple_arg("--isolation", isolation)
-        full_cmd.add_simple_arg("--ipc", ipc)
         full_cmd.add_args_list("--dns-search", dns_search)
         full_cmd.add_simple_arg("--domainname", domainname)
+
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
+
+        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
+
+        full_cmd.add_args_list("--expose", expose)
+
+        full_cmd.add_simple_arg("--gpus", gpus)
+
+        full_cmd.add_args_list("--group-add", groups_add)
+
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
-        full_cmd.add_flag("--oom-kill-disable", not oom_kill)
-        full_cmd.add_args_list("--label-file", label_files)
-        full_cmd.add_args_list("--link", link)
-        full_cmd.add_args_list("--link-local-ip", link_local_ip)
-        full_cmd.add_flag("--init", init)
+        full_cmd.add_simple_arg("--health-cmd", health_cmd)
         full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
+        full_cmd.add_simple_arg("--health-retries", health_retries)
         full_cmd.add_simple_arg(
             "--health-start-period", to_seconds(health_start_period)
         )
         full_cmd.add_simple_arg("--health-timeout", to_seconds(health_timeout))
-        full_cmd.add_args_list("--group-add", groups_add)
-        full_cmd.add_simple_arg("--health-cmd", health_cmd)
-        full_cmd.add_simple_arg("--health-retries", health_retries)
-        for env_name, env_value in envs.items():
-            full_cmd += ["--env", env_name + "=" + env_value]
-        full_cmd.add_simple_arg("--mac-address", mac_address)
-        full_cmd.add_simple_arg("--cpus", cpus)
-        full_cmd.add_simple_arg("--log-driver", log_driver)
-        full_cmd.add_simple_arg("--runtime", runtime)
+
         full_cmd.add_simple_arg("--hostname", hostname)
+
+        full_cmd.add_flag("--init", init)
+
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
-        full_cmd.add_simple_arg("--restart", restart)
-        full_cmd.add_simple_arg("--pids-limit", pids_limit)
-        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
-        full_cmd.add_flag("--privileged", privileged)
-        full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.add_simple_arg("--ipc", ipc)
+
+        full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
+
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_args_list("--expose", expose)
+        full_cmd.add_args_list("--label-file", label_files)
+
+        full_cmd.add_args_list("--link", link)
+        full_cmd.add_args_list("--link-local-ip", link_local_ip)
+
+        full_cmd.add_simple_arg("--log-driver", log_driver)
+        full_cmd.add_args_list("--log-opt", log_options)
+
+        full_cmd.add_simple_arg("--mac-address", mac_address)
+
+        full_cmd.add_simple_arg("--memory", memory)
+        full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
+        full_cmd.add_simple_arg("--memory-swap", memory_swap)
+        full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
+
+        mounts = [",".join(x) for x in mounts]
+        full_cmd.add_args_list("--mount", mounts)
+        full_cmd.add_simple_arg("--name", name)
+
+        full_cmd.add_args_list("--network", networks)
+        full_cmd.add_args_list("--network-aliases", network_aliases)
+
+        full_cmd.add_flag("--oom-kill-disable", not oom_kill)
+        full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
+
+        full_cmd.add_simple_arg("--pid", pid)
+        full_cmd.add_simple_arg("--pids-limit", pids_limit)
+
+        full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.add_flag("--privileged", privileged)
 
         for port_mapping in publish:
             if len(port_mapping) == 2:
@@ -890,35 +923,36 @@ class ContainerCLI(DockerCLICaller):
                     "-p",
                     f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
                 ]
+        full_cmd.add_flag("--publish-all", publish_all)
+
+        full_cmd.add_flag("--read-only", read_only)
+        full_cmd.add_simple_arg("--restart", restart)
+        full_cmd.add_flag("--rm", remove)
+
+        full_cmd.add_simple_arg("--runtime", runtime)
+        full_cmd.add_args_list("--security-opt", security_options)
+
+        full_cmd.add_simple_arg("--shm-size", shm_size)
+        full_cmd.add_flag("--sig-proxy", sig_proxy)
+
+        full_cmd.add_simple_arg("--stop-signal", stop_signal)
+        full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
+
+        full_cmd.add_args_list("--storage-opt", storage_options)
+        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_args_list("--ulimit", ulimit)
+
+        full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--userns", userns)
+        full_cmd.add_simple_arg("--uts", uts)
 
         for volume_definition in volumes:
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
-
-        full_cmd.add_simple_arg("--shm-size", shm_size)
-        full_cmd.add_simple_arg("--memory", memory)
-        full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
-        full_cmd.add_simple_arg("--memory-swap", memory_swap)
-        full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
-        full_cmd.add_args_list("--security-opt", security_options)
-        full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
-        full_cmd.add_args_list("--storage-opt", storage_options)
-        full_cmd.add_simple_arg("--gpus", gpus)
-        full_cmd.add_flag("--read-only", read_only)
-        full_cmd.add_simple_arg("--user", user)
-        full_cmd.add_simple_arg("--userns", userns)
-        full_cmd.add_simple_arg("--uts", uts)
-        full_cmd.add_args_list("--log-opt", log_options)
-        mounts = [",".join(x) for x in mounts]
-        full_cmd.add_args_list("--mount", mounts)
-        full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-aliases", network_aliases)
-        full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
-        full_cmd.add_flag("--sig-proxy", sig_proxy)
-        full_cmd.add_simple_arg("--stop-signal", stop_signal)
-        full_cmd.add_args_list("--tmpfs", tmpfs)
-        full_cmd.add_args_list("--ulimit", ulimit)
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
+        full_cmd.add_args_list("--volumes-from", volumes_from)
+
         full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(image)
