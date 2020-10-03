@@ -4,7 +4,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, overload
 
 import python_on_whales.components.buildx
 import python_on_whales.components.container
@@ -111,6 +111,58 @@ class VolumeCLI(DockerCLICaller):
 
         return Volume(self.client_config, run(full_cmd))
 
+    @overload
+    def inspect(self, x: str) -> Volume:
+        ...
+
+    @overload
+    def inspect(self, x: List[str]) -> List[Volume]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Volume, List[Volume]]:
+        if isinstance(x, str):
+            return Volume(self.client_config, x)
+        else:
+            return [Volume(self.client_config, reference) for reference in x]
+
+    def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
+        """List volumes
+
+        # Arguments
+            filters: See the [Docker documentation page about filtering
+                ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
+                An example `filters=dict(dangling=1, driver="local")`.
+
+        # Returns
+            `List[python_on_whales.Volume]`
+        """
+
+        full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
+
+        for key, value in filters.items():
+            full_cmd += ["--filter", f"{key}={value}"]
+
+        volumes_names = run(full_cmd).splitlines()
+
+        return [
+            Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
+        ]
+
+    def prune(self, filters: Dict[str, Union[str, int]] = {}) -> None:
+        """Remove volumes
+
+        # Arguments
+            filters: See the [Docker documentation page about filtering
+                ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
+                An example `filters=dict(dangling=1, driver="local")`.
+        """
+        full_cmd = self.docker_cmd + ["volume", "prune", "--force"]
+
+        for key, value in filters.items():
+            full_cmd += ["--filter", f"{key}={value}"]
+
+        run(full_cmd, capture_stderr=False, capture_stdout=False)
+
     def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
         """Removes one or more volumes
 
@@ -204,44 +256,6 @@ class VolumeCLI(DockerCLICaller):
         python_on_whales.components.image.ImageCLI(self.client_config).remove(
             image_name
         )
-
-    def prune(self, filters: Dict[str, Union[str, int]] = {}) -> None:
-        """Remove volumes
-
-        # Arguments
-            filters: See the [Docker documentation page about filtering
-                ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
-                An example `filters=dict(dangling=1, driver="local")`.
-        """
-        full_cmd = self.docker_cmd + ["volume", "prune", "--force"]
-
-        for key, value in filters.items():
-            full_cmd += ["--filter", f"{key}={value}"]
-
-        run(full_cmd, capture_stderr=False, capture_stdout=False)
-
-    def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
-        """List volumes
-
-        # Arguments
-            filters: See the [Docker documentation page about filtering
-                ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
-                An example `filters=dict(dangling=1, driver="local")`.
-
-        # Returns
-            `List[python_on_whales.Volume]`
-        """
-
-        full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
-
-        for key, value in filters.items():
-            full_cmd += ["--filter", f"{key}={value}"]
-
-        volumes_names = run(full_cmd).splitlines()
-
-        return [
-            Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
-        ]
 
 
 VolumeDefinition = Union[
