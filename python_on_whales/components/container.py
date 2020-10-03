@@ -598,7 +598,7 @@ class ContainerCLI(DockerCLICaller):
         cpuset_mems: Optional[List[int]] = None,
         detach: bool = False,
         # detach_keys: Any = None,
-        device: List[str] = [],
+        devices: List[str] = [],
         device_cgroup_rules: List[str] = [],
         device_read_bps: List[str] = [],
         device_read_iops: List[str] = [],
@@ -817,13 +817,25 @@ class ContainerCLI(DockerCLICaller):
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
         full_cmd.add_args_list("--add-host", add_hosts)
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
+        full_cmd.add_args_list("--blkio-weight-device", blkio_weight_device)
+        full_cmd.add_args_list("--cap-add", cap_add)
+        full_cmd.add_args_list("--cap-drop", cap_drop)
+        full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
+        full_cmd.add_simple_arg("--cidfile", cidfile)
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
         full_cmd.add_simple_arg("--cpu-quota", cpu_quota)
         full_cmd.add_simple_arg("--cpu-rt-period", cpu_rt_period)
         full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
         full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
+        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
+        full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(cpuset_mems))
         full_cmd.add_flag("--rm", remove)
+        if content_trust:
+            full_cmd += ["--disable-content-trust", "false"]
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_args_list("--device", devices)
+        full_cmd.add_args_list("--dns", dns)
+        full_cmd.add_args_list("--dns-option", dns_options)
         full_cmd.add_simple_arg("--name", name)
         full_cmd.add_simple_arg("--pid", pid)
         full_cmd.add_flag("--publish-all", publish_all)
@@ -951,3 +963,10 @@ def format_time_arg(time_object):
         return None
     else:
         return format_time_for_docker(time_object)
+
+
+def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
+    if sequence is None:
+        return None
+    sequence = [str(x) for x in sequence]
+    return ",".join(sequence)
