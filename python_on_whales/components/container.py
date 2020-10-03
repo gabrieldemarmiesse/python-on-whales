@@ -856,6 +856,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--link", link)
         full_cmd.add_args_list("--link-local-ip", link_local_ip)
         full_cmd.add_flag("--init", init)
+        full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
+        full_cmd.add_simple_arg(
+            "--health-start-period", to_seconds(health_start_period)
+        )
+        full_cmd.add_simple_arg("--health-timeout", to_seconds(health_timeout))
         full_cmd.add_args_list("--group-add", groups_add)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
         full_cmd.add_simple_arg("--health-retries", health_retries)
@@ -870,10 +875,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--ip6", ip6)
         full_cmd.add_simple_arg("--restart", restart)
         full_cmd.add_simple_arg("--pids-limit", pids_limit)
+        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
         full_cmd.add_flag("--privileged", privileged)
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
-        full_cmd.add_args_list("--label", format_labels(labels))
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.add_args_list("--expose", expose)
 
         for port_mapping in publish:
@@ -985,5 +991,13 @@ def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
     return ",".join(sequence)
 
 
-def format_labels(labels: Dict[str, str]):
-    return [f"{key}={value}" for key, value in labels.items()]
+def format_dict_for_cli(dictionary: Dict[str, str]):
+    return [f"{key}={value}" for key, value in dictionary.items()]
+
+
+def to_seconds(duration: Union[None, int, timedelta]) -> Optional[str]:
+    if duration is None:
+        return None
+    if isinstance(duration, timedelta):
+        duration = int(duration.total_seconds())
+    return f"{duration}s"
