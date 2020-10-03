@@ -869,6 +869,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
         full_cmd.add_args_list("--label", format_labels(labels))
+        full_cmd.add_args_list("--expose", expose)
 
         for port_mapping in publish:
             if len(port_mapping) == 2:
