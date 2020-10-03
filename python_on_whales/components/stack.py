@@ -46,6 +46,7 @@ class StackCLI(DockerCLICaller):
         return [Stack(self.client_config, name) for name in stacks_names]
 
     def ps(self):
+        """Not yet implemented"""
         raise NotImplementedError
 
     def remove(self, x: Union[ValidStack, List[ValidStack]]) -> None:
@@ -53,4 +54,5 @@ class StackCLI(DockerCLICaller):
         run(full_cmd)
 
     def services(self):
+        """Not yet implemented"""
         raise NotImplementedError

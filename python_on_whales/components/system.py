@@ -3,6 +3,18 @@ from python_on_whales.utils import run
 
 
 class SystemCLI(DockerCLICaller):
+    def disk_free(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def events(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def info(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def prune(self, all: bool = False, volumes: bool = False):
         """Remove unused docker data
 

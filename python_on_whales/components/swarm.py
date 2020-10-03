@@ -5,6 +5,10 @@ from python_on_whales.utils import run
 
 
 class SwarmCLI(DockerCLICaller):
+    def ca(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def init(
         self,
         advertise_address: Optional[str] = None,
@@ -107,3 +111,15 @@ class SwarmCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["swarm", "leave"]
         full_cmd.add_flag("--force", force)
         run(full_cmd)
+
+    def unlock(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def unlock_key(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def update(self):
+        """Not yet implemented"""
+        raise NotImplementedError

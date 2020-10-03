@@ -75,6 +75,30 @@ class ServiceCLI(DockerCLICaller):
         service_id = run(full_cmd)
         return Service(self.client_config, service_id, is_immutable_id=True)
 
+    def inspect(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def logs(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def list(self) -> List[Service]:
+        """Returns the list of services
+
+        # Returns
+            A `List[python_on_whales.Services]`
+        """
+        full_cmd = self.docker_cmd + ["service", "list", "--quiet"]
+
+        ids = run(full_cmd).splitlines()
+
+        return [Service(self.client_config, x) for x in ids]
+
+    def ps(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def remove(self, services: Union[ValidService, List[ValidService]]):
         """Removes a service
 
@@ -87,6 +111,10 @@ class ServiceCLI(DockerCLICaller):
             full_cmd.append(service)
 
         run(full_cmd)
+
+    def rollback(self):
+        """Not yet implemented"""
+        raise NotImplementedError
 
     def scale(self, new_scales: Dict[ValidService, int], detach=False):
         """Scale one or more services.
@@ -104,14 +132,6 @@ class ServiceCLI(DockerCLICaller):
             full_cmd.append(f"{str(service)}={new_scale}")
         run(full_cmd, capture_stderr=False, capture_stdout=False)
 
-    def list(self) -> List[Service]:
-        """Returns the list of services
-
-        # Returns
-            A `List[python_on_whales.Services]`
-        """
-        full_cmd = self.docker_cmd + ["service", "list", "--quiet"]
-
-        ids = run(full_cmd).splitlines()
-
-        return [Service(self.client_config, x) for x in ids]
+    def update(self):
+        """Not yet implemented"""
+        raise NotImplementedError

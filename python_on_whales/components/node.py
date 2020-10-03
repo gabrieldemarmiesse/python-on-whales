@@ -50,6 +50,30 @@ ValidNode = Union[Node, str]
 
 
 class NodeCLI(DockerCLICaller):
+    def demote(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def inspect(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def list(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def promote(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def ps(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def remove(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def update(
         self,
         node: ValidNode,
