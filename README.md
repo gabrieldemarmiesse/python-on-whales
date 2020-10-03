@@ -1,8 +1,6 @@
-# Python on whales!
+<img src="img/full.png" alt="logo" class="responsive">
 
-<img src="img/whale.png" alt="logo" height="400">
-
-An awesome Python wrapper for an awesome Docker CLI!
+A Docker client for Python, designed to be fun and intuivive!
 
 Works on Linux, MacOS and Windows, for Python 3.7 and above. 
 

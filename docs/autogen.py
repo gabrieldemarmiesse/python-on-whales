@@ -74,4 +74,4 @@ doc_generator = MyDocumentationGenerator(
 destination = PROJECT_ROOT / "docs" / "generated_sources"
 doc_generator.generate(destination)
 shutil.copyfile(PROJECT_ROOT / "README.md", destination / "index.md")
-shutil.copyfile(PROJECT_ROOT / "img/whale.png", destination / "img/whale.png")
+shutil.copyfile(PROJECT_ROOT / "img/full.png", destination / "img/full.png")
