@@ -629,7 +629,7 @@ class ContainerCLI(DockerCLICaller):
         isolation: Optional[str] = None,
         kernel_memory: Union[int, str, None] = None,
         labels: Dict[str, str] = {},
-        label_file: List[ValidPath] = [],
+        label_files: List[ValidPath] = [],
         link: List[ValidContainer] = [],
         link_local_ip: List[str] = [],
         log_driver: Optional[str] = None,
@@ -847,7 +847,13 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--env-file", env_files)
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
-
+        full_cmd.add_args_list("--label-file", label_files)
+        full_cmd.add_args_list("--link", link)
+        full_cmd.add_args_list("--link-local-ip", link_local_ip)
+        full_cmd.add_flag("--init", init)
+        full_cmd.add_args_list("--group-add", groups_add)
+        full_cmd.add_simple_arg("--health-cmd", health_cmd)
+        full_cmd.add_simple_arg("--health-retries", health_retries)
         for env_name, env_value in envs.items():
             full_cmd += ["--env", env_name + "=" + env_value]
         full_cmd.add_simple_arg("--mac-address", mac_address)
@@ -862,6 +868,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--privileged", privileged)
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
+        full_cmd.add_args_list("--label", format_labels(labels))
 
         for port_mapping in publish:
             if len(port_mapping) == 2:
@@ -970,3 +977,7 @@ def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
         return None
     sequence = [str(x) for x in sequence]
     return ",".join(sequence)
+
+
+def format_labels(labels: Dict[str, str]):
+    return [f"{key}={value}" for key, value in labels.items()]
