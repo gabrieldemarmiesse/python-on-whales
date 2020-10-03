@@ -140,6 +140,82 @@ class ImageCLI(DockerCLICaller):
         super().__init__(client_config)
         self.build = python_on_whales.components.buildx.BuildxCLI(client_config).build
 
+    def history(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def import_(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def inspect(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def load(
+        self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
+    ):
+        """Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
+
+        # Arguments
+            input: Path or input stream to load the images from.
+            quiet: If you don't want to display the progress bars.
+
+        # Returns
+            `None` at the moment, but should return the Docker images loaded (not
+            implemented yet).
+        """
+        full_cmd = self.docker_cmd + ["image", "load"]
+
+        if isinstance(input, (str, Path)):
+            full_cmd += ["--input", str(input)]
+
+        if quiet:
+            full_cmd.append("--quiet")
+
+        if isinstance(input, (str, Path)):
+            run(full_cmd)
+        elif isinstance(input, bytes):
+            run(full_cmd, input=input)
+        elif inspect.isgenerator(input):
+            self._load_from_generator(full_cmd, input)
+        # TODO: return images
+
+    def _load_from_generator(self, full_cmd: List[str], input: Iterator[bytes]):
+        p = Popen(full_cmd, stdin=PIPE)
+        for buffer_bytes in input:
+            p.stdin.write(buffer_bytes)
+            p.stdin.flush()
+        p.stdin.close()
+        exit_code = p.wait()
+        if exit_code != 0:
+            raise DockerException(full_cmd, exit_code)
+
+    def list(self) -> List[Image]:
+        """Returns the list of Docker images present on the machine.
+
+        Note that each image may have multiple tags.
+
+        # Returns
+            A `List[python_on_whales.Image]` object.
+        """
+        full_cmd = self.docker_cmd + [
+            "image",
+            "list",
+            "--quiet",
+            "--no-trunc",
+        ]
+
+        ids = run(full_cmd).splitlines()
+        # the list of tags is bigger than the number of images. We uniquify
+        ids = set(ids)
+
+        return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
+
+    def prune(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def pull(self, image_name: str, quiet: bool = False) -> Image:
         """Pull a docker image
 
@@ -170,6 +246,29 @@ class ImageCLI(DockerCLICaller):
 
         full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+
+    def remove(
+        self,
+        x: Union[ValidImage, List[ValidImage]],
+        force: bool = False,
+        prune: bool = True,
+    ):
+        """Remove one or more docker images.
+
+        # Arguments
+            x: Single image or list of Docker images to remove. You can use tags or
+                `python_on_whales.Image` objects.
+            force: Force removal of the image
+            prune: Delete untagged parents
+        """
+
+        full_cmd = self.docker_cmd + ["image", "remove"]
+        full_cmd.add_flag("--force", force)
+        full_cmd.add_flag("--no-prune", not prune)
+        for image in to_list(x):
+            full_cmd.append(image)
+
+        run(full_cmd)
 
     def save(
         self,
@@ -227,89 +326,6 @@ class ImageCLI(DockerCLICaller):
         exit_code = p.wait(0.1)
         if exit_code != 0:
             raise DockerException(full_cmd, exit_code, stderr=p.stderr.read())
-
-    def load(
-        self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
-    ):
-        """Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
-
-        # Arguments
-            input: Path or input stream to load the images from.
-            quiet: If you don't want to display the progress bars.
-
-        # Returns
-            `None` at the moment, but should return the Docker images loaded (not
-            implemented yet).
-        """
-        full_cmd = self.docker_cmd + ["image", "load"]
-
-        if isinstance(input, (str, Path)):
-            full_cmd += ["--input", str(input)]
-
-        if quiet:
-            full_cmd.append("--quiet")
-
-        if isinstance(input, (str, Path)):
-            run(full_cmd)
-        elif isinstance(input, bytes):
-            run(full_cmd, input=input)
-        elif inspect.isgenerator(input):
-            self._load_from_generator(full_cmd, input)
-        # TODO: return images
-
-    def _load_from_generator(self, full_cmd: List[str], input: Iterator[bytes]):
-        p = Popen(full_cmd, stdin=PIPE)
-        for buffer_bytes in input:
-            p.stdin.write(buffer_bytes)
-            p.stdin.flush()
-        p.stdin.close()
-        exit_code = p.wait()
-        if exit_code != 0:
-            raise DockerException(full_cmd, exit_code)
-
-    def remove(
-        self,
-        x: Union[ValidImage, List[ValidImage]],
-        force: bool = False,
-        prune: bool = True,
-    ):
-        """Remove one or more docker images.
-
-        # Arguments
-            x: Single image or list of Docker images to remove. You can use tags or
-                `python_on_whales.Image` objects.
-            force: Force removal of the image
-            prune: Delete untagged parents
-        """
-
-        full_cmd = self.docker_cmd + ["image", "remove"]
-        full_cmd.add_flag("--force", force)
-        full_cmd.add_flag("--no-prune", not prune)
-        for image in to_list(x):
-            full_cmd.append(image)
-
-        run(full_cmd)
-
-    def list(self) -> List[Image]:
-        """Returns the list of Docker images present on the machine.
-
-        Note that each image may have multiple tags.
-
-        # Returns
-            A `List[python_on_whales.Image]` object.
-        """
-        full_cmd = self.docker_cmd + [
-            "image",
-            "list",
-            "--quiet",
-            "--no-trunc",
-        ]
-
-        ids = run(full_cmd).splitlines()
-        # the list of tags is bigger than the number of images. We uniquify
-        ids = set(ids)
-
-        return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
         """Adds a tag to a Docker image.

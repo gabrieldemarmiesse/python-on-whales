@@ -227,6 +227,10 @@ class ContainerCLI(DockerCLICaller):
         super().__init__(*args, **kwargs)
         self.remove = self.remove
 
+    def attach(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def commit(
         self,
         container: ValidContainer,
@@ -985,6 +989,10 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(container)
         run(full_cmd)
 
+    def stats(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
     def stop(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
@@ -1010,6 +1018,22 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(container)
 
         run(full_cmd)
+
+    def top(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def unpause(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def update(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def wait(self):
+        """Not yet implemented"""
+        raise NotImplementedError
 
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:

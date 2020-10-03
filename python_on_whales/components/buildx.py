@@ -88,41 +88,6 @@ class BuildxCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--set", override)
         run(full_cmd + to_list(targets), capture_stderr=False)
 
-    def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
-        full_cmd = self.docker_cmd + ["buildx", "create"]
-
-        if use:
-            full_cmd.append("--use")
-
-        if context_or_endpoint is not None:
-            full_cmd.append(context_or_endpoint)
-        return Builder(self.client_config, run(full_cmd))
-
-    def use(
-        self, builder: Union[Builder, str], default: bool = False, global_: bool = False
-    ):
-        full_cmd = self.docker_cmd + ["buildx", "use"]
-
-        if default:
-            full_cmd.append("--use")
-        if global_:
-            full_cmd.append("--global")
-
-        full_cmd.append(str(builder))
-
-        run(full_cmd)
-
-    def remove(self, builder: Union[Builder, str]):
-        """Remove a builder
-
-        # Arguments
-            builder: The builder to remove
-        """
-        full_cmd = self.docker_cmd + ["buildx", "rm"]
-
-        full_cmd.append(str(builder))
-        run(full_cmd)
-
     def build(
         self,
         context_path: ValidPath,
@@ -192,3 +157,62 @@ class BuildxCLI(DockerCLICaller):
             return python_on_whales.components.image.Image(
                 self.client_config, to_list(tags)[0]
             )
+
+    def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
+        full_cmd = self.docker_cmd + ["buildx", "create"]
+
+        if use:
+            full_cmd.append("--use")
+
+        if context_or_endpoint is not None:
+            full_cmd.append(context_or_endpoint)
+        return Builder(self.client_config, run(full_cmd))
+
+    def disk_usage(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def inspect(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def list(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def prune(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def remove(self, builder: Union[Builder, str]):
+        """Remove a builder
+
+        # Arguments
+            builder: The builder to remove
+        """
+        full_cmd = self.docker_cmd + ["buildx", "rm"]
+
+        full_cmd.append(str(builder))
+        run(full_cmd)
+
+    def stop(self):
+        """Not yet implemented"""
+        raise NotImplementedError
+
+    def use(
+        self, builder: Union[Builder, str], default: bool = False, global_: bool = False
+    ):
+        full_cmd = self.docker_cmd + ["buildx", "use"]
+
+        if default:
+            full_cmd.append("--use")
+        if global_:
+            full_cmd.append("--global")
+
+        full_cmd.append(str(builder))
+
+        run(full_cmd)
+
+    def version(self):
+        """Not yet implemented"""
+        raise NotImplementedError
