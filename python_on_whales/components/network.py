@@ -6,7 +6,7 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, run, to_list
+from python_on_whales.utils import DockerCamelModel, format_dict_for_cli, run, to_list
 
 
 class NetworkInspectResult(DockerCamelModel):
@@ -32,6 +32,12 @@ class Network(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.remove()
+
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["network", "inspect", reference])
 
@@ -47,7 +53,26 @@ class Network(ReloadableObjectFromJson):
         return self._get_inspect_result().name
 
     def remove(self) -> None:
-        """Removes this Docker network."""
+        """Removes this Docker network.
+
+        Rather than removing it manually, you can use a context manager to
+        make sure the network is deleted even if an exception is raised.
+
+        ```python
+        from python_on_whales import docker
+
+        with docker.network.create("some_name") as my_net:
+            docker.run(
+                "busybox",
+                ["ping", "idonotexistatall.com"],
+                networks=[my_net],
+                remove=True,
+            )
+            # an exception will be raised because the container will fail
+            # but the network will be removed anyway.
+        ```
+
+        """
         NetworkCLI(self.client_config).remove(self)
 
 
@@ -55,6 +80,9 @@ ValidNetwork = Union[Network, str]
 
 
 class NetworkCLI(DockerCLICaller):
+    def connect(self):
+        raise NotImplementedError
+
     def create(
         self,
         name: str,
@@ -80,6 +108,22 @@ class NetworkCLI(DockerCLICaller):
         full_cmd.add_args_list("--opt", options)
         full_cmd.append(name)
         return Network(self.client_config, run(full_cmd), is_immutable_id=True)
+
+    def disconnect(self):
+        raise NotImplementedError
+
+    def inspect(self):
+        raise NotImplementedError
+
+    def list(self, filters: Dict[str, str] = {}):
+        full_cmd = self.docker_cmd + ["network", "list", "--no-trunc", "--quiet"]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+
+        ids = run(full_cmd).splitlines()
+        return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
+
+    def prune(self):
+        raise NotImplementedError
 
     def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
         """Removes a Docker network

@@ -1,7 +1,7 @@
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 
@@ -146,3 +146,7 @@ def install_buildx_if_needed(docker_binary: str):
             f"'docker buildx', here is the result:\n"
             f"{stderr}"
         )
+
+
+def format_dict_for_cli(dictionary: Dict[str, str]):
+    return [f"{key}={value}" for key, value in dictionary.items()]

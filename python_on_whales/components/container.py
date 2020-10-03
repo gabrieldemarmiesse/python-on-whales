@@ -1,6 +1,6 @@
 import inspect
 from datetime import datetime, timedelta
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import python_on_whales.components.network
 from python_on_whales.client_config import (
@@ -11,6 +11,7 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import (
     DockerCamelModel,
     ValidPath,
+    format_dict_for_cli,
     removeprefix,
     run,
     to_list,
@@ -1023,10 +1024,6 @@ def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
         return None
     sequence = [str(x) for x in sequence]
     return ",".join(sequence)
-
-
-def format_dict_for_cli(dictionary: Dict[str, str]):
-    return [f"{key}={value}" for key, value in dictionary.items()]
 
 
 def to_seconds(duration: Union[None, int, timedelta]) -> Optional[str]:

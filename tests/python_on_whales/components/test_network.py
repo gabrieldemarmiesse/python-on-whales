@@ -1,4 +1,6 @@
-from python_on_whales import docker
+import pytest
+
+from python_on_whales import DockerException, docker
 from python_on_whales.components.network import NetworkInspectResult
 from python_on_whales.test_utils import random_name
 
@@ -50,3 +52,20 @@ def test_parse_inspection():
 
     assert network_parsed.enable_I_pv6 is False
     assert network_parsed.driver == "host"
+
+
+def test_context_manager():
+    from python_on_whales import docker
+
+    with pytest.raises(DockerException):
+        with docker.network.create(random_name()) as my_net:
+            docker.run(
+                "busybox",
+                ["ping", "idonotexistatall.com"],
+                networks=[my_net],
+                remove=True,
+            )
+            # an exception will be raised because the container will fail
+            # but the network will be removed anyway.
+
+    assert my_net not in docker.network.list()
