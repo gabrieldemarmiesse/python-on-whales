@@ -1,4 +1,4 @@
-<img src="img/full.png" alt="logo" class="responsive">
+<img src="img/full.png" alt="logo" class="responsive" style="width: 80%; height: auto;">
 
 A Docker client for Python, designed to be fun and intuivive!
 
@@ -9,7 +9,7 @@ The docs can be found at this address: <https://gabrieldemarmiesse.github.io/pyt
 The Github repo can be found at this adress: <https://github.com/gabrieldemarmiesse/python-on-whales>
 
 
-### Some cool examples:
+## Some cool examples
 
 ```python
 >>> from python_on_whales import docker
@@ -92,9 +92,7 @@ e6ca3592b144: Downloading [=============>                                     ] 
 ```
 
 
-### What is it?
-
-Python on Whales is a Docker client for Python. 
+## Main features
 
 * 1 to 1 mapping between the CLI interface and the Python API. No need to look in the docs
 what is the name of the function/argument you need.
@@ -108,9 +106,11 @@ what is the name of the function/argument you need.
 * Nice SSH support for remote daemons.
 * Docker object as Python objects: Container, Images, Volumes, Services... and their
 attributes are updated in real-time!
+* Each Docker object can be used as a context manager. When getting out of the 
+context, the Docker object is removed automatically, even if an exception occurs.
 * A fully typed API compatible with `pathlib` and `os.path`
 
-### Why another project? Why not build on Docker-py?
+## Why another project? Why not build on Docker-py?
 
 Two major differences do not permit that:
 
