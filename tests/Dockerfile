@@ -4,7 +4,7 @@ RUN wget -O /docker-buildx https://github.com/docker/buildx/releases/download/v0
 RUN chmod a+x /docker-buildx
 
 #-----------------------------------------------------------------------------
-FROM python:3.6 as python_dependencies
+FROM python:3.7 as python_dependencies
 
 RUN pip install typeguard pydantic requests tqdm
 
