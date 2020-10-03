@@ -47,9 +47,11 @@ class MyDocumentationGenerator(DocumentationGenerator):
         signature = signature.replace("ContainerCLI.", "docker.container.")
         signature = signature.replace("ImageCLI.", "docker.image.")
         signature = signature.replace("NetworkCLI.", "docker.network.")
+        signature = signature.replace("NodeCLI.", "docker.node.")
         signature = signature.replace("ServiceCLI.", "docker.service.")
         signature = signature.replace("StackCLI.", "docker.stack.")
         signature = signature.replace("SwarmCLI.", "docker.swarm.")
+        signature = signature.replace("SystemCLI.", "docker.system.")
         signature = signature.replace("VolumeCLI.", "docker.volume.")
         return signature
 
