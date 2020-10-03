@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
+import python_on_whales.components.container
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -80,8 +81,24 @@ ValidNetwork = Union[Network, str]
 
 
 class NetworkCLI(DockerCLICaller):
-    def connect(self):
-        raise NotImplementedError
+    def connect(
+        self,
+        network: ValidNetwork,
+        container: python_on_whales.components.container.ValidContainer,
+        alias: Optional[str] = None,
+        driver_options: List[str] = [],
+        ip: Optional[str] = None,
+        ip6: Optional[str] = None,
+        links: List[python_on_whales.components.container.ValidContainer] = [],
+    ) -> None:
+        full_cmd = self.docker_cmd + ["network", "connect"]
+        full_cmd.add_simple_arg("--alias", alias)
+        full_cmd.add_args_list("--driver-opt", driver_options)
+        full_cmd.add_simple_arg("--ip", ip)
+        full_cmd.add_simple_arg("--ip6", ip6)
+        full_cmd.add_args_list("--link", links)
+        full_cmd += [network, container]
+        run(full_cmd)
 
     def create(
         self,
@@ -109,8 +126,16 @@ class NetworkCLI(DockerCLICaller):
         full_cmd.append(name)
         return Network(self.client_config, run(full_cmd), is_immutable_id=True)
 
-    def disconnect(self):
-        raise NotImplementedError
+    def disconnect(
+        self,
+        network: ValidNetwork,
+        container: python_on_whales.components.container.ValidContainer,
+        force: bool = False,
+    ):
+        full_cmd = self.docker_cmd + ["network", "disconnet"]
+        full_cmd.add_flag("--force", force)
+        full_cmd += [network, container]
+        run(full_cmd)
 
     @overload
     def inspect(self, x: str) -> Network:
