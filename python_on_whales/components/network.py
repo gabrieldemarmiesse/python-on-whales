@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -112,18 +112,31 @@ class NetworkCLI(DockerCLICaller):
     def disconnect(self):
         raise NotImplementedError
 
-    def inspect(self):
-        raise NotImplementedError
+    @overload
+    def inspect(self, x: str) -> Network:
+        ...
 
-    def list(self, filters: Dict[str, str] = {}):
+    @overload
+    def inspect(self, x: List[str]) -> List[Network]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Network, List[Network]]:
+        if isinstance(x, str):
+            return Network(self.client_config, x)
+        else:
+            return [Network(self.client_config, reference) for reference in x]
+
+    def list(self, filters: Dict[str, str] = {}) -> List[Network]:
         full_cmd = self.docker_cmd + ["network", "list", "--no-trunc", "--quiet"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         ids = run(full_cmd).splitlines()
         return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
-    def prune(self):
-        raise NotImplementedError
+    def prune(self, filters: Dict[str, str] = {}):
+        full_cmd = self.docker_cmd + ["network", "prune", "--force"]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        run(full_cmd)
 
     def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
         """Removes a Docker network
