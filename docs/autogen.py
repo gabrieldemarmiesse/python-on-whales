@@ -7,6 +7,7 @@ from python_on_whales.utils import PROJECT_ROOT
 pages = {
     "docker_client.md": ["python_on_whales.DockerClient"]
     + get_methods("python_on_whales.docker_client.DockerClient"),
+    "sub-commands/app.md": get_methods("python_on_whales.components.app.AppCLI"),
     "sub-commands/buildx.md": get_methods(
         "python_on_whales.components.buildx.BuildxCLI"
     ),
