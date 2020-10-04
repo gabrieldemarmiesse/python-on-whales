@@ -1,6 +1,7 @@
 from typing import Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
+from python_on_whales.components.app import AppCLI
 from python_on_whales.components.buildx import BuildxCLI
 from python_on_whales.components.container import ContainerCLI
 from python_on_whales.components.image import ImageCLI
@@ -73,6 +74,7 @@ class DockerClient(DockerCLICaller):
             )
         super().__init__(client_config)
 
+        self.app = AppCLI(self.client_config)
         self.volume = VolumeCLI(self.client_config)
         self.image = ImageCLI(self.client_config)
         self.container = ContainerCLI(self.client_config)
