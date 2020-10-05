@@ -134,6 +134,7 @@ class DockerClient(DockerCLICaller):
         self.wait = self.container.wait
 
     def version(self):
+        """Not yet implemented"""
         raise NotImplementedError
 
     def login(
