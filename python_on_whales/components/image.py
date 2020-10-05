@@ -4,7 +4,7 @@ import inspect
 from datetime import datetime
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union, overload
 
 import python_on_whales.components.buildx
 from python_on_whales.client_config import (
@@ -148,9 +148,20 @@ class ImageCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self):
+    @overload
+    def inspect(self, x: str) -> Image:
+        ...
+
+    @overload
+    def inspect(self, x: List[str]) -> List[Image]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Image, List[Image]]:
         """Not yet implemented"""
-        raise NotImplementedError
+        if isinstance(x, list):
+            return [Image(self.client_config, identifier) for identifier in x]
+        else:
+            return Image(self.client_config, x)
 
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
