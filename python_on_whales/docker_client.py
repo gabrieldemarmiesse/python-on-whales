@@ -3,14 +3,19 @@ from typing import Optional
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.app import AppCLI
 from python_on_whales.components.buildx import BuildxCLI
+from python_on_whales.components.config import ConfigCLI
 from python_on_whales.components.container import ContainerCLI
+from python_on_whales.components.context import ContextCLI
 from python_on_whales.components.image import ImageCLI
+from python_on_whales.components.manifest import ManifestCLI
 from python_on_whales.components.network import NetworkCLI
 from python_on_whales.components.node import NodeCLI
+from python_on_whales.components.secret import SecretCLI
 from python_on_whales.components.service import ServiceCLI
 from python_on_whales.components.stack import StackCLI
 from python_on_whales.components.swarm import SwarmCLI
 from python_on_whales.components.system import SystemCLI
+from python_on_whales.components.trust import TrustCLI
 from python_on_whales.components.volume import VolumeCLI
 
 from .utils import ValidPath, run
@@ -75,16 +80,21 @@ class DockerClient(DockerCLICaller):
         super().__init__(client_config)
 
         self.app = AppCLI(self.client_config)
-        self.volume = VolumeCLI(self.client_config)
-        self.image = ImageCLI(self.client_config)
-        self.container = ContainerCLI(self.client_config)
         self.buildx = BuildxCLI(self.client_config)
+        self.config = ConfigCLI(self.client_config)
+        self.container = ContainerCLI(self.client_config)
+        self.context = ContextCLI(self.client_config)
+        self.image = ImageCLI(self.client_config)
+        self.manifest = ManifestCLI(self.client_config)
         self.network = NetworkCLI(self.client_config)
-        self.service = ServiceCLI(self.client_config)
         self.node = NodeCLI(self.client_config)
+        self.secret = SecretCLI(self.client_config)
+        self.service = ServiceCLI(self.client_config)
         self.stack = StackCLI(self.client_config)
         self.swarm = SwarmCLI(self.client_config)
         self.system = SystemCLI(self.client_config)
+        self.trust = TrustCLI(self.client_config)
+        self.volume = VolumeCLI(self.client_config)
 
         # aliases
         self.build = self.buildx.build

@@ -7,15 +7,21 @@ site_description: 'Python on whales docs'
 nav:
   - Docker client: docker_client.md
   - Sub-commands:
+    - docker app: sub-commands/app.md
     - docker buildx: sub-commands/buildx.md
+    - docker config: sub-commands/config.md
     - docker container: sub-commands/container.md
+    - docker context: sub-commands/context.md
     - docker image: sub-commands/image.md
-    - docker node: sub-commands/node.md
+    - docker manifest: sub-commands/manifest.md
     - docker network: sub-commands/network.md
+    - docker node: sub-commands/node.md
+    - docker secret: sub-commands/secret.md
     - docker service: sub-commands/service.md
     - docker stack: sub-commands/stack.md
     - docker swarm: sub-commands/swarm.md
     - docker system: sub-commands/system.md
+    - docker trust: sub-commands/trust.md
     - docker volume: sub-commands/volume.md
   - Docker objects:
     - Builders: docker_objects/builders.md

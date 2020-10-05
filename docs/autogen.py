@@ -11,14 +11,26 @@ pages = {
     "sub-commands/buildx.md": get_methods(
         "python_on_whales.components.buildx.BuildxCLI"
     ),
+    "sub-commands/config.md": get_methods(
+        "python_on_whales.components.config.ConfigCLI"
+    ),
     "sub-commands/container.md": get_methods(
         "python_on_whales.components.container.ContainerCLI"
     ),
+    "sub-commands/context.md": get_methods(
+        "python_on_whales.components.context.ContextCLI"
+    ),
     "sub-commands/image.md": get_methods("python_on_whales.components.image.ImageCLI"),
+    "sub-commands/manifest.md": get_methods(
+        "python_on_whales.components.manifest.ManifestCLI"
+    ),
     "sub-commands/network.md": get_methods(
         "python_on_whales.components.network.NetworkCLI"
     ),
     "sub-commands/node.md": get_methods("python_on_whales.components.node.NodeCLI"),
+    "sub-commands/secret.md": get_methods(
+        "python_on_whales.components.secret.SecretCLI"
+    ),
     "sub-commands/service.md": get_methods(
         "python_on_whales.components.service.ServiceCLI"
     ),
@@ -27,6 +39,7 @@ pages = {
     "sub-commands/system.md": get_methods(
         "python_on_whales.components.system.SystemCLI"
     ),
+    "sub-commands/trust.md": get_methods("python_on_whales.components.trust.TrustCLI"),
     "sub-commands/volume.md": get_methods(
         "python_on_whales.components.volume.VolumeCLI"
     ),
@@ -45,14 +58,18 @@ class MyDocumentationGenerator(DocumentationGenerator):
     def process_signature(self, signature):
         signature = signature.replace("DockerClient.", "docker.")
         signature = signature.replace("BuildxCLI.", "docker.buildx.")
+        signature = signature.replace("ContextCLI.", "docker.context.")
         signature = signature.replace("ContainerCLI.", "docker.container.")
         signature = signature.replace("ImageCLI.", "docker.image.")
+        signature = signature.replace("ManifestCLI.", "docker.manifest.")
         signature = signature.replace("NetworkCLI.", "docker.network.")
         signature = signature.replace("NodeCLI.", "docker.node.")
+        signature = signature.replace("SecretCLI.", "docker.secret.")
         signature = signature.replace("ServiceCLI.", "docker.service.")
         signature = signature.replace("StackCLI.", "docker.stack.")
         signature = signature.replace("SwarmCLI.", "docker.swarm.")
         signature = signature.replace("SystemCLI.", "docker.system.")
+        signature = signature.replace("TrustCLI.", "docker.trust.")
         signature = signature.replace("VolumeCLI.", "docker.volume.")
         return signature
 
