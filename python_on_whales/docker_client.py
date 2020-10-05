@@ -97,13 +97,19 @@ class DockerClient(DockerCLICaller):
         self.volume = VolumeCLI(self.client_config)
 
         # aliases
+        self.attach = None
         self.build = self.buildx.build
         self.commit = self.container.commit
         self.copy = self.container.copy
         self.create = self.container.create
         self.diff = self.container.diff
+        self.events = None
         self.execute = self.container.execute
+        self.export = self.container.export
         self.images = self.image.list
+        self.import_ = self.image.import_
+        self.info = self.system.info
+        # self.inspect -> too hard to implement
         self.kill = self.container.kill
         self.load = self.image.load
         self.logs = self.container.logs
@@ -114,10 +120,21 @@ class DockerClient(DockerCLICaller):
         self.rename = self.container.rename
         self.restart = self.container.restart
         self.remove = self.container.remove
+        # self.rmi -> doesn't make much sense since it would be docker.remove_image
         self.run = self.container.run
         self.save = self.image.save
+        # self.search -> Is anybody going to use it in python?
+        self.start = self.container.start
+        self.stats = self.container.stats
         self.stop = self.container.stop
         self.tag = self.image.tag
+        self.top = self.container.stop
+        self.unpause = self.container.unpause
+        self.update = self.container.update
+        self.wait = self.container.wait
+
+    def version(self):
+        raise NotImplementedError
 
     def login(
         self,
