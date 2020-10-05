@@ -542,7 +542,8 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--security-opt", security_options)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
-        full_cmd.add_flag("--sig-proxy", sig_proxy)
+        if sig_proxy is False:
+            full_cmd += ["--sig-proxy", "false"]
 
         full_cmd.add_simple_arg("--stop-signal", stop_signal)
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
@@ -1153,7 +1154,8 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--security-opt", security_options)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
-        full_cmd.add_flag("--sig-proxy", sig_proxy)
+        if sig_proxy is False:
+            full_cmd += ["--sig-proxy", "false"]
 
         full_cmd.add_simple_arg("--stop-signal", stop_signal)
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
