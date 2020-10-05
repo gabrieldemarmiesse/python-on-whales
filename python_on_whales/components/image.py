@@ -144,9 +144,22 @@ class ImageCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def import_(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def import_(
+        self,
+        source: ValidPath,
+        tag: Optional[str] = None,
+        changes: List[str] = [],
+        message: Optional[str] = None,
+        platform: Optional[str] = None,
+    ) -> Image:
+        full_cmd = self.docker_cmd + ["image", "import"]
+        full_cmd.add_args_list("--change", changes)
+        full_cmd.add_simple_arg("--message", message)
+        full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.append(source)
+        if tag is not None:
+            full_cmd.append(tag)
+        return Image(self.client_config, run(full_cmd))
 
     @overload
     def inspect(self, x: str) -> Image:
@@ -157,7 +170,7 @@ class ImageCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Image, List[Image]]:
-        """Not yet implemented"""
+        """Creates a `python_on_whales.Image` object."""
         if isinstance(x, list):
             return [Image(self.client_config, identifier) for identifier in x]
         else:
