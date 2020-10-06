@@ -635,17 +635,21 @@ class ContainerCLI(DockerCLICaller):
         ]
         run(full_cmd)
 
-    def inspect(self, reference: str) -> Container:
+    def inspect(self, x: Union[str, List[str]]) -> Container:
         """Returns a container object from a name or ID.
 
         # Arguments
-            reference: A container name or ID.
+            reference: A container name or ID, or a list of container names
+                and/or IDs
 
         # Returns:
-            A `python_on_whales.Container` object.
-
+            A `python_on_whales.Container` object or a list of those
+            if a list of IDs was passed as input.
         """
-        return Container(self.client_config, reference)
+        if isinstance(x, list):
+            return [Container(self.client_config, reference) for reference in x]
+        else:
+            return Container(self.client_config, x)
 
     def kill(
         self,
