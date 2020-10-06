@@ -16,6 +16,7 @@ from python_on_whales.utils import (
     DockerCamelModel,
     DockerException,
     ValidPath,
+    format_dict_for_cli,
     run,
     to_list,
 )
@@ -236,9 +237,17 @@ class ImageCLI(DockerCLICaller):
 
         return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def prune(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def prune(self, all: bool = False, filter: Dict[str, str] = {}) -> None:
+        """Remove unused images
+
+        # Arguments
+            all: Remove all unused images, not just dangling ones
+            filter: Provide filter values (e.g. `{"until": "<timestamp>"}`)
+        """
+        full_cmd = self.docker_cmd + ["image", "prune"]
+        full_cmd.add_flag("--all", all)
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filter))
+        run(full_cmd)
 
     def pull(self, image_name: str, quiet: bool = False) -> Image:
         """Pull a docker image
