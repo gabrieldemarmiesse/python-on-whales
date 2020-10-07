@@ -1187,7 +1187,7 @@ class ContainerCLI(DockerCLICaller):
         if detach:
             return Container(self.client_config, run(full_cmd))
         else:
-            return run(full_cmd)
+            return run(full_cmd, capture_stderr=False)
 
     def start(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
         """Starts one or more stopped containers.
