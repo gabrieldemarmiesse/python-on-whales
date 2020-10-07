@@ -171,6 +171,6 @@ A more in depth guide can be found [here](https://gist.github.com/tomlankhorst/3
 
 ## Discreet resources
 
-TODO (just put `hamster=100` in the daemon.json).
+TODO (just put `"node-generic-resources": ["hamster=100"]` in the daemon.json, there are too many hamsters to give them names).
 
  
