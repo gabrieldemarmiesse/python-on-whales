@@ -32,3 +32,5 @@ nav:
     - Services: docker_objects/services.md
     - Stacks: docker_objects/stacks.md
     - Volumes: docker_objects/volumes.md
+  - User guide:
+      - Swarm generic resources: user_guide/generic_resources.md
