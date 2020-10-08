@@ -96,6 +96,8 @@ class BuildxCLI(DockerCLICaller):
         cache: bool = True,
         output: Optional[Dict[str, str]] = None,
         platforms: Optional[List[str]] = None,
+        cache_from: Optional[str] = None,
+        cache_to: Optional[str] = None,
         progress: Union[str, bool] = "auto",
         pull: bool = False,
         push: bool = False,
@@ -136,6 +138,8 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--push", push)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
+        full_cmd.add_simple_arg("--cache-from", cache_from)
+        full_cmd.add_simple_arg("--cache-to", cache_to)
         for secret in to_list(secrets):
             full_cmd += ["--secret", secret]
         if output is not None:
