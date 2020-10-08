@@ -104,6 +104,7 @@ class BuildxCLI(DockerCLICaller):
         secrets: Union[str, List[str]] = [],
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
+        load: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -136,6 +137,7 @@ class BuildxCLI(DockerCLICaller):
 
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--push", push)
+        full_cmd.add_flag("--load", load)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
         full_cmd.add_simple_arg("--cache-from", cache_from)
