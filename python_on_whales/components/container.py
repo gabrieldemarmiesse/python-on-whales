@@ -40,6 +40,21 @@ class ContainerHostConfig(DockerCamelModel):
     auto_remove: bool
 
 
+class ContainerConfig(DockerCamelModel):
+    hostname: str
+    domainname: str
+    attach_stdin: bool
+    attach_stdout: bool
+    attach_stderr: bool
+    tty: bool
+    open_stdin: bool
+    stdin_once: bool
+    env: List[str]
+    cmd: Optional[List[str]]
+    image: str
+    labels: Dict[str, str]
+
+
 class ContainerInspectResult(DockerCamelModel):
     id: str
     created: datetime
@@ -47,6 +62,7 @@ class ContainerInspectResult(DockerCamelModel):
     name: str
     state: ContainerState
     host_config: ContainerHostConfig
+    config: ContainerConfig
 
 
 class Container(ReloadableObjectFromJson):
