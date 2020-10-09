@@ -88,12 +88,24 @@ class Container(ReloadableObjectFromJson):
     def _parse_json_object(self, json_object: Dict[str, Any]):
         return ContainerInspectResult.parse_obj(json_object)
 
+    # ----------------------------------------------------------------
+    # attributes
     @property
-    def id(self):
+    def id(self) -> str:
         return self._get_immutable_id()
 
     @property
-    def name(self):
+    def created(self) -> datetime:
+        return self._get_inspect_result().created
+
+    @property
+    def image(self) -> python_on_whales.components.image.Image:
+        return python_on_whales.components.image.Image(
+            self.client_config, self._get_inspect_result().image, is_immutable_id=True
+        )
+
+    @property
+    def name(self) -> str:
         return removeprefix(self._get_inspect_result().name, "/")
 
     @property
@@ -105,10 +117,11 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().host_config
 
     @property
-    def image(self) -> python_on_whales.components.image.Image:
-        return python_on_whales.components.image.Image(
-            self.client_config, self._get_inspect_result().image, is_immutable_id=True
-        )
+    def config(self) -> ContainerConfig:
+        return self._get_inspect_result().config
+
+    # --------------------------------------------------------------------
+    # public methods
 
     def commit(
         self,
