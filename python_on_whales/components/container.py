@@ -703,7 +703,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--until", format_time_arg(until))
         return run(full_cmd + [container])
 
-    def list(self, all: bool = False) -> List[Container]:
+    def list(self, all: bool = False, filters: Dict[str, str] = {}) -> List[Container]:
         """List the containers on the host.
 
         # Arguments
@@ -714,8 +714,8 @@ class ContainerCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
-        if all:
-            full_cmd.append("--all")
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_flag("--all", all)
 
         return [Container(self.client_config, x) for x in run(full_cmd).splitlines()]
 

@@ -164,3 +164,41 @@ def test_context_manager_with_create():
             raise ArithmeticError
 
     assert container_name not in [x.name for x in docker.container.list(all=True)]
+
+
+def test_filters():
+    random_label_value = random_name()
+
+    containers_with_labels = []
+
+    for _ in range(3):
+        containers_with_labels.append(
+            docker.run(
+                "busybox",
+                ["sleep", "infinity"],
+                remove=True,
+                detach=True,
+                labels=dict(dodo=random_label_value),
+            )
+        )
+
+    containers_with_wrong_labels = []
+    for _ in range(3):
+        containers_with_wrong_labels.append(
+            docker.run(
+                "busybox",
+                ["sleep", "infinity"],
+                remove=True,
+                detach=True,
+                labels=dict(dodo="something"),
+            )
+        )
+
+    expected_containers_with_labels = docker.container.list(
+        filters=dict(label=f"dodo={random_label_value}")
+    )
+
+    assert set(expected_containers_with_labels) == set(containers_with_labels)
+
+    for container in containers_with_labels + containers_with_wrong_labels:
+        container.kill()
