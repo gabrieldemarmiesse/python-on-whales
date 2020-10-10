@@ -66,7 +66,7 @@ class BuildxCLI(DockerCLICaller):
         pull: bool = False,
         push: bool = False,
         set: Dict[str, str] = {},
-    ) -> None:
+    ) -> str:
         """Bake is similar to make, it allows you to build things declared in a file.
 
         For example it allows you to build multiple docker image in parallel.
@@ -86,13 +86,17 @@ class BuildxCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "bake"]
 
         full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_flag("--load", load)
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--push", push)
+        full_cmd.add_flag("--print", print)
+        if progress != "auto" and isinstance(progress, str):
+            full_cmd += ["--progress", progress]
         for file in to_list(files):
             full_cmd.add_simple_arg("--file", file)
         full_cmd.add_args_list("--set", format_dict_for_cli(set))
-        run(full_cmd + to_list(targets), capture_stderr=False)
+        return run(full_cmd + to_list(targets), capture_stderr=progress is False)
 
     def build(
         self,
@@ -105,7 +109,7 @@ class BuildxCLI(DockerCLICaller):
         cache_from: Optional[str] = None,
         cache_to: Optional[str] = None,
         file: Optional[ValidPath] = None,
-        iidfile: Optional[ValidPath] = None,
+        image_id_file: Optional[ValidPath] = None,
         labels: Dict[str, str] = {},
         load: bool = False,
         network: Optional[str] = None,
@@ -151,6 +155,15 @@ class BuildxCLI(DockerCLICaller):
 
         if progress != "auto" and isinstance(progress, str):
             full_cmd += ["--progress", progress]
+
+        full_cmd.add_args_list("--add-host", add_hosts)
+        full_cmd.add_args_list("--allow", allow)
+        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
+        full_cmd.add_simple_arg("--builder", builder)
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_simple_arg("--iidfile", image_id_file)
+
+        full_cmd.add_args_list("--ssh", format_dict_for_cli(ssh))
 
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--push", push)
