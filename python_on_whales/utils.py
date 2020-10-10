@@ -172,14 +172,22 @@ def reader(pipe, pipe_name, queue):
         queue.put(None)
 
 
-def stream_stdout_and_stderr(command) -> Iterable[Tuple[str, bytes]]:
-    process = Popen(command, stdout=PIPE, stderr=PIPE)
+def stream_stdout_and_stderr(full_cmd: list) -> Iterable[Tuple[str, bytes]]:
+    full_cmd = list(map(str, full_cmd))
+    process = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
     q = Queue()
+    full_stderr = b""  # for the error message
     Thread(target=reader, args=[process.stdout, "stdout", q]).start()
     Thread(target=reader, args=[process.stderr, "stderr", q]).start()
     for _ in range(2):
         for source, line in iter(q.get, None):
             yield source, line
+            if source == "stderr":
+                full_stderr += line
+
+    exit_code = process.wait()
+    if exit_code != 0:
+        raise DockerException(full_cmd, exit_code, stderr=full_stderr)
 
 
 def format_dict_for_cli(dictionary: Dict[str, str]):

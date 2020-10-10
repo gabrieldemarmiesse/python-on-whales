@@ -833,7 +833,7 @@ class ContainerCLI(DockerCLICaller):
 
     def run(
         self,
-        image: str,
+        image: python_on_whales.components.image.ValidImage,
         command: List[str] = [],
         *,
         add_hosts: List[Tuple[str, str]] = [],

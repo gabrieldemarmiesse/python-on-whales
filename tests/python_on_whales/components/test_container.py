@@ -1,9 +1,12 @@
+import sys
+import tempfile
 import time
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 
-from python_on_whales import DockerException, docker
+from python_on_whales import DockerException, Image, docker
 from python_on_whales.components.container import ContainerState
 from python_on_whales.test_utils import random_name
 
@@ -27,13 +30,42 @@ def test_exact_output():
     assert docker.run("busybox", ["echo", "dodo"], remove=True) == "dodo"
 
 
+def build_image_running(python_code) -> Image:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        (tmpdir / "file.py").write_text(python_code)
+        (tmpdir / "Dockerfile").write_text(
+            f"""
+FROM python:{sys.version_info[0]}.{sys.version_info[1]}
+COPY file.py /file.py
+CMD python /file.py
+        """
+        )
+        return docker.build(tmpdir, tags="some_image")
+
+
+def test_fails_correctly():
+    python_code = """
+import sys
+sys.stdout.write("everything is fine")
+sys.stderr.write("Something is wrong!")
+sys.exit(1)
+"""
+    image = build_image_running(python_code)
+    with image:
+        with pytest.raises(DockerException) as err:
+            for _ in docker.run(image, stream=True, remove=True):
+                pass
+        assert "Something is wrong!" in str(err.value)
+
+
 def test_remove():
     output = docker.run("hello-world", remove=True)
     assert "Hello from Docker!" in output
 
 
 def test_cpus():
-    output = docker.run("hello-world", cpus=1.5)
+    output = docker.run("hello-world", cpus=1.5, remove=True)
     assert "Hello from Docker!" in output
 
 
