@@ -352,8 +352,10 @@ class ImageCLI(DockerCLICaller):
             run(full_cmd)
 
     def _save_generator(self, full_cmd) -> Iterator[bytes]:
+
         full_cmd = [str(x) for x in full_cmd]
         p = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
+        p.communicate()
         for line in p.stdout:
             yield line
         exit_code = p.wait(0.1)

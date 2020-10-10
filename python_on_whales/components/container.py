@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.image
 import python_on_whales.components.network
@@ -18,6 +18,7 @@ from python_on_whales.utils import (
     format_dict_for_cli,
     removeprefix,
     run,
+    stream_stdout_and_stderr,
     to_list,
 )
 
@@ -836,7 +837,6 @@ class ContainerCLI(DockerCLICaller):
         command: List[str] = [],
         *,
         add_hosts: List[Tuple[str, str]] = [],
-        # attach: Any = None,
         blkio_weight: Optional[int] = None,
         blkio_weight_device: List[str] = [],
         cap_add: List[str] = [],
@@ -852,7 +852,6 @@ class ContainerCLI(DockerCLICaller):
         cpuset_cpus: Optional[List[int]] = None,
         cpuset_mems: Optional[List[int]] = None,
         detach: bool = False,
-        # detach_keys: Any = None,
         devices: List[str] = [],
         device_cgroup_rules: List[str] = [],
         device_read_bps: List[str] = [],
@@ -878,7 +877,6 @@ class ContainerCLI(DockerCLICaller):
         health_timeout: Union[None, int, timedelta] = None,
         hostname: Optional[str] = None,
         init: bool = False,
-        # interactive: Any = None,
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
         ipc: Optional[str] = None,
@@ -917,9 +915,9 @@ class ContainerCLI(DockerCLICaller):
         stop_signal: Optional[str] = None,
         stop_timeout: Optional[int] = None,
         storage_options: List[str] = [],
+        stream: bool = False,
         sysctl: Dict[str, str] = {},
         tmpfs: List[ValidPath] = [],
-        # tty: Any = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -930,7 +928,7 @@ class ContainerCLI(DockerCLICaller):
         volume_driver: Optional[str] = None,
         volumes_from: List[ValidContainer] = [],
         workdir: Optional[ValidPath] = None,
-    ) -> Union[Container, str]:
+    ) -> Union[Container, str, Iterable[Tuple[str, bytes]]]:
         """Runs a container
 
         You can use `docker.run` or `docker.container.run` to call this function.
@@ -1221,8 +1219,15 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.append(image)
         full_cmd += command
 
+        if detach and stream:
+            raise ValueError(
+                "It's not possible to stream and detach a container at "
+                "the same time."
+            )
         if detach:
             return Container(self.client_config, run(full_cmd))
+        elif stream:
+            return stream_stdout_and_stderr(full_cmd)
         else:
             return run(full_cmd, capture_stderr=False)
 

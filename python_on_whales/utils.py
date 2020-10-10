@@ -1,7 +1,10 @@
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from queue import Queue
+from subprocess import PIPE, Popen
+from threading import Thread
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
 
@@ -158,6 +161,25 @@ def install_buildx_if_needed(docker_binary: str):
             f"'docker buildx', here is the result:\n"
             f"{stderr}"
         )
+
+
+def reader(pipe, pipe_name, queue):
+    try:
+        with pipe:
+            for line in iter(pipe.readline, b""):
+                queue.put((pipe_name, line))
+    finally:
+        queue.put(None)
+
+
+def stream_stdout_and_stderr(command) -> Iterable[Tuple[str, bytes]]:
+    process = Popen(command, stdout=PIPE, stderr=PIPE)
+    q = Queue()
+    Thread(target=reader, args=[process.stdout, "stdout", q]).start()
+    Thread(target=reader, args=[process.stderr, "stderr", q]).start()
+    for _ in range(2):
+        for source, line in iter(q.get, None):
+            yield source, line
 
 
 def format_dict_for_cli(dictionary: Dict[str, str]):

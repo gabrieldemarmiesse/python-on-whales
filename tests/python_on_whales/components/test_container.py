@@ -9,8 +9,16 @@ from python_on_whales.test_utils import random_name
 
 
 def test_simple_command():
-    output = docker.run("hello-world")
+    output = docker.run("hello-world", remove=True)
     assert "Hello from Docker!" in output
+
+
+def test_simple_stream():
+    output = docker.run("hello-world", remove=True, stream=True)
+
+    output_as_list = list(output)
+
+    assert ("stdout", b"Hello from Docker!\n") in output_as_list
 
 
 def test_exact_output():
