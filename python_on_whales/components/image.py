@@ -18,6 +18,7 @@ from python_on_whales.utils import (
     ValidPath,
     format_dict_for_cli,
     run,
+    stream_stdout_and_stderr,
     to_list,
 )
 
@@ -179,7 +180,7 @@ class ImageCLI(DockerCLICaller):
 
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
-    ):
+    ) -> List[str]:
         """Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
 
         # Arguments
@@ -187,8 +188,8 @@ class ImageCLI(DockerCLICaller):
             quiet: If you don't want to display the progress bars.
 
         # Returns
-            `None` at the moment, but should return the Docker images loaded (not
-            implemented yet).
+            `None` when using bytes as input. A `List[str]` (list of tags)
+             when a path is provided.
         """
         full_cmd = self.docker_cmd + ["image", "load"]
 
@@ -199,7 +200,15 @@ class ImageCLI(DockerCLICaller):
             full_cmd.append("--quiet")
 
         if isinstance(input, (str, Path)):
-            run(full_cmd)
+            all_tags = []
+            for source, stream_bytes in stream_stdout_and_stderr(full_cmd):
+                decoded = stream_bytes.decode()[:-1]
+                if not quiet:
+                    print(decoded)
+                if "Loaded image" in decoded:
+                    all_tags.append(decoded.split(" ")[-1])
+            return all_tags
+
         elif isinstance(input, bytes):
             run(full_cmd, input=input)
         elif inspect.isgenerator(input):
