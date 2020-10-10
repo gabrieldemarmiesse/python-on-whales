@@ -52,9 +52,9 @@ sys.stdout.write("everything is fine\\n\\nhello world")
 sys.stderr.write("Something is wrong!")
     """
     image = build_image_running(python_code)
-    output_run = list(docker.run(image, remove=True, stream=True))
+    output_run = set(docker.run(image, remove=True, stream=True))
     container = docker.container.create(image, remove=True)
-    output_create = list(container.start(attach=True, stream=True))
+    output_create = set(container.start(attach=True, stream=True))
     assert output_run == output_create
 
 
