@@ -1,7 +1,7 @@
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pydantic
 
@@ -62,7 +62,8 @@ def run(
     capture_stdout: bool = True,
     capture_stderr: bool = True,
     input: bytes = None,
-) -> Optional[str]:
+    return_stderr: bool = False,
+) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
     if args[1] == "buildx":
         install_buildx_if_needed(args[0])
@@ -88,12 +89,23 @@ def run(
             completed_process.stdout,
             completed_process.stderr,
         )
-    if completed_process.stdout is None:
-        return
-    stdout = completed_process.stdout.decode()
-    if len(stdout) != 0 and stdout[-1] == "\n":
-        stdout = stdout[:-1]
-    return stdout
+
+    if return_stderr:
+        return (
+            post_process_stream(completed_process.stdout),
+            post_process_stream(completed_process.stderr),
+        )
+    else:
+        return post_process_stream(completed_process.stdout)
+
+
+def post_process_stream(stream: Optional[bytes]):
+    if stream is None:
+        return ""
+    stream = stream.decode()
+    if len(stream) != 0 and stream[-1] == "\n":
+        stream = stream[:-1]
+    return stream
 
 
 ValidPath = Union[str, Path]

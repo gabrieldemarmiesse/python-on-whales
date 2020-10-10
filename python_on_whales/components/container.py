@@ -450,6 +450,9 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
+        python_on_whales.components.image.ImageCLI(
+            self.client_config
+        )._pull_if_necessary(image)
         full_cmd = self.docker_cmd + ["create"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
@@ -1066,6 +1069,11 @@ class ContainerCLI(DockerCLICaller):
             The container output as a string if detach is `False` (the default),
             and a `python_on_whales.Container` if detach is `True`.
         """
+
+        python_on_whales.components.image.ImageCLI(
+            self.client_config
+        )._pull_if_necessary(image)
+
         full_cmd = self.docker_cmd + ["container", "run"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]

@@ -374,3 +374,14 @@ class ImageCLI(DockerCLICaller):
             new_tag,
         ]
         run(full_cmd)
+
+    def _pull_if_necessary(self, image: ValidImage):
+        if isinstance(image, Image):
+            # A docker image object must exist in the daemon to be defined.
+            return
+        try:
+            self.inspect(image)
+            return
+        except DockerException:
+            print(f"Unable to find image '{image}' locally")
+            self.pull(image)
