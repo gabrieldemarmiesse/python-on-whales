@@ -209,21 +209,28 @@ class ImageCLI(DockerCLICaller):
                     all_tags.append(decoded.split(" ")[-1])
             return all_tags
 
-        elif isinstance(input, bytes):
-            run(full_cmd, input=input)
-        elif inspect.isgenerator(input):
-            self._load_from_generator(full_cmd, input)
-        # TODO: return images
+        if isinstance(input, bytes):
+            input = [input]
+
+        stdout_lines = self._load_from_generator(full_cmd, input)
+        all_tags = []
+        for line in stdout_lines:
+            if "Loaded image" in line:
+                all_tags.append(line.split(" ")[-1])
+        return all_tags
 
     def _load_from_generator(self, full_cmd: List[str], input: Iterator[bytes]):
-        p = Popen(full_cmd, stdin=PIPE)
+        p = Popen(full_cmd, stdin=PIPE, stdout=PIPE)
         for buffer_bytes in input:
             p.stdin.write(buffer_bytes)
             p.stdin.flush()
         p.stdin.close()
+        stdout = p.stdout.read()
+        p.stdout.close()
         exit_code = p.wait()
         if exit_code != 0:
             raise DockerException(full_cmd, exit_code)
+        return stdout.decode().splitlines()
 
     def list(self) -> List[Image]:
         """Returns the list of Docker images present on the machine.
@@ -361,10 +368,8 @@ class ImageCLI(DockerCLICaller):
             run(full_cmd)
 
     def _save_generator(self, full_cmd) -> Iterator[bytes]:
-
         full_cmd = [str(x) for x in full_cmd]
         p = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
-        p.communicate()
         for line in p.stdout:
             yield line
         exit_code = p.wait(0.1)

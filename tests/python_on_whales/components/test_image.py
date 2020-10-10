@@ -16,7 +16,7 @@ def test_image_save_load(tmp_path):
     docker.image.pull("busybox:1", quiet=True)
     docker.image.save("busybox:1", output=tar_file)
     docker.image.remove("busybox:1")
-    docker.image.load(input=tar_file)
+    assert docker.image.load(input=tar_file) == ["busybox:1"]
 
 
 def test_save_iterator_bytes():
@@ -50,8 +50,9 @@ def test_save_iterator_bytes_and_load():
 
     docker.image.remove(image_name)
 
-    docker.image.load(my_tar_as_bytes)
-    docker.image.remove(image_name)  # TODO: use list instead.
+    loaded = docker.image.load(my_tar_as_bytes)
+    assert loaded == [image_name]
+    docker.image.inspect(image_name)
 
 
 def test_save_iterator_bytes_and_load_from_iterator():
@@ -59,8 +60,19 @@ def test_save_iterator_bytes_and_load_from_iterator():
     docker.image.pull(image_name, quiet=True)
     iterator = docker.image.save(image_name)
 
-    docker.image.load(iterator)
-    docker.image.remove(image_name)  # TODO: use list instead.
+    assert docker.image.load(iterator) == [image_name]
+    docker.image.inspect(image_name)
+
+
+def test_save_iterator_bytes_and_load_from_iterator_list_of_images():
+    images = ["busybox:1", "hello-world:latest"]
+    docker.image.pull(images[0], quiet=True)
+    docker.image.pull(images[1], quiet=True)
+    iterator = docker.image.save(images)
+
+    assert set(docker.image.load(iterator)) == set(images)
+    docker.image.inspect(images[0])
+    docker.image.inspect(images[1])
 
 
 def test_image_list():
