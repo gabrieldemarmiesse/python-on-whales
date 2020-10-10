@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import python_on_whales.components.image
@@ -9,7 +10,7 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObject,
 )
-from python_on_whales.utils import ValidPath, run, to_list
+from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 
 @dataclass
@@ -49,16 +50,22 @@ class Builder(ReloadableObject):
         return self._get_inspect_result().driver
 
 
+ValidBuilder = Union[str, Builder]
+
+
 class BuildxCLI(DockerCLICaller):
     def bake(
         self,
         targets: Union[str, List[str]],
+        builder: Optional[ValidBuilder] = None,
         files: Union[ValidPath, List[ValidPath]] = [],
-        cache: bool = True,
         load: bool = False,
+        cache: bool = True,
+        print: bool = False,
+        progress: Union[str, bool] = "auto",
         pull: bool = False,
         push: bool = False,
-        set: List[str] = [],
+        set: Dict[str, str] = {},
     ) -> None:
         """Bake is similar to make, it allows you to build things declared in a file.
 
@@ -84,27 +91,33 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--push", push)
         for file in to_list(files):
             full_cmd.add_simple_arg("--file", file)
-        for override in set:
-            full_cmd.add_simple_arg("--set", override)
+        full_cmd.add_args_list("--set", format_dict_for_cli(set))
         run(full_cmd + to_list(targets), capture_stderr=False)
 
     def build(
         self,
         context_path: ValidPath,
-        file: Optional[ValidPath] = None,
-        network: Optional[str] = None,
+        add_hosts: List[str] = [],
+        allow: List[str] = [],
+        build_args: Dict[str, str] = {},
+        builder: Optional[ValidBuilder] = None,
         cache: bool = True,
-        output: Optional[Dict[str, str]] = None,
-        platforms: Optional[List[str]] = None,
         cache_from: Optional[str] = None,
         cache_to: Optional[str] = None,
+        file: Optional[ValidPath] = None,
+        iidfile: Optional[ValidPath] = None,
+        labels: Dict[str, str] = {},
+        load: bool = False,
+        network: Optional[str] = None,
+        output: Optional[Dict[str, str]] = None,
+        platforms: Optional[List[str]] = None,
         progress: Union[str, bool] = "auto",
         pull: bool = False,
         push: bool = False,
         secrets: Union[str, List[str]] = [],
+        ssh: Dict[str, Union[str, Path]] = {},
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-        load: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -128,6 +141,10 @@ class BuildxCLI(DockerCLICaller):
                 `secrets="id=aws,src=/home/my_user/.aws/credentials"`
             target: Set the target build stage to build.
             tags: Tag or tags to put on the resulting image.
+
+        # Returns
+            A `python_on_whales.Image` if the image has been loaded into the Docker
+            daemon. Otherwise, `None`.
         """
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
