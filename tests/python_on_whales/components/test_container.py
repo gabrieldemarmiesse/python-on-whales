@@ -16,10 +16,46 @@ def test_simple_command():
     assert "Hello from Docker!" in output
 
 
+def test_simple_command_create_start():
+    output = docker.container.create("hello-world", remove=True).start(attach=True)
+    assert "Hello from Docker!" in output
+
+
 def test_simple_stream():
     output = docker.run("hello-world", remove=True, stream=True)
 
     assert ("stdout", b"Hello from Docker!\n") in list(output)
+
+
+def test_simple_stream_create_start():
+    container = docker.container.create("hello-world", remove=True)
+    output = container.start(attach=True, stream=True)
+    assert ("stdout", b"Hello from Docker!\n") in list(output)
+
+
+def test_same_output_run_create_start():
+    python_code = """
+import sys
+sys.stdout.write("everything is fine\\n\\nhello world")
+sys.stderr.write("Something is wrong!")
+    """
+    image = build_image_running(python_code)
+    output_run = docker.run(image, remove=True)
+    output_create = docker.container.create(image, remove=True).start(attach=True)
+    assert output_run == output_create
+
+
+def test_same_stream_run_create_start():
+    python_code = """
+import sys
+sys.stdout.write("everything is fine\\n\\nhello world")
+sys.stderr.write("Something is wrong!")
+    """
+    image = build_image_running(python_code)
+    output_run = list(docker.run(image, remove=True, stream=True))
+    container = docker.container.create(image, remove=True)
+    output_create = list(container.start(attach=True, stream=True))
+    assert output_run == output_create
 
 
 def test_exact_output():
@@ -55,6 +91,22 @@ sys.exit(1)
     with image:
         with pytest.raises(DockerException) as err:
             for _ in docker.run(image, stream=True, remove=True):
+                pass
+        assert "Something is wrong!" in str(err.value)
+
+
+def test_fails_correctly_create_start():
+    python_code = """
+import sys
+sys.stdout.write("everything is fine")
+sys.stderr.write("Something is wrong!")
+sys.exit(1)
+"""
+    image = build_image_running(python_code)
+    with image:
+        container = docker.container.create(image, remove=True)
+        with pytest.raises(DockerException) as err:
+            for _ in container.start(attach=True, stream=True):
                 pass
         assert "Something is wrong!" in str(err.value)
 

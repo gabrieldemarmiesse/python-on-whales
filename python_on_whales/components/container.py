@@ -227,13 +227,15 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).remove(self, force, volumes)
 
-    def start(self) -> None:
+    def start(
+        self, attach: bool = False, stream: bool = False
+    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this container.
 
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).start(self)
+        return ContainerCLI(self.client_config).start(self, attach, stream)
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
@@ -1231,7 +1233,12 @@ class ContainerCLI(DockerCLICaller):
         else:
             return run(full_cmd, capture_stderr=False)
 
-    def start(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
+    def start(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]],
+        attach: bool = False,
+        stream: bool = False,
+    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts one or more stopped containers.
 
         Aliases: `docker.start`, `docker.container.start`,
@@ -1240,10 +1247,23 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             containers: One or a list of containers.
         """
+        if attach and isinstance(containers, list):
+            raise ValueError("Attaching multiple containers on start is not supported.")
+        if not attach and stream:
+            raise ValueError(
+                "It's not possible to stream stderr and stdout if the client isn't "
+                "attached to the container. Please set `attach=True`."
+            )
         full_cmd = self.docker_cmd + ["container", "start"]
-        for container in to_list(containers):
-            full_cmd.append(container)
-        run(full_cmd)
+        full_cmd.add_flag("--attach", attach)
+        full_cmd += to_list(containers)
+
+        if stream:
+            return stream_stdout_and_stderr(full_cmd)
+        elif attach:
+            return run(full_cmd)
+        else:
+            run(full_cmd)
 
     def stats(self):
         """Not yet implemented"""
