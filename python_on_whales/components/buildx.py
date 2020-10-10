@@ -184,6 +184,9 @@ class BuildxCLI(DockerCLICaller):
         for tag in to_list(tags):
             full_cmd += ["--tag", tag]
 
+        # TODO: smart way of returning an image when it's loaded in the daemon.
+        # can use iidfile for that, and checking the output type.
+
         full_cmd.append(context_path)
 
         run(full_cmd, capture_stderr=progress is False)
