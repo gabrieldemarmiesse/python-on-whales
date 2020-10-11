@@ -57,7 +57,9 @@ pages = {
 class MyDocumentationGenerator(DocumentationGenerator):
     def process_signature(self, signature):
         signature = signature.replace("DockerClient.", "docker.")
+        signature = signature.replace("AppCLI.", "docker.app.")
         signature = signature.replace("BuildxCLI.", "docker.buildx.")
+        signature = signature.replace("ConfigCLI.", "docker.config.")
         signature = signature.replace("ContextCLI.", "docker.context.")
         signature = signature.replace("ContainerCLI.", "docker.container.")
         signature = signature.replace("ImageCLI.", "docker.image.")
