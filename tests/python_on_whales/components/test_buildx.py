@@ -17,13 +17,13 @@ def test_buildx_build(tmp_path):
 
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags="hello1")
+    image = docker.buildx.build(tmp_path, tags="hello1", load=True)
     assert "hello1:latest" in image.repo_tags
 
 
 def test_buildx_build_multiple_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
+    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"], load=True)
     assert "hello1:latest" in image.repo_tags
     assert "hello2:latest" in image.repo_tags
 
@@ -32,7 +32,7 @@ def test_cache_invalidity(tmp_path):
 
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with set_cache_validity_period(100):
-        image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
+        image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"], load=True)
         docker.image.remove("hello1")
         docker.pull("hello-world")
         docker.tag("hello-world", "hello1")

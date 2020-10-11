@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -109,7 +110,6 @@ class BuildxCLI(DockerCLICaller):
         cache_from: Optional[str] = None,
         cache_to: Optional[str] = None,
         file: Optional[ValidPath] = None,
-        image_id_file: Optional[ValidPath] = None,
         labels: Dict[str, str] = {},
         load: bool = False,
         network: Optional[str] = None,
@@ -145,10 +145,10 @@ class BuildxCLI(DockerCLICaller):
                 docker cache either to a registry `cache_to="user/app:cache"`,
                 or to a local directory `cache_to="type=local,dest=path/to/dir"`.
             file: The path of the Dockerfile
-            image_id_file: Write the image ID into a file.
             labels: Dict of labels to add to the image.
                 `labels={"very-secure": "1", "needs-gpu": "0"}` for example.
-            load: Shortcut for `output=dict(type="docker")`
+            load: Shortcut for `output=dict(type="docker")` If `True`,
+                `docker.buildx.build` will return a `python_on_whales.Image`.
             network: which network to use when building the Docker image
             output: Output destination
                 (format: `output={"type": "local", "dest": "path"}`
@@ -190,7 +190,6 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_simple_arg("--iidfile", image_id_file)
 
         full_cmd.add_simple_arg("--ssh", ssh)
 
@@ -213,18 +212,19 @@ class BuildxCLI(DockerCLICaller):
         for tag in to_list(tags):
             full_cmd += ["--tag", tag]
 
-        # TODO: smart way of returning an image when it's loaded in the daemon.
-        # can use iidfile for that, and checking the output type.
-
-        full_cmd.append(context_path)
-
-        run(full_cmd, capture_stderr=progress is False)
-        if tags == []:
-            return None
+        if return_image or load:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                id_file = Path(tmpdir) / "id_file"
+                full_cmd += ["--iidfile", id_file]
+                full_cmd.append(context_path)
+                run(full_cmd, capture_stderr=progress is False)
+                image_id = id_file.read_text()
+                return python_on_whales.components.image.Image(
+                    self.client_config, image_id
+                )
         else:
-            return python_on_whales.components.image.Image(
-                self.client_config, to_list(tags)[0]
-            )
+            full_cmd.append(context_path)
+            run(full_cmd, capture_stderr=progress is False)
 
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
         full_cmd = self.docker_cmd + ["buildx", "create"]
