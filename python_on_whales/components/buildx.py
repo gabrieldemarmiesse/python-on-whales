@@ -122,7 +122,6 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-        return_image: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -168,14 +167,9 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
-            return_image: Returns the loaded docker image instead of `None`.
-                Currently this argument is needed because the logic to detect
-                if an image was loaded in the docker daemon isn't implemented yet.
-                Later on, this argument will be obsolete and a `python_on_whales.Image`
-                will be returned automatically if the image was loaded.
 
         # Returns
-            A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
+            A `python_on_whales.Image` if `load=True`. Otherwise, `None`.
         """
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
@@ -212,16 +206,14 @@ class BuildxCLI(DockerCLICaller):
         for tag in to_list(tags):
             full_cmd += ["--tag", tag]
 
-        if return_image or load:
+        if load:
             with tempfile.TemporaryDirectory() as tmpdir:
                 id_file = Path(tmpdir) / "id_file"
                 full_cmd += ["--iidfile", id_file]
                 full_cmd.append(context_path)
                 run(full_cmd, capture_stderr=progress is False)
                 image_id = id_file.read_text()
-                return python_on_whales.components.image.Image(
-                    self.client_config, image_id
-                )
+            return python_on_whales.components.image.Image(self.client_config, image_id)
         else:
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)
