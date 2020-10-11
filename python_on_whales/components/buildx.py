@@ -122,6 +122,7 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
+        return_image: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -167,10 +168,14 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
+            return_image: Returns the loaded docker image instead of `None`.
+                Currently this argument is needed because the logic to detect
+                if an image was loaded in the docker daemon isn't implemented yet.
+                Later on, this argument will be obsolete and a `python_on_whales.Image`
+                will be returned automatically if the image was loaded.
 
         # Returns
-            A `python_on_whales.Image` if the image has been loaded into the Docker
-            daemon. Otherwise, `None`.
+            A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
         """
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
