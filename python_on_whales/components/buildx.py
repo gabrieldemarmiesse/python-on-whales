@@ -101,7 +101,7 @@ class BuildxCLI(DockerCLICaller):
     def build(
         self,
         context_path: ValidPath,
-        add_hosts: List[str] = [],
+        add_hosts: Dict[str, str] = {},
         allow: List[str] = [],
         build_args: Dict[str, str] = {},
         builder: Optional[ValidBuilder] = None,
@@ -119,7 +119,7 @@ class BuildxCLI(DockerCLICaller):
         pull: bool = False,
         push: bool = False,
         secrets: Union[str, List[str]] = [],
-        ssh: Dict[str, Union[str, Path]] = {},
+        ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
     ) -> Optional[python_on_whales.components.image.Image]:
@@ -130,21 +130,43 @@ class BuildxCLI(DockerCLICaller):
 
         # Arguments
             context_path: The path of the build context.
-            file: The path of the Dockerfile
-            network: which network to use when building the Docker image
+            add_hosts: Hosts to add. `add_hosts={"my_host1": "192.168.32.35"}`
+            allow: List of extra privileges.
+                Eg `allow=["network.host", "security.insecure"]`
+            build_args: The build arguments.
+                ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
+            builder: Specify which builder to use.
             cache: Whether or not to use the cache
+            cache_from: Works only with the container driver. Loads the cache
+                (if needed) from a registry `cache_from="user/app:cache"`  or
+                a directory on the client `cache_from="type=local,src=path/to/dir"`.
+            cache_to: Works only with the container driver. Sends the resulting
+                docker cache either to a registry `cache_to="user/app:cache"`,
+                or to a local directory `cache_to="type=local,dest=path/to/dir"`.
+            file: The path of the Dockerfile
+            image_id_file: Write the image ID into a file.
+            labels: Dict of labels to add to the image.
+                `labels={"very-secure": "1", "needs-gpu": "0"}` for example.
+            load: Shortcut for `output=dict(type="docker")`
+            network: which network to use when building the Docker image
             output: Output destination
                 (format: `output={"type": "local", "dest": "path"}`
+                Possible output types are
+                `["local", "tar", "oci", "docker", "image", "registry"]`.
+                See [this link](https://github.com/docker/buildx#-o---outputpath-typetypekeyvalue)
+                for more details about each exporter.
             platforms: List of target platforms when building the image. Ex:
                 `platforms=["linux/amd64", "linux/arm64"]`
             progress:Set type of progress output (auto, plain, tty, or False).
                 Use plain to keep the container output on screen
             pull: Always attempt to pull a newer version of the image
-            push: Shorthand for `output={"type": "registry"}`.
+            push: Shorthand for `output=dict(type="registry")`.
             secrets: One or more secrets passed as string(s). For example
                 `secrets="id=aws,src=/home/my_user/.aws/credentials"`
-            target: Set the target build stage to build.
+            ssh: SSH agent socket or keys to expose to the build
+                (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
+            target: Set the target build stage to build.
 
         # Returns
             A `python_on_whales.Image` if the image has been loaded into the Docker
@@ -156,14 +178,16 @@ class BuildxCLI(DockerCLICaller):
         if progress != "auto" and isinstance(progress, str):
             full_cmd += ["--progress", progress]
 
-        full_cmd.add_args_list("--add-host", add_hosts)
+        full_cmd.add_args_list(
+            "--add-host", format_dict_for_cli(add_hosts, separator=":")
+        )
         full_cmd.add_args_list("--allow", allow)
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.add_simple_arg("--iidfile", image_id_file)
 
-        full_cmd.add_args_list("--ssh", format_dict_for_cli(ssh))
+        full_cmd.add_simple_arg("--ssh", ssh)
 
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--push", push)

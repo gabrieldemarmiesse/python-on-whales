@@ -190,5 +190,5 @@ def stream_stdout_and_stderr(full_cmd: list) -> Iterable[Tuple[str, bytes]]:
         raise DockerException(full_cmd, exit_code, stderr=full_stderr)
 
 
-def format_dict_for_cli(dictionary: Dict[str, str]):
-    return [f"{key}={value}" for key, value in dictionary.items()]
+def format_dict_for_cli(dictionary: Dict[str, str], separator="="):
+    return [f"{key}{separator}{value}" for key, value in dictionary.items()]
