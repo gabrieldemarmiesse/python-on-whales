@@ -91,7 +91,25 @@ doc_generator = MyDocumentationGenerator(
     ],
     titles_size="##",
 )
+
+
+def add_links(text):
+    text = text.replace(
+        "`python_on_whales.Container`",
+        "[`python_on_whales.Container`](/docker_objects/containers/)",
+    )
+
+    return text
+
+
 destination = PROJECT_ROOT / "docs" / "generated_sources"
 doc_generator.generate(destination)
 shutil.copyfile(PROJECT_ROOT / "README.md", destination / "index.md")
 shutil.copyfile(PROJECT_ROOT / "img/full.png", destination / "img/full.png")
+
+
+bb = destination / "sub-commands" / "container.md"
+
+
+for file in destination.rglob("*.md"):
+    file.write_text(add_links(file.read_text()))
