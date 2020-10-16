@@ -213,7 +213,8 @@ class BuildxCLI(DockerCLICaller):
                 full_cmd.append(context_path)
                 run(full_cmd, capture_stderr=progress is False)
                 image_id = id_file.read_text()
-            return python_on_whales.components.image.Image(self.client_config, image_id)
+            # TODO: Fixme when using load in a container driver.
+            # return python_on_whales.components.image.Image(self.client_config, image_id)
         else:
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)
