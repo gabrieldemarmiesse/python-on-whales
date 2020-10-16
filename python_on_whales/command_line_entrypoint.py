@@ -1,3 +1,5 @@
+from typing import Optional
+
 import typer
 
 from python_on_whales import docker
@@ -21,6 +23,29 @@ def copy(source: str, destination: str):
         raise ValueError("No volume was specified. The format is 'volume:path'")
 
 
+image_app = typer.Typer()
+
+
+@image_app.command()
+def copy_from(docker_image: str, source: str, destination: str):
+    image = docker.image._pull_if_necessary(docker_image)
+    docker.image.copy_from(image, source, destination)
+
+
+@image_app.command()
+def copy_to(
+    docker_image: str,
+    source: str,
+    destination: str,
+    new_tag: Optional[str] = None,
+    push: bool = False,
+):
+    image = docker.image._pull_if_necessary(docker_image)
+    docker.image.copy_to(image, source, destination, new_tag)
+    if push:
+        docker.image.push(new_tag)
+
+
 @app.command()
 def download_cli():
     download_docker_cli()
@@ -32,6 +57,7 @@ def download_buildx():
 
 
 app.add_typer(volume_app, name="volume")
+app.add_typer(image_app, name="image")
 
 
 def main():
