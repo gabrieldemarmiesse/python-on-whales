@@ -3,6 +3,7 @@ import pytest
 from python_on_whales import DockerException, docker
 from python_on_whales.client_config import bulk_reload
 from python_on_whales.components.image import ImageInspectResult
+from python_on_whales.test_utils import random_name
 
 
 def test_image_remove():
@@ -214,3 +215,27 @@ def test_parse_inspect():
     some_object = ImageInspectResult.parse_raw(json_inspect_image)
 
     assert some_object.repo_tags == ["progrium/stress:latest"]
+
+
+def test_copy_from_and_to(tmp_path):
+    my_image = docker.pull("busybox:1")
+    (tmp_path / "dodo.txt").write_text("Hello world!")
+
+    new_image_name = random_name()
+    my_image.copy_to(tmp_path / "dodo.txt", "/dada.txt", new_tag=new_image_name)
+
+    new_image_name = docker.image.inspect(new_image_name)
+    new_image_name.copy_from("/dada.txt", tmp_path / "dudu.txt")
+    assert (tmp_path / "dodo.txt").read_text() == (tmp_path / "dudu.txt").read_text()
+
+
+def test_copy_from_and_to_directory(tmp_path):
+    my_image = docker.pull("busybox:1")
+    (tmp_path / "dodo.txt").write_text("Hello world!")
+
+    new_image_name = random_name()
+    my_image.copy_to(tmp_path, "/some_path", new_tag=new_image_name)
+
+    new_image_name = docker.image.inspect(new_image_name)
+    new_image_name.copy_from("/some_path", tmp_path / "some_path")
+    assert "Hello world!" == (tmp_path / "some_path" / "dodo.txt").read_text()

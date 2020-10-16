@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 from typing import Any, Dict, Iterator, List, Optional, Union, overload
 
 import python_on_whales.components.buildx
+import python_on_whales.components.container
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -132,6 +133,30 @@ class Image(ReloadableObjectFromJson):
         information about the arguments.
         """
         return ImageCLI(self.client_config).tag(self, new_tag)
+
+    def copy_from(self, path_in_image: ValidPath, destination: ValidPath):
+        """Copy a file from a docker image in the local filesystem.
+
+        See the `docker.image.copy_from` command for information about the arguments.
+        """
+        return ImageCLI(self.client_config).copy_from(self, path_in_image, destination)
+
+    def copy_to(
+        self,
+        local_path: ValidPath,
+        path_in_image: ValidPath,
+        new_tag: Optional[str] = None,
+    ) -> Image:
+        """Copy a file from the local filesystem in a docker image to create a new
+        docker image.
+
+        As if you did a dockerfile with a COPY instruction.
+
+        See the `docker.image.copy_to` command for information about the arguments.
+        """
+        return ImageCLI(self.client_config).copy_to(
+            self, local_path, path_in_image, new_tag
+        )
 
 
 ValidImage = Union[str, Image]
@@ -401,3 +426,24 @@ class ImageCLI(DockerCLICaller):
         except DockerException:
             print(f"Unable to find image '{image}' locally")
             self.pull(image)
+
+    def copy_from(
+        self, image: ValidImage, path_in_image: ValidPath, destination: ValidPath
+    ):
+        with python_on_whales.components.container.ContainerCLI(
+            self.client_config
+        ).create(image) as tmp_container:
+            tmp_container.copy_from(path_in_image, destination)
+
+    def copy_to(
+        self,
+        base_image: ValidImage,
+        local_path: ValidPath,
+        path_in_image: ValidPath,
+        new_tag: Optional[str] = None,
+    ) -> Image:
+        with python_on_whales.components.container.ContainerCLI(
+            self.client_config
+        ).create(base_image) as tmp_container:
+            tmp_container.copy_to(local_path, path_in_image)
+            return tmp_container.commit(tag=new_tag)

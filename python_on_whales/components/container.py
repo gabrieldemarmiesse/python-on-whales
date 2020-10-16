@@ -288,7 +288,8 @@ class ContainerCLI(DockerCLICaller):
         if message is not None:
             full_cmd += ["--message", message]
 
-        full_cmd += ["--pause", str(pause).lower()]
+        # TODO: fixme
+        # full_cmd += ["--pause", str(pause).lower()]
 
         full_cmd.append(str(container))
         if tag is not None:
