@@ -58,7 +58,7 @@ ValidBuilder = Union[str, Builder]
 class BuildxCLI(DockerCLICaller):
     def bake(
         self,
-        targets: Union[str, List[str]],
+        targets: Union[str, List[str]] = [],
         builder: Optional[ValidBuilder] = None,
         files: Union[ValidPath, List[ValidPath]] = [],
         load: bool = False,
@@ -128,6 +128,7 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
+        return_image: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -212,18 +213,16 @@ class BuildxCLI(DockerCLICaller):
         for tag in to_list(tags):
             full_cmd += ["--tag", tag]
 
-        if load:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                id_file = Path(tmpdir) / "id_file"
-                full_cmd += ["--iidfile", id_file]
-                full_cmd.append(context_path)
-                run(full_cmd, capture_stderr=progress is False)
-                image_id = id_file.read_text()
-            # TODO: Fixme when using load in a container driver.
-            # return python_on_whales.components.image.Image(self.client_config, image_id)
-        else:
-            full_cmd.append(context_path)
-            run(full_cmd, capture_stderr=progress is False)
+        full_cmd.append(context_path)
+        run(full_cmd, capture_stderr=progress is False)
+        if return_image:
+            if to_list(tags) == []:
+                raise ValueError(
+                    "If you want the docker image returned, you need to specify tags."
+                )
+            return python_on_whales.components.image.ImageCLI(
+                self.client_config
+            ).inspect(to_list(tags)[0])
 
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
         full_cmd = self.docker_cmd + ["buildx", "create"]
