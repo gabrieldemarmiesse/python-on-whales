@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.image
 from python_on_whales.client_config import (
@@ -67,7 +68,7 @@ class BuildxCLI(DockerCLICaller):
         pull: bool = False,
         push: bool = False,
         set: Dict[str, str] = {},
-    ) -> str:
+    ) -> Dict[str, Dict[str, Dict[str, Any]]]:
         """Bake is similar to make, it allows you to build things declared in a file.
 
         For example it allows you to build multiple docker image in parallel.
@@ -97,7 +98,12 @@ class BuildxCLI(DockerCLICaller):
         for file in to_list(files):
             full_cmd.add_simple_arg("--file", file)
         full_cmd.add_args_list("--set", format_dict_for_cli(set))
-        return run(full_cmd + to_list(targets), capture_stderr=progress is False)
+        targets = to_list(targets)
+        if print:
+            return json.loads(run(full_cmd + targets))
+        else:
+            run(full_cmd + targets, capture_stderr=progress is False)
+            return json.loads(run(full_cmd + ["--print"] + targets))
 
     def build(
         self,

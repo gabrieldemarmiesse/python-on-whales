@@ -86,3 +86,8 @@ def test_builder_inspect_result_from_string():
     a = BuilderInspectResult.from_str(some_builder_info)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
+
+
+def test_bake():
+    # TODO: Add tests for bake, especially the json output
+    pass
