@@ -78,12 +78,51 @@ class BuildxCLI(DockerCLICaller):
 
         # Arguments
             targets: Targets or groups of targets to build.
+            builder: The builder to use.
             files: Build definition file(s)
-            cache: Whether to use the cache or not.
             load: Shorthand for `set=["*.output=type=docker"]`
+            cache: Whether to use the cache or not.
+            print: Do nothing, just returns the config.
+            progress: Set type of progress output (`"auto"`, `"plain"`, `"tty"`,
+                or `False`). Use plain to keep the container output on screen
             pull: Always try to pull the newer version of the image
             push: Shorthand for `set=["*.output=type=registry"]`
             set: A list of overrides in the form `"targetpattern.key=value"`.
+
+        # Returns
+            The configuration used for the bake (files merged + override with
+            the arguments used in the function). It's the loaded json you would
+            obtain by running `docker buildx bake --print --load my_target` if
+            your command was `docker buildx bake --load my_target`. Some example here.
+
+
+        ```python
+        from python_on_whales import docker
+
+        # returns the config used and runs the builds
+        config = docker.buildx.bake(["my_target1", "my_target2"], load=True)
+        assert config == {
+            "target": {
+                "my_target1": {
+                    "context": "./",
+                    "dockerfile": "Dockerfile",
+                    "tags": ["pretty_image1:1.0.0"],
+                    "target": "out1",
+                    "output": ["type=docker"]
+                },
+                "my_target2": {
+                    "context": "./",
+                    "dockerfile": "Dockerfile",
+                    "tags": ["pretty_image2:1.0.0"],
+                    "target": "out2",
+                    "output": ["type=docker"]
+                }
+            }
+        }
+
+        # returns the config only, doesn't run the builds
+        config = docker.buildx.bake(["my_target1", "my_target2"], load=True, print=True)
+        ```
         """
         full_cmd = self.docker_cmd + ["buildx", "bake"]
 
@@ -164,7 +203,7 @@ class BuildxCLI(DockerCLICaller):
                 for more details about each exporter.
             platforms: List of target platforms when building the image. Ex:
                 `platforms=["linux/amd64", "linux/arm64"]`
-            progress:Set type of progress output (auto, plain, tty, or False).
+            progress: Set type of progress output (auto, plain, tty, or False).
                 Use plain to keep the container output on screen
             pull: Always attempt to pull a newer version of the image
             push: Shorthand for `output=dict(type="registry")`.
@@ -174,9 +213,11 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
+            return_image: Return the created docker image if `True`, needs
+                at least one `tags`.
 
         # Returns
-            A `python_on_whales.Image` if `load=True`. Otherwise, `None`.
+            A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
         """
 
         full_cmd = self.docker_cmd + ["buildx", "build"]
