@@ -95,6 +95,7 @@ def test_builder_inspect_result_from_string():
 
 
 bake_test_dir = PROJECT_ROOT / "tests/python_on_whales/components/bake_tests"
+bake_file = bake_test_dir / "docker-bake.hcl"
 
 
 @pytest.fixture
@@ -108,9 +109,7 @@ def change_cwd():
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake(only_print):
-    bake_file = bake_test_dir / "docker-bake.hcl"
     config = docker.buildx.bake(files=[bake_file], print=only_print)
-
     assert config == {
         "target": {
             "my_out1": {
@@ -127,6 +126,11 @@ def test_bake(only_print):
             },
         }
     }
+
+
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_with_load(only_print):
     config = docker.buildx.bake(files=[bake_file], load=True, print=only_print)
     assert config == {
         "target": {
@@ -143,6 +147,30 @@ def test_bake(only_print):
                 "tags": ["pretty_image2:1.0.0"],
                 "target": "out2",
                 "output": ["type=docker"],
+            },
+        }
+    }
+
+
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_with_variables(only_print):
+    config = docker.buildx.bake(
+        files=[bake_file], print=only_print, variables={"TAG": "3.0.4"}
+    )
+    assert config == {
+        "target": {
+            "my_out1": {
+                "context": "./",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image1:3.0.4"],
+                "target": "out1",
+            },
+            "my_out2": {
+                "context": "./",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:3.0.4"],
+                "target": "out2",
             },
         }
     }

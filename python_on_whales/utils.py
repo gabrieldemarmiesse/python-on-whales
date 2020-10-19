@@ -66,12 +66,13 @@ def run(
     capture_stderr: bool = True,
     input: bytes = None,
     return_stderr: bool = False,
+    env: Dict[str, str] = {},
 ) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
     if args[1] == "buildx":
         install_buildx_if_needed(args[0])
-        env = {"DOCKER_CLI_EXPERIMENTAL": "enabled"}
-    else:
+        env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
+    if env == {}:
         env = None
     if capture_stdout:
         stdout_dest = subprocess.PIPE

@@ -68,6 +68,7 @@ class BuildxCLI(DockerCLICaller):
         pull: bool = False,
         push: bool = False,
         set: Dict[str, str] = {},
+        variables: Dict[str, str] = {},
     ) -> Dict[str, Dict[str, Dict[str, Any]]]:
         """Bake is similar to make, it allows you to build things declared in a file.
 
@@ -139,10 +140,10 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_list("--set", format_dict_for_cli(set))
         targets = to_list(targets)
         if print:
-            return json.loads(run(full_cmd + targets))
+            return json.loads(run(full_cmd + targets, env=variables))
         else:
-            run(full_cmd + targets, capture_stderr=progress is False)
-            return json.loads(run(full_cmd + ["--print"] + targets))
+            run(full_cmd + targets, capture_stderr=progress is False, env=variables)
+            return json.loads(run(full_cmd + ["--print"] + targets, env=variables))
 
     def build(
         self,
