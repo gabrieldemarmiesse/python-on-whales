@@ -753,7 +753,12 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         full_cmd.add_flag("--all", all)
 
-        return [Container(self.client_config, x) for x in run(full_cmd).splitlines()]
+        # TODO: add a test for the fix of is_immutable_id, without it, we get
+        # race conditions (we read the attributes of a container but it might not exist.
+        return [
+            Container(self.client_config, x, is_immutable_id=True)
+            for x in run(full_cmd).splitlines()
+        ]
 
     def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
         """Pauses one or more containers
