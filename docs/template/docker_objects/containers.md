@@ -5,6 +5,11 @@ Don't use the constructor directly. Instead use
 from python_on_whales import docker
 
 my_container = docker.container.inspect("my-container-name")
+
+# for example:
+if my_container.state.running:
+    my_container.kill()
+
 ```
 For type hints, use this
 
