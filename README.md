@@ -22,10 +22,12 @@ The 01/05/2021, the code source will be available at <https://gabrieldemarmiesse
 with a MIT licence and the packages will be available with `pip install python-on-whales`
 
 
-Until May 1st 2021, this package is accessible only by my sponsors:
+Until May 1st 2021, this package is accessible only by sponsors:
 
 1) Go to <https://github.com/sponsors/gabrieldemarmiesse>
+
 2) Pick any tier
+
 3) Do either `pip install git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git` or if 
    you use a `requirements.txt` or a `setup.py`, you can declare Python on Whales as a dependency with
    `python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git`.

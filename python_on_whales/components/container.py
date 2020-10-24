@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.image
@@ -28,7 +29,7 @@ class ContainerState(DockerCamelModel):
     running: bool
     paused: bool
     restarting: bool
-    OOM_killed: bool
+    oom_killed: bool
     dead: bool
     pid: int
     exit_code: int
@@ -56,14 +57,52 @@ class ContainerConfig(DockerCamelModel):
     labels: Dict[str, str]
 
 
+class Mount(DockerCamelModel):
+    type: str
+    source: str
+    Destination: str
+    mode: str
+    rw: bool
+    propagation: str
+    driver: Optional[str]
+
+
+class NetworkSettings(DockerCamelModel):
+    bridge: str
+    sandbox_id: str
+    hairpin_mode: bool
+    link_local_ipv6_address: str
+    link_local_ipv6_prefix_lenght: int
+    ports: dict
+    sandbox_key: Path
+    secondary_ip_addresses: Optional[List[str]]
+    secondary_ipv6_addresses: Optional[List[str]]
+
+
 class ContainerInspectResult(DockerCamelModel):
     id: str
     created: datetime
+    path: str
+    args: List[str]
+    resolv_conf_path: str
+    hostname_path: str
+    hosts_path: str
+    log_path: str
     image: str
     name: str
+    restart_count: int
+    driver: str
+    platform: str
+    mount_label: str
+    process_label: str
+    app_armor_profile: str
+    exec_ids: Optional[List[str]]
+    graph_driver: dict
+    Mounts: List[Mount]
     state: ContainerState
     host_config: ContainerHostConfig
     config: ContainerConfig
+    network_settings: NetworkSettings
 
 
 class Container(ReloadableObjectFromJson):
