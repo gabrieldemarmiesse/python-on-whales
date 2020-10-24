@@ -101,16 +101,20 @@ what is the name of the function/argument you need.
 `docker run --gpu=all ...`
 * Support for Docker stack, services and Swarm (same API as the command line).
 * Progress bars and progressive outputs when pulling, pushing, loading, building...
-* Support for some other CLI commands that are not in Docker-py: 
+* Support for some other CLI commands that are not in [Docker-py](https://docker-py.readthedocs.io/en/stable/): 
 `docker cp`, `docker run --cpus ...` and more.
 * Nice SSH support for remote daemons.
 * Docker object as Python objects: Container, Images, Volumes, Services... and their
 attributes are updated in real-time!
 * Each Docker object can be used as a context manager. When getting out of the 
 context, the Docker object is removed automatically, even if an exception occurs.
-* A fully typed API compatible with `pathlib` and `os.path`
+* A fully typed API (Mypy and IDE-friendly) compatible with `pathlib` and `os.path`
 
 ## Why another project? Why not build on Docker-py?
+
+In a sense this project is built on top of [Docker-py](https://docker-py.readthedocs.io/en/stable/) 
+because the implementation, the organisation and the API is inspired from the project, but the codebases 
+cannot be the same.
 
 Two major differences do not permit that:
 
@@ -118,8 +122,8 @@ Two major differences do not permit that:
 mapping between the Docker command line and Python, so that users don't even have 
 to open the docs to do write code.
 
-2) While Docker-py is a complete re-implementation of the Docker client binary 
+2) While [Docker-py](https://docker-py.readthedocs.io/en/stable/) is a complete re-implementation of the Docker client binary 
 (written in Go), Python on Whales sits on top of the Docker client binary, which makes 
-implementing new features much easier. For example, it's 
+implementing new features much easier and safer. For example, it's 
 [unlikely that docker-py supports Buildx/buildkit](https://github.com/docker/docker-py/issues/2230#issuecomment-454344497)
-anytime soon because reimplementing is hard work.
+anytime soon because rewriting a large Go codebase in Python is hard work.
