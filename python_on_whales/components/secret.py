@@ -66,6 +66,11 @@ class SecretCLI(DockerCLICaller):
         labels: Dict[str, str] = {},
         template_driver: Optional[str] = None,
     ) -> Secret:
+        """Creates a `python_on_whales.Secret`.
+
+        # Returns
+        A `python_on_whales.Secret` object.
+        """
         full_cmd = self.docker_cmd + ["secret", "create"]
         full_cmd.add_simple_arg("--driver", driver)
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
@@ -85,7 +90,7 @@ class SecretCLI(DockerCLICaller):
             return Secret(self.client_config, x)
 
     def list(self, filters: Dict[str, str] = {}) -> List[Secret]:
-        """Returns the list of secrets."""
+        """Returns all secrets as a `List[python_on_whales.Secret]`."""
         full_cmd = self.docker_cmd + ["secret", "list", "--quiet"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         ids = run(full_cmd).splitlines()
