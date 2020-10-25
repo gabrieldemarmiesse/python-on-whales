@@ -40,6 +40,22 @@ class ContainerState(DockerCamelModel):
 
 class ContainerHostConfig(DockerCamelModel):
     auto_remove: bool
+    binds: Optional[List[str]]
+    log_config: Dict[str, Any]
+    network_mode: str
+    port_bindings: Dict[str, Any]
+    volume_driver: str
+    volumes_from: Optional[str]
+    dns: List[str]
+    dns_options: List[str]
+    dns_search: List[str]
+    extra_hosts: Optional[Dict[str, str]]
+    cgroup: str
+    pid_mode: str
+    privileged: bool
+    publish_all_ports: bool
+    readonly_rootfs: bool
+    cpu_count: float
 
 
 class ContainerConfig(DockerCamelModel):
@@ -67,6 +83,22 @@ class Mount(DockerCamelModel):
     driver: Optional[str]
 
 
+class NetworkInspectResult(DockerCamelModel):
+    ipam_config: Optional[dict]
+    links: Optional[List[str]]
+    aliases: Optional[List[str]]
+    network_id: str
+    endpoint_id: str
+    gateway: str
+    ip_address: str
+    ip_prefix_lenght: int
+    ipv6_gateway: str
+    global_ipv6_address: str
+    global_ipv6_prefix_lenght: int
+    mac_address: str
+    driver_options: Optional[dict]
+
+
 class NetworkSettings(DockerCamelModel):
     bridge: str
     sandbox_id: str
@@ -77,6 +109,15 @@ class NetworkSettings(DockerCamelModel):
     sandbox_key: Path
     secondary_ip_addresses: Optional[List[str]]
     secondary_ipv6_addresses: Optional[List[str]]
+    endpoint_id: str
+    gateway: str
+    global_ipv6_address: str
+    global_ipv6_prefix_lenght: int
+    ip_adress: str
+    ip_prefix_lenght: int
+    ipv6_gateway: str
+    mac_address: str
+    networks: Dict[str, NetworkInspectResult]
 
 
 class ContainerInspectResult(DockerCamelModel):

@@ -30,6 +30,14 @@ def to_docker_camel(string):
             "link_local_ipv6_address": "LinkLocalIPv6Address",
             "link_local_ipv6_prefix_lenght": "LinkLocalIPv6PrefixLen",
             "secondary_ipv6_addresses": "SecondaryIPv6Addresses",
+            "endpoint_id": "EndpointID",
+            "global_ipv6_prefix_lenght": "GlobalIPv6PrefixLen",
+            "ip_adress": "IPAddress",
+            "ip_prefix_lenght": "IPPrefixLen",
+            "ipv6_gateway": "IPv6Gateway",
+            "network_id": "NetworkID",
+            "ip_address": "IPAddress",
+            "global_ipv6_address": "GlobalIPv6Address",
         }
         return special_cases[string]
     except KeyError:

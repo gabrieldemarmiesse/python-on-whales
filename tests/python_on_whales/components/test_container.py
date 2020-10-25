@@ -1,8 +1,10 @@
+import json
 import sys
 import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Union
 
 import pytest
 
@@ -851,5 +853,38 @@ sleep_infinity_inspect = """
 def test_container_inspect_result_parsing_sleep_infinity():
     # a good test would be to parse it, then save it to json
     # and check that it's the same.
-    after_parsing = ContainerInspectResult.parse_raw(sleep_infinity_inspect)
+    after_parsing: ContainerInspectResult = ContainerInspectResult.parse_raw(
+        sleep_infinity_inspect
+    )
     assert after_parsing.restart_count == 0
+
+    json_content = json.loads(sleep_infinity_inspect)
+
+    # check_if_identical(json.loads(after_parsing.json(by_alias=True)), json_content)
+
+
+def check_if_identical(
+    a: Union[dict, list, bool, int, str, None],
+    b: Union[dict, list, bool, int, str, None],
+):
+    if isinstance(a, dict):
+        check_if_identical_dict(a, b)
+    elif isinstance(a, list):
+        check_if_identical_list(a, b)
+
+
+def check_if_identical_list(a: list, b: list):
+    assert len(a) == len(b)
+    for x, y in zip(a, b):
+        check_if_identical(x, y)
+
+
+def check_if_identical_dict(a: dict, b: dict):
+    "None can mean that a key doesn't exist"
+    for key in b.keys():
+        assert key in list(a.keys())
+
+    all_keys = set(list(a.keys()) + list(b.keys()))
+
+    for key in all_keys:
+        check_if_identical(a.get(key), b.get(key))
