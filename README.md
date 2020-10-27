@@ -26,7 +26,7 @@ This message shows that your installation appears to be working correctly.
 
 ```python
 >>> from python_on_whales import docker
->>> print(docker.run("nvidia/cuda:11.0-base", "nvidia-smi", gpus="all"))
+>>> print(docker.run("nvidia/cuda:11.0-base", ["nvidia-smi"], gpus="all"))
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 450.51.06    Driver Version: 450.51.06    CUDA Version: 11.0     |
 |-------------------------------+----------------------+----------------------+
