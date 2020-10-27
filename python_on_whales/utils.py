@@ -21,7 +21,27 @@ def title_if_necessary(string: str):
 
 
 def to_docker_camel(string):
-    return "".join(title_if_necessary(x) for x in string.split("_"))
+    try:
+        special_cases = {
+            "exec_ids": "ExecIDs",
+            "sandbox_id": "SandboxID",
+            "oom_killed": "OOMKilled",
+            "rw": "RW",
+            "link_local_ipv6_address": "LinkLocalIPv6Address",
+            "link_local_ipv6_prefix_lenght": "LinkLocalIPv6PrefixLen",
+            "secondary_ipv6_addresses": "SecondaryIPv6Addresses",
+            "endpoint_id": "EndpointID",
+            "global_ipv6_prefix_lenght": "GlobalIPv6PrefixLen",
+            "ip_adress": "IPAddress",
+            "ip_prefix_lenght": "IPPrefixLen",
+            "ipv6_gateway": "IPv6Gateway",
+            "network_id": "NetworkID",
+            "ip_address": "IPAddress",
+            "global_ipv6_address": "GlobalIPv6Address",
+        }
+        return special_cases[string]
+    except KeyError:
+        return "".join(title_if_necessary(x) for x in string.split("_"))
 
 
 class DockerCamelModel(pydantic.BaseModel):

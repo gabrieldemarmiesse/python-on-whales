@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.image
@@ -28,7 +29,7 @@ class ContainerState(DockerCamelModel):
     running: bool
     paused: bool
     restarting: bool
-    OOM_killed: bool
+    oom_killed: bool
     dead: bool
     pid: int
     exit_code: int
@@ -39,6 +40,22 @@ class ContainerState(DockerCamelModel):
 
 class ContainerHostConfig(DockerCamelModel):
     auto_remove: bool
+    binds: Optional[List[str]]
+    log_config: Dict[str, Any]
+    network_mode: str
+    port_bindings: Dict[str, Any]
+    volume_driver: str
+    volumes_from: Optional[str]
+    dns: List[str]
+    dns_options: List[str]
+    dns_search: List[str]
+    extra_hosts: Optional[Dict[str, str]]
+    cgroup: str
+    pid_mode: str
+    privileged: bool
+    publish_all_ports: bool
+    readonly_rootfs: bool
+    cpu_count: float
 
 
 class ContainerConfig(DockerCamelModel):
@@ -56,14 +73,77 @@ class ContainerConfig(DockerCamelModel):
     labels: Dict[str, str]
 
 
+class Mount(DockerCamelModel):
+    type: str
+    source: str
+    Destination: str
+    mode: str
+    rw: bool
+    propagation: str
+    driver: Optional[str]
+
+
+class NetworkInspectResult(DockerCamelModel):
+    ipam_config: Optional[dict]
+    links: Optional[List[str]]
+    aliases: Optional[List[str]]
+    network_id: str
+    endpoint_id: str
+    gateway: str
+    ip_address: str
+    ip_prefix_lenght: int
+    ipv6_gateway: str
+    global_ipv6_address: str
+    global_ipv6_prefix_lenght: int
+    mac_address: str
+    driver_options: Optional[dict]
+
+
+class NetworkSettings(DockerCamelModel):
+    bridge: str
+    sandbox_id: str
+    hairpin_mode: bool
+    link_local_ipv6_address: str
+    link_local_ipv6_prefix_lenght: int
+    ports: dict
+    sandbox_key: Path
+    secondary_ip_addresses: Optional[List[str]]
+    secondary_ipv6_addresses: Optional[List[str]]
+    endpoint_id: str
+    gateway: str
+    global_ipv6_address: str
+    global_ipv6_prefix_lenght: int
+    ip_adress: str
+    ip_prefix_lenght: int
+    ipv6_gateway: str
+    mac_address: str
+    networks: Dict[str, NetworkInspectResult]
+
+
 class ContainerInspectResult(DockerCamelModel):
     id: str
     created: datetime
+    path: str
+    args: List[str]
+    resolv_conf_path: str
+    hostname_path: str
+    hosts_path: str
+    log_path: str
     image: str
     name: str
+    restart_count: int
+    driver: str
+    platform: str
+    mount_label: str
+    process_label: str
+    app_armor_profile: str
+    exec_ids: Optional[List[str]]
+    graph_driver: dict
+    Mounts: List[Mount]
     state: ContainerState
     host_config: ContainerHostConfig
     config: ContainerConfig
+    network_settings: NetworkSettings
 
 
 class Container(ReloadableObjectFromJson):

@@ -9,6 +9,30 @@ The docs can be found at this address: <https://gabrieldemarmiesse.github.io/pyt
 The Github repo can be found at this adress: <https://github.com/gabrieldemarmiesse/python-on-whales>
 
 
+## How to install?
+
+I have put several hundred of hours of work into this project, because I love Docker and  
+I hope to make it fun to use from Python. 
+
+I will likely put several hundred of hours more
+into Python-on-whales for bugfixes, maintenance and new features!
+
+
+The 01/05/2021, the code source will be available at <https://gabrieldemarmiesse.github.io/python-on-whales/> 
+with a MIT licence and the packages will be available with `pip install python-on-whales`
+
+
+Until May 1st 2021, this package is accessible only by sponsors:
+
+1) Go to <https://github.com/sponsors/gabrieldemarmiesse>
+
+2) Pick any tier
+
+3) Do either `pip install git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git` or if 
+   you use a `requirements.txt` or a `setup.py`, you can declare Python on Whales as a dependency with
+   `python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git`.
+ 
+
 ## Some cool examples
 
 ```python
@@ -101,16 +125,20 @@ what is the name of the function/argument you need.
 `docker run --gpu=all ...`
 * Support for Docker stack, services and Swarm (same API as the command line).
 * Progress bars and progressive outputs when pulling, pushing, loading, building...
-* Support for some other CLI commands that are not in Docker-py: 
+* Support for some other CLI commands that are not in [Docker-py](https://docker-py.readthedocs.io/en/stable/): 
 `docker cp`, `docker run --cpus ...` and more.
 * Nice SSH support for remote daemons.
 * Docker object as Python objects: Container, Images, Volumes, Services... and their
 attributes are updated in real-time!
 * Each Docker object can be used as a context manager. When getting out of the 
 context, the Docker object is removed automatically, even if an exception occurs.
-* A fully typed API compatible with `pathlib` and `os.path`
+* A fully typed API (Mypy and IDE-friendly) compatible with `pathlib` and `os.path`
 
 ## Why another project? Why not build on Docker-py?
+
+In a sense this project is built on top of [Docker-py](https://docker-py.readthedocs.io/en/stable/) 
+because the implementation, the organisation and the API is inspired from the project, but the codebases 
+cannot be the same.
 
 Two major differences do not permit that:
 
@@ -118,8 +146,8 @@ Two major differences do not permit that:
 mapping between the Docker command line and Python, so that users don't even have 
 to open the docs to do write code.
 
-2) While Docker-py is a complete re-implementation of the Docker client binary 
+2) While [Docker-py](https://docker-py.readthedocs.io/en/stable/) is a complete re-implementation of the Docker client binary 
 (written in Go), Python on Whales sits on top of the Docker client binary, which makes 
-implementing new features much easier. For example, it's 
+implementing new features much easier and safer. For example, it's 
 [unlikely that docker-py supports Buildx/buildkit](https://github.com/docker/docker-py/issues/2230#issuecomment-454344497)
-anytime soon because reimplementing is hard work.
+anytime soon because rewriting a large Go codebase in Python is hard work.
