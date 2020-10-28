@@ -1,3 +1,5 @@
+import base64
+import os
 from typing import Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
@@ -175,3 +177,56 @@ class DockerClient(DockerCLICaller):
             full_cmd.append(server)
 
         run(full_cmd, capture_stdout=False, capture_stderr=False)
+
+    def login_ecr(
+        self,
+        aws_access_key_id: Optional[str] = None,
+        aws_secret_access_key: Optional[str] = None,
+        region_name: Optional[str] = None,
+    ):
+        """Login to the aws ECR registry. If the credentials are not provided as
+        arguments, they are taken from the environment variables as defined
+        in [the aws docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
+
+        Those are `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`.
+        """
+        import boto3
+
+        if aws_access_key_id is None:
+            try:
+                aws_access_key_id = os.environ["AWS_ACCESS_KEY_ID"]
+            except KeyError:
+                raise KeyError(
+                    "AWS_ACCESS_KEY_ID isn't in the environment variables and "
+                    "aws_access_key_id wasn't set when calling login_ecr."
+                )
+        if aws_secret_access_key is None:
+            try:
+                aws_secret_access_key = os.environ["AWS_SECRET_ACCESS_KEY"]
+            except KeyError:
+                raise KeyError(
+                    "AWS_SECRET_ACCESS_KEY isn't in the environment variables and "
+                    "aws_secret_access_key wasn't set when calling login_ecr."
+                )
+
+        if region_name is None:
+            try:
+                region_name = os.environ["AWS_DEFAULT_REGION"]
+            except KeyError:
+                raise KeyError(
+                    "AWS_DEFAULT_REGION isn't in the environment variables and "
+                    "region_name wasn't set when calling login_ecr."
+                )
+
+        aws_client = boto3.client(
+            service_name="ecr",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            region_name=region_name,
+        )
+
+        response = aws_client.get_authorization_token()["authorizationData"][0]
+        credentials = base64.b64decode(response["authorizationToken"]).decode()
+        username, password = credentials.split(":")
+        registry = response["proxyEndpoint"]
+        self.login(registry, username, password)
