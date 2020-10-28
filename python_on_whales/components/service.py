@@ -146,6 +146,7 @@ class ServiceCLI(DockerCLICaller):
     def update(
         self,
         service: ValidService,
+        detach: bool = False,
         force: bool = False,
         with_registry_authentication: bool = False,
     ):
@@ -153,5 +154,6 @@ class ServiceCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["service", "update"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--with-registry-auth", with_registry_authentication)
+        full_cmd.add_flag("--detach", detach)
         full_cmd.append(service)
         run(full_cmd, capture_stdout=False)
