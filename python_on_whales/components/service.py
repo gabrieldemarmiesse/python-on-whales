@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -75,9 +75,20 @@ class ServiceCLI(DockerCLICaller):
         service_id = run(full_cmd)
         return Service(self.client_config, service_id, is_immutable_id=True)
 
-    def inspect(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    @overload
+    def inspect(self, x: str) -> Service:
+        pass
+
+    @overload
+    def inspect(self, x: List[str]) -> List[Service]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Service, List[Service]]:
+        """Returns one or a list of `python_on_whales.Service` object(s)."""
+        if isinstance(x, str):
+            return Service(self.client_config, x)
+        else:
+            return [Service(self.client_config, a) for a in x]
 
     def logs(self):
         """Not yet implemented"""
@@ -132,6 +143,15 @@ class ServiceCLI(DockerCLICaller):
             full_cmd.append(f"{str(service)}={new_scale}")
         run(full_cmd, capture_stderr=False, capture_stdout=False)
 
-    def update(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def update(
+        self,
+        service: ValidService,
+        force: bool = False,
+        with_registry_authentication: bool = False,
+    ):
+        """Update a service"""
+        full_cmd = self.docker_cmd + ["service", "update"]
+        full_cmd.add_flag("--force", force)
+        full_cmd.add_flag("--with-registry-auth", with_registry_authentication)
+        full_cmd.append(service)
+        run(full_cmd, capture_stdout=False)
