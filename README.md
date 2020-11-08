@@ -172,3 +172,19 @@ to open the docs to do write code.
 implementing new features much easier and safer. For example, it's 
 [unlikely that docker-py supports Buildx/buildkit](https://github.com/docker/docker-py/issues/2230#issuecomment-454344497)
 anytime soon because rewriting a large Go codebase in Python is hard work.
+
+
+## Where is the project now? Where is it going?
+
+Currently, about 75% of the Docker CLI API is covered. Of course the most used functions 
+were done first: docker run, docker pull, docker push, docker build (with buildx), docker volume...
+
+The main parts missing are Docker swarm support, Docker buildx builders management, and a better inspection 
+of Docker objects like volumes and images (for Docker containers, the inspection is pretty good).
+
+This project aims at a 100% feature parity between the Docker CLI and Python on whales. 
+
+This includes Docker buildx, Docker app, Docker Swarm, Docker stacks and Docker compose.
+
+You can consider that this software is in beta, some small API changes are still possible.
+ 
