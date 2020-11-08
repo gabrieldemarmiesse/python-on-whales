@@ -28,10 +28,31 @@ Until May 1st 2021, this package is accessible only by sponsors:
 
 2) Pick any tier
 
+3) I'll send you and invitation to access the repository at <https://github.com/gabrieldemarmiesse/python-on-whales> 
+ (one hour max, there is no API in Github for sponsors, I can't automate it).
+
 3) Do either `pip install git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git` or if 
-   you use a `requirements.txt` or a `setup.py`, you can declare Python on Whales as a dependency with
-   `python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git`.
- 
+   you use a `requirements.txt` or a `setup.py`, you can declare Python on whales as a dependency with
+   
+```python
+# setup.py
+
+from setuptools import find_packages, setup
+
+setup(
+    name="my-package",
+    install_requires=["python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git"],
+    packages=find_packages(),
+)
+```
+
+```
+# requirements.txt
+python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git
+other-package-1
+other-package-2
+...
+``` 
 
 ## Some cool examples
 
