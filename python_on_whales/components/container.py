@@ -43,12 +43,12 @@ class ContainerHostConfig(DockerCamelModel):
     binds: Optional[List[str]]
     log_config: Dict[str, Any]
     network_mode: str
-    port_bindings: Dict[str, Any]
+    port_bindings: Optional[Dict[str, Any]]
     volume_driver: str
     volumes_from: Optional[str]
-    dns: List[str]
-    dns_options: List[str]
-    dns_search: List[str]
+    dns: Optional[List[str]]
+    dns_options: Optional[List[str]]
+    dns_search: Optional[List[str]]
     extra_hosts: Optional[Dict[str, str]]
     cgroup: str
     pid_mode: str
