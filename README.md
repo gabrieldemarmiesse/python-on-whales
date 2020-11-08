@@ -159,7 +159,7 @@ context, the Docker object is removed automatically, even if an exception occurs
 
 In a sense this project is built on top of [Docker-py](https://docker-py.readthedocs.io/en/stable/) 
 because the implementation, the organisation and the API is inspired from the project, but the codebases 
-cannot be the same.
+could not be the same.
 
 Two major differences do not permit that:
 
@@ -168,7 +168,7 @@ mapping between the Docker command line and Python, so that users don't even hav
 to open the docs to do write code.
 
 2) While [Docker-py](https://docker-py.readthedocs.io/en/stable/) is a complete re-implementation of the Docker client binary 
-(written in Go), Python on Whales sits on top of the Docker client binary, which makes 
+(written in Go), Python on whales sits on top of the Docker client binary, which makes 
 implementing new features much easier and safer. For example, it's 
 [unlikely that docker-py supports Buildx/buildkit](https://github.com/docker/docker-py/issues/2230#issuecomment-454344497)
 anytime soon because rewriting a large Go codebase in Python is hard work.
