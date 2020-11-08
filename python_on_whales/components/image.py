@@ -110,6 +110,62 @@ class Image(ReloadableObjectFromJson):
     def repo_tags(self) -> List[str]:
         return self._get_inspect_result().repo_tags
 
+    @property
+    def repo_digests(self) -> List[str]:
+        return self._get_inspect_result().repo_digests
+
+    @property
+    def parent(self) -> str:
+        return self._get_inspect_result().parent
+
+    @property
+    def comment(self) -> str:
+        return self._get_inspect_result().comment
+
+    @property
+    def created(self) -> datetime:
+        return self._get_inspect_result().created
+
+    @property
+    def container(self) -> str:
+        return self._get_inspect_result().container
+
+    @property
+    def container_config(self) -> ContainerConfigClass:
+        return self._get_inspect_result().container_config
+
+    @property
+    def docker_version(self) -> str:
+        return self._get_inspect_result().docker_version
+
+    @property
+    def author(self) -> str:
+        return self._get_inspect_result().author
+
+    @property
+    def architecture(self) -> str:
+        return self._get_inspect_result().architecture
+
+    @property
+    def os(self) -> str:
+        return self._get_inspect_result().os
+
+    @property
+    def size(self) -> int:
+        return self._get_inspect_result().size
+
+    @property
+    def virtual_size(self) -> int:
+        return self._get_inspect_result().virtual_size
+
+    @property
+    def graph_driver(self) -> Dict[str, Any]:
+        return self._get_inspect_result().graph_driver
+
+    @property
+    def metadata(self) -> Dict[str, str]:
+        return self._get_inspect_result().metadata
+
     def remove(self, force: bool = False, prune: bool = True):
         """Remove this Docker image.
 
