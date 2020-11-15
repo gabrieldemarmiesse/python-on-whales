@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Union, overload
+from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -7,6 +7,25 @@ from python_on_whales.client_config import (
     ReloadableObjectFromJson,
 )
 from python_on_whales.utils import DockerCamelModel, run, to_list
+
+
+class Resources(DockerCamelModel):
+    limits: Dict[str, int]
+    reservations: Dict[str, int]
+
+
+class ContainerSpec(DockerCamelModel):
+    image: str
+    labels: Dict[str, str]
+    privileges: Dict[str, Optional[str]]
+    stop_grace_period: int
+    isolation: str
+    env: Optional[List[str]]
+
+
+class TaskTemplate(DockerCamelModel):
+    container_spec: ContainerSpec
+    resources: Resources
 
 
 class ChangeConfig(DockerCamelModel):
@@ -23,6 +42,7 @@ class ServiceSpec(DockerCamelModel):
     mode: Dict[str, Any]
     update_config: ChangeConfig
     rollback_config: ChangeConfig
+    task_template: TaskTemplate
 
 
 class ServiceInspectResult(DockerCamelModel):
@@ -62,7 +82,7 @@ class Service(ReloadableObjectFromJson):
         return self._get_inspect_result().updated_at
 
     @property
-    def spec(self) -> dict:
+    def spec(self) -> ServiceSpec:
         return self._get_inspect_result().spec
 
 
