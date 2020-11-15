@@ -80,7 +80,11 @@ class StackCLI(DockerCLICaller):
         return Stack(self.client_config, name)
 
     def list(self) -> List[Stack]:
-        """Returns a list of `python_on_whales.Stack`"""
+        """Returns a list of `python_on_whales.Stack`
+
+        # Returns
+            A `List[python_on_whales.Stack]`.
+        """
         full_cmd = self.docker_cmd + ["stack", "ls", "--format", "{{.Name}}"]
         stacks_names = run(full_cmd).splitlines()
         return [Stack(self.client_config, name) for name in stacks_names]
