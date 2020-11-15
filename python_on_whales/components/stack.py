@@ -53,6 +53,10 @@ class StackCLI(DockerCLICaller):
             with_registry_auth: Send registry authentication details to Swarm agents.
                 Required if you need to run `docker login` to pull the docker images
                 in your stack.
+            env_files: Similar to `.env` files in docker-compose. Loads `variables` from
+                `.env` files. If both `env_files` and `variables` are used, `variables`
+                have priority. This behavior is similar to the one you would experience with
+                compose.
             variables: A dict dictating by what to replace the variables declared in
                 the docker-compose files. In the docker CLI, you would use
                 environment variables for this.
