@@ -213,3 +213,28 @@ def stream_stdout_and_stderr(full_cmd: list) -> Iterable[Tuple[str, bytes]]:
 
 def format_dict_for_cli(dictionary: Dict[str, str], separator="="):
     return [f"{key}{separator}{value}" for key, value in dictionary.items()]
+
+
+def read_env_file(env_file: Path) -> Dict[str, str]:
+    result_dict = {}
+    for line in env_file.read_text().splitlines():
+        line = line.strip()
+        try:
+            first_sharp = line.index("#")
+        except ValueError:
+            pass
+        else:
+            line = line[:first_sharp]
+        if not line:
+            continue
+        line = line.strip()
+        key, value = line.split("=")
+        result_dict[key] = value
+    return result_dict
+
+
+def read_env_files(env_files: List[Path]) -> Dict[str, str]:
+    result_dict = {}
+    for file in env_files:
+        result_dict.update(read_env_file(file))
+    return result_dict

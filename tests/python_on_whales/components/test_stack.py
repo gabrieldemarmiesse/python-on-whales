@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from python_on_whales import docker
@@ -36,4 +38,24 @@ def test_stack_variables():
     assert expected in agent_service.spec.task_template.container_spec.env
 
     docker.stack.remove("other_stack")
+    docker.swarm.leave(force=True)
+
+
+def test_stack_env_files(tmp_path: Path):
+    env_file = tmp_path / "some.env"
+    env_file.write_text("SOME_VARIABLE=hello-world # some var \n # some comment")
+    docker.swarm.init()
+    third_stack = docker.stack.deploy(
+        "third_stack",
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        env_files=[env_file],
+    )
+
+    agent_service = docker.service.inspect("third_stack_agent")
+    expected = "SOME_OTHER_VARIABLE=hello-world"
+    assert expected in agent_service.spec.task_template.container_spec.env
+
+    assert docker.stack.list() == [third_stack]
+
+    docker.stack.remove(third_stack)
     docker.swarm.leave(force=True)

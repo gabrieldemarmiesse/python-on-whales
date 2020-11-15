@@ -1,8 +1,11 @@
+from __future__ import annotations
+
+from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import python_on_whales.components.service
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.utils import ValidPath, run, to_list
+from python_on_whales.utils import ValidPath, read_env_files, run, to_list
 
 
 class Stack:
@@ -12,6 +15,9 @@ class Stack:
 
     def __str__(self):
         return self.name
+
+    def __eq__(self, other: Stack):
+        return self.client_config == other.client_config and self.name == other.name
 
     def remove(self) -> None:
         StackCLI(self.client_config).remove(self)
@@ -29,6 +35,7 @@ class StackCLI(DockerCLICaller):
         prune: bool = False,
         resolve_image: str = "always",
         with_registry_auth: bool = False,
+        env_files: List[ValidPath] = [],
         variables: Dict[str, str] = {},
     ) -> Stack:
         """Deploys a stack.
@@ -46,6 +53,9 @@ class StackCLI(DockerCLICaller):
             with_registry_auth: Send registry authentication details to Swarm agents.
                 Required if you need to run `docker login` to pull the docker images
                 in your stack.
+            variables: A dict dictating by what to replace the variables declared in
+                the docker-compose files. In the docker CLI, you would use
+                environment variables for this.
 
         # Returns
             A `python_on_whales.Stack` object.
@@ -58,7 +68,11 @@ class StackCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--resolve-image", resolve_image)
         full_cmd.add_flag("--with-registry-auth", with_registry_auth)
         full_cmd.append(name)
-        run(full_cmd, capture_stdout=False, capture_stderr=False, env=variables)
+
+        env = read_env_files([Path(x) for x in env_files])
+        env.update(variables)
+
+        run(full_cmd, capture_stdout=False, capture_stderr=False, env=env)
         return Stack(self.client_config, name)
 
     def list(self) -> List[Stack]:
