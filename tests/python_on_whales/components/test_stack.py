@@ -26,14 +26,14 @@ def test_services_inspect():
 def test_stack_variables():
     docker.swarm.init()
     docker.stack.deploy(
-        "some_stack",
+        "other_stack",
         [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
         variables={"SOME_VARIABLE": "hello-world"},
     )
 
-    agent_service = docker.service.inspect("some_stack_agent")
+    agent_service = docker.service.inspect("other_stack_agent")
     expected = "SOME_OTHER_VARIABLE=hello-world"
     assert expected in agent_service.spec.task_template.container_spec.env
 
-    docker.stack.remove("some_stack")
+    docker.stack.remove("other_stack")
     docker.swarm.leave(force=True)
