@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 
+import python_on_whales.components.service
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import ValidPath, run, to_list
 
@@ -28,7 +29,7 @@ class StackCLI(DockerCLICaller):
         prune: bool = False,
         resolve_image: str = "always",
         with_registry_auth: bool = False,
-    ):
+    ) -> Stack:
         full_cmd = self.docker_cmd + ["stack", "deploy"]
 
         full_cmd.add_args_list("--compose-file", compose_files)
@@ -42,7 +43,7 @@ class StackCLI(DockerCLICaller):
 
     def list(self) -> List[Stack]:
         full_cmd = self.docker_cmd + ["stack", "ls", "--format", "{{.Name}}"]
-        stacks_names = run(full_cmd)
+        stacks_names = run(full_cmd).splitlines()
         return [Stack(self.client_config, name) for name in stacks_names]
 
     def ps(self):
@@ -53,6 +54,12 @@ class StackCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["stack", "remove"] + to_list(x)
         run(full_cmd)
 
-    def services(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def services(
+        self, stack: ValidStack
+    ) -> List[python_on_whales.components.service.Service]:
+        full_cmd = self.docker_cmd + ["stack", "services", "--quiet", stack]
+        ids = run(full_cmd).splitlines()
+        return [
+            python_on_whales.components.service.Service(self.client_config, id_)
+            for id_ in ids
+        ]
