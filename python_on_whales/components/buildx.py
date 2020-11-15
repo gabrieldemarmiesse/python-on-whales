@@ -89,6 +89,8 @@ class BuildxCLI(DockerCLICaller):
             pull: Always try to pull the newer version of the image
             push: Shorthand for `set=["*.output=type=registry"]`
             set: A list of overrides in the form `"targetpattern.key=value"`.
+            variables: A dict containing the values of the variables defined in the
+                hcl file. See <https://github.com/docker/buildx#hcl-variables-and-functions>
 
         # Returns
             The configuration used for the bake (files merged + override with

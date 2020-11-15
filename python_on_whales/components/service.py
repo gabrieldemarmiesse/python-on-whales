@@ -9,12 +9,28 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import DockerCamelModel, run, to_list
 
 
+class ChangeConfig(DockerCamelModel):
+    parallelism: int
+    failure_action: str
+    monitor: int
+    max_failure_ratio: int
+    order: str
+
+
+class ServiceSpec(DockerCamelModel):
+    name: str
+    labels: Dict[str, str]
+    mode: Dict[str, Any]
+    update_config: ChangeConfig
+    rollback_config: ChangeConfig
+
+
 class ServiceInspectResult(DockerCamelModel):
     ID: str
     version: Dict[str, Any]
     created_at: datetime
     updated_at: datetime
-    spec: dict
+    spec: ServiceSpec
 
 
 class Service(ReloadableObjectFromJson):
