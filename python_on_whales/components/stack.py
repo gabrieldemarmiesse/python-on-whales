@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 
+import python_on_whales.components.service
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import ValidPath, run, to_list
 
@@ -28,7 +29,26 @@ class StackCLI(DockerCLICaller):
         prune: bool = False,
         resolve_image: str = "always",
         with_registry_auth: bool = False,
-    ):
+    ) -> Stack:
+        """Deploys a stack.
+
+        # Arguments
+            name: The name of the stack to deploy. Mandatory.
+            compose_files: One or more docker-compose files. If there are more than
+            one, they will be fused together.
+            orchestrator: The orchestrator to use, `"swarm" or "kubernetes" or "all".
+            prune: Prune services that are no longer referenced
+            resolve_image: Query the registry to resolve image digest
+                and supported platforms `"always"|"changed"|"never"` (default `"always"`).
+                Note that if the registry cannot be queried when using `"always"`, it's
+                going to try to use images present locally on the nodes.
+            with_registry_auth: Send registry authentication details to Swarm agents.
+                Required if you need to run `docker login` to pull the docker images
+                in your stack.
+
+        # Returns
+            A `python_on_whales.Stack` object.
+        """
         full_cmd = self.docker_cmd + ["stack", "deploy"]
 
         full_cmd.add_args_list("--compose-file", compose_files)
@@ -41,8 +61,9 @@ class StackCLI(DockerCLICaller):
         return Stack(self.client_config, name)
 
     def list(self) -> List[Stack]:
+        """Returns a list of `python_on_whales.Stack`"""
         full_cmd = self.docker_cmd + ["stack", "ls", "--format", "{{.Name}}"]
-        stacks_names = run(full_cmd)
+        stacks_names = run(full_cmd).splitlines()
         return [Stack(self.client_config, name) for name in stacks_names]
 
     def ps(self):
@@ -50,9 +71,29 @@ class StackCLI(DockerCLICaller):
         raise NotImplementedError
 
     def remove(self, x: Union[ValidStack, List[ValidStack]]) -> None:
+        """Removes one or more stacks.
+
+        # Arguments
+            x: One or more stacks
+
+        """
         full_cmd = self.docker_cmd + ["stack", "remove"] + to_list(x)
         run(full_cmd)
 
-    def services(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def services(
+        self, stack: ValidStack
+    ) -> List[python_on_whales.components.service.Service]:
+        """List the services present in the stack.
+
+        # Arguments
+            stack: A docker stack or the name of a stack.
+
+        # Returns
+            A `List[python_on_whales.Stack]`
+        """
+        full_cmd = self.docker_cmd + ["stack", "services", "--quiet", stack]
+        ids = run(full_cmd).splitlines()
+        return [
+            python_on_whales.components.service.Service(self.client_config, id_)
+            for id_ in ids
+        ]
