@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import python_on_whales.components.service
 from python_on_whales.client_config import DockerCLICaller
@@ -29,6 +29,7 @@ class StackCLI(DockerCLICaller):
         prune: bool = False,
         resolve_image: str = "always",
         with_registry_auth: bool = False,
+        variables: Dict[str, str] = {},
     ) -> Stack:
         """Deploys a stack.
 
@@ -57,7 +58,7 @@ class StackCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--resolve-image", resolve_image)
         full_cmd.add_flag("--with-registry-auth", with_registry_auth)
         full_cmd.append(name)
-        run(full_cmd, capture_stdout=False, capture_stderr=False)
+        run(full_cmd, capture_stdout=False, capture_stderr=False, env=variables)
         return Stack(self.client_config, name)
 
     def list(self) -> List[Stack]:

@@ -18,7 +18,7 @@ I will likely put several hundred of hours more
 into Python-on-whales for bugfixes, maintenance and new features!
 
 
-The 01/05/2021, the code source will be available at <https://gabrieldemarmiesse.github.io/python-on-whales/> 
+The 01/05/2021, the source code will be available at <https://github.com/gabrieldemarmiesse/python-on-whales>
 with a MIT licence and the packages will be available with `pip install python-on-whales`
 
 
