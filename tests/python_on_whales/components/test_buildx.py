@@ -174,3 +174,28 @@ def test_bake_with_variables(only_print):
             },
         }
     }
+
+
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_with_variables(only_print, monkeypatch):
+    monkeypatch.setenv("IMAGE_NAME_1", "dodo")
+    config = docker.buildx.bake(
+        files=[bake_file], print=only_print, variables={"TAG": "3.0.4"}
+    )
+    assert config == {
+        "target": {
+            "my_out1": {
+                "context": "./",
+                "dockerfile": "Dockerfile",
+                "tags": ["dodo:3.0.4"],
+                "target": "out1",
+            },
+            "my_out2": {
+                "context": "./",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:3.0.4"],
+                "target": "out2",
+            },
+        }
+    }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -73,7 +74,8 @@ class StackCLI(DockerCLICaller):
         full_cmd.add_flag("--with-registry-auth", with_registry_auth)
         full_cmd.append(name)
 
-        env = read_env_files([Path(x) for x in env_files])
+        env = dict(os.environ)
+        env.update(read_env_files([Path(x) for x in env_files]))
         env.update(variables)
 
         run(full_cmd, capture_stdout=False, capture_stderr=False, env=env)

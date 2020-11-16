@@ -2,6 +2,10 @@ variable TAG {
 	default = "1.0.0"
 }
 
+variable IMAGE_NAME_1 {
+	default = "pretty_image1"
+}
+
 group default {
 	targets = ["my_out1", "my_out2"]
 }
@@ -9,7 +13,7 @@ group default {
 target my_out1 {
 	context = "./"
 	target = "out1"
-	tags = ["pretty_image1:${TAG}"]
+	tags = ["${IMAGE_NAME_1}:${TAG}"]
 }
 
 target my_out2 {
