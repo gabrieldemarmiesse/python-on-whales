@@ -28,18 +28,14 @@ class DiskFreeResult:
 
             docker_items[docker_items_dict["Type"]] = docker_items_dict
 
-        self.images: DockerItemsSummary = DockerItemsSummary.parse_obj(
-            docker_items["Images"]
-        )
-        self.containers: DockerItemsSummary = DockerItemsSummary.parse_obj(
-            docker_items["Containers"]
-        )
-        self.volumes: DockerItemsSummary = DockerItemsSummary.parse_obj(
-            docker_items["Local Volumes"]
-        )
-        self.build_cache: DockerItemsSummary = DockerItemsSummary.parse_obj(
-            docker_items["Build Cache"]
-        )
+        self.images: DockerItemsSummary
+        self.images = DockerItemsSummary.parse_obj(docker_items["Images"])
+        self.containers: DockerItemsSummary
+        self.containers = DockerItemsSummary.parse_obj(docker_items["Containers"])
+        self.volumes: DockerItemsSummary
+        self.volumes = DockerItemsSummary.parse_obj(docker_items["Local Volumes"])
+        self.build_cache: DockerItemsSummary
+        self.build_cache = DockerItemsSummary.parse_obj(docker_items["Build Cache"])
 
 
 class SystemCLI(DockerCLICaller):
