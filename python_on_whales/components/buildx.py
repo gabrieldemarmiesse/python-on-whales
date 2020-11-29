@@ -293,9 +293,17 @@ class BuildxCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def prune(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def prune(self, all: bool = False, filters: Dict[str, str] = {}) -> None:
+        """Remove build cache on the current builder.
+
+        # Arguments
+            all: Remove all cache, not just dangling layers
+            filters: Filters to use, for example `filters=dict(until="24h")`
+        """
+        full_cmd = self.docker_cmd + ["buildx", "prune", "--force"]
+        full_cmd.add_flag("--all", all)
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        run(full_cmd)
 
     def remove(self, builder: Union[Builder, str]):
         """Remove a builder

@@ -97,6 +97,10 @@ class ServiceCLI(DockerCLICaller):
     ):
         """Creates a Docker swarm service.
 
+        Consider using 'docker stack deploy' instead as it's idempotent and
+        easier to read for complex applications.
+        docker stack deploy is basically docker compose for swarm clusters.
+
         # Arguments:
             image: The image to use as the base for the service.
             command: The command to execute in the container(s).
@@ -184,11 +188,13 @@ class ServiceCLI(DockerCLICaller):
         service: ValidService,
         detach: bool = False,
         force: bool = False,
+        image: Optional[str] = None,
         with_registry_authentication: bool = False,
     ):
         """Update a service"""
         full_cmd = self.docker_cmd + ["service", "update"]
         full_cmd.add_flag("--force", force)
+        full_cmd.add_simple_arg("--image", image)
         full_cmd.add_flag("--with-registry-auth", with_registry_authentication)
         full_cmd.add_flag("--detach", detach)
         full_cmd.append(service)

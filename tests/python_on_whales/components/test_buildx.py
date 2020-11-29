@@ -199,3 +199,7 @@ def test_bake_with_variables(only_print, monkeypatch):
             },
         }
     }
+
+
+def test_prune():
+    docker.buildx.prune(filters=dict(until="3m"))
