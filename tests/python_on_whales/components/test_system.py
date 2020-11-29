@@ -7,3 +7,8 @@ def test_disk_free():
     docker_items_summary = docker.system.disk_free()
     assert docker_items_summary.images.active > 1
     assert docker_items_summary.images.size > 2000
+
+
+def test_info():
+    output = docker.system.info()
+    pass

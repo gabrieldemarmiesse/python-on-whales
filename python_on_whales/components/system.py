@@ -71,7 +71,8 @@ class SystemCLI(DockerCLICaller):
 
     def info(self):
         """Not yet implemented"""
-        raise NotImplementedError
+        full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
+        return json.loads(run(full_cmd))
 
     def prune(self, all: bool = False, volumes: bool = False) -> None:
         """Remove unused docker data
