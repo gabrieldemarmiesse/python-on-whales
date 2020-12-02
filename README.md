@@ -11,48 +11,9 @@ The Github repo can be found at this adress: <https://github.com/gabrieldemarmie
 
 ## How to install?
 
-I have put several hundred of hours of work into this project, because I love Docker and  
-I hope to make it fun to use from Python. 
-
-I will likely put several hundred of hours more
-into Python-on-whales for bugfixes, maintenance and new features!
-
-
-The 01/05/2021, the source code will be available at <https://github.com/gabrieldemarmiesse/python-on-whales>
-with a MIT licence and the packages will be available with `pip install python-on-whales`
-
-
-Until May 1st 2021, this package is accessible only by sponsors:
-
-1) Go to <https://github.com/sponsors/gabrieldemarmiesse>
-
-2) Pick any tier
-
-3) I'll send you and invitation to access the repository at <https://github.com/gabrieldemarmiesse/python-on-whales> 
- (one hour max, there is no API in Github for sponsors, I can't automate it).
-
-3) Do either `pip install git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git` or if 
-   you use a `requirements.txt` or a `setup.py`, you can declare Python on whales as a dependency with
-   
-```python
-# setup.py
-
-from setuptools import find_packages, setup
-
-setup(
-    name="my-package",
-    install_requires=["python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git"],
-    packages=find_packages(),
-)
 ```
-
+pip install python-on-whales
 ```
-# requirements.txt
-python-on-whales @ git+ssh://git@github.com/gabrieldemarmiesse/python-on-whales.git
-other-package-1
-other-package-2
-...
-``` 
 
 ## Some cool examples
 
@@ -188,3 +149,9 @@ This includes Docker buildx, Docker app, Docker Swarm, Docker stacks and Docker 
 
 You can consider that this software is in beta, some small API changes are still possible.
  
+ 
+## What about the license?
+
+It's a MIT license, so quite permissive.
+
+The license can be found [in the git repository](https://github.com/gabrieldemarmiesse/python-on-whales/blob/master/LICENSE).
