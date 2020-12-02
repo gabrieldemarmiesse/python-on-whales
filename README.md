@@ -1,4 +1,4 @@
-<img src="img/full.png" alt="logo" class="responsive" style="width: 80%; height: auto;">
+<img src="https://raw.githubusercontent.com/gabrieldemarmiesse/python-on-whales/master/img/full.png" alt="logo" class="responsive" style="width: 80%; height: auto;">
 
 A Docker client for Python, designed to be fun and intuivive!
 
