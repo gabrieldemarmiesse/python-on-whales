@@ -8,6 +8,7 @@ from typing import Union
 
 import pytest
 
+import python_on_whales
 from python_on_whales import DockerException, Image, docker
 from python_on_whales.components.container import ContainerInspectResult, ContainerState
 from python_on_whales.test_utils import random_name
@@ -189,7 +190,7 @@ def test_container_state():
     a = ContainerState.parse_raw(json_state)
 
     assert a.status == "running"
-    assert a.running == True
+    assert a.running
     assert a.exit_code == 0
     assert a.finished_at == datetime(
         2020, 9, 2, 22, 14, 50, 462597, tzinfo=timezone(timedelta(hours=2))
@@ -232,7 +233,7 @@ def test_diff():
 def test_methods():
     my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True)
     my_container.kill()
-    assert my_container.state.running == False
+    assert not my_container.state.running
     my_container.remove()
 
 
@@ -241,7 +242,7 @@ def test_context_manager():
     with pytest.raises(ArithmeticError):
         with docker.run(
             "busybox:1", ["sleep", "infinity"], detach=True, name=container_name
-        ) as c:
+        ):
             raise ArithmeticError
 
     assert container_name not in [x.name for x in docker.container.list(all=True)]
@@ -253,6 +254,7 @@ def test_context_manager_with_create():
         with docker.container.create(
             "busybox:1", ["sleep", "infinity"], name=container_name
         ) as c:
+            assert isinstance(c, python_on_whales.Container)
             raise ArithmeticError
 
     assert container_name not in [x.name for x in docker.container.list(all=True)]
@@ -858,7 +860,7 @@ def test_container_inspect_result_parsing_sleep_infinity():
     )
     assert after_parsing.restart_count == 0
 
-    json_content = json.loads(sleep_infinity_inspect)
+    json.loads(sleep_infinity_inspect)
 
     # check_if_identical(json.loads(after_parsing.json(by_alias=True)), json_content)
 

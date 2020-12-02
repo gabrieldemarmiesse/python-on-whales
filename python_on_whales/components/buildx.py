@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-import tempfile
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.image

@@ -10,5 +10,5 @@ def test_disk_free():
 
 
 def test_info():
-    output = docker.system.info()
+    docker.system.info()
     pass

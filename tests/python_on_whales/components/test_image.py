@@ -1,7 +1,6 @@
 import pytest
 
 from python_on_whales import DockerException, docker
-from python_on_whales.client_config import bulk_reload
 from python_on_whales.components.image import ImageInspectResult
 from python_on_whales.test_utils import random_name
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import inspect
 from datetime import datetime
 from pathlib import Path
 from subprocess import PIPE, Popen
