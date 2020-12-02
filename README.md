@@ -11,7 +11,7 @@ The Github repo can be found at this adress: <https://github.com/gabrieldemarmie
 
 ## How to install?
 
-```
+```bash
 pip install python-on-whales
 ```
 
