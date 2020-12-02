@@ -1,5 +1,4 @@
 import os
-from contextlib import contextmanager
 
 import pytest
 
@@ -178,7 +177,7 @@ def test_bake_with_variables(only_print):
 
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
-def test_bake_with_variables(only_print, monkeypatch):
+def test_bake_with_variables_2(only_print, monkeypatch):
     monkeypatch.setenv("IMAGE_NAME_1", "dodo")
     config = docker.buildx.bake(
         files=[bake_file], print=only_print, variables={"TAG": "3.0.4"}

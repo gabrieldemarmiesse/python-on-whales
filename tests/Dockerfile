@@ -14,6 +14,14 @@ RUN pip install -r /tmp/test-requirements.txt -r /tmp/requirements.txt
 
 
 #-----------------------------------------------------------------------------
+FROM python_dependencies as lint
+WORKDIR /python-on-whales
+COPY . .
+RUN flake8
+RUN isort --check
+RUN black --check
+
+#-----------------------------------------------------------------------------
 FROM python_dependencies as tests_with_binaries
 COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
 COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/

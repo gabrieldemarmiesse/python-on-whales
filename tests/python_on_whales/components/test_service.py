@@ -249,7 +249,7 @@ def test_service_inspect_result_2():
     }
 }
     """
-    service_inspect_result = ServiceInspectResult.parse_raw(json_inspect)
+    ServiceInspectResult.parse_raw(json_inspect)
 
 
 def test_service_inspect_result_3():
@@ -413,9 +413,9 @@ def test_service_inspect_result_3():
             }
         ]
     }
-}   
+}
     """
-    service_inspect_result = ServiceInspectResult.parse_raw(json_inspect)
+    ServiceInspectResult.parse_raw(json_inspect)
 
 
 def test_service_inspect_result_4():
@@ -532,4 +532,4 @@ def test_service_inspect_result_4():
     }
 }
     """
-    service_inspect_result = ServiceInspectResult.parse_raw(json_inspect)
+    ServiceInspectResult.parse_raw(json_inspect)
