@@ -18,8 +18,8 @@ FROM python_dependencies as lint
 WORKDIR /python-on-whales
 COPY . .
 RUN flake8
-RUN isort --check
-RUN black --check
+RUN isort --check ./
+RUN black --check ./
 
 #-----------------------------------------------------------------------------
 FROM python_dependencies as tests_with_binaries
