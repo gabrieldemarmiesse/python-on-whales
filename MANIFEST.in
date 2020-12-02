@@ -1,1 +1,2 @@
-global-include *README.md
+global-include *.txt
+global-include *.md
