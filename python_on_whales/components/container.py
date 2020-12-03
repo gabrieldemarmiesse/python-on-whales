@@ -1024,6 +1024,10 @@ class ContainerCLI(DockerCLICaller):
         For a deeper dive into the arguments and what they do, visit
         <https://docs.docker.com/engine/reference/run/>
 
+        If you want to know exactly how to call `docker.run()` depending on your
+        use case (detach, stream...), take a look at
+        the [`docker.run()` guide](../user_guide/docker_run.md).
+
         ```python
         >>> from python_on_whales import docker
         >>> returned_string = docker.run("hello-world")
