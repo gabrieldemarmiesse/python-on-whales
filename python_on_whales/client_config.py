@@ -65,7 +65,7 @@ class ClientConfig:
                     "If you want to trigger the download of the client binary file "
                     "manually (for example if you want to do it in a Dockerfile), "
                     "you can run the following command:\n "
-                    "$ docker-on-whales download-cli \n"
+                    "$ python-on-whales download-cli \n"
                 )
                 download_docker_cli()
                 self.client_binary_path = DOCKER_BINARY_PATH
