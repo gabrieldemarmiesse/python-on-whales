@@ -56,6 +56,19 @@ class ContainerHostConfig(DockerCamelModel):
     publish_all_ports: bool
     readonly_rootfs: bool
     cpu_count: float
+    shm_size: int
+    runtime: str
+    console_size: List[int]
+    cpu_shares: int
+    memory: int
+    nano_cpus: int
+    cgroup_parent: str
+    blkio_weight: int
+    cpu_period: int
+    cpu_quota: int
+    cpu_realtime_period: int
+    cpu_realtime_runtime: int
+    kernel_memory: int
 
 
 class ContainerConfig(DockerCamelModel):
