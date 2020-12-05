@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -54,13 +54,27 @@ class NodeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self):
+    @overload
+    def inspect(self, x: str) -> Node:
+        ...
+
+    @overload
+    def inspect(self, x: List[str]) -> List[Node]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Node, List[Node]]:
         """Not yet implemented"""
         raise NotImplementedError
 
-    def list(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def list(self) -> List[Node]:
+        """Returns the list of nodes in this swarm.
+
+        # Returns
+            A `List[python_on_whales.Node]`
+        """
+        full_cmd = self.docker_cmd + ["node", "list", "--quiet"]
+        all_ids = run(full_cmd).splitlines()
+        return [Node(self.client_config, x, is_immutable_id=True) for x in all_ids]
 
     def promote(self):
         """Not yet implemented"""
