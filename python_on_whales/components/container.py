@@ -1499,23 +1499,24 @@ class ContainerCLI(DockerCLICaller):
         Some Examples:
 
         ```python
-        cont_1 = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 8"], detach=True)
-        with cont_1:
-            exit_code = docker.wait(cont_1)
+        cont = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 8"], detach=True)
+
+        exit_code = docker.wait(cont)
 
         print(exit_code)
         # 8
+        docker.container.remove(cont)
         ```
 
         ```python
         cont_1 = docker.run("ubuntu", ["bash", "-c", "sleep 4 && exit 8"], detach=True)
         cont_2 = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 10"], detach=True)
 
-        with cont_1, cont_2:
-            exit_codes = docker.wait([cont_1, cont_2])
+        exit_codes = docker.wait([cont_1, cont_2])
 
         print(exit_codes)
         # [8, 10]
+        docker.container.remove([cont_1, cont_2])
         ```
         """
         full_cmd = self.docker_cmd + ["container", "wait"]
