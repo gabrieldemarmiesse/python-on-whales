@@ -63,8 +63,19 @@ class NodeCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Node, List[Node]]:
-        """Not yet implemented"""
-        raise NotImplementedError
+        """Returns a `python_on_whales.Node` object from a string
+        (id or hostname of the node)
+
+        # Arguments
+            x: One id or hostname or a list of ids or hostnames
+
+        # Returns
+            One or a list of `python_on_whales.Node`
+        """
+        if isinstance(x, str):
+            return Node(self.client_config, x)
+        else:
+            return [Node(self.client_config, reference) for reference in x]
 
     def list(self) -> List[Node]:
         """Returns the list of nodes in this swarm.
