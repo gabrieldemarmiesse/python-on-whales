@@ -234,6 +234,15 @@ class ImageCLI(DockerCLICaller):
         message: Optional[str] = None,
         platform: Optional[str] = None,
     ) -> Image:
+        """Import the contents from a tarball to create a filesystem image
+
+        Alias: `docker.import_(...)`
+
+        # Arguments
+            changes: Apply Dockerfile instruction to the created image
+            message: Set commit message for imported image
+            platform: Set platform if server is multi-platform capable
+        """
         full_cmd = self.docker_cmd + ["image", "import"]
         full_cmd.add_args_list("--change", changes)
         full_cmd.add_simple_arg("--message", message)
@@ -262,6 +271,8 @@ class ImageCLI(DockerCLICaller):
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
     ) -> List[str]:
         """Loads one or multiple Docker image(s) from a tar or an iterator of `bytes`.
+
+        Alias: `docker.load(...)`
 
         # Arguments
             input: Path or input stream to load the images from.
@@ -315,6 +326,8 @@ class ImageCLI(DockerCLICaller):
     def list(self) -> List[Image]:
         """Returns the list of Docker images present on the machine.
 
+        Alias: `docker.images()`
+
         Note that each image may have multiple tags.
 
         # Returns
@@ -348,6 +361,8 @@ class ImageCLI(DockerCLICaller):
     def pull(self, image_name: str, quiet: bool = False) -> Image:
         """Pull a docker image
 
+        Alias: `docker.pull(...)`
+
         # Arguments
             image_name: The image name
             quiet: If you don't want to see the progress bars.
@@ -366,6 +381,8 @@ class ImageCLI(DockerCLICaller):
 
     def push(self, tag_or_repo: str, quiet: bool = False):
         """Push a tag or a repository to a registry
+
+        Alias: `docker.push(...)`
 
         # Arguments
             tag_or_repo: Tag or repo to push
@@ -405,6 +422,8 @@ class ImageCLI(DockerCLICaller):
         output: Optional[ValidPath] = None,
     ) -> Optional[Iterator[bytes]]:
         """Save one or more images to a tar archive. Returns a stream if output is `None`
+
+        Alias: `docker.save(...)`
 
         # Arguments
             images: Single docker image or list of docker images to save
@@ -458,6 +477,8 @@ class ImageCLI(DockerCLICaller):
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
         """Adds a tag to a Docker image.
+
+        Alias: `docker.tag(...)`
 
         # Arguments
             source_image: The Docker image to tag. You can use a tag to reference it.

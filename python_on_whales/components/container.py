@@ -232,6 +232,8 @@ class Container(ReloadableObjectFromJson):
     ) -> python_on_whales.components.image.Image:
         """Create a new image from the container's changes.
 
+        Alias: `docker.commit(...)`
+
         See the [`docker.container.commit`](../sub-commands/container.md) command for
         information about the arguments.
         """
@@ -405,10 +407,12 @@ class ContainerCLI(DockerCLICaller):
     ):
         """Copy files/folders between a container and the local filesystem
 
+        Alias: `docker.copy(...)`
+
         ```python
         from python_on_whales import docker
 
-        docker.run("ubuntu", ["sleep", "infinity"], name="dodo", remove=True)
+        docker.run("ubuntu", ["sleep", "infinity"], name="dodo", remove=True, detach=True)
 
         docker.copy("/tmp/my_local_file.txt", ("dodo", "/path/in/container.txt"))
         docker.copy(("dodo", "/path/in/container.txt"), "/tmp/my_local_file2.txt")
@@ -541,6 +545,8 @@ class ContainerCLI(DockerCLICaller):
         workdir: Optional[ValidPath] = None,
     ) -> Container:
         """Creates a container, but does not start it.
+
+        Alias: `docker.create(...)`
 
         Start it then with the `.start()` method.
 
@@ -707,6 +713,8 @@ class ContainerCLI(DockerCLICaller):
     def diff(self, container: ValidContainer) -> Dict[str, str]:
         """List all the files modified, added or deleted since the container started.
 
+        Alias: `docker.diff(...)`
+
         # Arguments
             container: The container to inspect
 
@@ -730,6 +738,8 @@ class ContainerCLI(DockerCLICaller):
         detach: bool = False,
     ) -> Optional[str]:
         """Execute a command inside a container
+
+        Alias: `docker.execute(...)`
 
         # Arguments
             container: The container to execute the command in.
@@ -756,6 +766,8 @@ class ContainerCLI(DockerCLICaller):
 
     def export(self, container: ValidContainer, output: ValidPath) -> None:
         """Export a container's filesystem as a tar archive
+
+        Alias: `docker.export(...)`
 
         # Arguments
             container: The container to export.
@@ -793,6 +805,8 @@ class ContainerCLI(DockerCLICaller):
     ):
         """Kill a container.
 
+        Alias: `docker.kill(...)`
+
         # Arguments
             containers: One or more containers to kill
             signal: The signal to send the container
@@ -816,6 +830,10 @@ class ContainerCLI(DockerCLICaller):
         until: Union[None, datetime, timedelta] = None,
     ) -> str:
         """Returns the logs of a container as a string.
+
+        Alias: `docker.logs(...)`
+
+        The follow option is not yet implemented.
 
         # Arguments
             container: The container to get the logs of
@@ -841,6 +859,8 @@ class ContainerCLI(DockerCLICaller):
     def list(self, all: bool = False, filters: Dict[str, str] = {}) -> List[Container]:
         """List the containers on the host.
 
+        Alias: `docker.ps(...)`
+
         # Arguments
             all: If `True`, also returns containers that are not running.
 
@@ -861,6 +881,8 @@ class ContainerCLI(DockerCLICaller):
 
     def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
         """Pauses one or more containers
+
+        Alias: `docker.pause(...)`
 
         # Arguments
             containers: One or more containers to pause
@@ -885,6 +907,8 @@ class ContainerCLI(DockerCLICaller):
     def rename(self, container: ValidContainer, new_name: str) -> None:
         """Changes the name of a container.
 
+        Alias: `docker.rename(...)`
+
         # Arguments
             container: The container to rename
             new_name: The new name of the container.
@@ -898,6 +922,8 @@ class ContainerCLI(DockerCLICaller):
         time: Optional[Union[int, timedelta]] = None,
     ):
         """Restarts one or more container.
+
+        Alias: `docker.restart(...)`
 
         # Arguments
             containers: One or more containers to restart
@@ -923,6 +949,8 @@ class ContainerCLI(DockerCLICaller):
         volumes: bool = False,
     ) -> None:
         """Removes a container
+
+        Alias: `docker.remove(...)`
 
         # Arguments
             containers: One or more containers.
@@ -1375,7 +1403,14 @@ class ContainerCLI(DockerCLICaller):
             run(full_cmd)
 
     def stats(self):
-        """Not yet implemented"""
+        """Get containers resource usage statistics
+
+        Alias: `docker.stats(...)`
+
+        Not yet implemented
+        """
+        # We can do something nice with
+        # docker stats --format "{{json .}}" --no-stream --no-trunc
         raise NotImplementedError
 
     def stop(
@@ -1384,6 +1419,8 @@ class ContainerCLI(DockerCLICaller):
         time: Union[int, timedelta] = None,
     ):
         """Stops one or more running containers
+
+        Alias: `docker.stop(...)`
 
         Aliases: `docker.stop`, `docker.container.stop`,
         `python_on_whales.Container.stop`.
@@ -1405,19 +1442,35 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     def top(self):
-        """Not yet implemented"""
+        """Get the running processes of a container
+
+        Alias: `docker.top(...)`
+
+        Not yet implemented"""
         raise NotImplementedError
 
     def unpause(self):
-        """Not yet implemented"""
+        """Unpause all processes within one or more containers
+
+        Alias: `docker.unpause(...)`
+
+        Not yet implemented"""
         raise NotImplementedError
 
     def update(self):
-        """Not yet implemented"""
+        """Update configuration of one or more containers
+
+        Alias: `docker.update(...)`
+
+        Not yet implemented"""
         raise NotImplementedError
 
     def wait(self):
-        """Not yet implemented"""
+        """Block until one or more containers stop, then returns their exit codes
+
+        Alias: `docker.wait(...)`
+
+        Not yet implemented"""
         raise NotImplementedError
 
 

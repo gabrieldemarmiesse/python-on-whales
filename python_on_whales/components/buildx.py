@@ -175,6 +175,8 @@ class BuildxCLI(DockerCLICaller):
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
+        Alias: `docker.build(...)`
+
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
 
