@@ -10,7 +10,7 @@ from python_on_whales.utils import to_list
 
 from .utils import ValidPath, run
 
-CACHE_VALIDITY_PERIOD = 0.05
+CACHE_VALIDITY_PERIOD = 0.01
 
 
 class Command(list):

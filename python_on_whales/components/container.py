@@ -304,6 +304,14 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).pause(self)
 
+    def unpause(self) -> None:
+        """Unpause the container
+
+        See the [`docker.container.unpause`](../sub-commands/container.md#unpause) command for
+        information about the arguments.
+        """
+        return ContainerCLI(self.client_config).unpause(self)
+
     def rename(self, new_name: str) -> None:
         """Rename this container
 
@@ -1457,13 +1465,17 @@ class ContainerCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self):
+    def unpause(self, x: Union[ValidContainer, List[ValidContainer]]):
         """Unpause all processes within one or more containers
 
         Alias: `docker.unpause(...)`
 
-        Not yet implemented"""
-        raise NotImplementedError
+        # Arguments
+            x: One or more containers (name, id or `python_on_whales.Container` object).
+        """
+        full_cmd = self.docker_cmd + ["container", "unpause"]
+        full_cmd += to_list(x)
+        run(full_cmd)
 
     def update(self):
         """Update configuration of one or more containers
