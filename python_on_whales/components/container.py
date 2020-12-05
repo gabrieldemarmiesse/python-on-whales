@@ -73,8 +73,8 @@ class ContainerHostConfig(DockerCamelModel):
     oom_kill_disable: bool
     cpu_count: float
     cpu_percent: float
-    masked_paths: List[Path]
-    readonly_paths: List[Path]
+    masked_paths: Optional[List[Path]]
+    readonly_paths: Optional[List[Path]]
 
 
 class ContainerConfig(DockerCamelModel):
