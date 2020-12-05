@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 import python_on_whales.components.image
 import python_on_whales.components.network
@@ -782,7 +782,15 @@ class ContainerCLI(DockerCLICaller):
         ]
         run(full_cmd)
 
-    def inspect(self, x: Union[str, List[str]]) -> Container:
+    @overload
+    def inspect(self, x: str) -> Container:
+        ...
+
+    @overload
+    def inspect(self, x: List[str]) -> List[Container]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Container, List[Container]]:
         """Returns a container object from a name or ID.
 
         # Arguments
@@ -1465,13 +1473,60 @@ class ContainerCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def wait(self):
+    @overload
+    def wait(self, x: ValidContainer) -> int:
+        ...
+
+    @overload
+    def wait(self, x: List[ValidContainer]) -> List[int]:
+        ...
+
+    def wait(
+        self, x: Union[ValidContainer, List[ValidContainer]]
+    ) -> Union[int, List[int]]:
         """Block until one or more containers stop, then returns their exit codes
 
         Alias: `docker.wait(...)`
 
-        Not yet implemented"""
-        raise NotImplementedError
+
+        # Arguments
+            x: One or a list of containers to wait for.
+
+        # Returns
+            An `int` if a single container was passed as argument or a list of ints
+            if multiple containers were passed as arguments.
+
+        Some Examples:
+
+        ```python
+        cont = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 8"], detach=True)
+
+        exit_code = docker.wait(cont)
+
+        print(exit_code)
+        # 8
+        docker.container.remove(cont)
+        ```
+
+        ```python
+        cont_1 = docker.run("ubuntu", ["bash", "-c", "sleep 4 && exit 8"], detach=True)
+        cont_2 = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 10"], detach=True)
+
+        exit_codes = docker.wait([cont_1, cont_2])
+
+        print(exit_codes)
+        # [8, 10]
+        docker.container.remove([cont_1, cont_2])
+        ```
+        """
+        full_cmd = self.docker_cmd + ["container", "wait"]
+        if isinstance(x, list):
+            full_cmd += x
+            exit_codes = run(full_cmd)
+            return [int(exit_code) for exit_code in exit_codes.splitlines()]
+        else:
+            full_cmd.append(x)
+            return int(run(full_cmd))
 
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:

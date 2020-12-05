@@ -1093,3 +1093,39 @@ def test_parse_buildkit_container_configuration():
         some_buildkit_container_configuration
     )
     assert after_parsing.restart_count == 0
+
+
+def test_wait_single_container():
+    cont_1 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 8"], detach=True)
+    with cont_1:
+        exit_code = docker.wait(cont_1)
+
+    assert exit_code == 8
+
+
+def test_wait_single_container_already_finished():
+    cont_1 = docker.run("busybox", ["sh", "-c", "exit 8"], detach=True)
+    first_exit_code = docker.wait(cont_1)
+    second_exit_code = docker.wait(cont_1)
+
+    assert first_exit_code == second_exit_code == 8
+
+
+def test_wait_multiple_container():
+    cont_1 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 8"], detach=True)
+    cont_2 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 10"], detach=True)
+
+    with cont_1, cont_2:
+        exit_codes = docker.wait([cont_1, cont_2])
+
+    assert exit_codes == [8, 10]
+
+
+def test_wait_multiple_container_random_exit_order():
+    cont_1 = docker.run("busybox", ["sh", "-c", "sleep 4 && exit 8"], detach=True)
+    cont_2 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 10"], detach=True)
+
+    with cont_1, cont_2:
+        exit_codes = docker.wait([cont_1, cont_2])
+
+    assert exit_codes == [8, 10]
