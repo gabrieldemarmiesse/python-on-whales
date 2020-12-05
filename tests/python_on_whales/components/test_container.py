@@ -1129,3 +1129,17 @@ def test_wait_multiple_container_random_exit_order():
         exit_codes = docker.wait([cont_1, cont_2])
 
     assert exit_codes == [8, 10]
+
+
+def test_pause_unpause():
+    container = docker.run(
+        "busybox", ["ping", "www.google.com"], detach=True, remove=True
+    )
+
+    with container:
+        assert container.state.running
+        container.pause()
+        assert container.state.paused
+        container.unpause()
+        assert not container.state.paused
+        assert container.state.running
