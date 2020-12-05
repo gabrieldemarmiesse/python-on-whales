@@ -1500,8 +1500,25 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.update(...)`
 
-        Not yet implemented"""
-        raise NotImplementedError
+        """
+        full_cmd = self.docker_cmd + ["container", "update"]
+        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
+        full_cmd.add_simple_arg("--cpu-period", cpu_period)
+        full_cmd.add_simple_arg("--cpu-quota", cpu_quota)
+        full_cmd.add_simple_arg("--cpu-rt-period", cpu_rt_period)
+        full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
+        full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
+        full_cmd.add_simple_arg("--cpus", cpus)
+        full_cmd.add_simple_arg("--cpuset-cpus", cpuset_cpus)
+        full_cmd.add_simple_arg("--cpuset-mems", cpuset_mems)
+        full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
+        full_cmd.add_simple_arg("--memory", memory)
+        full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
+        full_cmd.add_simple_arg("--memory-swap", memory_swap)
+        full_cmd.add_simple_arg("--pids-limit", pids_limit)
+        full_cmd.add_simple_arg("--restart", restart)
+        full_cmd += to_list(x)
+        run(full_cmd)
 
     @overload
     def wait(self, x: ValidContainer) -> int:
