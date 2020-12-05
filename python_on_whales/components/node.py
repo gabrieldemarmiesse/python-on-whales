@@ -5,7 +5,7 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, run
+from python_on_whales.utils import DockerCamelModel, run, to_list
 
 
 class NodeInspectResult(DockerCamelModel):
@@ -50,9 +50,15 @@ ValidNode = Union[Node, str]
 
 
 class NodeCLI(DockerCLICaller):
-    def demote(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def demote(self, x: Union[ValidNode, List[ValidNode]]):
+        """Demote one or more nodes from manager in the swarm
+
+        # Arguments
+            x: One or a list of nodes.
+        """
+        full_cmd = self.docker_cmd + ["node", "demote"]
+        full_cmd += to_list(x)
+        run(full_cmd)
 
     @overload
     def inspect(self, x: str) -> Node:
@@ -87,17 +93,32 @@ class NodeCLI(DockerCLICaller):
         all_ids = run(full_cmd).splitlines()
         return [Node(self.client_config, x, is_immutable_id=True) for x in all_ids]
 
-    def promote(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def promote(self, x: Union[ValidNode, List[ValidNode]]):
+        """Promote one or more nodes to manager in the swarm
+
+        # Arguments
+            x: One or a list of nodes.
+        """
+        full_cmd = self.docker_cmd + ["node", "promote"]
+        full_cmd += to_list(x)
+        run(full_cmd)
 
     def ps(self):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def remove(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def remove(self, x: Union[ValidNode, List[ValidNode]], force: bool = False):
+        """Remove one or more nodes from the swarm
+
+        # Arguments
+            x: One node or a list of nodes. You can use the id or the hostname of a node.
+                You can also use a `python_on_whales.Node`.
+            force: Force remove a node from the swarm
+        """
+        full_cmd = self.docker_cmd + ["node", "remove"]
+        full_cmd.add_flag("--force", force)
+        full_cmd += to_list(x)
+        run(full_cmd)
 
     def update(
         self,
