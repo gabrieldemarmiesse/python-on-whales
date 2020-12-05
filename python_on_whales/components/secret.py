@@ -69,7 +69,7 @@ class SecretCLI(DockerCLICaller):
         """Creates a `python_on_whales.Secret`.
 
         # Returns
-        A `python_on_whales.Secret` object.
+            A `python_on_whales.Secret` object.
         """
         full_cmd = self.docker_cmd + ["secret", "create"]
         full_cmd.add_simple_arg("--driver", driver)
