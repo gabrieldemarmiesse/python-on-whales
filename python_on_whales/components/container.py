@@ -1495,6 +1495,28 @@ class ContainerCLI(DockerCLICaller):
         # Returns
             An `int` if a single container was passed as argument or a list of ints
             if multiple containers were passed as arguments.
+
+        Some Examples:
+
+        ```python
+        cont_1 = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 8"], detach=True)
+        with cont_1:
+            exit_code = docker.wait(cont_1)
+
+        print(exit_code)
+        # 8
+        ```
+
+        ```python
+        cont_1 = docker.run("ubuntu", ["bash", "-c", "sleep 4 && exit 8"], detach=True)
+        cont_2 = docker.run("ubuntu", ["bash", "-c", "sleep 2 && exit 10"], detach=True)
+
+        with cont_1, cont_2:
+            exit_codes = docker.wait([cont_1, cont_2])
+
+        print(exit_codes)
+        # [8, 10]
+        ```
         """
         full_cmd = self.docker_cmd + ["container", "wait"]
         if isinstance(x, list):
