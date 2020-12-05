@@ -1477,7 +1477,25 @@ class ContainerCLI(DockerCLICaller):
         full_cmd += to_list(x)
         run(full_cmd)
 
-    def update(self):
+    def update(
+        self,
+        x: Union[ValidContainer, List[ValidContainer]],
+        blkio_weight: Optional[int] = None,
+        cpu_period: Optional[int] = None,
+        cpu_quota: Optional[int] = None,
+        cpu_rt_period: Optional[int] = None,
+        cpu_rt_runtime: Optional[int] = None,
+        cpu_shares: Optional[int] = None,
+        cpus: Optional[float] = None,
+        cpuset_cpus: Optional[List[int]] = None,
+        cpuset_mems: Optional[List[int]] = None,
+        kernel_memory: Union[int, str, None] = None,
+        memory: Union[int, str, None] = None,
+        memory_reservation: Union[int, str, None] = None,
+        memory_swap: Union[int, str, None] = None,
+        pids_limit: Optional[int] = None,
+        restart: Optional[str] = None,
+    ):
         """Update configuration of one or more containers
 
         Alias: `docker.update(...)`
