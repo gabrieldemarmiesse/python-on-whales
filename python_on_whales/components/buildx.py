@@ -314,9 +314,10 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.append(str(builder))
         run(full_cmd)
 
-    def stop(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def stop(self) -> str:
+        """Returns the docker buildx version as a string."""
+        full_cmd = self.docker_cmd + ["buildx", "version"]
+        return run(full_cmd)
 
     def use(
         self, builder: Union[Builder, str], default: bool = False, global_: bool = False
