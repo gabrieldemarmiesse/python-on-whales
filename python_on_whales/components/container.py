@@ -55,7 +55,6 @@ class ContainerHostConfig(DockerCamelModel):
     privileged: bool
     publish_all_ports: bool
     readonly_rootfs: bool
-    cpu_count: float
     shm_size: int
     runtime: str
     console_size: List[int]
@@ -69,6 +68,13 @@ class ContainerHostConfig(DockerCamelModel):
     cpu_realtime_period: int
     cpu_realtime_runtime: int
     kernel_memory: int
+    memory_reservation: int
+    memory_swap: int
+    oom_kill_disable: bool
+    cpu_count: float
+    cpu_percent: float
+    masked_paths: List[Path]
+    readonly_paths: List[Path]
 
 
 class ContainerConfig(DockerCamelModel):
