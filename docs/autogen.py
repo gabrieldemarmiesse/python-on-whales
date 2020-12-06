@@ -11,6 +11,9 @@ pages = {
     "sub-commands/buildx.md": get_methods(
         "python_on_whales.components.buildx.BuildxCLI"
     ),
+    "sub-commands/compose.md": get_methods(
+        "python_on_whales.components.compose.ComposeCLI"
+    ),
     "sub-commands/config.md": get_methods(
         "python_on_whales.components.config.ConfigCLI"
     ),
@@ -59,6 +62,7 @@ class MyDocumentationGenerator(DocumentationGenerator):
         signature = signature.replace("DockerClient.", "docker.")
         signature = signature.replace("AppCLI.", "docker.app.")
         signature = signature.replace("BuildxCLI.", "docker.buildx.")
+        signature = signature.replace("ComposeCLI.", "docker.compose.")
         signature = signature.replace("ConfigCLI.", "docker.config.")
         signature = signature.replace("ContextCLI.", "docker.context.")
         signature = signature.replace("ContainerCLI.", "docker.container.")
