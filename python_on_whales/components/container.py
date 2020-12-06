@@ -1152,7 +1152,7 @@ class ContainerCLI(DockerCLICaller):
             command: List of arguments to provide to the container.
             add_hosts: hosts to add in the format of a tuple. For example,
                 `add_hosts=[("my_host_1", "192.168.30.31"), ("host2", "192.168.80.81")]`
-            blkio_weight:Block IO (relative weight), between 10 and 1000,
+            blkio_weight: Block IO (relative weight), between 10 and 1000,
                 or 0 to disable (default 0)
             cpu_period: Limit CPU CFS (Completely Fair Scheduler) period
             cpu_quota: Limit CPU CFS (Completely Fair Scheduler) quota
@@ -1161,6 +1161,8 @@ class ContainerCLI(DockerCLICaller):
             cpu_shares: CPU shares (relative weight)
             cpus: The maximal amount of cpu the container can use.
                 `1` means one cpu core.
+            cpuset_cpus: CPUs in which to allow execution. Must be given as a list.
+            cpuset_mems: MEMs in which to allow execution. Must be given as a list.
             detach: If `False`, returns the ouput of the container as a string.
                 If `True`, returns a `python_on_whales.Container` object.
             dns_search: Set custom DNS search domains
@@ -1500,6 +1502,26 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.update(...)`
 
+        # Arguments
+            x: One or a list of containers to update.
+            blkio_weight: Block IO (relative weight), between 10 and 1000,
+                or 0 to disable (default 0)
+            cpu_period: Limit CPU CFS (Completely Fair Scheduler) period
+            cpu_quota: Limit CPU CFS (Completely Fair Scheduler) quota
+            cpu_rt_period: Limit CPU real-time period in microseconds
+            cpu_rt_runtime: Limit CPU real-time runtime in microseconds
+            cpu_shares: CPU shares (relative weight)
+            cpus: The maximal amount of cpu the container can use.
+                `1` means one cpu core.
+            cpuset_cpus: CPUs in which to allow execution. Must be given as a list.
+            cpuset_mems: MEMs in which to allow execution. Must be given as a list.
+            memory:  Memory limit, valid values are `1024` (ints are bytes) or
+                `"43m"` or `"6g"`.
+            memory_reservation: Memory soft limit
+            memory_swap: Swap limit equal to memory plus swap: '-1'
+                to enable unlimited swap.
+            pids_limit: Tune container pids limit (set `-1` for unlimited)
+            restart: Restart policy to apply when a container exits (default "no")
         """
         full_cmd = self.docker_cmd + ["container", "update"]
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
