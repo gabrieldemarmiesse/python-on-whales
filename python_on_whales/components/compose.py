@@ -1,10 +1,25 @@
 from __future__ import annotations
 
+from typing import Dict, List, Optional, Union
+
 from python_on_whales.client_config import DockerCLICaller
 
 
 class ComposeCLI(DockerCLICaller):
-    def build(self):
+    def build(
+        self,
+        services: List[str] = [],
+        build_args: Dict[str, str] = {},
+        compress: bool = False,
+        force_remove: bool = False,
+        memory: Union[int, str, None] = None,
+        no_cache: bool = False,
+        no_remove: bool = False,
+        parallel: bool = False,
+        progress: Optional[str] = None,
+        pull: bool = False,
+        quiet: bool = False,
+    ):
         """Not yet implemented"""
         raise NotImplementedError
 
