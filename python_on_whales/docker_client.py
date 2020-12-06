@@ -5,6 +5,7 @@ from typing import Optional
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.app import AppCLI
 from python_on_whales.components.buildx import BuildxCLI
+from python_on_whales.components.compose import ComposeCLI
 from python_on_whales.components.config import ConfigCLI
 from python_on_whales.components.container import ContainerCLI
 from python_on_whales.components.context import ContextCLI

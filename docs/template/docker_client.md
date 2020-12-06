@@ -6,6 +6,7 @@
 # Sub-commands
 * [`docker.app`](sub-commands/app.md)
 * [`docker.buildx`](sub-commands/buildx.md)
+* [`docker.compose`](sub-commands/compose.md)
 * [`docker.config`](sub-commands/config.md)
 * [`docker.container`](sub-commands/container.md)
 * [`docker.context`](sub-commands/context.md)
