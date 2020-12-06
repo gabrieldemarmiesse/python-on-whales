@@ -84,6 +84,7 @@ class DockerClient(DockerCLICaller):
 
         self.app = AppCLI(self.client_config)
         self.buildx = BuildxCLI(self.client_config)
+        self.compose = ComposeCLI(self.client_config)
         self.config = ConfigCLI(self.client_config)
         self.container = ContainerCLI(self.client_config)
         self.context = ContextCLI(self.client_config)
