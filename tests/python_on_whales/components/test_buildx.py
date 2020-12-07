@@ -1,4 +1,6 @@
 import os
+import tempfile
+from pathlib import Path
 
 import pytest
 
@@ -8,8 +10,10 @@ from python_on_whales.test_utils import set_cache_validity_period
 from python_on_whales.utils import PROJECT_ROOT
 
 dockerfile_content1 = """
-FROM busybox
-RUN touch /dada
+FROM busybox as base
+RUN mkdir /dudu
+RUN touch /dudu/dada
+RUN echo Hello world! >> /dudu/dodo
 """
 
 
@@ -73,6 +77,25 @@ def test_buildx_build_network(tmp_path):
 def test_buildx_build_file(tmp_path):
     (tmp_path / "Dockerfile111").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, file=(tmp_path / "Dockerfile111"))
+
+
+dockerfile_content2 = """
+FROM busybox as base
+RUN mkdir /dudu
+RUN touch /dudu/dada
+RUN echo Hello world! >> /dudu/dodo
+
+FROM scratch as final_output
+COPY --from=base /dudu .
+"""
+
+
+def test_buildx_output_directory(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content2)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_dir = Path(tmp_dir)
+        docker.build(tmp_path, output=dict(type="local", dest=str(tmp_dir)))
+        assert (tmp_dir / "dodo").read_text() == "Hello world!\n"
 
 
 def test_buildx_create_remove():

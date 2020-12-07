@@ -169,7 +169,7 @@ class BuildxCLI(DockerCLICaller):
         labels: Dict[str, str] = {},
         load: bool = False,
         network: Optional[str] = None,
-        output: Optional[Dict[str, str]] = None,
+        output: Dict[str, str] = {},
         platforms: Optional[List[str]] = None,
         progress: Union[str, bool] = "auto",
         pull: bool = False,
@@ -262,8 +262,8 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cache-to", cache_to)
         for secret in to_list(secrets):
             full_cmd += ["--secret", secret]
-        if output is not None:
-            full_cmd += ["--output", ",".join(output)]
+        if output != {}:
+            full_cmd += ["--output", format_dict_for_buildx(output)]
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--network", network)
@@ -373,14 +373,18 @@ class BuildxCLI(DockerCLICaller):
         return run(full_cmd)
 
 
-def guess_if_image_is_loaded(push: bool, output, load: bool) -> bool:
+def guess_if_image_is_loaded(push: bool, output: dict, load: bool) -> bool:
     """docker buildx build cannot have multiple outputs, which helps use decide."""
     if push:
         return False
-    elif output is not None:
+    elif output != {}:
         return False
     elif load:
         return True
     else:
         # The most common use case
         return True
+
+
+def format_dict_for_buildx(options: Dict[str, str]) -> str:
+    return ",".join(format_dict_for_cli(options, separator="="))
