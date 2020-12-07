@@ -11,7 +11,13 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObject,
 )
-from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
+from python_on_whales.utils import (
+    DockerException,
+    ValidPath,
+    format_dict_for_cli,
+    run,
+    to_list,
+)
 
 
 @dataclass
@@ -171,7 +177,7 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-        return_image: bool = False,
+        return_image: Optional[bool] = None,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -219,8 +225,11 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
-            return_image: Return the created docker image if `True`, needs
-                at least one `tags`.
+            return_image: Return the created docker image if `True`. Needs
+                at least one `tags` and the image must be loaded into the docker daemon
+                after the build. If `False`, the `docker.build(...)` function returns
+                nothing. If `None` (default value), python-on-whales will try to guess
+                based on the `load` and `push` arguments.
 
         # Returns
             A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
@@ -262,14 +271,33 @@ class BuildxCLI(DockerCLICaller):
 
         full_cmd.append(context_path)
         run(full_cmd, capture_stderr=progress is False)
+        if push:
+            return_image = False
+        elif load:
+            return_image = True
+        else:
+            return_image = True
         if return_image:
-            if to_list(tags) == []:
+            if not to_list(tags):
                 raise ValueError(
-                    "If you want the docker image returned, you need to specify tags."
+                    "If you want the docker image returned, "
+                    "you need to specify tags, even random ones."
+                    "If you don't need your image returned, "
+                    "because buildx does not load it for example, do "
+                    "`docker.build(..., return_image=False)`."
                 )
-            return python_on_whales.components.image.ImageCLI(
-                self.client_config
-            ).inspect(to_list(tags)[0])
+            tag_to_find = to_list(tags)[0]
+            try:
+                return python_on_whales.components.image.ImageCLI(
+                    self.client_config
+                ).inspect(tag_to_find)
+            except DockerException as e:
+                raise FileNotFoundError(
+                    f"Could not find the docker image with tag '{tag_to_find}' after "
+                    f"building it. It's possible that it was not loaded, for example if "
+                    f"you just wanted to check that the dockerfile was valid. To avoid "
+                    f"getting this error, do `docker.build(..., return_image=False)`."
+                ) from e
 
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
         full_cmd = self.docker_cmd + ["buildx", "create"]
