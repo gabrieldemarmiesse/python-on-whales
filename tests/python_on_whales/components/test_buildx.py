@@ -65,7 +65,7 @@ def test_buildx_error(tmp_path):
     with pytest.raises(DockerException) as e:
         docker.buildx.build(tmp_path)
 
-    assert f"docker buildx build " in str(e.value)
+    assert "docker buildx build " in str(e.value)
     assert str(tmp_path) in str(e.value)
 
 
