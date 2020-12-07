@@ -2,7 +2,7 @@ import pytest
 
 from python_on_whales import DockerException, docker
 from python_on_whales.components.network import NetworkInspectResult
-from python_on_whales.test_utils import random_name
+from python_on_whales.utils import random_name
 
 
 def test_network_create_remove():

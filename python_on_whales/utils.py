@@ -1,3 +1,5 @@
+import random
+import string
 import subprocess
 import warnings
 from pathlib import Path
@@ -238,3 +240,7 @@ def read_env_files(env_files: List[Path]) -> Dict[str, str]:
     for file in env_files:
         result_dict.update(read_env_file(file))
     return result_dict
+
+
+def random_name() -> str:
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=20))

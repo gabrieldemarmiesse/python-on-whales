@@ -14,8 +14,13 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.test_utils import random_name
-from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
+from python_on_whales.utils import (
+    DockerCamelModel,
+    ValidPath,
+    random_name,
+    run,
+    to_list,
+)
 
 
 class VolumeInspectResult(DockerCamelModel):

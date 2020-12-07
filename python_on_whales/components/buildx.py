@@ -15,6 +15,7 @@ from python_on_whales.utils import (
     DockerException,
     ValidPath,
     format_dict_for_cli,
+    random_name,
     run,
     to_list,
 )
@@ -185,6 +186,8 @@ class BuildxCLI(DockerCLICaller):
 
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
+        If you don't load a docker image into the daemon (less common but valid
+        use case), you can use `docker.build(..., return_image=False)`
 
         # Arguments
             context_path: The path of the build context.
@@ -234,7 +237,7 @@ class BuildxCLI(DockerCLICaller):
         # Returns
             A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
         """
-
+        tags = to_list(tags)
         full_cmd = self.docker_cmd + ["buildx", "build"]
 
         if progress != "auto" and isinstance(progress, str):
@@ -266,31 +269,29 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
 
-        for tag in to_list(tags):
-            full_cmd += ["--tag", tag]
+        if return_image is None:
+            return_image = guess_if_image_is_loaded(push, output, load)
+        if return_image and not tags:
+            # we give a temporary tag that we'll remove afterwards
+            # otherwise we can't fetch the image
+            tags = [random_name()]
+            temporary_tag = True
+        else:
+            temporary_tag = False
+
+        full_cmd.add_args_list("--tag", tags)
 
         full_cmd.append(context_path)
         run(full_cmd, capture_stderr=progress is False)
-        if push:
-            return_image = False
-        elif load:
-            return_image = True
-        else:
-            return_image = True
+
         if return_image:
-            if not to_list(tags):
-                raise ValueError(
-                    "If you want the docker image returned, "
-                    "you need to specify tags, even random ones."
-                    "If you don't need your image returned, "
-                    "because buildx does not load it for example, do "
-                    "`docker.build(..., return_image=False)`."
-                )
+
             tag_to_find = to_list(tags)[0]
+            docker_image_cli = python_on_whales.components.image.ImageCLI(
+                self.client_config
+            )
             try:
-                return python_on_whales.components.image.ImageCLI(
-                    self.client_config
-                ).inspect(tag_to_find)
+                builded_image = docker_image_cli.inspect(tag_to_find)
             except DockerException as e:
                 raise FileNotFoundError(
                     f"Could not find the docker image with tag '{tag_to_find}' after "
@@ -298,6 +299,10 @@ class BuildxCLI(DockerCLICaller):
                     f"you just wanted to check that the dockerfile was valid. To avoid "
                     f"getting this error, do `docker.build(..., return_image=False)`."
                 ) from e
+            if temporary_tag:
+                # we remove the tag but not the image.
+                docker_image_cli.remove(tag_to_find, prune=False)
+            return builded_image
 
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
         full_cmd = self.docker_cmd + ["buildx", "create"]
@@ -366,3 +371,16 @@ class BuildxCLI(DockerCLICaller):
         """Returns the docker buildx version as a string."""
         full_cmd = self.docker_cmd + ["buildx", "version"]
         return run(full_cmd)
+
+
+def guess_if_image_is_loaded(push: bool, output, load: bool) -> bool:
+    """docker buildx build cannot have multiple outputs, which helps use decide."""
+    if push:
+        return False
+    elif output is not None:
+        return False
+    elif load:
+        return True
+    else:
+        # The most common use case
+        return True

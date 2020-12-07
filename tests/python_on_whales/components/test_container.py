@@ -11,7 +11,7 @@ import pytest
 import python_on_whales
 from python_on_whales import DockerException, Image, docker
 from python_on_whales.components.container import ContainerInspectResult, ContainerState
-from python_on_whales.test_utils import random_name
+from python_on_whales.utils import random_name
 
 
 def test_simple_command():

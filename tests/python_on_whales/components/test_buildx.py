@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from python_on_whales import DockerException, docker
+from python_on_whales import DockerException, Image, docker
 from python_on_whales.components.buildx import BuilderInspectResult
 from python_on_whales.test_utils import set_cache_validity_period
 from python_on_whales.utils import PROJECT_ROOT
@@ -15,18 +15,25 @@ RUN touch /dada
 
 def test_buildx_build(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    docker.buildx.build(tmp_path)
+    docker.build(tmp_path)
+
+
+def test_buildx_build_no_tags(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker_image = docker.build(tmp_path)
+    assert isinstance(docker_image, Image)
+    assert docker.run(docker_image, ["echo", "dodo"], remove=True) == "dodo"
 
 
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags="hello1", return_image=True)
+    image = docker.build(tmp_path, tags="hello1", return_image=True)
     assert "hello1:latest" in image.repo_tags
 
 
 def test_buildx_build_multiple_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"], return_image=True)
+    image = docker.build(tmp_path, tags=["hello1", "hello2"], return_image=True)
     assert "hello1:latest" in image.repo_tags
     assert "hello2:latest" in image.repo_tags
 
@@ -35,9 +42,7 @@ def test_cache_invalidity(tmp_path):
 
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with set_cache_validity_period(100):
-        image = docker.buildx.build(
-            tmp_path, tags=["hello1", "hello2"], return_image=True
-        )
+        image = docker.build(tmp_path, tags=["hello1", "hello2"])
         docker.image.remove("hello1")
         docker.pull("hello-world")
         docker.tag("hello-world", "hello1")
@@ -48,15 +53,16 @@ def test_cache_invalidity(tmp_path):
 
 def test_buildx_build_aliases(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    docker.build(tmp_path)
-    docker.image.build(tmp_path)
+    docker.build(tmp_path, return_image=False)
+    docker.image.build(tmp_path, return_image=False)
 
 
 def test_buildx_error(tmp_path):
     with pytest.raises(DockerException) as e:
         docker.buildx.build(tmp_path)
 
-    assert f"docker buildx build {tmp_path}" in str(e.value)
+    assert f"docker buildx build " in str(e.value)
+    assert str(tmp_path) in str(e.value)
 
 
 def test_buildx_build_network(tmp_path):
