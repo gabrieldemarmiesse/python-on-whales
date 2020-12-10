@@ -78,7 +78,8 @@ class Builder(ReloadableObject):
             docker.build(".")
 
         # now the variable buildx_builder is not usable since we're out of the context manager.
-        #
+        # the .remove() method was called behind the scenes
+        # since it was the current builder, 'default' is now the current builder.
         ```
 
         """
