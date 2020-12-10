@@ -18,6 +18,31 @@ def test_buildx_build(tmp_path):
     docker.buildx.build(tmp_path)
 
 
+def test_buildx_build_context_manager(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(use=True):
+        docker.buildx.build(tmp_path)
+
+
+def test_buildx_build_context_manager2(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    buildx_builder = docker.buildx.create()
+    docker.buildx.use(buildx_builder)
+    with buildx_builder:
+        docker.buildx.build(tmp_path)
+
+    # check that the builder doesn't exist
+    with pytest.raises(DockerException):
+        docker.buildx.inspect(buildx_builder.name)
+
+
+def test_inspect():
+    my_builder = docker.buildx.create(use=True)
+    with my_builder:
+        assert docker.buildx.inspect(my_builder.name) == my_builder
+        assert docker.buildx.inspect() == my_builder
+
+
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     image = docker.buildx.build(tmp_path, tags="hello1", return_image=True)

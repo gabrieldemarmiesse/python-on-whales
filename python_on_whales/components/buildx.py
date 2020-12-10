@@ -34,12 +34,26 @@ class BuilderInspectResult:
 
 class Builder(ReloadableObject):
     def __init__(
-        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+        self,
+        client_config: ClientConfig,
+        reference: Optional[str],
+        is_immutable_id=False,
     ):
         super().__init__(client_config, "name", reference, is_immutable_id)
 
-    def _fetch_and_parse_inspect_result(self, reference: str) -> BuilderInspectResult:
-        inspect_str = run(self.docker_cmd + ["buildx", "inspect", reference])
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.remove()
+
+    def _fetch_and_parse_inspect_result(
+        self, reference: Optional[str]
+    ) -> BuilderInspectResult:
+        full_cmd = self.docker_cmd + ["buildx", "inspect"]
+        if reference is not None:
+            full_cmd.append(reference)
+        inspect_str = run(full_cmd)
         return BuilderInspectResult.from_str(inspect_str)
 
     @property
@@ -49,6 +63,27 @@ class Builder(ReloadableObject):
     @property
     def driver(self) -> str:
         return self._get_inspect_result().driver
+
+    def remove(self):
+        """Removes this builder. After this operation the builder cannot be used anymore.
+
+        If you use the builder as a context manager, it will call this function when
+        you exit the context manager.
+
+        ```python
+        from python_on_whales import docker
+
+        buildx_builder = docker.buildx.create(use=True)
+        with buildx_builder:
+            docker.build(".")
+
+        # now the variable buildx_builder is not usable since we're out of the context manager.
+        # the .remove() method was called behind the scenes
+        # since it was the current builder, 'default' is now the current builder.
+        ```
+
+        """
+        BuildxCLI(self.client_config).remove(self)
 
 
 ValidBuilder = Union[str, Builder]
@@ -285,9 +320,17 @@ class BuildxCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def inspect(self, x: Optional[str] = None) -> Builder:
+        """Returns a builder instance from the name.
+
+        # Arguments
+            x: If `None` (the default), returns the current builder. If a string is provided,
+                the builder that has this name is returned.
+
+        # Returns
+            A `python_on_whales.Builder` object.
+        """
+        return Builder(self.client_config, x, is_immutable_id=False)
 
     def list(self):
         """Not yet implemented"""
