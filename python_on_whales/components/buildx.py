@@ -306,7 +306,18 @@ class BuildxCLI(DockerCLICaller):
                 self.client_config
             ).inspect(to_list(tags)[0])
 
-    def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):
+    def create(
+        self, context_or_endpoint: Optional[str] = None, use: bool = False
+    ) -> Builder:
+        """Create a new builder instance
+
+        # Arguments
+            context_or_endpoint:
+            use: Set the current builder instance to this builder
+
+        # Returns
+            A `python_on_whales.Builder` object.
+        """
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
         if use:
@@ -348,7 +359,7 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
-    def remove(self, builder: Union[Builder, str]):
+    def remove(self, builder: Union[Builder, str]) -> None:
         """Remove a builder
 
         # Arguments
@@ -356,28 +367,48 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "rm"]
 
-        full_cmd.append(str(builder))
+        full_cmd.append(builder)
         run(full_cmd)
 
-    def stop(self) -> str:
-        """Not yet implemented"""
-        raise NotImplementedError
+    def stop(self, builder: Optional[ValidBuilder]) -> None:
+        """Stop the builder instance
+
+        # Arguments:
+            builder: The builder to stop. If `None` (the default value),
+                the current builder is stopped.
+        """
+        full_cmd = self.docker_cmd + ["buildx", "stop"]
+        if builder is not None:
+            full_cmd.append(builder)
+        run(full_cmd)
 
     def use(
         self, builder: Union[Builder, str], default: bool = False, global_: bool = False
-    ):
+    ) -> None:
+        """Set the current builder instance
+
+        # Arguments
+            builder: The builder to use
+            default: Set builder as default for the current context
+            global_: Builder will be used even when changing contexts
+        """
         full_cmd = self.docker_cmd + ["buildx", "use"]
 
-        if default:
-            full_cmd.append("--use")
-        if global_:
-            full_cmd.append("--global")
-
-        full_cmd.append(str(builder))
-
+        full_cmd.add_flag("--default", default)
+        full_cmd.add_flag("--global", global_)
+        full_cmd.append(builder)
         run(full_cmd)
 
-    def version(self):
-        """Returns the docker buildx version as a string."""
+    def version(self) -> str:
+        """Returns the docker buildx version as a string.
+
+        ```python
+        from python_on_whales import docker
+
+        version = docker.buildx.version()
+        print(version)
+        # "github.com/docker/buildx v0.4.2 fb7b670b764764dc4716df3eba07ffdae4cc47b2"
+        ```
+        """
         full_cmd = self.docker_cmd + ["buildx", "version"]
         return run(full_cmd)
