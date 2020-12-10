@@ -57,6 +57,9 @@ class Builder(ReloadableObject):
     def driver(self) -> str:
         return self._get_inspect_result().driver
 
+    def remove(self):
+        return BuildxCLI(self.client_config).remove(self)
+
 
 ValidBuilder = Union[str, Builder]
 
@@ -301,7 +304,8 @@ class BuildxCLI(DockerCLICaller):
                 ) from e
             if temporary_tag:
                 # we remove the tag but not the image.
-                docker_image_cli.remove(tag_to_find, prune=False)
+                pass
+                #docker_image_cli.remove(tag_to_find, prune=False)
             return builded_image
 
     def create(self, context_or_endpoint: Optional[str] = None, use: bool = False):

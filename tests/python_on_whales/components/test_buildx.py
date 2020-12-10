@@ -9,6 +9,14 @@ from python_on_whales.components.buildx import BuilderInspectResult
 from python_on_whales.test_utils import set_cache_validity_period
 from python_on_whales.utils import PROJECT_ROOT
 
+@pytest.fixture
+def temporary_container_builder():
+    builder = docker.buildx.create(use=True)
+    yield
+    docker.buildx.use("default")
+    builder.remove()
+
+
 dockerfile_content1 = """
 FROM busybox as base
 RUN mkdir /dudu
@@ -22,8 +30,15 @@ def test_buildx_build(tmp_path):
     docker.build(tmp_path)
 
 
+dockerfile_content_unique = """
+FROM busybox as base
+RUN mkdir /dudu
+RUN touch /dudu/dada
+RUN echo ghriaopghriaopghriaopghri >> /dudu/dodo
+"""
+
 def test_buildx_build_no_tags(tmp_path):
-    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    (tmp_path / "Dockerfile").write_text(dockerfile_content_unique)
     docker_image = docker.build(tmp_path)
     assert isinstance(docker_image, Image)
     assert docker.run(docker_image, ["echo", "dodo"], remove=True) == "dodo"
@@ -77,6 +92,14 @@ def test_buildx_build_network(tmp_path):
 def test_buildx_build_file(tmp_path):
     (tmp_path / "Dockerfile111").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, file=(tmp_path / "Dockerfile111"))
+
+
+@pytest.mark.usefixtures("temporary_container_builder")
+def test_buildx_not_loaded(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with pytest.raises(FileNotFoundError) as err:
+        docker.build(tmp_path)
+    assert "docker.build(..., return_image=False)" in str(err.value)
 
 
 dockerfile_content2 = """
