@@ -367,7 +367,7 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "rm"]
 
-        full_cmd.append(str(builder))
+        full_cmd.append(builder)
         run(full_cmd)
 
     def stop(self, builder: Optional[ValidBuilder]) -> None:
