@@ -43,6 +43,14 @@ def test_inspect():
         assert docker.buildx.inspect() == my_builder
 
 
+def test_use_builder():
+    my_builder = docker.buildx.create()
+    with my_builder:
+        docker.buildx.use(my_builder)
+        docker.buildx.use("default")
+        docker.buildx.use(my_builder, default=True, global_=True)
+
+
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     image = docker.buildx.build(tmp_path, tags="hello1", return_image=True)
