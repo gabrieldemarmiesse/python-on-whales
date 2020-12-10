@@ -134,14 +134,34 @@ implementing new features much easier and safer. For example, it's
 [unlikely that docker-py supports Buildx/buildkit](https://github.com/docker/docker-py/issues/2230#issuecomment-454344497)
 anytime soon because rewriting a large Go codebase in Python is hard work.
 
+## Should I use Docker-py or Python on Whales?
+
+Well, it's written in each project's description!
+
+* Docker-py: A Python library for the Docker Engine API
+* Python on whales: An awesome Python wrapper for an awesome Docker CLI
+
+
+If you need to talk to the Docker engine directly, you need to do low level operations,
+use docker-py. Some good example would be writing the code to control docker from an IDE, 
+or if the speed of Docker calls is very important. 
+If you don't want to depend on the Docker CLI binary (~50MB), use docker-py.
+
+
+If you wanted to call the docker command line from Python, 
+do high level operations, use Python on Whales.
+For example if you want to write your CI logic in Python rather than in bash (a very good choice 😉).
+Some commands are only available in Python on whales 
+too: `docker.buildx.build(...)`, `docker.stack.deploy(...)`...
+
+Use the right tool for the right job 🙂
 
 ## Where is the project now? Where is it going?
 
-Currently, about 75% of the Docker CLI API is covered. Of course the most used functions 
+Currently, about 85% of the Docker CLI API is covered. Of course the most used functions 
 were done first: docker run, docker pull, docker push, docker build (with buildx), docker volume...
 
-The main parts missing are Docker swarm support, Docker buildx builders management, and a better inspection 
-of Docker objects like volumes and images (for Docker containers, the inspection is pretty good).
+If you look around the docs, you might find a few functions that are not implemented yet.
 
 This project aims at a 100% feature parity between the Docker CLI and Python on whales. 
 
