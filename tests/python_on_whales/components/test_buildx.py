@@ -32,7 +32,18 @@ def with_container_driver():
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    docker.buildx.build(tmp_path)
+    my_image = docker.buildx.build(tmp_path)
+    assert my_image.size > 1000
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_output_local(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(
+        tmp_path, output=dict(type="local", dest=tmp_path / "my_image")
+    )
+    assert my_image is None
+    assert (tmp_path / "my_image/dada").is_file()
 
 
 def test_buildx_build_context_manager2(tmp_path):

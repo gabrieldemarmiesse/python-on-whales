@@ -199,7 +199,7 @@ class BuildxCLI(DockerCLICaller):
         labels: Dict[str, str] = {},
         load: bool = False,
         network: Optional[str] = None,
-        output: Optional[Dict[str, str]] = None,
+        output: Dict[str, str] = {},
         platforms: Optional[List[str]] = None,
         progress: Union[str, bool] = "auto",
         pull: bool = False,
@@ -208,7 +208,6 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-        return_image: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -256,12 +255,6 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
-            return_image: Return a `python_on_whales.Image` created docker image
-                if `True`. The image must be loaded into the docker daemon
-                after the build (which is the default behavior).
-                If `False`, the `docker.build(...)` function returns
-                nothing. If `None` (default value), python-on-whales will try to guess
-                based on the `load` and `push` arguments.
 
         # Returns
             A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
@@ -290,8 +283,8 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cache-from", cache_from)
         full_cmd.add_simple_arg("--cache-to", cache_to)
         full_cmd.add_args_list("--secret", to_list(secrets))
-        if output is not None:
-            full_cmd += ["--output", ",".join(output)]
+        if output != {}:
+            full_cmd += ["--output", format_dict_for_buildx(output)]
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--network", network)
@@ -455,3 +448,7 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "version"]
         return run(full_cmd)
+
+
+def format_dict_for_buildx(options: Dict[str, str]) -> str:
+    return ",".join(format_dict_for_cli(options, separator="="))
