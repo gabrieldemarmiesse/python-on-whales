@@ -254,8 +254,12 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
-            return_image: Return the created docker image if `True`, needs
-                at least one `tags`.
+            return_image: Return a `python_on_whales.Image` created docker image
+                if `True`. The image must be loaded into the docker daemon
+                after the build (which is the default behavior).
+                If `False`, the `docker.build(...)` function returns
+                nothing. If `None` (default value), python-on-whales will try to guess
+                based on the `load` and `push` arguments.
 
         # Returns
             A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
@@ -305,6 +309,35 @@ class BuildxCLI(DockerCLICaller):
             return python_on_whales.components.image.ImageCLI(
                 self.client_config
             ).inspect(to_list(tags)[0])
+
+    def _build_will_load_image(
+        self,
+        builder: Optional[str],
+        push: bool,
+        load: bool,
+        output: Optional[Dict[str, str]],
+    ) -> bool:
+        if load:
+            return True
+        if push:
+            return False
+        if output["type"] == "docker" and "dest" not in output:
+            return True
+        if output is not None:
+            return False
+
+        # now load push and output are not set.
+        if self.inspect(builder).driver == "docker":
+            return True
+
+        return False
+
+    def _method_to_get_image(self, builder: Optional[str]) -> str:
+        builder = self.inspect(builder)
+        if builder.driver == "docker":
+            return "iidfile"
+        else:
+            return "tag"
 
     def create(
         self, context_or_endpoint: Optional[str] = None, use: bool = False
