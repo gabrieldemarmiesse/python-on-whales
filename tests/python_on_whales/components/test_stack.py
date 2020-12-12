@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 
 import pytest
@@ -13,9 +14,12 @@ def with_test_stack():
         "some_stack",
         [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
     )
+    time.sleep(1)
     yield
     docker.stack.remove("some_stack")
+    time.sleep(1)
     docker.swarm.leave(force=True)
+    time.sleep(1)
 
 
 @pytest.mark.usefixtures("with_test_stack")
@@ -38,7 +42,9 @@ def test_stack_variables():
     assert expected in agent_service.spec.task_template.container_spec.env
 
     docker.stack.remove("other_stack")
+    time.sleep(1)
     docker.swarm.leave(force=True)
+    time.sleep(1)
 
 
 def test_stack_env_files(tmp_path: Path):
@@ -56,6 +62,8 @@ def test_stack_env_files(tmp_path: Path):
     assert expected in agent_service.spec.task_template.container_spec.env
 
     assert docker.stack.list() == [third_stack]
-
+    time.sleep(1)
     docker.stack.remove(third_stack)
+    time.sleep(1)
     docker.swarm.leave(force=True)
+    time.sleep(1)

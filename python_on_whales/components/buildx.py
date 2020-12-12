@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import os
+import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.image
@@ -191,13 +193,13 @@ class BuildxCLI(DockerCLICaller):
         build_args: Dict[str, str] = {},
         builder: Optional[ValidBuilder] = None,
         cache: bool = True,
-        cache_from: Optional[str] = None,
-        cache_to: Optional[str] = None,
+        cache_from: Union[str, Dict[str, str], None] = None,
+        cache_to: Union[str, Dict[str, str], None] = None,
         file: Optional[ValidPath] = None,
         labels: Dict[str, str] = {},
         load: bool = False,
         network: Optional[str] = None,
-        output: Optional[Dict[str, str]] = None,
+        output: Dict[str, str] = {},
         platforms: Optional[List[str]] = None,
         progress: Union[str, bool] = "auto",
         pull: bool = False,
@@ -206,7 +208,6 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-        return_image: bool = False,
     ) -> Optional[python_on_whales.components.image.Image]:
         """Build a Docker image with builkit as backend.
 
@@ -214,6 +215,8 @@ class BuildxCLI(DockerCLICaller):
 
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
+        If no image is loaded into the Docker daemon (if `push=True` for ex),
+        then `None` is returned.
 
         # Arguments
             context_path: The path of the build context.
@@ -227,9 +230,13 @@ class BuildxCLI(DockerCLICaller):
             cache_from: Works only with the container driver. Loads the cache
                 (if needed) from a registry `cache_from="user/app:cache"`  or
                 a directory on the client `cache_from="type=local,src=path/to/dir"`.
+                It's also possible to use a dict form for this argument. e.g.
+                `cache_from=dict(type="local", src="path/to/dir")`
             cache_to: Works only with the container driver. Sends the resulting
                 docker cache either to a registry `cache_to="user/app:cache"`,
                 or to a local directory `cache_to="type=local,dest=path/to/dir"`.
+                It's also possible to use a dict form for this argument. e.g.
+                `cache_to=dict(type="local", dest="path/to/dir", mode="max")`
             file: The path of the Dockerfile
             labels: Dict of labels to add to the image.
                 `labels={"very-secure": "1", "needs-gpu": "0"}` for example.
@@ -254,13 +261,13 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
-            return_image: Return the created docker image if `True`, needs
-                at least one `tags`.
 
         # Returns
-            A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
+            A `python_on_whales.Image` if a Docker image is loaded
+            in the daemon after the build (the default behavior when
+            calling `docker.build(...)`). Otherwise, `None`.
         """
-
+        tags = to_list(tags)
         full_cmd = self.docker_cmd + ["buildx", "build"]
 
         if progress != "auto" and isinstance(progress, str):
@@ -281,38 +288,104 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--load", load)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
-        full_cmd.add_simple_arg("--cache-from", cache_from)
-        full_cmd.add_simple_arg("--cache-to", cache_to)
-        for secret in to_list(secrets):
-            full_cmd += ["--secret", secret]
-        if output is not None:
-            full_cmd += ["--output", ",".join(output)]
+        if isinstance(cache_from, dict):
+            full_cmd.add_simple_arg("--cache-from", format_dict_for_buildx(cache_from))
+        else:
+            full_cmd.add_simple_arg("--cache-from", cache_from)
+        if isinstance(cache_to, dict):
+            full_cmd.add_simple_arg("--cache-to", format_dict_for_buildx(cache_to))
+        else:
+            full_cmd.add_simple_arg("--cache-to", cache_to)
+        full_cmd.add_args_list("--secret", to_list(secrets))
+        if output != {}:
+            full_cmd += ["--output", format_dict_for_buildx(output)]
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_args_list("--tag", tags)
 
-        for tag in to_list(tags):
-            full_cmd += ["--tag", tag]
+        will_load_image = self._build_will_load_image(builder, push, load, output)
+        # very special_case, must be fixed https://github.com/docker/buildx/issues/420
+        if (
+            will_load_image
+            and not tags
+            and self.inspect(builder).driver == "docker-container"
+        ):
+            # we have no way of fetching the image because iidfile is wrong in this case.
+            will_load_image = False
 
-        full_cmd.append(context_path)
-        run(full_cmd, capture_stderr=progress is False)
-        if return_image:
-            if to_list(tags) == []:
-                raise ValueError(
-                    "If you want the docker image returned, you need to specify tags."
-                )
-            return python_on_whales.components.image.ImageCLI(
-                self.client_config
-            ).inspect(to_list(tags)[0])
+        if not will_load_image:
+            full_cmd.append(context_path)
+            run(full_cmd, capture_stderr=progress is False)
+            return
+
+        docker_image = python_on_whales.components.image.ImageCLI(self.client_config)
+        if self._method_to_get_image(builder) == "tags":
+            full_cmd.append(context_path)
+            run(full_cmd, capture_stderr=progress is False)
+            return docker_image.inspect(tags[0])
+        else:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                tmp_dir = Path(tmp_dir)
+                iidfile = tmp_dir / "id_file.txt"
+                full_cmd.add_simple_arg("--iidfile", iidfile)
+                full_cmd.append(context_path)
+                run(full_cmd, capture_stderr=progress is False)
+                image_id = iidfile.read_text()
+                return docker_image.inspect(image_id)
+
+    def _build_will_load_image(
+        self,
+        builder: Optional[str],
+        push: bool,
+        load: bool,
+        output: Optional[Dict[str, str]],
+    ) -> bool:
+        if load:
+            return True
+        if push:
+            return False
+        if output != {}:
+            if output.get("type") == "docker" and "dest" not in output:
+                return True
+            else:
+                return False
+
+        # now load push and output are not set.
+        if self.inspect(builder).driver == "docker":
+            return True
+
+        return False
+
+    def _method_to_get_image(self, builder: Optional[str]) -> str:
+        """Getting around https://github.com/docker/buildx/issues/420"""
+        builder = self.inspect(builder)
+        if builder.driver == "docker":
+            return "iidfile"
+        else:
+            return "tag"
 
     def create(
-        self, context_or_endpoint: Optional[str] = None, use: bool = False
+        self,
+        context_or_endpoint: Optional[str] = None,
+        buildkitd_flags: Optional[str] = None,
+        config: Optional[ValidPath] = None,
+        driver: Optional[str] = None,
+        driver_options: Dict[str, str] = {},
+        name: Optional[str] = None,
+        use: bool = False,
     ) -> Builder:
         """Create a new builder instance
 
         # Arguments
             context_or_endpoint:
+            buildkitd_flags: Flags for buildkitd daemon
+            config: BuildKit config file
+            driver: Driver to use (available: [kubernetes docker docker-container])
+            driver_options: Options for the driver.
+                e.g `driver_options=dict(network="host")`
+            name: Builder instance name
             use: Set the current builder instance to this builder
 
         # Returns
@@ -320,8 +393,15 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
-        if use:
-            full_cmd.append("--use")
+        full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
+        full_cmd.add_simple_arg("--config", config)
+        full_cmd.add_simple_arg("--driver", driver)
+        if driver_options != {}:
+            full_cmd.add_simple_arg(
+                "--driver-opt", format_dict_for_buildx(driver_options)
+            )
+        full_cmd.add_simple_arg("--name", name)
+        full_cmd.add_flag("--use", use)
 
         if context_or_endpoint is not None:
             full_cmd.append(context_or_endpoint)
@@ -412,3 +492,7 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "version"]
         return run(full_cmd)
+
+
+def format_dict_for_buildx(options: Dict[str, str]) -> str:
+    return ",".join(format_dict_for_cli(options, separator="="))

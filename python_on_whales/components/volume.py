@@ -226,7 +226,7 @@ class VolumeCLI(DockerCLICaller):
             buildx = python_on_whales.components.buildx.BuildxCLI(self.client_config)
             image_name = random_name()
             dummy_image = buildx.build(
-                temp_dir, tags=image_name, progress=False, return_image=True
+                temp_dir, tags=image_name, progress=False, load=True
             )
 
         container = python_on_whales.components.container.ContainerCLI(

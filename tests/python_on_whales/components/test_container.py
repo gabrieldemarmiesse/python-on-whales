@@ -80,7 +80,7 @@ COPY file.py /file.py
 CMD python /file.py
         """
         )
-        return docker.build(tmpdir, tags="some_image", return_image=True)
+        return docker.build(tmpdir, tags="some_image", load=True)
 
 
 def test_fails_correctly():

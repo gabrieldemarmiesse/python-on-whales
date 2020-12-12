@@ -13,15 +13,161 @@ RUN touch /dada
 """
 
 
+@pytest.fixture
+def with_docker_driver():
+    current_builder = docker.buildx.inspect()
+    docker.buildx.use("default")
+    yield
+    docker.buildx.use(current_builder)
+
+
+@pytest.fixture
+def with_container_driver():
+    current_builder = docker.buildx.inspect()
+    with docker.buildx.create(use=True):
+        yield
+    docker.buildx.use(current_builder)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    docker.buildx.build(tmp_path)
+    my_image = docker.buildx.build(tmp_path)
+    assert my_image.size > 1000
 
 
-def test_buildx_build_context_manager(tmp_path):
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_load_docker_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    with docker.buildx.create(use=True):
-        docker.buildx.build(tmp_path)
+    my_image = docker.buildx.build(tmp_path, load=True)
+    assert my_image.size > 1000
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_push_registry(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(
+            tmp_path, push=True, tags=f"{docker_registry}/dodo"
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_push_registry_override_builder(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(driver_options=dict(network="host")) as my_builder:
+        output = docker.buildx.build(
+            tmp_path, push=True, tags=f"{docker_registry}/dodo", builder=my_builder
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_caching(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    cache = f"{docker_registry}/project:cache"
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_to=cache)
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_from=cache)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_caching_both_name_time(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    cache = f"{docker_registry}/project:cache"
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_to=cache, cache_from=cache)
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_to=cache, cache_from=cache)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_caching_dict_form(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(
+            tmp_path, cache_to=dict(type="local", dest=tmp_path / "cache", mode="max")
+        )
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(
+            tmp_path, cache_from=dict(type="local", src=tmp_path / "cache")
+        )
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_output_type_registry(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(
+            tmp_path, output=dict(type="registry"), tags=f"{docker_registry}/dodo"
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_push_registry_multiple_tags(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    tags = [f"{docker_registry}/dodo:1", f"{docker_registry}/dada:1"]
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(tmp_path, push=True, tags=tags)
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo:1")
+    docker.pull(f"{docker_registry}/dada:1")
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_load_container_driver(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(tmp_path, load=True)
+
+    # can only be fixed by fixing https://github.com/docker/buildx/issues/420
+    assert my_image is None
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_container_driver(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(tmp_path)
+    assert my_image is None
+    # by default, loading isn't activated with the container driver.
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_output_local_docker_driver(tmp_path):
+    _test_buildx_build_output_local(tmp_path)
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_output_local_container_driver(tmp_path):
+    _test_buildx_build_output_local(tmp_path)
+
+
+def _test_buildx_build_output_local(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(
+        tmp_path, output=dict(type="local", dest=tmp_path / "my_image")
+    )
+    assert my_image is None
+    assert (tmp_path / "my_image/dada").is_file()
+
+
+def test_multiarch_build(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    tags = [f"{docker_registry}/dodo:1"]
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(
+            tmp_path, push=True, tags=tags, platforms=["linux/amd64", "linux/arm64"]
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo:1")
 
 
 def test_buildx_build_context_manager2(tmp_path):
@@ -43,6 +189,22 @@ def test_inspect():
         assert docker.buildx.inspect() == my_builder
 
 
+def test_builder_name():
+    my_builder = docker.buildx.create(name="some_builder")
+    with my_builder:
+        assert my_builder.name == "some_builder"
+
+
+def test_builder_options():
+    my_builder = docker.buildx.create(driver_options=dict(network="host"))
+    my_builder.remove()
+
+
+def test_builder_set_driver():
+    my_builder = docker.buildx.create(driver="docker-container")
+    my_builder.remove()
+
+
 def test_use_builder():
     my_builder = docker.buildx.create()
     with my_builder:
@@ -51,26 +213,27 @@ def test_use_builder():
         docker.buildx.use(my_builder, default=True, global_=True)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags="hello1", return_image=True)
+    image = docker.buildx.build(tmp_path, tags="hello1")
     assert "hello1:latest" in image.repo_tags
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_multiple_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"], return_image=True)
+    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
     assert "hello1:latest" in image.repo_tags
     assert "hello2:latest" in image.repo_tags
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_cache_invalidity(tmp_path):
 
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with set_cache_validity_period(100):
-        image = docker.buildx.build(
-            tmp_path, tags=["hello1", "hello2"], return_image=True
-        )
+        image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
         docker.image.remove("hello1")
         docker.pull("hello-world")
         docker.tag("hello-world", "hello1")
@@ -79,24 +242,29 @@ def test_cache_invalidity(tmp_path):
         assert "hello2:latest" in image.repo_tags
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_aliases(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.build(tmp_path)
     docker.image.build(tmp_path)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_error(tmp_path):
     with pytest.raises(DockerException) as e:
         docker.buildx.build(tmp_path)
 
-    assert f"docker buildx build {tmp_path}" in str(e.value)
+    assert "docker buildx build" in str(e.value)
+    assert str(tmp_path) in str(e.value)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_network(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, network="host")
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_file(tmp_path):
     (tmp_path / "Dockerfile111").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, file=(tmp_path / "Dockerfile111"))
@@ -138,6 +306,7 @@ def change_cwd():
     os.chdir(old_cwd)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake(only_print):
@@ -160,6 +329,7 @@ def test_bake(only_print):
     }
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake_with_load(only_print):
@@ -184,6 +354,7 @@ def test_bake_with_load(only_print):
     }
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake_with_variables(only_print):
@@ -208,6 +379,7 @@ def test_bake_with_variables(only_print):
     }
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake_with_variables_2(only_print, monkeypatch):
