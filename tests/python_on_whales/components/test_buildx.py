@@ -55,6 +55,17 @@ def test_buildx_build_push_registry(tmp_path, docker_registry):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_output_type_registry(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(
+            tmp_path, output=dict(type="registry"), tags=f"{docker_registry}/dodo"
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_push_registry_multiple_tags(tmp_path, docker_registry):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     tags = [f"{docker_registry}/dodo:1", f"{docker_registry}/dada:1"]
