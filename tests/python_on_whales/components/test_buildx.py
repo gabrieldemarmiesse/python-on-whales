@@ -13,15 +13,26 @@ RUN touch /dada
 """
 
 
+@pytest.fixture
+def with_docker_driver():
+    current_builder = docker.buildx.inspect()
+    docker.buildx.use("default")
+    yield
+    docker.buildx.use(current_builder)
+
+
+@pytest.fixture
+def with_container_driver():
+    current_builder = docker.buildx.inspect()
+    with docker.buildx.create(use=True):
+        yield
+    docker.buildx.use(current_builder)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path)
-
-
-def test_buildx_build_context_manager(tmp_path):
-    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    with docker.buildx.create(use=True):
-        docker.buildx.build(tmp_path)
 
 
 def test_buildx_build_context_manager2(tmp_path):
@@ -51,12 +62,14 @@ def test_use_builder():
         docker.buildx.use(my_builder, default=True, global_=True)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     image = docker.buildx.build(tmp_path, tags="hello1", return_image=True)
     assert "hello1:latest" in image.repo_tags
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_multiple_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"], return_image=True)
@@ -64,6 +77,7 @@ def test_buildx_build_multiple_tags(tmp_path):
     assert "hello2:latest" in image.repo_tags
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_cache_invalidity(tmp_path):
 
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
@@ -79,24 +93,29 @@ def test_cache_invalidity(tmp_path):
         assert "hello2:latest" in image.repo_tags
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_aliases(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.build(tmp_path)
     docker.image.build(tmp_path)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_error(tmp_path):
     with pytest.raises(DockerException) as e:
         docker.buildx.build(tmp_path)
 
-    assert f"docker buildx build {tmp_path}" in str(e.value)
+    assert "docker buildx build" in str(e.value)
+    assert str(tmp_path) in str(e.value)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_network(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, network="host")
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_file(tmp_path):
     (tmp_path / "Dockerfile111").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, file=(tmp_path / "Dockerfile111"))
@@ -138,6 +157,7 @@ def change_cwd():
     os.chdir(old_cwd)
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake(only_print):
@@ -160,6 +180,7 @@ def test_bake(only_print):
     }
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake_with_load(only_print):
@@ -184,6 +205,7 @@ def test_bake_with_load(only_print):
     }
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake_with_variables(only_print):
@@ -208,6 +230,7 @@ def test_bake_with_variables(only_print):
     }
 
 
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
 def test_bake_with_variables_2(only_print, monkeypatch):

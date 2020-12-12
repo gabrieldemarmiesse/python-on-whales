@@ -330,10 +330,11 @@ class BuildxCLI(DockerCLICaller):
             return True
         if push:
             return False
-        if output["type"] == "docker" and "dest" not in output:
-            return True
         if output is not None:
-            return False
+            if output["type"] == "docker" and "dest" not in output:
+                return True
+            else:
+                return False
 
         # now load push and output are not set.
         if self.inspect(builder).driver == "docker":
