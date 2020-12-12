@@ -88,6 +88,20 @@ def test_buildx_caching_both_name_time(tmp_path, docker_registry):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_caching_dict_form(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(
+            tmp_path, cache_to=dict(type="local", dest=tmp_path / "cache", mode="max")
+        )
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(
+            tmp_path, cache_from=dict(type="local", src=tmp_path / "cache")
+        )
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_output_type_registry(tmp_path, docker_registry):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with docker.buildx.create(use=True, driver_options=dict(network="host")):

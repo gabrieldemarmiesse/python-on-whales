@@ -284,8 +284,14 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--load", load)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
-        full_cmd.add_simple_arg("--cache-from", cache_from)
-        full_cmd.add_simple_arg("--cache-to", cache_to)
+        if isinstance(cache_from, dict):
+            full_cmd.add_simple_arg("--cache-from", format_dict_for_buildx(cache_from))
+        else:
+            full_cmd.add_simple_arg("--cache-from", cache_from)
+        if isinstance(cache_to, dict):
+            full_cmd.add_simple_arg("--cache-to", format_dict_for_buildx(cache_to))
+        else:
+            full_cmd.add_simple_arg("--cache-to", cache_to)
         full_cmd.add_args_list("--secret", to_list(secrets))
         if output != {}:
             full_cmd += ["--output", format_dict_for_buildx(output)]
