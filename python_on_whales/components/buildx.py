@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import os
+import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.image
@@ -264,7 +266,7 @@ class BuildxCLI(DockerCLICaller):
         # Returns
             A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
         """
-
+        tags = to_list(tags)
         full_cmd = self.docker_cmd + ["buildx", "build"]
 
         if progress != "auto" and isinstance(progress, str):
@@ -287,28 +289,35 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--target", target)
         full_cmd.add_simple_arg("--cache-from", cache_from)
         full_cmd.add_simple_arg("--cache-to", cache_to)
-        for secret in to_list(secrets):
-            full_cmd += ["--secret", secret]
+        full_cmd.add_args_list("--secret", to_list(secrets))
         if output is not None:
             full_cmd += ["--output", ",".join(output)]
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_args_list("--tag", tags)
 
-        for tag in to_list(tags):
-            full_cmd += ["--tag", tag]
+        will_load_image = self._build_will_load_image(builder, push, load, output)
+        if not will_load_image:
+            full_cmd.append(context_path)
+            run(full_cmd, capture_stderr=progress is False)
+            return
 
-        full_cmd.append(context_path)
-        run(full_cmd, capture_stderr=progress is False)
-        if return_image:
-            if to_list(tags) == []:
-                raise ValueError(
-                    "If you want the docker image returned, you need to specify tags."
-                )
-            return python_on_whales.components.image.ImageCLI(
-                self.client_config
-            ).inspect(to_list(tags)[0])
+        docker_image = python_on_whales.components.image.ImageCLI(self.client_config)
+        if self._method_to_get_image(builder) == "tags":
+            full_cmd.append(context_path)
+            run(full_cmd, capture_stderr=progress is False)
+            return docker_image.inspect(tags[0])
+        else:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                tmp_dir = Path(tmp_dir)
+                iidfile = tmp_dir / "id_file.txt"
+                full_cmd.add_simple_arg("--iidfile", iidfile)
+                full_cmd.append(context_path)
+                run(full_cmd, capture_stderr=progress is False)
+                image_id = iidfile.read_text()
+                return docker_image.inspect(image_id)
 
     def _build_will_load_image(
         self,
