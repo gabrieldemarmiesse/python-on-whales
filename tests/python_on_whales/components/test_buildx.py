@@ -66,6 +66,28 @@ def test_buildx_build_push_registry_override_builder(tmp_path, docker_registry):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_caching(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    cache = f"{docker_registry}/project:cache"
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_to=cache)
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_from=cache)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_caching_both_name_time(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    cache = f"{docker_registry}/project:cache"
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_to=cache, cache_from=cache)
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(tmp_path, cache_to=cache, cache_from=cache)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_output_type_registry(tmp_path, docker_registry):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with docker.buildx.create(use=True, driver_options=dict(network="host")):
