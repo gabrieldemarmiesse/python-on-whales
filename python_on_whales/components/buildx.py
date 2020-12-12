@@ -370,6 +370,12 @@ class BuildxCLI(DockerCLICaller):
 
         # Arguments
             context_or_endpoint:
+            buildkitd_flags: Flags for buildkitd daemon
+            config: BuildKit config file
+            driver: Driver to use (available: [kubernetes docker docker-container])
+            driver_options: Options for the driver.
+                e.g `driver_options=dict(network="host")`
+            name: Builder instance name
             use: Set the current builder instance to this builder
 
         # Returns
