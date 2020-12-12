@@ -257,7 +257,9 @@ class BuildxCLI(DockerCLICaller):
             target: Set the target build stage to build.
 
         # Returns
-            A `python_on_whales.Image` if `return_image=True`. Otherwise, `None`.
+            A `python_on_whales.Image` if a Docker image is loaded
+            in the daemon after the build (the default behavior when
+            calling `docker.build(...)`). Otherwise, `None`.
         """
         tags = to_list(tags)
         full_cmd = self.docker_cmd + ["buildx", "build"]
