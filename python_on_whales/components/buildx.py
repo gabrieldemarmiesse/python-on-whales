@@ -215,6 +215,8 @@ class BuildxCLI(DockerCLICaller):
 
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
+        If no image is loaded into the Docker daemon (if `push=True` for ex),
+        then `None` is returned.
 
         # Arguments
             context_path: The path of the build context.
