@@ -112,6 +112,17 @@ def _test_buildx_build_output_local(tmp_path):
     assert (tmp_path / "my_image/dada").is_file()
 
 
+def test_multiarch_build(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    tags = [f"{docker_registry}/dodo:1"]
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(
+            tmp_path, push=True, tags=tags, platforms=["linux/amd64", "linux/arm64"]
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo:1")
+
+
 def test_buildx_build_context_manager2(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     buildx_builder = docker.buildx.create()
