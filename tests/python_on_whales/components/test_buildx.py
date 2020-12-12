@@ -43,6 +43,28 @@ def test_buildx_build_load_docker_driver(tmp_path):
     assert my_image.size > 1000
 
 
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_push_registry(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(
+            tmp_path, push=True, tags=f"{docker_registry}/dodo"
+        )
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_push_registry_multiple_tags(tmp_path, docker_registry):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    tags = [f"{docker_registry}/dodo:1", f"{docker_registry}/dada:1"]
+    with docker.buildx.create(use=True, driver_options=dict(network="host")):
+        output = docker.buildx.build(tmp_path, push=True, tags=tags)
+    assert output is None
+    docker.pull(f"{docker_registry}/dodo:1")
+    docker.pull(f"{docker_registry}/dada:1")
+
+
 @pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_load_container_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
@@ -96,6 +118,22 @@ def test_inspect():
     with my_builder:
         assert docker.buildx.inspect(my_builder.name) == my_builder
         assert docker.buildx.inspect() == my_builder
+
+
+def test_builder_name():
+    my_builder = docker.buildx.create(name="some_builder")
+    with my_builder:
+        assert my_builder.name == "some_builder"
+
+
+def test_builder_options():
+    my_builder = docker.buildx.create(driver_options=dict(network="host"))
+    my_builder.remove()
+
+
+def test_builder_set_driver():
+    my_builder = docker.buildx.create(driver="docker-container")
+    my_builder.remove()
 
 
 def test_use_builder():

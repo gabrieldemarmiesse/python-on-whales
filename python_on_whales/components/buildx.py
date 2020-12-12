@@ -357,7 +357,14 @@ class BuildxCLI(DockerCLICaller):
             return "tag"
 
     def create(
-        self, context_or_endpoint: Optional[str] = None, use: bool = False
+        self,
+        context_or_endpoint: Optional[str] = None,
+        buildkitd_flags: Optional[str] = None,
+        config: Optional[ValidPath] = None,
+        driver: Optional[str] = None,
+        driver_options: Dict[str, str] = {},
+        name: Optional[str] = None,
+        use: bool = False,
     ) -> Builder:
         """Create a new builder instance
 
@@ -370,8 +377,15 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
-        if use:
-            full_cmd.append("--use")
+        full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
+        full_cmd.add_simple_arg("--config", config)
+        full_cmd.add_simple_arg("--driver", driver)
+        if driver_options != {}:
+            full_cmd.add_simple_arg(
+                "--driver-opt", format_dict_for_buildx(driver_options)
+            )
+        full_cmd.add_simple_arg("--name", name)
+        full_cmd.add_flag("--use", use)
 
         if context_or_endpoint is not None:
             full_cmd.append(context_or_endpoint)
