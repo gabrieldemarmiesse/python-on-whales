@@ -292,6 +292,15 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_list("--tag", tags)
 
         will_load_image = self._build_will_load_image(builder, push, load, output)
+        # very special_case, must be fixed https://github.com/docker/buildx/issues/420
+        if (
+            will_load_image
+            and not tags
+            and self.inspect(builder).driver == "docker-container"
+        ):
+            # we have no way of fetching the image because iidfile is wrong in this case.
+            will_load_image = False
+
         if not will_load_image:
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)
@@ -323,8 +332,8 @@ class BuildxCLI(DockerCLICaller):
             return True
         if push:
             return False
-        if output is not None:
-            if output["type"] == "docker" and "dest" not in output:
+        if output != {}:
+            if output.get("type") == "docker" and "dest" not in output:
                 return True
             else:
                 return False
@@ -336,6 +345,7 @@ class BuildxCLI(DockerCLICaller):
         return False
 
     def _method_to_get_image(self, builder: Optional[str]) -> str:
+        """Getting around https://github.com/docker/buildx/issues/420"""
         builder = self.inspect(builder)
         if builder.driver == "docker":
             return "iidfile"

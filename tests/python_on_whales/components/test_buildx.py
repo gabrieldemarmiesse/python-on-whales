@@ -37,7 +37,40 @@ def test_buildx_build(tmp_path):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
-def test_buildx_build_output_local(tmp_path):
+def test_buildx_build_load_docker_driver(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(tmp_path, load=True)
+    assert my_image.size > 1000
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_load_container_driver(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(tmp_path, load=True)
+
+    # can only be fixed by fixing https://github.com/docker/buildx/issues/420
+    assert my_image is None
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_container_driver(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.buildx.build(tmp_path)
+    assert my_image is None
+    # by default, loading isn't activated with the container driver.
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_output_local_docker_driver(tmp_path):
+    _test_buildx_build_output_local(tmp_path)
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_output_local_container_driver(tmp_path):
+    _test_buildx_build_output_local(tmp_path)
+
+
+def _test_buildx_build_output_local(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     my_image = docker.buildx.build(
         tmp_path, output=dict(type="local", dest=tmp_path / "my_image")
@@ -76,14 +109,14 @@ def test_use_builder():
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_single_tag(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags="hello1", return_image=True)
+    image = docker.buildx.build(tmp_path, tags="hello1")
     assert "hello1:latest" in image.repo_tags
 
 
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_multiple_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"], return_image=True)
+    image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
     assert "hello1:latest" in image.repo_tags
     assert "hello2:latest" in image.repo_tags
 
@@ -93,9 +126,7 @@ def test_cache_invalidity(tmp_path):
 
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with set_cache_validity_period(100):
-        image = docker.buildx.build(
-            tmp_path, tags=["hello1", "hello2"], return_image=True
-        )
+        image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
         docker.image.remove("hello1")
         docker.pull("hello-world")
         docker.tag("hello-world", "hello1")
