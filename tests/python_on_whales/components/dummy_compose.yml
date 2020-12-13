@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  my_service:
+    build:
+      context: my_service_build
+    ports:
+     - "5000:5000"
+    volumes:
+     - /tmp:/tmp
+
+    environment:
+     - DATADOG_HOST=something
+  redis:
+    image: library/redis:latest
+  my_postgres:
+    image: library/postgres:latest
+    environment:
+     - DD_API_KEY=__your_datadog_api_key_here__
+     - POSTGRES_HOST_AUTH_METHOD=trust

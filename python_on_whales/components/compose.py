@@ -1,27 +1,22 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union
+from typing import List
 
 from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.utils import run
 
 
 class ComposeCLI(DockerCLICaller):
-    def build(
-        self,
-        services: List[str] = [],
-        build_args: Dict[str, str] = {},
-        compress: bool = False,
-        force_remove: bool = False,
-        memory: Union[int, str, None] = None,
-        no_cache: bool = False,
-        no_remove: bool = False,
-        parallel: bool = False,
-        progress: Optional[str] = None,
-        pull: bool = False,
-        quiet: bool = False,
-    ):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def build(self, services: List[str] = []):
+        """Build services declared in a yaml compose file.
+
+        # Arguments
+            services: The services to build (as strings).
+                If empty (default), all services are built.
+        """
+        full_cmd = self.docker_compose_cmd + ["build"]
+        full_cmd += services
+        run(full_cmd, capture_stdout=False)
 
     def config(self):
         """Not yet implemented"""
@@ -32,8 +27,9 @@ class ComposeCLI(DockerCLICaller):
         raise NotImplementedError
 
     def down(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+        """Stop and remove the containers"""
+        full_cmd = self.docker_compose_cmd + ["down"]
+        run(full_cmd)
 
     def events(self):
         """Not yet implemented"""
@@ -107,9 +103,23 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def up(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def up(self, services: List[str] = [], detach=False):
+        """Start the containers.
+
+        # Arguments
+            services: The services to start. If empty (default), all services are
+                started.
+            detach: If `True`, run the containers in the background. Only `True` is
+                supported at the moment.
+        """
+        if not detach:
+            raise NotImplementedError(
+                "Only detaching containers is supported at the moment."
+            )
+        full_cmd = self.docker_compose_cmd + ["up"]
+        full_cmd.add_flag("--detach", detach)
+        full_cmd += services
+        run(full_cmd, capture_stdout=False)
 
     def version(self):
         """Not yet implemented"""
