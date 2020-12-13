@@ -1,7 +1,7 @@
 import json
 import shutil
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
@@ -32,7 +32,6 @@ class Command(list):
 
 @dataclass
 class ClientConfig:
-
     config: Optional[ValidPath] = None
     context: Optional[str] = None
     debug: Optional[bool] = None
@@ -44,6 +43,7 @@ class ClientConfig:
     tlskey: Optional[ValidPath] = None
     tlsverify: Optional[bool] = None
     client_binary_path: Optional[ValidPath] = None
+    compose_files: List[ValidPath] = field(default_factory=list)
 
     def get_docker_path(self) -> ValidPath:
         if self.client_binary_path is None:
@@ -108,6 +108,12 @@ class ClientConfig:
 
         return result
 
+    @property
+    def docker_compose_cmd(self) -> Command:
+        base_cmd = self.docker_cmd + ["compose"]
+        base_cmd.add_args_list("--file", self.compose_files)
+        return base_cmd
+
 
 class DockerCLICaller:
     def __init__(self, client_config: ClientConfig):
@@ -116,6 +122,10 @@ class DockerCLICaller:
     @property
     def docker_cmd(self) -> Command:
         return self.client_config.docker_cmd
+
+    @property
+    def docker_compose_cmd(self) -> Command:
+        return self.client_config.docker_compose_cmd
 
 
 class ReloadableObject(DockerCLICaller):

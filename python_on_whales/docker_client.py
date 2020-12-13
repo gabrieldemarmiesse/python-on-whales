@@ -1,6 +1,6 @@
 import base64
 import os
-from typing import Optional
+from typing import List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.app import AppCLI
@@ -65,6 +65,7 @@ class DockerClient(DockerCLICaller):
         tlskey: Optional[ValidPath] = None,
         tlsverify: Optional[bool] = None,
         client_config: Optional[ClientConfig] = None,
+        compose_files: List[ValidPath] = [],
     ):
 
         if client_config is None:
@@ -79,6 +80,7 @@ class DockerClient(DockerCLICaller):
                 tlscert=tlscert,
                 tlskey=tlskey,
                 tlsverify=tlsverify,
+                compose_files=compose_files,
             )
         super().__init__(client_config)
 
