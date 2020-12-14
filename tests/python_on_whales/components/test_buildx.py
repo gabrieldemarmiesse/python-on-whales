@@ -133,6 +133,22 @@ def test_buildx_build_load_container_driver(tmp_path):
 
 
 @pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_load_container_driver_tag(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.build(tmp_path, load=True, tags="my_tag:1") as my_image:
+        assert my_image.repo_tags == ["my_tag:1"]
+
+
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_load_container_driver_tags(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.buildx.build(
+        tmp_path, load=True, tags=["my_tag:1", "other_tag:2"]
+    ) as my_image:
+        assert set(my_image.repo_tags) == {"my_tag:1", "other_tag:2"}
+
+
+@pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_container_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     my_image = docker.buildx.build(tmp_path)
