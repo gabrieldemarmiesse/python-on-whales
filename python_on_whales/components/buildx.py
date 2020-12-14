@@ -4,6 +4,7 @@ import json
 import os
 import tempfile
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -32,6 +33,11 @@ class BuilderInspectResult:
                 result_dict["driver"] = line.split(":")[1].strip()
 
         return cls(**result_dict)
+
+
+class GetImageMethod(Enum):
+    TAG = 1
+    IIDFILE = 2
 
 
 class Builder(ReloadableObject):
@@ -321,7 +327,7 @@ class BuildxCLI(DockerCLICaller):
             return
 
         docker_image = python_on_whales.components.image.ImageCLI(self.client_config)
-        if self._method_to_get_image(builder) == "tags":
+        if self._method_to_get_image(builder) == GetImageMethod.TAG:
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)
             return docker_image.inspect(tags[0])
@@ -358,13 +364,13 @@ class BuildxCLI(DockerCLICaller):
 
         return False
 
-    def _method_to_get_image(self, builder: Optional[str]) -> str:
+    def _method_to_get_image(self, builder: Optional[str]) -> GetImageMethod:
         """Getting around https://github.com/docker/buildx/issues/420"""
         builder = self.inspect(builder)
         if builder.driver == "docker":
-            return "iidfile"
+            return GetImageMethod.IIDFILE
         else:
-            return "tag"
+            return GetImageMethod.TAG
 
     def create(
         self,
