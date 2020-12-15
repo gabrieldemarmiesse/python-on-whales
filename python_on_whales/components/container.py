@@ -24,6 +24,19 @@ from python_on_whales.utils import (
 )
 
 
+class ContainerHealthcheckResult(DockerCamelModel):
+    start: datetime
+    end: datetime
+    exit_code: int
+    output: str
+
+
+class ContainerHealth(DockerCamelModel):
+    status: str
+    failing_streak: int
+    log: List[ContainerHealthcheckResult]
+
+
 class ContainerState(DockerCamelModel):
     status: str
     running: bool
@@ -36,6 +49,7 @@ class ContainerState(DockerCamelModel):
     error: str
     started_at: datetime
     finished_at: datetime
+    health: Optional[ContainerHealth]
 
 
 class ContainerHostConfig(DockerCamelModel):
@@ -94,12 +108,13 @@ class ContainerConfig(DockerCamelModel):
 
 class Mount(DockerCamelModel):
     type: str
+    name: Optional[str]
     source: str
-    Destination: str
+    destination: str
+    driver: Optional[str]
     mode: str
     rw: bool
     propagation: str
-    driver: Optional[str]
 
 
 class NetworkInspectResult(DockerCamelModel):
@@ -144,11 +159,13 @@ class ContainerInspectResult(DockerCamelModel):
     created: datetime
     path: str
     args: List[str]
+    state: ContainerState
+    image: str
     resolv_conf_path: str
     hostname_path: str
     hosts_path: str
     log_path: str
-    image: str
+    node: Any
     name: str
     restart_count: int
     driver: str
@@ -157,10 +174,9 @@ class ContainerInspectResult(DockerCamelModel):
     process_label: str
     app_armor_profile: str
     exec_ids: Optional[List[str]]
-    graph_driver: dict
-    Mounts: List[Mount]
-    state: ContainerState
     host_config: ContainerHostConfig
+    graph_driver: dict
+    mounts: List[Mount]
     config: ContainerConfig
     network_settings: NetworkSettings
 
@@ -198,6 +214,12 @@ class Container(ReloadableObjectFromJson):
     def created(self) -> datetime:
         return self._get_inspect_result().created
 
+    @property
+    def path(self) -> str:
+        return self._get_inspect_result().path
+    @property
+    def args(self) -> List[str]:
+        return self._get_inspect_result().args
     @property
     def image(self) -> python_on_whales.components.image.Image:
         return python_on_whales.components.image.Image(

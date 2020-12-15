@@ -25,6 +25,9 @@ def print_dodo(container: Container):
 It attributes are the same that you get with the command line:
 `docker container inspect ...`
 
+If you want to know the exact structure, you can go to the 
+[`docker container inspect` reference page](https://docs.docker.com/engine/api/v1.40/#operation/ContainerInspect)
+
 An example is worth many lines of descriptions.
 
 
