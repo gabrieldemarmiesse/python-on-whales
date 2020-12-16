@@ -217,9 +217,11 @@ class Container(ReloadableObjectFromJson):
     @property
     def path(self) -> str:
         return self._get_inspect_result().path
+
     @property
     def args(self) -> List[str]:
         return self._get_inspect_result().args
+
     @property
     def image(self) -> python_on_whales.components.image.Image:
         return python_on_whales.components.image.Image(
