@@ -19,13 +19,14 @@ from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
 
 
 class VolumeInspectResult(DockerCamelModel):
-    created_at: datetime
-    driver: str
-    labels: Dict[str, str]
-    mountpoint: Path
     name: str
-    options: Optional[Dict[str, str]]
+    driver: str
+    mountpoint: Path
+    created_at: datetime
+    status: Optional[Dict[str, Any]]
+    labels: Dict[str, str]
     scope: str
+    options: Optional[Dict[str, str]]
 
 
 class Volume(ReloadableObjectFromJson):
