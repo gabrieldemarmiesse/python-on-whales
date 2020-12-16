@@ -38,6 +38,12 @@ def to_docker_camel(string):
             "network_id": "NetworkID",
             "ip_address": "IPAddress",
             "global_ipv6_address": "GlobalIPv6Address",
+            "blkio_device_read_iops": "BlkioDeviceReadIOps",
+            "blkio_device_write_iops": "BlkioDeviceWriteIOps",
+            "device_ids": "DeviceIDs",
+            "kernel_memory_tcp": "KernelMemoryTCP",
+            "container_id_file": "ContainerIDFile",
+            "uts_mode": "UTSMode",
         }
         return special_cases[string]
     except KeyError:

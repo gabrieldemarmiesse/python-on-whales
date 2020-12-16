@@ -24,6 +24,19 @@ from python_on_whales.utils import (
 )
 
 
+class ContainerHealthcheckResult(DockerCamelModel):
+    start: datetime
+    end: datetime
+    exit_code: int
+    output: str
+
+
+class ContainerHealth(DockerCamelModel):
+    status: str
+    failing_streak: int
+    log: List[ContainerHealthcheckResult]
+
+
 class ContainerState(DockerCamelModel):
     status: str
     running: bool
@@ -36,74 +49,175 @@ class ContainerState(DockerCamelModel):
     error: str
     started_at: datetime
     finished_at: datetime
+    health: Optional[ContainerHealth]
+
+
+class ContainerWeightDevice(DockerCamelModel):
+    path: Path
+    weight: int
+
+
+class ContainerThrottleDevice(DockerCamelModel):
+    path: Path
+    rate: int
+
+
+class ContainerDevice(DockerCamelModel):
+    path_on_host: Path
+    path_in_container: Path
+    cgroup_permissions: str
+
+
+class ContainerDeviceRequest(DockerCamelModel):
+    driver: str
+    count: str
+    device_ids: List[str]
+    capabilities: List[str]
+    options: Any
+
+
+class ContainerUlimit(DockerCamelModel):
+    name: str
+    soft: int
+    hard: int
+
+
+class ContainerLogConfig(DockerCamelModel):
+    type: str
+    config: Any
+
+
+class ContainerRestartPolicy(DockerCamelModel):
+    name: str
+    maximum_retry_count: Optional[int]
 
 
 class ContainerHostConfig(DockerCamelModel):
-    auto_remove: bool
-    binds: Optional[List[str]]
-    log_config: Dict[str, Any]
-    network_mode: str
-    port_bindings: Optional[Dict[str, Any]]
-    volume_driver: str
-    volumes_from: Optional[str]
-    dns: Optional[List[str]]
-    dns_options: Optional[List[str]]
-    dns_search: Optional[List[str]]
-    extra_hosts: Optional[Dict[str, str]]
-    cgroup: str
-    pid_mode: str
-    privileged: bool
-    publish_all_ports: bool
-    readonly_rootfs: bool
-    shm_size: int
-    runtime: str
-    console_size: List[int]
     cpu_shares: int
     memory: int
-    nano_cpus: int
-    cgroup_parent: str
+    cgroup_parent: Path
     blkio_weight: int
+    blkio_weight_device: Optional[List[ContainerWeightDevice]]
+    blkio_device_read_bps: Optional[List[ContainerThrottleDevice]]
+    blkio_device_write_bps: Optional[List[ContainerThrottleDevice]]
+    blkio_device_read_iops: Optional[List[ContainerThrottleDevice]]
+    blkio_device_write_iops: Optional[List[ContainerThrottleDevice]]
     cpu_period: int
     cpu_quota: int
     cpu_realtime_period: int
     cpu_realtime_runtime: int
+    cpuset_cpus: str
+    cpuset_mems: str
+    devices: Optional[List[ContainerDevice]]
+    device_cgroup_rules: Optional[List[str]]
+    device_requests: Optional[List[ContainerDeviceRequest]]
     kernel_memory: int
+    kernel_memory_tcp: int
     memory_reservation: int
     memory_swap: int
+    memory_swappiness: Optional[int]
+    nano_cpus: int
     oom_kill_disable: bool
-    cpu_count: float
-    cpu_percent: float
+    init: Optional[bool]
+    pids_limit: Optional[int]
+    ulimits: Optional[List[ContainerUlimit]]
+    cpu_count: int
+    cpu_percent: int
+    binds: Optional[List[str]]
+    container_id_file: Path
+    log_config: ContainerLogConfig
+    network_mode: str
+    port_bindings: Optional[Dict[str, Any]]  # needs reworking
+    restart_policy: ContainerRestartPolicy
+    auto_remove: bool
+    volume_driver: str
+    volumes_from: Optional[str]
+    mounts: Any  # needs reworking
+    capabilities: Optional[List[str]]
+    cap_add: Optional[List[str]]
+    cap_drop: Optional[List[str]]
+    dns: Optional[List[str]]
+    dns_options: Optional[List[str]]
+    dns_search: Optional[List[str]]
+    extra_hosts: Optional[Dict[str, str]]
+    group_add: Optional[List[str]]
+    ipc_mode: str
+    cgroup: str
+    links: Optional[List[str]]
+    oom_score_adj: int
+    pid_mode: str
+    privileged: bool
+    publish_all_ports: bool
+    readonly_rootfs: bool
+    security_opt: Optional[List[str]]
+    storage_opt: Any
+    tmpfs: Optional[Dict[Path, str]]
+    uts_mode: str
+    userns_mode: str
+    shm_size: int
+    sysctls: Optional[Dict[str, Any]]
+    runtime: str
+    console_size: Tuple[int, int]
+    isolation: Optional[str]
     masked_paths: Optional[List[Path]]
     readonly_paths: Optional[List[Path]]
+
+
+class ContainerHealthCheck(DockerCamelModel):
+    test: List[str]
+    interval: int
+    timeout: int
+    retries: int
+    start_period: int
 
 
 class ContainerConfig(DockerCamelModel):
     hostname: str
     domainname: str
+    user: str
     attach_stdin: bool
     attach_stdout: bool
     attach_stderr: bool
+    exposed_ports: Optional[dict]
     tty: bool
     open_stdin: bool
     stdin_once: bool
     env: List[str]
     cmd: Optional[List[str]]
+    healthcheck: Optional[ContainerHealthCheck]
+    args_escaped: Optional[bool]
     image: str
+    volumes: Optional[dict]
+    working_dir: Path
+    entrypoint: Optional[List[str]]
+    network_disabled: Optional[bool]
+    mac_address: Optional[str]
+    on_build: Optional[List[str]]
     labels: Dict[str, str]
+    stop_signal: Optional[str]
+    stop_timeout: Optional[int]
+    shell: Optional[List[str]]
 
 
 class Mount(DockerCamelModel):
     type: str
+    name: Optional[str]
     source: str
-    Destination: str
+    destination: str
+    driver: Optional[str]
     mode: str
     rw: bool
     propagation: str
-    driver: Optional[str]
+
+
+class ContainerEndpointIPAMConfig(DockerCamelModel):
+    ipv4_address: str
+    ipv6_address: str
+    link_local_ips: List[str]
 
 
 class NetworkInspectResult(DockerCamelModel):
-    ipam_config: Optional[dict]
+    ipam_config: Optional[ContainerEndpointIPAMConfig]
     links: Optional[List[str]]
     aliases: Optional[List[str]]
     network_id: str
@@ -118,16 +232,21 @@ class NetworkInspectResult(DockerCamelModel):
     driver_options: Optional[dict]
 
 
+class ContainerNetworkAddress(DockerCamelModel):
+    addr: str
+    prefix_len: int
+
+
 class NetworkSettings(DockerCamelModel):
     bridge: str
     sandbox_id: str
     hairpin_mode: bool
     link_local_ipv6_address: str
     link_local_ipv6_prefix_lenght: int
-    ports: dict
+    ports: dict  # to rework
     sandbox_key: Path
-    secondary_ip_addresses: Optional[List[str]]
-    secondary_ipv6_addresses: Optional[List[str]]
+    secondary_ip_addresses: Optional[List[ContainerNetworkAddress]]
+    secondary_ipv6_addresses: Optional[List[ContainerNetworkAddress]]
     endpoint_id: str
     gateway: str
     global_ipv6_address: str
@@ -144,11 +263,13 @@ class ContainerInspectResult(DockerCamelModel):
     created: datetime
     path: str
     args: List[str]
+    state: ContainerState
+    image: str
     resolv_conf_path: str
     hostname_path: str
     hosts_path: str
     log_path: str
-    image: str
+    node: Any
     name: str
     restart_count: int
     driver: str
@@ -157,10 +278,11 @@ class ContainerInspectResult(DockerCamelModel):
     process_label: str
     app_armor_profile: str
     exec_ids: Optional[List[str]]
-    graph_driver: dict
-    Mounts: List[Mount]
-    state: ContainerState
     host_config: ContainerHostConfig
+    graph_driver: Dict[str, Any]  # to rework
+    size_rw: Optional[int]
+    size_root_fs: Optional[int]
+    mounts: List[Mount]
     config: ContainerConfig
     network_settings: NetworkSettings
 
@@ -197,6 +319,14 @@ class Container(ReloadableObjectFromJson):
     @property
     def created(self) -> datetime:
         return self._get_inspect_result().created
+
+    @property
+    def path(self) -> str:
+        return self._get_inspect_result().path
+
+    @property
+    def args(self) -> List[str]:
+        return self._get_inspect_result().args
 
     @property
     def image(self) -> python_on_whales.components.image.Image:
