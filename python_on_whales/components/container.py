@@ -52,41 +52,113 @@ class ContainerState(DockerCamelModel):
     health: Optional[ContainerHealth]
 
 
+class ContainerWeightDevice(DockerCamelModel):
+    path: Path
+    weight: int
+
+
+class ContainerThrottleDevice(DockerCamelModel):
+    path: Path
+    rate: int
+
+
+class ContainerDevice(DockerCamelModel):
+    path_on_host: Path
+    path_in_container: Path
+    cgroup_permissions: str
+
+
+class ContainerDeviceRequest(DockerCamelModel):
+    driver: str
+    count: str
+    device_ids: List[str]
+    capabilities: List[str]
+    options: Any
+
+
+class ContainerUlimit:
+    name: str
+    soft: int
+    hard: int
+
+
+class ContainerLogConfig(DockerCamelModel):
+    type: str
+    config: Any
+
+
+class ContainerRestartPolicy(DockerCamelModel):
+    name: str
+    maximum_retry_count: Optional[int]
+
+
 class ContainerHostConfig(DockerCamelModel):
-    auto_remove: bool
-    binds: Optional[List[str]]
-    log_config: Dict[str, Any]
-    network_mode: str
-    port_bindings: Optional[Dict[str, Any]]
-    volume_driver: str
-    volumes_from: Optional[str]
-    dns: Optional[List[str]]
-    dns_options: Optional[List[str]]
-    dns_search: Optional[List[str]]
-    extra_hosts: Optional[Dict[str, str]]
-    cgroup: str
-    pid_mode: str
-    privileged: bool
-    publish_all_ports: bool
-    readonly_rootfs: bool
-    shm_size: int
-    runtime: str
-    console_size: List[int]
     cpu_shares: int
     memory: int
-    nano_cpus: int
-    cgroup_parent: str
+    cgroup_parent: Path
     blkio_weight: int
+    blkio_weight_device: List[ContainerWeightDevice]
+    blkio_device_read_bps: List[ContainerThrottleDevice]
+    blkio_device_write_bps: List[ContainerThrottleDevice]
+    blkio_device_read_iops: List[ContainerThrottleDevice]
+    blkio_device_write_iops: List[ContainerThrottleDevice]
     cpu_period: int
     cpu_quota: int
     cpu_realtime_period: int
     cpu_realtime_runtime: int
+    cpuset_cpus: str
+    cpuset_mems: str
+    devices: List[ContainerDevice]
+    device_cgroup_rules: List[str]
+    device_requests: List[ContainerDeviceRequest]
     kernel_memory: int
+    kernel_memory_tcp: int
     memory_reservation: int
     memory_swap: int
+    memory_swappiness: int
+    nano_cpus: int
     oom_kill_disable: bool
-    cpu_count: float
-    cpu_percent: float
+    init: Optional[bool]
+    pids_limit: Optional[int]
+    ulimits: List[ContainerUlimit]
+    cpu_count: int
+    cpu_percent: int
+    binds: Optional[List[str]]
+    container_id_file: Path
+    log_config: ContainerLogConfig
+    network_mode: str
+    port_bindings: Optional[Dict[str, Any]]  # needs reworking
+    restart_policy: ContainerRestartPolicy
+    auto_remove: bool
+    volume_driver: str
+    volumes_from: Optional[str]
+    mounts: Any  # needs reworking
+    capabilities: List[str]
+    cap_add: List[str]
+    cap_drop: List[str]
+    dns: Optional[List[str]]
+    dns_options: Optional[List[str]]
+    dns_search: Optional[List[str]]
+    extra_hosts: Optional[Dict[str, str]]
+    group_add: List[str]
+    ipc_mode: str
+    cgroup: str
+    links: List[str]
+    oom_score_adj: int
+    pid_mode: str
+    privileged: bool
+    publish_all_ports: bool
+    readonly_rootfs: bool
+    security_opt: List[str]
+    storage_opt: Any
+    tmpfs: Dict[Path, str]
+    uts_mode: str
+    userns_mode: str
+    shm_size: int
+    sysctls: Dict[str, Any]
+    runtime: str
+    console_size: Tuple[int, int]
+    isolation: Optional[str]
     masked_paths: Optional[List[Path]]
     readonly_paths: Optional[List[Path]]
 
@@ -176,6 +248,8 @@ class ContainerInspectResult(DockerCamelModel):
     exec_ids: Optional[List[str]]
     host_config: ContainerHostConfig
     graph_driver: dict
+    size_rw: Optional[int]
+    size_root_fs: Optional[int]
     mounts: List[Mount]
     config: ContainerConfig
     network_settings: NetworkSettings
