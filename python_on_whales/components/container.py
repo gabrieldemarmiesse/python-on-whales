@@ -162,20 +162,39 @@ class ContainerHostConfig(DockerCamelModel):
     masked_paths: Optional[List[Path]]
     readonly_paths: Optional[List[Path]]
 
+class ContainerHealthCheck(DockerCamelModel):
+    test: List[str]
+    interval: int
+    timeout: int
+    retries: int
+    start_period: int
 
 class ContainerConfig(DockerCamelModel):
     hostname: str
     domainname: str
+    user: str
     attach_stdin: bool
     attach_stdout: bool
     attach_stderr: bool
+    exposed_ports: dict
     tty: bool
     open_stdin: bool
     stdin_once: bool
     env: List[str]
     cmd: Optional[List[str]]
+    healthcheck: ContainerHealthCheck
+    args_escaped: bool
     image: str
+    volumes: dict
+    working_dir: Path
+    entrypoint: List[str]
+    network_disabled: bool
+    mac_address: str
+    on_build: List[str]
     labels: Dict[str, str]
+    stop_signal: str
+    stop_timeout: int
+    shell: List[str]
 
 
 class Mount(DockerCamelModel):
@@ -189,8 +208,14 @@ class Mount(DockerCamelModel):
     propagation: str
 
 
+class ContainerEndpointIPAMConfig(DockerCamelModel):
+    ipv4_address: str
+    ipv6_address: str
+    link_local_ips: List[str]
+
+
 class NetworkInspectResult(DockerCamelModel):
-    ipam_config: Optional[dict]
+    ipam_config: Optional[ContainerEndpointIPAMConfig]
     links: Optional[List[str]]
     aliases: Optional[List[str]]
     network_id: str
@@ -205,16 +230,20 @@ class NetworkInspectResult(DockerCamelModel):
     driver_options: Optional[dict]
 
 
+class ContainerNetworkAddress(DockerCamelModel):
+    addr: str
+    prefix_len: int
+
 class NetworkSettings(DockerCamelModel):
     bridge: str
     sandbox_id: str
     hairpin_mode: bool
     link_local_ipv6_address: str
     link_local_ipv6_prefix_lenght: int
-    ports: dict
+    ports: dict   # to rework
     sandbox_key: Path
-    secondary_ip_addresses: Optional[List[str]]
-    secondary_ipv6_addresses: Optional[List[str]]
+    secondary_ip_addresses: Optional[List[ContainerNetworkAddress]]
+    secondary_ipv6_addresses: Optional[List[ContainerNetworkAddress]]
     endpoint_id: str
     gateway: str
     global_ipv6_address: str
@@ -247,7 +276,7 @@ class ContainerInspectResult(DockerCamelModel):
     app_armor_profile: str
     exec_ids: Optional[List[str]]
     host_config: ContainerHostConfig
-    graph_driver: dict
+    graph_driver: Dict[str, Any]   # to rework
     size_rw: Optional[int]
     size_root_fs: Optional[int]
     mounts: List[Mount]
