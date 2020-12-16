@@ -149,7 +149,7 @@ class ContainerHostConfig(DockerCamelModel):
     privileged: bool
     publish_all_ports: bool
     readonly_rootfs: bool
-    security_opt: List[str]
+    security_opt: Optional[List[str]]
     storage_opt: Any
     tmpfs: Optional[Dict[Path, str]]
     uts_mode: str
