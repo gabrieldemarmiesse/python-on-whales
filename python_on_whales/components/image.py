@@ -23,44 +23,23 @@ from python_on_whales.utils import (
 )
 
 
-class ContainerConfigClass(DockerCamelModel):
-    hostname: str
-    domainname: str
-    user: str
-    attach_stdin: bool
-    attach_stdout: bool
-    attach_stderr: bool
-    tty: bool
-    open_stdin: bool
-    stdin_once: bool
-    env: Optional[List[str]]
-    cmd: Optional[List[str]]
-    image: str
-    volume: Optional[List[str]]
-    working_dir: Path
-    entrypoint: Optional[List[str]]
-    on_build: Optional[List[str]]
-    labels: Optional[Dict[str, str]]
+class ImageHealthcheck(DockerCamelModel):
+    test: List[str]
+    interval: int
+    timeout: int
+    retries: int
+    start_period: int
 
 
-class ImageConfigClass(DockerCamelModel):
-    hostname: str
-    domainname: str
-    user: str
-    attach_stdin: bool
-    attach_stdout: bool
-    attach_stderr: bool
-    tty: bool
-    open_stdin: bool
-    stdin_once: bool
-    env: Optional[List[str]]
-    cmd: Optional[List[str]]
-    image: str
-    volume: Optional[List[str]]
-    working_dir: Path
-    entrypoint: Optional[List[str]]
-    on_build: Optional[List[str]]
-    labels: Optional[Dict[str, str]]
+class ImageGraphDriver(DockerCamelModel):
+    name: str
+    data: Any
+
+
+class ImageRootFS(DockerCamelModel):
+    type: str
+    layers: List[str]
+    base_layer: Optional[str]
 
 
 class ImageInspectResult(DockerCamelModel):
@@ -71,15 +50,17 @@ class ImageInspectResult(DockerCamelModel):
     comment: str
     created: datetime
     container: str
-    container_config: ContainerConfigClass
+    container_config: python_on_whales.components.container.ContainerConfig
     docker_version: str
     author: str
+    config: python_on_whales.components.container.ContainerConfig
     architecture: str
     os: str
+    os_version: Optional[str]
     size: int
     virtual_size: int
-    graph_driver: Dict[str, Any]
-    root_FS: Dict[str, Any]
+    graph_driver: ImageGraphDriver
+    root_fs: ImageRootFS
     metadata: Dict[str, str]
 
 
@@ -130,7 +111,7 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().container
 
     @property
-    def container_config(self) -> ContainerConfigClass:
+    def container_config(self) -> python_on_whales.components.container.ContainerConfig:
         return self._get_inspect_result().container_config
 
     @property

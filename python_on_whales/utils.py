@@ -44,6 +44,7 @@ def to_docker_camel(string):
             "kernel_memory_tcp": "KernelMemoryTCP",
             "container_id_file": "ContainerIDFile",
             "uts_mode": "UTSMode",
+            "root_fs": "RootFS",
         }
         return special_cases[string]
     except KeyError:
