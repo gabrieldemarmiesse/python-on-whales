@@ -42,7 +42,6 @@ def to_docker_camel(string):
             "blkio_device_write_iops": "BlkioDeviceWriteIOps",
             "device_ids": "DeviceIDs",
             "kernel_memory_tcp": "KernelMemoryTCP",
-            "nano_cpus": "NanoCPUs",
             "container_id_file": "ContainerIDFile",
             "uts_mode": "UTSMode",
         }
