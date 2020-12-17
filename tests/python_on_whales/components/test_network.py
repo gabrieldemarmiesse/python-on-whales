@@ -50,8 +50,9 @@ network_inspect_str = """
 def test_parse_inspection():
     network_parsed = NetworkInspectResult.parse_raw(network_inspect_str)
 
-    assert network_parsed.enable_I_pv6 is False
+    assert network_parsed.enable_ipv6 is False
     assert network_parsed.driver == "host"
+    assert network_parsed.ipam.options is None
 
 
 def test_context_manager():

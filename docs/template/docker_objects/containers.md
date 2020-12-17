@@ -27,7 +27,7 @@ It attributes are the same that you get with the command line:
 
 If you want to know the exact structure, you can go to the 
 [`docker container inspect` reference page](https://docs.docker.com/engine/api/v1.40/#operation/ContainerInspect)
-
+and click on "200 no error".
 An example is worth many lines of descriptions.
 
 
