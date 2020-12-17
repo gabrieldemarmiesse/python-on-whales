@@ -182,7 +182,7 @@ class ContainerConfig(DockerCamelModel):
     tty: bool
     open_stdin: bool
     stdin_once: bool
-    env: List[str]
+    env: Optional[List[str]]
     cmd: Optional[List[str]]
     healthcheck: Optional[ContainerHealthCheck]
     args_escaped: Optional[bool]
@@ -193,7 +193,7 @@ class ContainerConfig(DockerCamelModel):
     network_disabled: Optional[bool]
     mac_address: Optional[str]
     on_build: Optional[List[str]]
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
     stop_signal: Optional[str]
     stop_timeout: Optional[int]
     shell: Optional[List[str]]
