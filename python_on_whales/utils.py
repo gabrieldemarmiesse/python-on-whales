@@ -45,6 +45,10 @@ def to_docker_camel(string):
             "container_id_file": "ContainerIDFile",
             "uts_mode": "UTSMode",
             "root_fs": "RootFS",
+            "enable_ipv6": "EnableIPv6",
+            "ipv4_address": "IPv4Address",
+            "ipv6_address": "IPv6Address",
+            "ipam": "IPAM",
         }
         return special_cases[string]
     except KeyError:

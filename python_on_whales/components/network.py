@@ -12,21 +12,36 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import DockerCamelModel, format_dict_for_cli, run, to_list
 
 
-class NetworkInspectResult(DockerCamelModel):
-    id: str
+class NetworkIPAM(DockerCamelModel):
+    driver: str
+    config: Dict[str, Any]
+    options: Optional[Dict[str, Any]]
+
+
+class NetworkContainer(DockerCamelModel):
     name: str
+    endpoint_id: str
+    mac_address: str
+    ipv4_address: str
+    ipv6_address: str
+
+
+class NetworkInspectResult(DockerCamelModel):
+    name: str
+    id: str
     created: datetime
     scope: str
     driver: str
-    enable_I_pv6: bool
+    enable_ipv6: bool
+    ipam: NetworkIPAM
     internal: bool
     attachable: bool
     ingress: bool
+    containers: Dict[str, NetworkContainer]
+    options: Dict[str, Any]
+    labels: Dict[str, str]
     config_from: dict
     config_only: bool
-    containers: dict
-    options: dict
-    labels: dict
 
 
 class Network(ReloadableObjectFromJson):
