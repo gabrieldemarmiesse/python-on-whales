@@ -1,4 +1,5 @@
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -39,6 +40,7 @@ def _docker_registry(login=True):
         with registry:
             registry.copy_to(htpasswd_file, "/tmp/htpasswd")
             registry.start()
+            time.sleep(1.5)
             if login:
                 docker.login(
                     "localhost:5000", username="my_user", password="my_password"
