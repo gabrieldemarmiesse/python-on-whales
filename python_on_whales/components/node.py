@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
@@ -8,9 +9,51 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import DockerCamelModel, run, to_list
 
 
+class NodeVersion(DockerCamelModel):
+    index: int
+
+
+class NodeSpec(DockerCamelModel):
+    name: str
+    labels: Dict[str, str]
+    role: str
+    availability: str
+
+
+class NodePlatform(DockerCamelModel):
+    architecture: str
+    os: str
+
+
+class NodeDescription(DockerCamelModel):
+    hostname: str
+    platform: NodePlatform
+    resources: dict  # TODO: better type
+    engine: dict  # TODO: better type
+    tls_info: dict  # TODO: better type
+
+
+class NodeStatus(DockerCamelModel):
+    state: str
+    message: str
+    addr: str
+
+
+class NodeManagerStatus(DockerCamelModel):
+    leader: bool
+    reachability: str
+    addr: str
+
+
 class NodeInspectResult(DockerCamelModel):
     ID: str
-    version: dict
+    version: NodeVersion
+    created_at: datetime
+    updated_at: datetime
+    spec: NodeSpec
+    description: Any
+    status: NodeStatus
+    manager_status: Optional[NodeManagerStatus]
 
 
 class Node(ReloadableObjectFromJson):
