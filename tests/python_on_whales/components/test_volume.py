@@ -1,8 +1,36 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import List
+
+import pytest
 
 from python_on_whales import docker
 from python_on_whales.components.volume import VolumeInspectResult
+
+
+def get_all_volumes_jsons() -> List[Path]:
+    jsons_directory = Path(__file__).parent / "volumes"
+    return sorted(list(jsons_directory.iterdir()))
+
+
+@pytest.mark.parametrize("json_file", get_all_volumes_jsons())
+def test_load_json(json_file):
+    json_as_txt = json_file.read_text()
+    a = VolumeInspectResult.parse_raw(json_as_txt)
+    if json_file.name == "0.json":
+        assert a.created_at == datetime(
+            year=2020,
+            month=8,
+            day=27,
+            hour=9,
+            minute=39,
+            second=50,
+            tzinfo=timezone(timedelta(hours=2)),
+        )
+        assert a.mountpoint == Path(
+            "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
+        )
+        assert a.options is None
 
 
 def test_simple_volume():
@@ -46,41 +74,6 @@ def test_list():
     all_volumes = docker.volume.list()
     for v in volumes:
         assert v in all_volumes
-
-
-json_volume_inspect = """
-{
-    "CreatedAt": "2020-08-27T09:39:50+02:00",
-    "Driver": "local",
-    "Labels": {
-        "com.docker.compose.project": "some_project",
-        "com.docker.compose.version": "1.25.5",
-        "com.docker.compose.volume": "letsencrypt_config"
-    },
-    "Mountpoint": "/var/lib/docker/volumes/scube_letsencrypt_config/_data",
-    "Name": "scube_letsencrypt_config",
-    "Options": null,
-    "Scope": "local"
-}
-"""
-
-
-def test_volume_inspect_result_config():
-
-    a = VolumeInspectResult.parse_raw(json_volume_inspect)
-    assert a.created_at == datetime(
-        year=2020,
-        month=8,
-        day=27,
-        hour=9,
-        minute=39,
-        second=50,
-        tzinfo=timezone(timedelta(hours=2)),
-    )
-    assert a.mountpoint == Path(
-        "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
-    )
-    assert a.options is None
 
 
 def test_copy_to_volume(tmp_path):
