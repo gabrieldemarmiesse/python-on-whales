@@ -1,0 +1,92 @@
+{
+    "Name": "ingress",
+    "Id": "sfb94kg2forpvbkjsrur8tkb3",
+    "Created": "2020-10-12T16:49:21.513250065Z",
+    "Scope": "swarm",
+    "Driver": "overlay",
+    "EnableIPv6": false,
+    "IPAM": {
+        "Driver": "default",
+        "Options": null,
+        "Config": [
+            {
+                "Subnet": "10.0.0.0/24",
+                "Gateway": "10.0.0.1"
+            }
+        ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": true,
+    "ConfigFrom": {
+        "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {
+        "43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a": {
+            "Name": "scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+            "EndpointID": "2a26ed12e3dc35035ee8fb61bf7709d048cc42b7eefb72bb4e9621b0a61e3161",
+            "MacAddress": "02:42:0a:00:00:e4",
+            "IPv4Address": "10.0.0.228/24",
+            "IPv6Address": ""
+        },
+        "5d7bac8f63f38e66df4c967e4d6b3611bc55b148740752141b11ec49c6d4482b": {
+            "Name": "scube_postgis.1.dnxxoigt20bi0j0cj4kjttxiw",
+            "EndpointID": "fe7ba15133c65f2a31fe8d50d9579cf15e4fa53af0dbe0ae3637faa4972743b3",
+            "MacAddress": "02:42:0a:00:00:2e",
+            "IPv4Address": "10.0.0.46/24",
+            "IPv6Address": ""
+        },
+        "78288b3914fc80f303ecaebac1de16283a6917679a82601f35794c4669088374": {
+            "Name": "scube_redis.1.5hvdl4hr3pp70iyq2w49qr09r",
+            "EndpointID": "1eaf137aac74a9a26101928b9d70a9159ff0c45d3e59caed5dd4206d80c17e28",
+            "MacAddress": "02:42:0a:00:00:e5",
+            "IPv4Address": "10.0.0.229/24",
+            "IPv6Address": ""
+        },
+        "fee7ee12e7869512def70ac650386e53efb5852732f7d6a6a5b6bfa08292140c": {
+            "Name": "swarmpit_app.1.tsxhl7679cqlvmgsnquq0mq2p",
+            "EndpointID": "f21341580ef0d8eb1583c5260993fc54117b79d4052ea83a3bdbed8cae8c6cf4",
+            "MacAddress": "02:42:0a:00:00:32",
+            "IPv4Address": "10.0.0.50/24",
+            "IPv6Address": ""
+        },
+        "ingress-sbox": {
+            "Name": "ingress-endpoint",
+            "EndpointID": "ae1e80a64e41a7d28c5f633eabab2917730343bab1eb8014324c6fe61ebaba8e",
+            "MacAddress": "02:42:0a:00:00:02",
+            "IPv4Address": "10.0.0.2/24",
+            "IPv6Address": ""
+        }
+    },
+    "Options": {
+        "com.docker.network.driver.overlay.vxlanid_list": "4096"
+    },
+    "Labels": {},
+    "Peers": [
+        {
+            "Name": "6647e1922047",
+            "IP": "172.31.17.136"
+        },
+        {
+            "Name": "3610d8c324c0",
+            "IP": "172.31.27.202"
+        },
+        {
+            "Name": "5d7adbaa52fc",
+            "IP": "172.31.28.233"
+        },
+        {
+            "Name": "47222e41883b",
+            "IP": "172.31.1.13"
+        },
+        {
+            "Name": "548a55cd9827",
+            "IP": "172.31.11.3"
+        },
+        {
+            "Name": "6bb83797578d",
+            "IP": "172.31.10.16"
+        }
+    ]
+}

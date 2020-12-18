@@ -9,7 +9,7 @@ from python_on_whales.components.node import NodeInspectResult
 
 def get_all_nodes_jsons() -> List[Path]:
     jsons_directory = Path(__file__).parent / "nodes"
-    return list(jsons_directory.iterdir())
+    return sorted(list(jsons_directory.iterdir()))
 
 
 @pytest.fixture
