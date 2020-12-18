@@ -1,0 +1,309 @@
+{
+    "Id": "43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a",
+    "Created": "2020-12-03T10:54:37.768710246Z",
+    "Path": "/entrypoint.sh",
+    "Args": [
+        "--providers.docker=true",
+        "--accesslog=true",
+        "--log.level=INFO",
+        "--api.insecure=true",
+        "--entryPoints.web.address=:80",
+        "--entryPoints.https.address=:443",
+        "--providers.docker=true",
+        "--providers.docker.exposedbydefault=false",
+        "--providers.docker.swarmMode=true",
+        "--providers.docker.network=scube_default",
+        "--certificatesresolvers.myresolver.acme.email=admin@earthcube.eu",
+        "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json",
+        "--certificatesresolvers.myresolver.acme.tlschallenge=true",
+        "--entrypoints.web.http.redirections.entrypoint.to=https",
+        "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    ],
+    "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 17007,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2020-12-03T10:54:49.948797848Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+    },
+    "Image": "sha256:d2f13a1d85e62ada746f1cf825d3724e46b429c4211490fdfc37e3a601bf6cdc",
+    "ResolvConfPath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/resolv.conf",
+    "HostnamePath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/hostname",
+    "HostsPath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/hosts",
+    "LogPath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a-json.log",
+    "Name": "/scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+    "RestartCount": 0,
+    "Driver": "overlay2",
+    "Platform": "linux",
+    "MountLabel": "",
+    "ProcessLabel": "",
+    "AppArmorProfile": "docker-default",
+    "ExecIDs": null,
+    "HostConfig": {
+        "Binds": null,
+        "ContainerIDFile": "",
+        "LogConfig": {
+            "Type": "json-file",
+            "Config": {}
+        },
+        "NetworkMode": "default",
+        "PortBindings": {},
+        "RestartPolicy": {
+            "Name": "",
+            "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "CapAdd": null,
+        "CapDrop": null,
+        "Capabilities": null,
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": null,
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "SecurityOpt": null,
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "runc",
+        "ConsoleSize": [
+            0,
+            0
+        ],
+        "Isolation": "default",
+        "CpuShares": 0,
+        "Memory": 2147483648,
+        "NanoCpus": 1000000000,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "KernelMemory": 0,
+        "KernelMemoryTCP": 0,
+        "MemoryReservation": 0,
+        "MemorySwap": -1,
+        "MemorySwappiness": null,
+        "OomKillDisable": false,
+        "PidsLimit": null,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Target": "/var/run/docker.sock",
+                "ReadOnly": true
+            },
+            {
+                "Type": "volume",
+                "Source": "scube_traefik-data",
+                "Target": "/letsencrypt",
+                "VolumeOptions": {
+                    "Labels": {
+                        "com.docker.stack.namespace": "scube"
+                    }
+                }
+            }
+        ],
+        "MaskedPaths": [
+            "/proc/asound",
+            "/proc/acpi",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/sys/firmware"
+        ],
+        "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+        ]
+    },
+    "GraphDriver": {
+        "Data": {
+            "LowerDir": "/var/lib/docker/overlay2/904422c194f2c02117ec42751d3fa20bb65bf7945211d27925b11462cc6d0de6-init/diff:/var/lib/docker/overlay2/cf0c4d61e5ad65ad7c1c75f6effb69061db8afd20024b23653149affd1c2dcc3/diff:/var/lib/docker/overlay2/29616e12a802654ef28451873f88011c3dc0f40e81fa36a6aa07e3b3632fdade/diff:/var/lib/docker/overlay2/1346148d18d86d4790d1f1d644438fe1d91fbb0f95608568c42506de67b498a9/diff:/var/lib/docker/overlay2/f1de1c3e01d4346ad8b2b1b08bf3e71d29e9581b99bcfa4bd62f45843b55510f/diff",
+            "MergedDir": "/var/lib/docker/overlay2/904422c194f2c02117ec42751d3fa20bb65bf7945211d27925b11462cc6d0de6/merged",
+            "UpperDir": "/var/lib/docker/overlay2/904422c194f2c02117ec42751d3fa20bb65bf7945211d27925b11462cc6d0de6/diff",
+            "WorkDir": "/var/lib/docker/overlay2/904422c194f2c02117ec42751d3fa20bb65bf7945211d27925b11462cc6d0de6/work"
+        },
+        "Name": "overlay2"
+    },
+    "Mounts": [
+        {
+            "Type": "bind",
+            "Source": "/var/run/docker.sock",
+            "Destination": "/var/run/docker.sock",
+            "Mode": "",
+            "RW": false,
+            "Propagation": "rprivate"
+        },
+        {
+            "Type": "volume",
+            "Name": "scube_traefik-data",
+            "Source": "/var/lib/docker/volumes/scube_traefik-data/_data",
+            "Destination": "/letsencrypt",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+        }
+    ],
+    "Config": {
+        "Hostname": "43c8723ce0a9",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": {
+            "80/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": [
+            "--providers.docker=true",
+            "--accesslog=true",
+            "--log.level=INFO",
+            "--api.insecure=true",
+            "--entryPoints.web.address=:80",
+            "--entryPoints.https.address=:443",
+            "--providers.docker=true",
+            "--providers.docker.exposedbydefault=false",
+            "--providers.docker.swarmMode=true",
+            "--providers.docker.network=scube_default",
+            "--certificatesresolvers.myresolver.acme.email=admin@earthcube.eu",
+            "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json",
+            "--certificatesresolvers.myresolver.acme.tlschallenge=true",
+            "--entrypoints.web.http.redirections.entrypoint.to=https",
+            "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+        ],
+        "Image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/traefik:v2.3@sha256:2c70a04b8c80f30e501c72995d8ad083a52b53729b1d822ae0f8c9b99c20c466",
+        "Volumes": null,
+        "WorkingDir": "",
+        "Entrypoint": [
+            "/entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": {
+            "com.docker.stack.namespace": "scube",
+            "com.docker.swarm.node.id": "a3i9k93drhmg9u6gw43q7net4",
+            "com.docker.swarm.service.id": "xlkka3nmf3vp7whxa1ytk4ft8",
+            "com.docker.swarm.service.name": "scube_traefik",
+            "com.docker.swarm.task": "",
+            "com.docker.swarm.task.id": "oso75s3hbdlzjruy04zug808l",
+            "com.docker.swarm.task.name": "scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+            "org.opencontainers.image.description": "A modern reverse-proxy",
+            "org.opencontainers.image.documentation": "https://docs.traefik.io",
+            "org.opencontainers.image.title": "Traefik",
+            "org.opencontainers.image.url": "https://traefik.io",
+            "org.opencontainers.image.vendor": "Traefik Labs",
+            "org.opencontainers.image.version": "v2.3.0",
+            "traefik.enable": "true",
+            "traefik.http.routers.traefik.priority": "200",
+            "traefik.http.routers.traefik.rule": "Host(`traefik-prod.earthcube.eu`)",
+            "traefik.http.services.traefik.loadbalancer.server.port": "8080"
+        }
+    },
+    "NetworkSettings": {
+        "Bridge": "",
+        "SandboxID": "90b57382a60462e4371635f7103030ea6c96f55589396c0ba78cde947cd8bc32",
+        "HairpinMode": false,
+        "LinkLocalIPv6Address": "",
+        "LinkLocalIPv6PrefixLen": 0,
+        "Ports": {
+            "80/tcp": null
+        },
+        "SandboxKey": "/var/run/docker/netns/90b57382a604",
+        "SecondaryIPAddresses": null,
+        "SecondaryIPv6Addresses": null,
+        "EndpointID": "",
+        "Gateway": "",
+        "GlobalIPv6Address": "",
+        "GlobalIPv6PrefixLen": 0,
+        "IPAddress": "",
+        "IPPrefixLen": 0,
+        "IPv6Gateway": "",
+        "MacAddress": "",
+        "Networks": {
+            "ingress": {
+                "IPAMConfig": {
+                    "IPv4Address": "10.0.0.228"
+                },
+                "Links": null,
+                "Aliases": [
+                    "43c8723ce0a9"
+                ],
+                "NetworkID": "sfb94kg2forpvbkjsrur8tkb3",
+                "EndpointID": "2a26ed12e3dc35035ee8fb61bf7709d048cc42b7eefb72bb4e9621b0a61e3161",
+                "Gateway": "",
+                "IPAddress": "10.0.0.228",
+                "IPPrefixLen": 24,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "MacAddress": "02:42:0a:00:00:e4",
+                "DriverOpts": null
+            },
+            "scube_default": {
+                "IPAMConfig": {
+                    "IPv4Address": "10.0.1.91"
+                },
+                "Links": null,
+                "Aliases": [
+                    "43c8723ce0a9"
+                ],
+                "NetworkID": "m3pa31ev1611bkpmef1y7o8xn",
+                "EndpointID": "7621a5fb240e6b67e5f08e51abb7f148e9956eda8298937996ae6a051c9bfb47",
+                "Gateway": "",
+                "IPAddress": "10.0.1.91",
+                "IPPrefixLen": 24,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "MacAddress": "02:42:0a:00:01:5b",
+                "DriverOpts": null
+            }
+        }
+    }
+}
