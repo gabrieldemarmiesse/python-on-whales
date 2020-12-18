@@ -8,7 +8,7 @@ from python_on_whales.components.service import ServiceInspectResult
 
 def get_all_services_jsons() -> List[Path]:
     jsons_directory = Path(__file__).parent / "services"
-    return list(jsons_directory.iterdir())
+    return sorted(list(jsons_directory.iterdir()))
 
 
 @pytest.mark.parametrize("json_file", get_all_services_jsons())
