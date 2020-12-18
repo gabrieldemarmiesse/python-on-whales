@@ -1,0 +1,168 @@
+{
+    "ID": "xgtvnedzvi7x0t2bphf589mbq",
+    "Version": {
+        "Index": 5859788
+    },
+    "CreatedAt": "2020-11-23T18:31:07.661623473Z",
+    "UpdatedAt": "2020-12-18T15:58:41.517782591Z",
+    "Spec": {
+        "Name": "scube_scube-cpu-workers",
+        "Labels": {
+            "com.docker.stack.image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/cpu-workers:1",
+            "com.docker.stack.namespace": "scube"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/scube-cpu-workers:1@sha256:669455536589ecaa978b376864346884baed6ac738a06425b62f",
+                "Labels": {
+                    "com.docker.stack.namespace": "scube"
+                },
+                "Env": [
+                    "STORAGE_SECRET_KEY=geruaixosjanbgbergeatrahgtahtjuyjk"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "bind",
+                        "Source": "/var/run/docker.sock",
+                        "Target": "/var/run/docker.sock"
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 1000000000,
+                    "MemoryBytes": 3221225472
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "on-failure",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "x4ymj7n0ul3xd8m1naztp3kqh",
+                    "Aliases": [
+                        "cpu-workers"
+                    ]
+                }
+            ],
+            "ForceUpdate": 1,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 13
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "PreviousSpec": {
+        "Name": "scube_cpu-workers",
+        "Labels": {
+            "com.docker.stack.image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/cpu-workers:1",
+            "com.docker.stack.namespace": "scube"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/scube-cpu-workers:1@sha256:66963d8ff9g663g868sz1be2d05aa67efabaed6ac738a06425b62f",
+                "Labels": {
+                    "com.docker.stack.namespace": "scube"
+                },
+                "Env": [
+                    "STORAGE_SECRET_KEY=some_random_key"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "bind",
+                        "Source": "/var/run/docker.sock",
+                        "Target": "/var/run/docker.sock"
+                    }
+                ],
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 1000000000,
+                    "MemoryBytes": 3221225472
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "on-failure",
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "x4ymj7n0ul3xd8m1naztp3kqh",
+                    "Aliases": [
+                        "cpu-workers"
+                    ]
+                }
+            ],
+            "ForceUpdate": 1,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 13
+            }
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "x4ymj7n0ul3xd8m1naztp3kqh",
+                "Addr": "10.0.1.132/24"
+            }
+        ]
+    }
+}

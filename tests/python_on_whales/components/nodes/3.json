@@ -1,0 +1,114 @@
+{
+    "ID": "tpk03s8lwrt07i2xsmtnfi25s",
+    "Version": {
+        "Index": 3759924
+    },
+    "CreatedAt": "2020-09-21T11:18:20.081981303Z",
+    "UpdatedAt": "2020-11-30T09:19:57.214134001Z",
+    "Spec": {
+        "Labels": {
+            "has-stuff": "1",
+            "some-labels": "1"
+        },
+        "Role": "manager",
+        "Availability": "active"
+    },
+    "Description": {
+        "Hostname": "ip-172-31-24-227",
+        "Platform": {
+            "Architecture": "x86_64",
+            "OS": "linux"
+        },
+        "Resources": {
+            "NanoCPUs": 4000000000,
+            "MemoryBytes": 16789770240
+        },
+        "Engine": {
+            "EngineVersion": "19.03.12",
+            "Plugins": [
+                {
+                    "Type": "Log",
+                    "Name": "awslogs"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "fluentd"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "gcplogs"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "gelf"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "journald"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "json-file"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "local"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "logentries"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "splunk"
+                },
+                {
+                    "Type": "Log",
+                    "Name": "syslog"
+                },
+                {
+                    "Type": "Network",
+                    "Name": "bridge"
+                },
+                {
+                    "Type": "Network",
+                    "Name": "host"
+                },
+                {
+                    "Type": "Network",
+                    "Name": "ipvlan"
+                },
+                {
+                    "Type": "Network",
+                    "Name": "macvlan"
+                },
+                {
+                    "Type": "Network",
+                    "Name": "null"
+                },
+                {
+                    "Type": "Network",
+                    "Name": "overlay"
+                },
+                {
+                    "Type": "Volume",
+                    "Name": "local"
+                }
+            ]
+        },
+        "TLSInfo": {
+            "TrustRoot": "-----BEGIN CERTIFICATE-----\nMIIBajCCARCgAwIBAgIUBvJiogjaioragYIKoZIzj0EAwIw\nEzERMA8GA1UEAxMIc3dhcm0tY2EwHhcNMjAwOTIxMTExMzAwWhcNNDAwOTE2MTEx\nMzAwWjATMREwDwYDVagreahthtqGSM49AwEH\nA0IABH/mYqMuHncIxTXhtrzajhjrPrAcbWsCh\nfO4+08L0dUagrehtrahtahtahfdEB/wQEAwIBBjAPBgNVHRMB\nAf8EBTADAQH/MB0GA1UdDgQWBBTR/C0Yn1u7732kshz71dpWkV7RWzAKBggqhkjO\nPQQDAgNIADBFAiEAkiHFFeKghRNp2VEQq19bwx5JkCqKjbmjspyAM58cJrECIH7H\nMBXIpJQMByl7wpK8Yshop0OiTm33fiBC/q5meVrv\n-----END CERTIFICATE-----\n",
+            "CertIssuerSubject": "MBMxETAPBgareg+aergga-XJtLWNh",
+            "CertIssuerPublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEf+Zioy4edwjFNdoAZYT6+ahtrzhtazhamqmqajigrsdrgr+++tawKF87j7TwvR1QnWkCK38BDjEpiv/gw=="
+        }
+    },
+    "Status": {
+        "State": "ready",
+        "Addr": "172.31.24.227"
+    },
+    "ManagerStatus": {
+        "Leader": true,
+        "Reachability": "reachable",
+        "Addr": "172.31.24.227:2377"
+    }
+}
