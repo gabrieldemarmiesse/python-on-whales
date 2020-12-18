@@ -1,0 +1,118 @@
+{
+    "ID": "m3m209zl7pxn513ufboctb3q2",
+    "Version": {
+        "Index": 102
+    },
+    "CreatedAt": "2020-11-14T15:12:39.4142383Z",
+    "UpdatedAt": "2020-11-14T15:12:39.4169672Z",
+    "Spec": {
+        "Name": "my_stack_influxdb",
+        "Labels": {
+            "com.docker.stack.image": "influxdb:1.7",
+            "com.docker.stack.namespace": "my_stack"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "influxdb:1.7@sha256:481709b32cca5001a6d03022b3a11e152fd4faa3038e5c0b92bb6de59dbbd868",
+                "Labels": {
+                    "com.docker.stack.namespace": "my_stack"
+                },
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "volume",
+                        "Source": "my_stack_influx-data",
+                        "Target": "/var/lib/influxdb",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "my_stack"
+                            },
+                            "DriverConfig": {
+                                "Name": "local"
+                            }
+                        }
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 600000000,
+                    "MemoryBytes": 536870912
+                },
+                "Reservations": {
+                    "NanoCPUs": 300000000,
+                    "MemoryBytes": 134217728
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "arm64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "cs2i9dj34n2t3d3axzbfibhbg",
+                    "Aliases": [
+                        "influxdb"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "cs2i9dj34n2t3d3axzbfibhbg",
+                "Addr": "10.0.3.2/24"
+            }
+        ]
+    }
+}

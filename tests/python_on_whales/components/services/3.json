@@ -1,0 +1,116 @@
+{
+    "ID": "r7iyibbjflmmgsgw7wug7gamm",
+    "Version": {
+        "Index": 108
+    },
+    "CreatedAt": "2020-11-14T15:12:41.0319543Z",
+    "UpdatedAt": "2020-11-14T15:12:41.0357977Z",
+    "Spec": {
+        "Name": "my_stack_agent",
+        "Labels": {
+            "com.docker.stack.image": "swarmpit/agent:latest",
+            "com.docker.stack.namespace": "my_stack",
+            "swarmpit.agent": "true"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "swarmpit/agent:latest@sha256:f92ba65f7923794d43ebffc88fbd49bfe8cde8db48ca6888ece5747b9ab1375c",
+                "Labels": {
+                    "com.docker.stack.namespace": "my_stack"
+                },
+                "Env": [
+                    "DOCKER_API_VERSION=1.35"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "bind",
+                        "Source": "/var/run/docker.sock",
+                        "Target": "/var/run/docker.sock",
+                        "ReadOnly": true
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 100000000,
+                    "MemoryBytes": 67108864
+                },
+                "Reservations": {
+                    "NanoCPUs": 50000000,
+                    "MemoryBytes": 33554432
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "arm64",
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "cs2i9dj34n2t3d3axzbfibhbg",
+                    "Aliases": [
+                        "agent"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Global": {}
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "cs2i9dj34n2t3d3axzbfibhbg",
+                "Addr": "10.0.3.5/24"
+            }
+        ]
+    }
+}
