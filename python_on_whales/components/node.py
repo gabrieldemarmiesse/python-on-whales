@@ -25,12 +25,35 @@ class NodePlatform(DockerCamelModel):
     os: str
 
 
+class NodeResource(DockerCamelModel):
+    nano_cpus: int
+    memory_bytes: int
+    generic_resources: List[Dict[str, Dict[str, Any]]]  # TODO: use a model here
+
+
+class EnginePlugin(DockerCamelModel):
+    type: str
+    name: str
+
+
+class NodeEngine(DockerCamelModel):
+    engine_version: str
+    labels: Dict[str, str]
+    plugins: List[EnginePlugin]
+
+
+class NodeTLSInfo(DockerCamelModel):
+    trust_root: str
+    certissuer_subject: str
+    certissuer_public_key: str
+
+
 class NodeDescription(DockerCamelModel):
     hostname: str
     platform: NodePlatform
-    resources: dict  # TODO: better type
-    engine: dict  # TODO: better type
-    tls_info: dict  # TODO: better type
+    resources: NodeResource
+    engine: NodeEngine
+    tls_info: NodeTLSInfo
 
 
 class NodeStatus(DockerCamelModel):
