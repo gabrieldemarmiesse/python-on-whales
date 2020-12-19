@@ -28,5 +28,13 @@ def test_list_nodes():
 @pytest.mark.parametrize("json_file", get_all_nodes_jsons())
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
-    NodeInspectResult.parse_raw(json_as_txt)
-    # we could do more checks here if needed
+    a: NodeInspectResult = NodeInspectResult.parse_raw(json_as_txt)
+    if json_file.name == "1.json":
+        assert (
+            a.description.resources.generic_resources[0].named_resource_spec.kind
+            == "gpu"
+        )
+        assert (
+            a.description.resources.generic_resources[0].named_resource_spec.value
+            == "gpu-0"
+        )

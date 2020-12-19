@@ -25,10 +25,25 @@ class NodePlatform(DockerCamelModel):
     os: str
 
 
+class NodeNamedResourceSpec(DockerCamelModel):
+    kind: str
+    value: str
+
+
+class NodeDiscreteResourceSpec(DockerCamelModel):
+    kind: str
+    value: int
+
+
+class NodeGenericResource(DockerCamelModel):
+    named_resource_spec: Optional[NodeNamedResourceSpec]
+    discrete_resource_spec: Optional[NodeDiscreteResourceSpec]
+
+
 class NodeResource(DockerCamelModel):
     nano_cpus: int
     memory_bytes: int
-    generic_resources: List[Dict[str, Dict[str, Any]]]  # TODO: use a model here
+    generic_resources: Optional[List[NodeGenericResource]]
 
 
 class EnginePlugin(DockerCamelModel):
@@ -38,14 +53,14 @@ class EnginePlugin(DockerCamelModel):
 
 class NodeEngine(DockerCamelModel):
     engine_version: str
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
     plugins: List[EnginePlugin]
 
 
 class NodeTLSInfo(DockerCamelModel):
     trust_root: str
-    certissuer_subject: str
-    certissuer_public_key: str
+    cert_issuer_subject: str
+    cert_issuer_public_key: str
 
 
 class NodeDescription(DockerCamelModel):
@@ -74,7 +89,7 @@ class NodeInspectResult(DockerCamelModel):
     created_at: datetime
     updated_at: datetime
     spec: NodeSpec
-    description: Any
+    description: NodeDescription
     status: NodeStatus
     manager_status: Optional[NodeManagerStatus]
 
