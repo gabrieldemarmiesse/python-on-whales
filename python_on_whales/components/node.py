@@ -88,7 +88,7 @@ class NodeManagerStatus(DockerCamelModel):
 
 
 class NodeInspectResult(DockerCamelModel):
-    ID: str
+    id: str = Field(alias="ID")
     version: NodeVersion
     created_at: datetime
     updated_at: datetime
@@ -102,7 +102,7 @@ class Node(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "ID", reference, is_immutable_id)
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["node", "inspect", reference])
@@ -113,6 +113,34 @@ class Node(ReloadableObjectFromJson):
     @property
     def id(self) -> str:
         return self._get_immutable_id()
+
+    @property
+    def version(self) -> NodeVersion:
+        return self._get_inspect_result().version
+
+    @property
+    def created_at(self) -> datetime:
+        return self._get_inspect_result().created_at
+
+    @property
+    def updated_at(self) -> datetime:
+        return self._get_inspect_result().updated_at
+
+    @property
+    def spec(self) -> NodeSpec:
+        return self._get_inspect_result().spec
+
+    @property
+    def description(self) -> NodeDescription:
+        return self._get_inspect_result().description
+
+    @property
+    def status(self) -> NodeStatus:
+        return self._get_inspect_result().status
+
+    @property
+    def manager_status(self) -> Optional[NodeManagerStatus]:
+        return self._get_inspect_result().manager_status
 
     def update(
         self,

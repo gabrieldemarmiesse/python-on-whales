@@ -145,6 +145,7 @@ def test_copy_from_and_to_directory(tmp_path):
 
 
 def test_many_images():
+    # TODO: get the json inspects results and put them in the "images/" directory
     for tag in [
         "ubuntu:16.04",
         "ubuntu:18.04",
