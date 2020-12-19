@@ -1,0 +1,11 @@
+{
+    "CreatedAt": "2020-10-08T18:32:55Z",
+    "Driver": "local",
+    "Labels": {
+        "com.docker.stack.namespace": "scube"
+    },
+    "Mountpoint": "/var/lib/docker/volumes/scube_traefik-data/_data",
+    "Name": "scube_traefik-data",
+    "Options": null,
+    "Scope": "local"
+}

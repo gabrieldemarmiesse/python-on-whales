@@ -1,0 +1,156 @@
+{
+    "Name": "scube_default",
+    "Id": "m3pa31ev1611bkpmef1y7o8xn",
+    "Created": "2020-11-16T11:14:08.397450776Z",
+    "Scope": "swarm",
+    "Driver": "overlay",
+    "EnableIPv6": false,
+    "IPAM": {
+        "Driver": "default",
+        "Options": null,
+        "Config": [
+            {
+                "Subnet": "10.0.1.0/24",
+                "Gateway": "10.0.1.1"
+            }
+        ]
+    },
+    "Internal": false,
+    "Attachable": true,
+    "Ingress": false,
+    "ConfigFrom": {
+        "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {
+        "0d82654871d3477f24118d0951ed91d5759b8cdea61a4c15dbe18b10fb2f4e91": {
+            "Name": "scube_docker-logs-to-disk.a3i9k93drhmg9u6gw43q7net4.ovlcfqqh5kg095tidr9ednr5d",
+            "EndpointID": "545535192f11f83b832d74a8f1ffbf77c2f54b723dec93291dfc8acb91e3b4b2",
+            "MacAddress": "02:42:0a:00:01:5c",
+            "IPv4Address": "10.0.1.92/24",
+            "IPv6Address": ""
+        },
+        "2db6ef93e665a56349c003d3b6cd650ecf42a939bc92cb4cb80934e257d050ad": {
+            "Name": "scube_postgrest.1.kyuzw4ij4cfvnh5hiw1ezq6uy",
+            "EndpointID": "c65bd63b3dd45110dfd95b1a54f48cd5ba1a6789d5cc1b0a92a98262727162d8",
+            "MacAddress": "02:42:0a:00:01:e6",
+            "IPv4Address": "10.0.1.230/24",
+            "IPv6Address": ""
+        },
+        "3de3586b7e0e0d7a71263959be6cb9b3729fd560eb03abed9a5769a73c97d595": {
+            "Name": "scube_cron-update-cred-ecr-swarm.1.fdxphu92wk7miwypz1kz74hqp",
+            "EndpointID": "da3632304183d8bf83f54d0fff00af367f2330cfad64e040420006a13fc01041",
+            "MacAddress": "02:42:0a:00:01:c8",
+            "IPv4Address": "10.0.1.200/24",
+            "IPv6Address": ""
+        },
+        "43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a": {
+            "Name": "scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+            "EndpointID": "7621a5fb240e6b67e5f08e51abb7f148e9956eda8298937996ae6a051c9bfb47",
+            "MacAddress": "02:42:0a:00:01:5b",
+            "IPv4Address": "10.0.1.91/24",
+            "IPv6Address": ""
+        },
+        "4ccb754d1112c9b400d652650d5a031c0c8b0aa400433fbfa7a4a8a9deca165d": {
+            "Name": "swarmpit_agent.a3i9k93drhmg9u6gw43q7net4.jdov7eifboh27afhmi5eqfbdq",
+            "EndpointID": "9bf238805a423ad5d12865432e3fc47a2069217ffbcc5b7f494822f2e1d32dca",
+            "MacAddress": "02:42:0a:00:01:71",
+            "IPv4Address": "10.0.1.113/24",
+            "IPv6Address": ""
+        },
+        "5d7bac8f63f38e66df4c967e4d6b3611bc55b148740752141b11ec49c6d4482b": {
+            "Name": "scube_postgis.1.dnxxoigt20bi0j0cj4kjttxiw",
+            "EndpointID": "fbdcf74cd35f638bc34cc6a2ccec6e121bae44c8690da805fba23312686a85b9",
+            "MacAddress": "02:42:0a:00:01:e7",
+            "IPv4Address": "10.0.1.231/24",
+            "IPv6Address": ""
+        },
+        "78288b3914fc80f303ecaebac1de16283a6917679a82601f35794c4669088374": {
+            "Name": "scube_redis.1.5hvdl4hr3pp70iyq2w49qr09r",
+            "EndpointID": "95818eff49e7242087b0c30cc6414e87ec13728bef01ec7ce59652a1702de828",
+            "MacAddress": "02:42:0a:00:01:67",
+            "IPv4Address": "10.0.1.103/24",
+            "IPv6Address": ""
+        },
+        "7fa850bc3eae56493989ce8e5b06746da2284c3eaa381f6470b4bb26577e1c51": {
+            "Name": "scube_asset-server.1.i45ukkpnjss6m37ohnkcaw7fn",
+            "EndpointID": "b38cb4306009f71fae3e915f2f415ce2b7c71d3f48ea16ff712360bcc3bc790b",
+            "MacAddress": "02:42:0a:00:01:92",
+            "IPv4Address": "10.0.1.146/24",
+            "IPv6Address": ""
+        },
+        "c3d0c69370b9e33fc3ff4be3b7b3022b96b99845ca93ab7b76c0a1a02b9e45a6": {
+            "Name": "scube_qc-back.1.eh7f9wclpd7a3ixay4ca8tun2",
+            "EndpointID": "7903f9e47e9273be3ff0c2c21db0bc53475f0de80190a2770fb1c1920200f4df",
+            "MacAddress": "02:42:0a:00:01:44",
+            "IPv4Address": "10.0.1.68/24",
+            "IPv6Address": ""
+        },
+        "ce08d9baddaa72ae098a275f72297f492f33904719d474929c99f79497e32c35": {
+            "Name": "scube_cron-login-ecr-on-host-root.a3i9k93drhmg9u6gw43q7net4.pdvlvgnein05ui1m3d2f8a5tl",
+            "EndpointID": "f762aca62ffda08f6dad03c8de5d8cab62b375ba1f5e048ae74501067ae74c3f",
+            "MacAddress": "02:42:0a:00:01:30",
+            "IPv4Address": "10.0.1.48/24",
+            "IPv6Address": ""
+        },
+        "db83deebeee07df22f5e491007eef4c3499d5cc313a05ae462d1d687d0588978": {
+            "Name": "scube_tagging-tile-server.1.btzr85qi1rxx76zloza748z7l",
+            "EndpointID": "e4d7d92785f3669f67624c3289099dbca5ad88686b85808c008c5a506064820a",
+            "MacAddress": "02:42:0a:00:01:02",
+            "IPv4Address": "10.0.1.2/24",
+            "IPv6Address": ""
+        },
+        "e4f333155d88e08fd6db61e191d9002e0e43b02af389706c78d4441c4b4014a3": {
+            "Name": "scube_cron-send-logs.a3i9k93drhmg9u6gw43q7net4.ecmaazkewr62x1n2wlddu8z4k",
+            "EndpointID": "4a4c906125eb54ed1c3ed79b25fa82c6b96c0d783e6346edac1c70d3b7642d58",
+            "MacAddress": "02:42:0a:00:01:f5",
+            "IPv4Address": "10.0.1.245/24",
+            "IPv6Address": ""
+        },
+        "fee7ee12e7869512def70ac650386e53efb5852732f7d6a6a5b6bfa08292140c": {
+            "Name": "swarmpit_app.1.tsxhl7679cqlvmgsnquq0mq2p",
+            "EndpointID": "49e24d6a914083ae22bd43476d16f39f7f27cf2477b4c89550dd0dfe4f5f2123",
+            "MacAddress": "02:42:0a:00:01:78",
+            "IPv4Address": "10.0.1.120/24",
+            "IPv6Address": ""
+        },
+        "lb-scube_default": {
+            "Name": "scube_default-endpoint",
+            "EndpointID": "c96e48245198b3e27a7943157da530fa56680a00d83739f940823f81862eed57",
+            "MacAddress": "02:42:0a:00:01:8c",
+            "IPv4Address": "10.0.1.140/24",
+            "IPv6Address": ""
+        }
+    },
+    "Options": {
+        "com.docker.network.driver.overlay.vxlanid_list": "4097",
+        "encrypted": ""
+    },
+    "Labels": {},
+    "Peers": [
+        {
+            "Name": "6647e1922047",
+            "IP": "172.31.17.136"
+        },
+        {
+            "Name": "5d7adbaa52fc",
+            "IP": "172.31.28.233"
+        },
+        {
+            "Name": "3610d8c324c0",
+            "IP": "172.31.27.202"
+        },
+        {
+            "Name": "47222e41883b",
+            "IP": "172.31.1.13"
+        },
+        {
+            "Name": "548a55cd9827",
+            "IP": "172.31.11.3"
+        },
+        {
+            "Name": "6bb83797578d",
+            "IP": "172.31.10.16"
+        }
+    ]
+}

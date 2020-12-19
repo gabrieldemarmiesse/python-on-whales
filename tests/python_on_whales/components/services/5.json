@@ -1,0 +1,111 @@
+{
+    "ID": "ttkkm29xchs0gi83n1g0m7ov4",
+    "Version": {
+        "Index": 122
+    },
+    "CreatedAt": "2020-11-14T15:12:44.7495433Z",
+    "UpdatedAt": "2020-11-14T15:12:44.7547664Z",
+    "Spec": {
+        "Name": "my_stack_db",
+        "Labels": {
+            "com.docker.stack.image": "couchdb:2.3.0",
+            "com.docker.stack.namespace": "my_stack"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "couchdb:2.3.0@sha256:ee75c9a737e7c48af0170142689959f2d70f93700162fef40818c799dfeecb8e",
+                "Labels": {
+                    "com.docker.stack.namespace": "my_stack"
+                },
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "volume",
+                        "Source": "my_stack_db-data",
+                        "Target": "/opt/couchdb/data",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "my_stack"
+                            },
+                            "DriverConfig": {
+                                "Name": "local"
+                            }
+                        }
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 300000000,
+                    "MemoryBytes": 268435456
+                },
+                "Reservations": {
+                    "NanoCPUs": 150000000,
+                    "MemoryBytes": 134217728
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "cs2i9dj34n2t3d3axzbfibhbg",
+                    "Aliases": [
+                        "db"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "cs2i9dj34n2t3d3axzbfibhbg",
+                "Addr": "10.0.3.9/24"
+            }
+        ]
+    }
+}

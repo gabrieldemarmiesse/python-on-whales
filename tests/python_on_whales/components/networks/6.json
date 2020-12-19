@@ -1,0 +1,34 @@
+{
+    "Name": "bridge",
+    "Id": "19556d6a3ad9cc8dd0668a714a0036591bb9659b8682de0d388501c06c5a4b91",
+    "Created": "2020-09-29T16:39:20.835139147Z",
+    "Scope": "local",
+    "Driver": "bridge",
+    "EnableIPv6": false,
+    "IPAM": {
+        "Driver": "default",
+        "Options": null,
+        "Config": [
+            {
+                "Subnet": "172.17.0.0/16"
+            }
+        ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "ConfigFrom": {
+        "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {},
+    "Options": {
+        "com.docker.network.bridge.default_bridge": "true",
+        "com.docker.network.bridge.enable_icc": "true",
+        "com.docker.network.bridge.enable_ip_masquerade": "true",
+        "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+        "com.docker.network.bridge.name": "docker0",
+        "com.docker.network.driver.mtu": "1500"
+    },
+    "Labels": {}
+}

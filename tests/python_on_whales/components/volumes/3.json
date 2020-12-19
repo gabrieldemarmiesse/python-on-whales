@@ -1,0 +1,11 @@
+{
+    "CreatedAt": "2020-09-30T15:13:42Z",
+    "Driver": "local",
+    "Labels": {
+        "com.docker.stack.namespace": "scube"
+    },
+    "Mountpoint": "/var/lib/docker/volumes/scube_scube-workers-rabbitmq-data/_data",
+    "Name": "scube_scube-workers-rabbitmq-data",
+    "Options": null,
+    "Scope": "local"
+}

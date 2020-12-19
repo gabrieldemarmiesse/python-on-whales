@@ -1,0 +1,160 @@
+{
+    "ID": "v1z59cs9evr57w36xv3a4r4ny",
+    "Version": {
+        "Index": 115
+    },
+    "CreatedAt": "2020-11-14T15:12:42.9316045Z",
+    "UpdatedAt": "2020-11-14T15:12:42.9344438Z",
+    "Spec": {
+        "Name": "my_stack_app",
+        "Labels": {
+            "com.docker.stack.image": "swarmpit/swarmpit:latest",
+            "com.docker.stack.namespace": "my_stack"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "swarmpit/swarmpit:latest@sha256:20fddbdb7b352a5ac06f6d88bcc0ca4f67a45f1a14b18d557f01052a97a27147",
+                "Labels": {
+                    "com.docker.stack.namespace": "my_stack"
+                },
+                "Env": [
+                    "SWARMPIT_DB=http://db:5984",
+                    "SWARMPIT_INFLUXDB=http://influxdb:8086"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "bind",
+                        "Source": "/var/run/docker.sock",
+                        "Target": "/var/run/docker.sock",
+                        "ReadOnly": true
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "Healthcheck": {
+                    "Test": [
+                        "CMD",
+                        "curl",
+                        "-f",
+                        "http://localhost:8080"
+                    ],
+                    "Interval": 60000000000,
+                    "Timeout": 10000000000,
+                    "Retries": 3
+                },
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 500000000,
+                    "MemoryBytes": 1073741824
+                },
+                "Reservations": {
+                    "NanoCPUs": 250000000,
+                    "MemoryBytes": 536870912
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Constraints": [
+                    "node.role == manager"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "arm64",
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "cs2i9dj34n2t3d3axzbfibhbg",
+                    "Aliases": [
+                        "app"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip",
+            "Ports": [
+                {
+                    "Protocol": "tcp",
+                    "TargetPort": 8080,
+                    "PublishedPort": 888,
+                    "PublishMode": "ingress"
+                }
+            ]
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip",
+            "Ports": [
+                {
+                    "Protocol": "tcp",
+                    "TargetPort": 8080,
+                    "PublishedPort": 888,
+                    "PublishMode": "ingress"
+                }
+            ]
+        },
+        "Ports": [
+            {
+                "Protocol": "tcp",
+                "TargetPort": 8080,
+                "PublishedPort": 888,
+                "PublishMode": "ingress"
+            }
+        ],
+        "VirtualIPs": [
+            {
+                "NetworkID": "ejkqulgep23uu3a5bmgudnibe",
+                "Addr": "10.0.0.7/24"
+            },
+            {
+                "NetworkID": "cs2i9dj34n2t3d3axzbfibhbg",
+                "Addr": "10.0.3.7/24"
+            }
+        ]
+    }
+}

@@ -1,0 +1,131 @@
+{
+    "Name": "docker_gwbridge",
+    "Id": "e758ef47d9741868bd1fe936dabb5a278399077d2de3f8f225cfe9690a4de930",
+    "Created": "2020-09-30T09:58:43.028434416Z",
+    "Scope": "local",
+    "Driver": "bridge",
+    "EnableIPv6": false,
+    "IPAM": {
+        "Driver": "default",
+        "Options": null,
+        "Config": [
+            {
+                "Subnet": "172.18.0.0/16",
+                "Gateway": "172.18.0.1"
+            }
+        ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "ConfigFrom": {
+        "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {
+        "0d82654871d3477f24118d0951ed91d5759b8cdea61a4c15dbe18b10fb2f4e91": {
+            "Name": "gateway_b5f749164154",
+            "EndpointID": "0128af2b2f85c25d12fdef518892ac6f5b104f8c8a6c3184059ce3f4d34b5402",
+            "MacAddress": "02:42:ac:12:00:0f",
+            "IPv4Address": "172.18.0.15/16",
+            "IPv6Address": ""
+        },
+        "2db6ef93e665a56349c003d3b6cd650ecf42a939bc92cb4cb80934e257d050ad": {
+            "Name": "gateway_4f8d4d0ee527",
+            "EndpointID": "1e62c58c6fad5ba91eed0f661cefab9005022f227c5c7ba2092930b05d7d13e2",
+            "MacAddress": "02:42:ac:12:00:10",
+            "IPv4Address": "172.18.0.16/16",
+            "IPv6Address": ""
+        },
+        "3de3586b7e0e0d7a71263959be6cb9b3729fd560eb03abed9a5769a73c97d595": {
+            "Name": "gateway_b165054904f2",
+            "EndpointID": "009c156076575ace352f2933adfe21af18d9de67387285f4401dd8ee07743514",
+            "MacAddress": "02:42:ac:12:00:05",
+            "IPv4Address": "172.18.0.5/16",
+            "IPv6Address": ""
+        },
+        "43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a": {
+            "Name": "gateway_90b57382a604",
+            "EndpointID": "5742543b9fdae7f9435e72ed15d8248a16349524cb72bea5c34e925252939fa9",
+            "MacAddress": "02:42:ac:12:00:09",
+            "IPv4Address": "172.18.0.9/16",
+            "IPv6Address": ""
+        },
+        "4ccb754d1112c9b400d652650d5a031c0c8b0aa400433fbfa7a4a8a9deca165d": {
+            "Name": "gateway_52d3ac1d43f1",
+            "EndpointID": "cd5a0ab05d20a96a2deb23582bfed2d184ec432f1652d0cc512b4e7cbbc8a173",
+            "MacAddress": "02:42:ac:12:00:04",
+            "IPv4Address": "172.18.0.4/16",
+            "IPv6Address": ""
+        },
+        "5d7bac8f63f38e66df4c967e4d6b3611bc55b148740752141b11ec49c6d4482b": {
+            "Name": "gateway_3b4dbee36f0b",
+            "EndpointID": "a447ca61696ebb4d7c2083b79799af2157b20cdd809a7de9d8536b8af32f9249",
+            "MacAddress": "02:42:ac:12:00:07",
+            "IPv4Address": "172.18.0.7/16",
+            "IPv6Address": ""
+        },
+        "78288b3914fc80f303ecaebac1de16283a6917679a82601f35794c4669088374": {
+            "Name": "gateway_b32ecd679ade",
+            "EndpointID": "9e40c1cbca6c46f9268dda297d506de2da8a63875c5b3a3aa6760c28bc456531",
+            "MacAddress": "02:42:ac:12:00:0a",
+            "IPv4Address": "172.18.0.10/16",
+            "IPv6Address": ""
+        },
+        "7fa850bc3eae56493989ce8e5b06746da2284c3eaa381f6470b4bb26577e1c51": {
+            "Name": "gateway_fd2a6d86dca5",
+            "EndpointID": "cdc5a657a15d6a961055c8868e545752051a97b4495dfbe932b9245dedd62e7f",
+            "MacAddress": "02:42:ac:12:00:06",
+            "IPv4Address": "172.18.0.6/16",
+            "IPv6Address": ""
+        },
+        "c3d0c69370b9e33fc3ff4be3b7b3022b96b99845ca93ab7b76c0a1a02b9e45a6": {
+            "Name": "gateway_faa852175d5d",
+            "EndpointID": "ea532123b67efe37cf5263782714cc049edffd26e5f0585dff631b6527f705ff",
+            "MacAddress": "02:42:ac:12:00:0c",
+            "IPv4Address": "172.18.0.12/16",
+            "IPv6Address": ""
+        },
+        "ce08d9baddaa72ae098a275f72297f492f33904719d474929c99f79497e32c35": {
+            "Name": "gateway_55e4bf98f93f",
+            "EndpointID": "a040afc7fd5b02aad643b48812bc4335dc1535008f16a52564bdcdada1be52e4",
+            "MacAddress": "02:42:ac:12:00:0d",
+            "IPv4Address": "172.18.0.13/16",
+            "IPv6Address": ""
+        },
+        "db83deebeee07df22f5e491007eef4c3499d5cc313a05ae462d1d687d0588978": {
+            "Name": "gateway_2037a4797949",
+            "EndpointID": "aaadcf1a321b1c4cd9601c7b171b615790f338cbd26a843291c00e11297d1c0f",
+            "MacAddress": "02:42:ac:12:00:0b",
+            "IPv4Address": "172.18.0.11/16",
+            "IPv6Address": ""
+        },
+        "e4f333155d88e08fd6db61e191d9002e0e43b02af389706c78d4441c4b4014a3": {
+            "Name": "gateway_c2450dc1d280",
+            "EndpointID": "44d1c6b8f868a12f1a27c99af25a5a6ee79ab0377700a5bc0368d57bcdd2e633",
+            "MacAddress": "02:42:ac:12:00:08",
+            "IPv4Address": "172.18.0.8/16",
+            "IPv6Address": ""
+        },
+        "fee7ee12e7869512def70ac650386e53efb5852732f7d6a6a5b6bfa08292140c": {
+            "Name": "gateway_22b14a43682f",
+            "EndpointID": "be19c19868de7a7f9fad0d37ada43c9737f6d2cbf24b70645236addcdd17467f",
+            "MacAddress": "02:42:ac:12:00:03",
+            "IPv4Address": "172.18.0.3/16",
+            "IPv6Address": ""
+        },
+        "ingress-sbox": {
+            "Name": "gateway_ingress-sbox",
+            "EndpointID": "4403bf8e6070ef9dc638824be0c2252a535280ce83b129a1131e2af0e2fa545c",
+            "MacAddress": "02:42:ac:12:00:02",
+            "IPv4Address": "172.18.0.2/16",
+            "IPv6Address": ""
+        }
+    },
+    "Options": {
+        "com.docker.network.bridge.enable_icc": "false",
+        "com.docker.network.bridge.enable_ip_masquerade": "true",
+        "com.docker.network.bridge.name": "docker_gwbridge"
+    },
+    "Labels": {}
+}

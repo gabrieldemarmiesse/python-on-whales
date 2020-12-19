@@ -1,0 +1,13 @@
+{
+    "CreatedAt": "2020-08-27T09:39:50+02:00",
+    "Driver": "local",
+    "Labels": {
+        "com.docker.compose.project": "some_project",
+        "com.docker.compose.version": "1.25.5",
+        "com.docker.compose.volume": "letsencrypt_config"
+    },
+    "Mountpoint": "/var/lib/docker/volumes/scube_letsencrypt_config/_data",
+    "Name": "scube_letsencrypt_config",
+    "Options": null,
+    "Scope": "local"
+}
