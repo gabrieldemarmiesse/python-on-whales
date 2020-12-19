@@ -50,6 +50,7 @@ def to_docker_camel(string):
             "ipv6_address": "IPv6Address",
             "ipam": "IPAM",
             "tls_info": "TLSInfo",
+            "virtual_ips": "VirtualIPs",
         }
         return special_cases[string]
     except KeyError:
