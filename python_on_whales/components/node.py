@@ -26,7 +26,7 @@ class NodeSpec(DockerCamelModel):
 
 class NodePlatform(DockerCamelModel):
     architecture: str
-    os: str
+    os: str = Field(alias="OS")
 
 
 class NodeNamedResourceSpec(DockerCamelModel):
