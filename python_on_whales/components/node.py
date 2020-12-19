@@ -14,7 +14,7 @@ class NodeVersion(DockerCamelModel):
 
 
 class NodeSpec(DockerCamelModel):
-    name: str
+    name: Optional[str]
     labels: Dict[str, str]
     role: str
     availability: str
@@ -35,7 +35,7 @@ class NodeDescription(DockerCamelModel):
 
 class NodeStatus(DockerCamelModel):
     state: str
-    message: str
+    message: Optional[str]
     addr: str
 
 
