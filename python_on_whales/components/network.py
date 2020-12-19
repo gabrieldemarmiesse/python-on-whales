@@ -14,7 +14,7 @@ from python_on_whales.utils import DockerCamelModel, format_dict_for_cli, run, t
 
 class NetworkIPAM(DockerCamelModel):
     driver: str
-    config: Dict[str, Any]
+    config: List[Dict[str, Any]]
     options: Optional[Dict[str, Any]]
 
 

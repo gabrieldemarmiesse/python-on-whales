@@ -15,8 +15,6 @@ def get_all_networks_jsons() -> List[Path]:
 
 @pytest.mark.parametrize("json_file", get_all_networks_jsons())
 def test_load_json(json_file):
-    if json_file.name == "6.json":
-        pytest.skip("TODO: fixme!")
     json_as_txt = json_file.read_text()
     NetworkInspectResult.parse_raw(json_as_txt)
     # we could do more checks here if needed
