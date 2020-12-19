@@ -38,3 +38,4 @@ def test_load_json(json_file):
             a.description.resources.generic_resources[0].named_resource_spec.value
             == "gpu-0"
         )
+        assert a.description.resources.nano_cpus == 4000000001

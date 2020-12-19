@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
+
+from pydantic import Field
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -41,7 +45,7 @@ class NodeGenericResource(DockerCamelModel):
 
 
 class NodeResource(DockerCamelModel):
-    nano_cpus: int
+    nano_cpus: int = Field(alias="NanoCPUs")
     memory_bytes: int
     generic_resources: Optional[List[NodeGenericResource]]
 
