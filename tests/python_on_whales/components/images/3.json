@@ -1,0 +1,115 @@
+{
+    "Id": "sha256:5694f61f7e2942ee6ac961c76ee8d2f6f249d090bd289b1d0d966d4e4b126368",
+    "RepoTags": [
+        "traefik:v2.3.2"
+    ],
+    "RepoDigests": [
+        "traefik@sha256:6e6d4dc5a19afe06778ca092cdbbb98e31cb9f9c313edafa23f81a0e6ddf8a23"
+    ],
+    "Parent": "",
+    "Comment": "",
+    "Created": "2020-10-20T17:58:33.459209073Z",
+    "Container": "690873bd7898e94c70736f14786f88f25654dbb88d82ff6f9617c107b934f507",
+    "ContainerConfig": {
+        "Hostname": "690873bd7898",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": {
+            "80/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": [
+            "/bin/sh",
+            "-c",
+            "#(nop) ",
+            "LABEL org.opencontainers.image.vendor=Traefik Labs org.opencontainers.image.url=https://traefik.io org.opencontainers.image.title=Traefik org.opencontainers.image.description=A modern reverse-proxy org.opencontainers.image.version=v2.3.2 org.opencontainers.image.documentation=https://docs.traefik.io"
+        ],
+        "ArgsEscaped": true,
+        "Image": "sha256:0862da7396f15070343449e7076dd4763a12ac3514a6a27855fe3244a6926545",
+        "Volumes": null,
+        "WorkingDir": "",
+        "Entrypoint": [
+            "/entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": {
+            "org.opencontainers.image.description": "A modern reverse-proxy",
+            "org.opencontainers.image.documentation": "https://docs.traefik.io",
+            "org.opencontainers.image.title": "Traefik",
+            "org.opencontainers.image.url": "https://traefik.io",
+            "org.opencontainers.image.vendor": "Traefik Labs",
+            "org.opencontainers.image.version": "v2.3.2"
+        }
+    },
+    "DockerVersion": "18.09.7",
+    "Author": "",
+    "Config": {
+        "Hostname": "",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": {
+            "80/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": [
+            "traefik"
+        ],
+        "ArgsEscaped": true,
+        "Image": "sha256:0862da7396f15070343449e7076dd4763a12ac3514a6a27855fe3244a6926545",
+        "Volumes": null,
+        "WorkingDir": "",
+        "Entrypoint": [
+            "/entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": {
+            "org.opencontainers.image.description": "A modern reverse-proxy",
+            "org.opencontainers.image.documentation": "https://docs.traefik.io",
+            "org.opencontainers.image.title": "Traefik",
+            "org.opencontainers.image.url": "https://traefik.io",
+            "org.opencontainers.image.vendor": "Traefik Labs",
+            "org.opencontainers.image.version": "v2.3.2"
+        }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 92405290,
+    "VirtualSize": 92405290,
+    "GraphDriver": {
+        "Data": {
+            "LowerDir": "/var/lib/docker/overlay2/a1c03f67dd02857ccaddf33a756d22b722b5ffcc92ea397d5834bb6d9c3e40a8/diff:/var/lib/docker/overlay2/979fe7375c51e06c3a79bf7d7adbb1cd5c21cb3be626b93770a0b7cf4929b7cd/diff:/var/lib/docker/overlay2/ce1ff2f90c9cb1cb87a7f790e0dacf6a4df689c835acae012c3aed81315867ea/diff",
+            "MergedDir": "/var/lib/docker/overlay2/cda8717359f4df5f5def7e859c97f350a9db6c3d0a4f249f3c6f2e0d26447290/merged",
+            "UpperDir": "/var/lib/docker/overlay2/cda8717359f4df5f5def7e859c97f350a9db6c3d0a4f249f3c6f2e0d26447290/diff",
+            "WorkDir": "/var/lib/docker/overlay2/cda8717359f4df5f5def7e859c97f350a9db6c3d0a4f249f3c6f2e0d26447290/work"
+        },
+        "Name": "overlay2"
+    },
+    "RootFS": {
+        "Type": "layers",
+        "Layers": [
+            "sha256:3e207b409db364b595ba862cdc12be96dcdad8e36c59a03b7b3b61c946a5741a",
+            "sha256:4dca0fb1912d95147c68fab2028b462575694acfcbce3cc1580d791619f762ec",
+            "sha256:0f5ba6ac63d8792e0195a7d4cc761bcb8e4d9b10889489be9994b6285de4e163",
+            "sha256:763f1c30bf4df2aaa25e761eb54435fc8419dc9fc4d8d1f9dadfab65bc5d9f3f"
+        ]
+    },
+    "Metadata": {
+        "LastTagTime": "0001-01-01T00:00:00Z"
+    }
+}

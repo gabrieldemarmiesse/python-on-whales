@@ -1,0 +1,102 @@
+{
+    "Id": "sha256:6972c414f322dfa40324df3c503d4b217ccdec6d576e408ed10437f508f4181b",
+    "RepoTags": [
+        "docker:19.03.13"
+    ],
+    "RepoDigests": [
+        "docker@sha256:84165ff897a6e328c702f8da72046efb7e00c6aa3d3b2c5057f276707bcedf33"
+    ],
+    "Parent": "",
+    "Comment": "",
+    "Created": "2020-10-22T03:15:51.998974501Z",
+    "Container": "f345162df91bf719c446cb88c1a96cbd793655219036a089936082925c6fe5fe",
+    "ContainerConfig": {
+        "Hostname": "f345162df91b",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "DOCKER_VERSION=19.03.13",
+            "DOCKER_TLS_CERTDIR=/certs"
+        ],
+        "Cmd": [
+            "/bin/sh",
+            "-c",
+            "#(nop) ",
+            "CMD [\"sh\"]"
+        ],
+        "ArgsEscaped": true,
+        "Image": "sha256:d3f395f819532f98ddfd25340106cd1ac43884f8f05c80a485656f7827517f49",
+        "Volumes": null,
+        "WorkingDir": "",
+        "Entrypoint": [
+            "docker-entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": {}
+    },
+    "DockerVersion": "18.09.7",
+    "Author": "",
+    "Config": {
+        "Hostname": "",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "DOCKER_VERSION=19.03.13",
+            "DOCKER_TLS_CERTDIR=/certs"
+        ],
+        "Cmd": [
+            "sh"
+        ],
+        "ArgsEscaped": true,
+        "Image": "sha256:d3f395f819532f98ddfd25340106cd1ac43884f8f05c80a485656f7827517f49",
+        "Volumes": null,
+        "WorkingDir": "",
+        "Entrypoint": [
+            "docker-entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": null
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 217168073,
+    "VirtualSize": 217168073,
+    "GraphDriver": {
+        "Data": {
+            "LowerDir": "/var/lib/docker/overlay2/c923f785bdc12939a74b4c2bad0538652d7cc6016be8bf840ae328c91fd1a923/diff:/var/lib/docker/overlay2/c88b19938456d622874cabc03921307e0bbd25a4bbdf1f94e620eaaf9ec0072e/diff:/var/lib/docker/overlay2/cc0dceb142e18182a2d331cbc90cc3f71e174a195e758fa5fd5dc8cc6f9e4f97/diff:/var/lib/docker/overlay2/90e11796ba9898a2babf42c9ff27af61145c7ee328e66eb97c30864261bd85df/diff:/var/lib/docker/overlay2/888cdcb4d65c4ec26af9ab24afa61cfefed24a1f7a1a0ab9a25d753e89cf7cd5/diff:/var/lib/docker/overlay2/55f9fbb1f4de4e21bdeea9f4dcb90cf1481e7f25382eedd7eb996c21f16e28aa/diff",
+            "MergedDir": "/var/lib/docker/overlay2/841b0c817ab0a44312e0c41e6b8628402e0ba3a79a75d94ea142e98e158ba01b/merged",
+            "UpperDir": "/var/lib/docker/overlay2/841b0c817ab0a44312e0c41e6b8628402e0ba3a79a75d94ea142e98e158ba01b/diff",
+            "WorkDir": "/var/lib/docker/overlay2/841b0c817ab0a44312e0c41e6b8628402e0ba3a79a75d94ea142e98e158ba01b/work"
+        },
+        "Name": "overlay2"
+    },
+    "RootFS": {
+        "Type": "layers",
+        "Layers": [
+            "sha256:ace0eda3e3be35a979cec764a3321b4c7d0b9e4bb3094d20d3ff6782961a8d54",
+            "sha256:911954e2fe4912454925760227df8972102130813f474a408fb7086071d3dc8f",
+            "sha256:31b11ec6ff38c8580850a0cf7424d0e4c4264c98187d0ee4594c768e6b03dc2d",
+            "sha256:e1a73c32da7617f2994d95e67378444e594debce8579bb285405f66c93544c7e",
+            "sha256:383f309b5d37a3ad29bee763fd84e0b9b70f5470ef710dffe9fff8be6237378a",
+            "sha256:3730a0890c469a88d899c25971f7dfaa704e5860315df27f6dd5a9f32d32b442",
+            "sha256:1d278c39f50af13c7f8866c450cc35d552cd796e03b300194e22ef81c1e33404"
+        ]
+    },
+    "Metadata": {
+        "LastTagTime": "0001-01-01T00:00:00Z"
+    }
+}

@@ -142,17 +142,3 @@ def test_copy_from_and_to_directory(tmp_path):
     new_image_name = docker.image.inspect(new_image_name)
     new_image_name.copy_from("/some_path", tmp_path / "some_path")
     assert "Hello world!" == (tmp_path / "some_path" / "dodo.txt").read_text()
-
-
-def test_many_images():
-    # TODO: get the json inspects results and put them in the "images/" directory
-    for tag in [
-        "ubuntu:16.04",
-        "ubuntu:18.04",
-        "ubuntu:20.04",
-        "busybox:1",
-        "traefik:v2.3.2",
-        "redis:alpine3.12",
-        "docker:19.03.13",
-    ]:
-        docker.pull(tag)._get_inspect_result()
