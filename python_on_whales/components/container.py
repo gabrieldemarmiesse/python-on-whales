@@ -311,7 +311,7 @@ class Container(ReloadableObjectFromJson):
         return ContainerInspectResult.parse_obj(json_object)
 
     # ----------------------------------------------------------------
-    # attributes
+    # attributes taken from the json inspect result
     @property
     def id(self) -> str:
         return self._get_immutable_id()
@@ -329,26 +329,92 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().args
 
     @property
-    def image(self) -> python_on_whales.components.image.Image:
-        return python_on_whales.components.image.Image(
-            self.client_config, self._get_inspect_result().image, is_immutable_id=True
-        )
+    def state(self) -> ContainerState:
+        return self._get_inspect_result().state
+
+    @property
+    def image(self) -> str:
+        return self._get_inspect_result().image
+
+    @property
+    def resolv_conf_path(self) -> str:
+        return self._get_inspect_result().resolv_conf_path
+
+    @property
+    def hostname_path(self) -> str:
+        return self._get_inspect_result().hostname_path
+
+    @property
+    def hosts_path(self) -> str:
+        return self._get_inspect_result().hosts_path
+
+    @property
+    def log_path(self) -> str:
+        return self._get_inspect_result().log_path
+
+    @property
+    def node(self) -> Any:
+        return self._get_inspect_result().node
 
     @property
     def name(self) -> str:
         return removeprefix(self._get_inspect_result().name, "/")
 
     @property
-    def state(self) -> ContainerState:
-        return self._get_inspect_result().state
+    def restart_count(self) -> int:
+        return self._get_inspect_result().restart_count
+
+    @property
+    def driver(self) -> str:
+        return self._get_inspect_result().driver
+
+    @property
+    def platform(self) -> str:
+        return self._get_inspect_result().platform
+
+    @property
+    def mount_label(self) -> str:
+        return self._get_inspect_result().mount_label
+
+    @property
+    def process_label(self) -> str:
+        return self._get_inspect_result().process_label
+
+    @property
+    def app_armor_profile(self) -> str:
+        return self._get_inspect_result().app_armor_profile
+
+    @property
+    def exec_ids(self) -> Optional[List[str]]:
+        return self._get_inspect_result().exec_ids
 
     @property
     def host_config(self) -> ContainerHostConfig:
         return self._get_inspect_result().host_config
 
     @property
+    def graph_driver(self):
+        return self._get_inspect_result().graph_driver
+
+    @property
+    def size_rw(self) -> Optional[int]:
+        return self._get_inspect_result().size_rw
+
+    @property
+    def size_root_fs(self) -> Optional[int]:
+        return self._get_inspect_result().size_root_fs
+
+    @property
+    def mounts(self) -> List[Mount]:
+        return self._get_inspect_result().mounts
+
+    @property
     def config(self) -> ContainerConfig:
         return self._get_inspect_result().config
+
+    @property
+    def network_settings(self) -> NetworkSettings:
+        return self._get_inspect_result().network_settings
 
     # --------------------------------------------------------------------
     # public methods
