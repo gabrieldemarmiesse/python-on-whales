@@ -75,7 +75,7 @@ For example, if you create two containers with the same name from different thre
 succeed. If you pull the same docker image from multiple processes/threads, the Docker daemon will 
 only pull the image and layers once.
 
-Unless you code some dangerous scenario similar to this one
+Just be careful with some scenario similar to this one
 
 ```
 Thread 1: my_container = docker.run(..., detach=True)
@@ -87,4 +87,5 @@ Thread 2: docker.container.prune()
 Thread 1: docker.logs(my_container)  # will fail because the container was removed by thread 2
 ```
 
+In the end, unless you use this type of logic in your code, 
 Python-on-whales is safe to use with multithreading and multiprocessing.
