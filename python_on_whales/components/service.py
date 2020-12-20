@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
+from pydantic import Field
+
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -9,16 +11,21 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import DockerCamelModel, run, to_list
 
 
+class CPUMemoryQuotas(DockerCamelModel):
+    nano_cpus: Optional[int] = Field(alias="NanoCPUs")
+    memory_bytes: Optional[int]
+
+
 class Resources(DockerCamelModel):
-    limits: Dict[str, int]
-    reservations: Dict[str, int]
+    limits: Optional[CPUMemoryQuotas]
+    reservations: Optional[CPUMemoryQuotas]
 
 
 class ContainerSpec(DockerCamelModel):
     image: str
     labels: Dict[str, str]
     privileges: Dict[str, Optional[str]]
-    stop_grace_period: int
+    stop_grace_period: Optional[int]
     isolation: str
     env: Optional[List[str]]
 
@@ -40,24 +47,62 @@ class ServiceSpec(DockerCamelModel):
     name: str
     labels: Dict[str, str]
     mode: Dict[str, Any]
-    update_config: ChangeConfig
-    rollback_config: ChangeConfig
+    update_config: Optional[ChangeConfig]
+    rollback_config: Optional[ChangeConfig]
     task_template: TaskTemplate
 
 
+class ServiceVersion(DockerCamelModel):
+    index: int
+
+
+class EndpointPortConfig(DockerCamelModel):
+    name: Optional[str]
+    protocol: str
+    target_port: int
+    published_port: int
+    publish_mode: str
+
+
+class ServiceEndpointSpec(DockerCamelModel):
+    mode: str
+    ports: Optional[List[EndpointPortConfig]]
+
+
+class VirtualIP(DockerCamelModel):
+    network_id: str
+    addr: str
+
+
+class ServiceEndpoint(DockerCamelModel):
+    spec: ServiceEndpointSpec
+    ports: Optional[List[EndpointPortConfig]]
+    virtual_ips: List[VirtualIP]
+
+
+class ServiceUpdateStatus(DockerCamelModel):
+    state: str
+    started_at: str
+    completed_at: str
+    message: str
+
+
 class ServiceInspectResult(DockerCamelModel):
-    ID: str
-    version: Dict[str, Any]
+    id: str = Field(alias="ID")
+    version: ServiceVersion
     created_at: datetime
     updated_at: datetime
     spec: ServiceSpec
+    previous_spec: Optional[ServiceSpec]
+    endpoint: ServiceEndpoint
+    update_status: Optional[ServiceUpdateStatus]
 
 
 class Service(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "ID", reference, is_immutable_id)
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["service", "inspect", reference])

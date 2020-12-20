@@ -13,8 +13,6 @@ def get_all_services_jsons() -> List[Path]:
 
 @pytest.mark.parametrize("json_file", get_all_services_jsons())
 def test_load_json(json_file):
-    if json_file.name == "1.json":
-        pytest.skip("TODO: FIXE!")
     json_as_txt = json_file.read_text()
     ServiceInspectResult.parse_raw(json_as_txt)
     # we could do more checks here if needed

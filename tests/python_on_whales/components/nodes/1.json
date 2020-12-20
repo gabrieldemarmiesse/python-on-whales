@@ -17,7 +17,7 @@
             "OS": "linux"
         },
         "Resources": {
-            "NanoCPUs": 4000000000,
+            "NanoCPUs": 4000000001,
             "MemoryBytes": 16481628160,
             "GenericResources": [
                 {

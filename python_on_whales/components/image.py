@@ -131,6 +131,10 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().os
 
     @property
+    def os_version(self) -> str:
+        return self._get_inspect_result().os_version
+
+    @property
     def size(self) -> int:
         return self._get_inspect_result().size
 
@@ -139,8 +143,12 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().virtual_size
 
     @property
-    def graph_driver(self) -> Dict[str, Any]:
+    def graph_driver(self) -> ImageGraphDriver:
         return self._get_inspect_result().graph_driver
+
+    @property
+    def root_fs(self) -> ImageRootFS:
+        return self._get_inspect_result().root_fs
 
     @property
     def metadata(self) -> Dict[str, str]:

@@ -14,7 +14,7 @@ from python_on_whales.utils import DockerCamelModel, format_dict_for_cli, run, t
 
 class NetworkIPAM(DockerCamelModel):
     driver: str
-    config: Dict[str, Any]
+    config: List[Dict[str, Any]]
     options: Optional[Dict[str, Any]]
 
 
@@ -63,12 +63,64 @@ class Network(ReloadableObjectFromJson):
         return NetworkInspectResult.parse_obj(json_object)
 
     @property
+    def name(self) -> str:
+        return self._get_inspect_result().name
+
+    @property
     def id(self) -> str:
         return self._get_immutable_id()
 
     @property
-    def name(self) -> List[str]:
-        return self._get_inspect_result().name
+    def created(self) -> datetime:
+        return self._get_inspect_result().created
+
+    @property
+    def scope(self) -> str:
+        return self._get_inspect_result().scope
+
+    @property
+    def driver(self) -> str:
+        return self._get_inspect_result().driver
+
+    @property
+    def enable_ipv6(self) -> bool:
+        return self._get_inspect_result().enable_ipv6
+
+    @property
+    def ipam(self) -> NetworkIPAM:
+        return self._get_inspect_result().ipam
+
+    @property
+    def internal(self) -> bool:
+        return self._get_inspect_result().internal
+
+    @property
+    def attachable(self) -> bool:
+        return self._get_inspect_result().attachable
+
+    @property
+    def ingress(self) -> bool:
+        return self._get_inspect_result().ingress
+
+    @property
+    def containers(self) -> Dict[str, NetworkContainer]:
+        return self._get_inspect_result().containers
+
+    @property
+    def options(self) -> Dict[str, Any]:
+        return self._get_inspect_result().options
+
+    @property
+    def labels(self) -> Dict[str, str]:
+        return self._get_inspect_result().labels
+
+    @property
+    def config_from(self) -> dict:
+        return self._get_inspect_result().config_from
+
+    @property
+    def config_only(self) -> bool:
+        return self._get_inspect_result().config_only
 
     def remove(self) -> None:
         """Removes this Docker network.

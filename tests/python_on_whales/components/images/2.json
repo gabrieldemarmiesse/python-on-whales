@@ -1,0 +1,111 @@
+{
+    "Id": "sha256:c678242f9116148617f225c247be7fb10490d772b3a666d68b2930590d3d25a8",
+    "RepoTags": [
+        "redis:alpine3.12"
+    ],
+    "RepoDigests": [
+        "redis@sha256:68d4030e07912c418332ba6fdab4ac69f0293d9b1daaed4f1f77bdeb0a5eb048"
+    ],
+    "Parent": "",
+    "Comment": "",
+    "Created": "2020-12-17T12:57:17.80785207Z",
+    "Container": "b85671743fb42ddd22ebc831e823b06df60e5b307d5e25af0018385f98cec9ab",
+    "ContainerConfig": {
+        "Hostname": "b85671743fb4",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": {
+            "6379/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "REDIS_VERSION=6.0.9",
+            "REDIS_DOWNLOAD_URL=http://download.redis.io/releases/redis-6.0.9.tar.gz",
+            "REDIS_DOWNLOAD_SHA=dc2bdcf81c620e9f09cfd12e85d3bc631c897b2db7a55218fd8a65eaa37f86dd"
+        ],
+        "Cmd": [
+            "/bin/sh",
+            "-c",
+            "#(nop) ",
+            "CMD [\"redis-server\"]"
+        ],
+        "Image": "sha256:4949819faf8f18577fe8ae708c48aceb84d6e3a5751cfc9bb8dbf0b068c786cb",
+        "Volumes": {
+            "/data": {}
+        },
+        "WorkingDir": "/data",
+        "Entrypoint": [
+            "docker-entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": {}
+    },
+    "DockerVersion": "19.03.12",
+    "Author": "",
+    "Config": {
+        "Hostname": "",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": {
+            "6379/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "REDIS_VERSION=6.0.9",
+            "REDIS_DOWNLOAD_URL=http://download.redis.io/releases/redis-6.0.9.tar.gz",
+            "REDIS_DOWNLOAD_SHA=dc2bdcf81c620e9f09cfd12e85d3bc631c897b2db7a55218fd8a65eaa37f86dd"
+        ],
+        "Cmd": [
+            "redis-server"
+        ],
+        "Image": "sha256:4949819faf8f18577fe8ae708c48aceb84d6e3a5751cfc9bb8dbf0b068c786cb",
+        "Volumes": {
+            "/data": {}
+        },
+        "WorkingDir": "/data",
+        "Entrypoint": [
+            "docker-entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": null
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 31616341,
+    "VirtualSize": 31616341,
+    "GraphDriver": {
+        "Data": {
+            "LowerDir": "/var/lib/docker/overlay2/6f5e3eb323da7c0e75080b9d41f3448e5a5fe34c9836c917ee453d88a553afd9/diff:/var/lib/docker/overlay2/4ed516e8a3b2bec5348aa27d51da80c0dad2035f3d968ba4ae513d8d730d843f/diff:/var/lib/docker/overlay2/7a3c57317f7d49351b9bb754e0a61a620dc774aa2e90985853d628a9e514ac89/diff:/var/lib/docker/overlay2/644178d7533325b02565421282f26bae2af3a11e97e00290698913743572795d/diff:/var/lib/docker/overlay2/bb48fd3da35ef9c574ff9b2d0826f9c63145b094eed5824404918aefe65fcd94/diff",
+            "MergedDir": "/var/lib/docker/overlay2/a655b2d550edeb790f6eb21c39cc5f6b8fe80a6d9378447983ad70ef425f2020/merged",
+            "UpperDir": "/var/lib/docker/overlay2/a655b2d550edeb790f6eb21c39cc5f6b8fe80a6d9378447983ad70ef425f2020/diff",
+            "WorkDir": "/var/lib/docker/overlay2/a655b2d550edeb790f6eb21c39cc5f6b8fe80a6d9378447983ad70ef425f2020/work"
+        },
+        "Name": "overlay2"
+    },
+    "RootFS": {
+        "Type": "layers",
+        "Layers": [
+            "sha256:777b2c648970480f50f5b4d0af8f9a8ea798eea43dbcf40ce4a8c7118736bdcf",
+            "sha256:10ce09ccc048def7727127196c6e7a3b45eaa02772f82b24ac8c2ac397b35a6e",
+            "sha256:d47a16a2e9cb0a5a4f7dbfc01e015eb68bd22303cfb2f2ba4b52254e27c7e3df",
+            "sha256:be0117672de887757febc2858d452d7307bac8b24e30edf3f436a63bd2715613",
+            "sha256:744c670930f0e851640272f1ed12b74a49826a4d7ad73942e40fdb946b4f93a3",
+            "sha256:e943c2cabaacd1739472683906d4bf3f06311ab4f06ad490399cf7d0db23d59b"
+        ]
+    },
+    "Metadata": {
+        "LastTagTime": "0001-01-01T00:00:00Z"
+    }
+}

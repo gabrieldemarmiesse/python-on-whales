@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
+
+from pydantic import Field
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -8,16 +13,96 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import DockerCamelModel, run, to_list
 
 
+class NodeVersion(DockerCamelModel):
+    index: int
+
+
+class NodeSpec(DockerCamelModel):
+    name: Optional[str]
+    labels: Dict[str, str]
+    role: str
+    availability: str
+
+
+class NodePlatform(DockerCamelModel):
+    architecture: str
+    os: str = Field(alias="OS")
+
+
+class NodeNamedResourceSpec(DockerCamelModel):
+    kind: str
+    value: str
+
+
+class NodeDiscreteResourceSpec(DockerCamelModel):
+    kind: str
+    value: int
+
+
+class NodeGenericResource(DockerCamelModel):
+    named_resource_spec: Optional[NodeNamedResourceSpec]
+    discrete_resource_spec: Optional[NodeDiscreteResourceSpec]
+
+
+class NodeResource(DockerCamelModel):
+    nano_cpus: int = Field(alias="NanoCPUs")
+    memory_bytes: int
+    generic_resources: Optional[List[NodeGenericResource]]
+
+
+class EnginePlugin(DockerCamelModel):
+    type: str
+    name: str
+
+
+class NodeEngine(DockerCamelModel):
+    engine_version: str
+    labels: Optional[Dict[str, str]]
+    plugins: List[EnginePlugin]
+
+
+class NodeTLSInfo(DockerCamelModel):
+    trust_root: str
+    cert_issuer_subject: str
+    cert_issuer_public_key: str
+
+
+class NodeDescription(DockerCamelModel):
+    hostname: str
+    platform: NodePlatform
+    resources: NodeResource
+    engine: NodeEngine
+    tls_info: NodeTLSInfo
+
+
+class NodeStatus(DockerCamelModel):
+    state: str
+    message: Optional[str]
+    addr: str
+
+
+class NodeManagerStatus(DockerCamelModel):
+    leader: bool
+    reachability: str
+    addr: str
+
+
 class NodeInspectResult(DockerCamelModel):
-    ID: str
-    version: dict
+    id: str = Field(alias="ID")
+    version: NodeVersion
+    created_at: datetime
+    updated_at: datetime
+    spec: NodeSpec
+    description: NodeDescription
+    status: NodeStatus
+    manager_status: Optional[NodeManagerStatus]
 
 
 class Node(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "ID", reference, is_immutable_id)
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["node", "inspect", reference])
@@ -28,6 +113,34 @@ class Node(ReloadableObjectFromJson):
     @property
     def id(self) -> str:
         return self._get_immutable_id()
+
+    @property
+    def version(self) -> NodeVersion:
+        return self._get_inspect_result().version
+
+    @property
+    def created_at(self) -> datetime:
+        return self._get_inspect_result().created_at
+
+    @property
+    def updated_at(self) -> datetime:
+        return self._get_inspect_result().updated_at
+
+    @property
+    def spec(self) -> NodeSpec:
+        return self._get_inspect_result().spec
+
+    @property
+    def description(self) -> NodeDescription:
+        return self._get_inspect_result().description
+
+    @property
+    def status(self) -> NodeStatus:
+        return self._get_inspect_result().status
+
+    @property
+    def manager_status(self) -> Optional[NodeManagerStatus]:
+        return self._get_inspect_result().manager_status
 
     def update(
         self,
