@@ -92,6 +92,11 @@ class ContainerRestartPolicy(DockerCamelModel):
     maximum_retry_count: Optional[int]
 
 
+class PortBinding(DockerCamelModel):
+    host_ip: str
+    host_port: str
+
+
 class ContainerHostConfig(DockerCamelModel):
     cpu_shares: int
     memory: int
@@ -127,7 +132,7 @@ class ContainerHostConfig(DockerCamelModel):
     container_id_file: Path
     log_config: ContainerLogConfig
     network_mode: str
-    port_bindings: Optional[Dict[str, Any]]  # needs reworking
+    port_bindings: Optional[Dict[str, Optional[List[PortBinding]]]]
     restart_policy: ContainerRestartPolicy
     auto_remove: bool
     volume_driver: str
