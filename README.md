@@ -115,6 +115,7 @@ attributes are updated in real-time!
 * Each Docker object can be used as a context manager. When getting out of the 
 context, the Docker object is removed automatically, even if an exception occurs.
 * A fully typed API (Mypy and IDE-friendly) compatible with `pathlib` and `os.path`
+* All Docker objects and the Docker client are safe to use with multithreading and multiprocessing.
 
 ## Why another project? Why not build on Docker-py?
 

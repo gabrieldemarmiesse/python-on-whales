@@ -57,3 +57,34 @@ They're actually aliases
 * [`docker.unpause`](sub-commands/container.md#unpause)
 * [`docker.update`](sub-commands/container.md#update)
 * [`docker.wait`](sub-commands/container.md#wait)
+
+
+# About multithreading and multiprocessing
+
+Behind the scenes, Python on whales calls the Docker command line interface with
+subprocess. The Python on whales client does not store any intermediate state so it's safe 
+to use with multithreading. 
+
+The Docker objects store some intermediate states (the attributes 
+that you would normally get with `docker ... inspect`but no logic in 
+the codebase depends on those attributes. They're just here so that users can look at them. 
+So you can share them between process/threads and pickle containers, images, networks...
+
+The Docker daemon works with its own objects internally and handles concurrent and conflicting requests. 
+For example, if you create two containers with the same name from different threads, only one will 
+succeed. If you pull the same docker image from multiple processes/threads, the Docker daemon will 
+only pull the image and layers once.
+
+Unless you code some dangerous scenario similar to this one
+
+```
+Thread 1: my_container = docker.run(..., detach=True)
+...
+# my_container finishes
+...
+Thread 2: docker.container.prune()
+...
+Thread 1: docker.logs(my_container)  # will fail because the container was removed by thread 2
+```
+
+Python-on-whales is safe to use with multithreading and multiprocessing.
