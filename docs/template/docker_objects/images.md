@@ -25,6 +25,10 @@ def print_dodo(image: Image):
 It attributes are the same that you get with the command line:
 `docker image inspect ...`
 
+To get a complete description of those attributes, you 
+can take a look at the [daemon api reference page](https://docs.docker.com/engine/api/v1.40/#operation/ImageInspect) 
+and click on "200 No error".
+
 An example is worth many lines of descriptions.
 
 ```
