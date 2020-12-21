@@ -123,6 +123,10 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().author
 
     @property
+    def config(self) -> python_on_whales.components.container.ContainerConfig:
+        return self._get_inspect_result().config
+
+    @property
     def architecture(self) -> str:
         return self._get_inspect_result().architecture
 
