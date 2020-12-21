@@ -20,14 +20,14 @@ volume = docker.volume.create()
 
 with volume:
     to_evaluate = [
-    "volume.name",
-    "volume.driver",
-    "volume.mountpoint",
-    "volume.created_at",
-    "volume.status",
-    "volume.labels",
-    "volume.scope",
-    "volume.options",
+        "volume.name",
+        "volume.driver",
+        "volume.mountpoint",
+        "volume.created_at",
+        "volume.status",
+        "volume.labels",
+        "volume.scope",
+        "volume.options",
     ]
 
     for i, attribute_access in enumerate(to_evaluate):

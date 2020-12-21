@@ -50,6 +50,7 @@ class Volume(ReloadableObjectFromJson):
     @property
     def name(self) -> str:
         return self._get_immutable_id()
+
     @property
     def driver(self) -> str:
         return self._get_inspect_result().driver
@@ -71,7 +72,7 @@ class Volume(ReloadableObjectFromJson):
         return self._get_inspect_result().labels
 
     @property
-    def scope(self) ->str:
+    def scope(self) -> str:
         return self._get_inspect_result().scope
 
     @property
