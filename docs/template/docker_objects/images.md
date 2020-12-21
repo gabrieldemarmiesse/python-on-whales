@@ -30,14 +30,14 @@ An example is worth many lines of descriptions.
 ```
 In [1]: from python_on_whales import docker
 
-In [2]: image = docker.pull("ubuntu:20.04")
+In [2]: image = docker.pull("ubuntu")
 20.04: Pulling from library/ubuntu
 6a5697faee43: Pull complete
 ba13d3bc422b: Pull complete
 a254829d9e55: Pull complete
 Digest: sha256:fff16eea1a8ae92867721d90c59a75652ea66d29c05294e6e2f898704bdb8cf1
-Status: Downloaded newer image for ubuntu:20.04
-docker.io/library/ubuntu:20.04
+Status: Downloaded newer image for ubuntu:latest
+docker.io/library/ubuntu:latest
 
 In [3]: def super_print(obj):
    ...:     print(f"type={type(obj)}, value={obj}")
