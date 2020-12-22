@@ -276,9 +276,9 @@ class ContainerInspectResult(DockerCamelModel):
     state: ContainerState
     image: str
     resolv_conf_path: str
-    hostname_path: str
-    hosts_path: str
-    log_path: str
+    hostname_path: Path
+    hosts_path: Path
+    log_path: Path
     node: Any
     name: str
     restart_count: int
@@ -351,15 +351,15 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().resolv_conf_path
 
     @property
-    def hostname_path(self) -> str:
+    def hostname_path(self) -> Path:
         return self._get_inspect_result().hostname_path
 
     @property
-    def hosts_path(self) -> str:
+    def hosts_path(self) -> Path:
         return self._get_inspect_result().hosts_path
 
     @property
-    def log_path(self) -> str:
+    def log_path(self) -> Path:
         return self._get_inspect_result().log_path
 
     @property
