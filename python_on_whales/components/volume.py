@@ -35,6 +35,12 @@ class Volume(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "name", reference, is_immutable_id)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.remove()
+
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["volume", "inspect", reference])
 
@@ -46,16 +52,32 @@ class Volume(ReloadableObjectFromJson):
         return self._get_immutable_id()
 
     @property
-    def created_at(self) -> datetime:
-        return self._get_inspect_result().created_at
-
-    @property
     def driver(self) -> str:
         return self._get_inspect_result().driver
 
     @property
+    def mountpoint(self) -> Path:
+        return self._get_inspect_result().mountpoint
+
+    @property
+    def created_at(self) -> datetime:
+        return self._get_inspect_result().created_at
+
+    @property
+    def status(self) -> Optional[Dict[str, Any]]:
+        return self._get_inspect_result().status
+
+    @property
     def labels(self) -> Dict[str, str]:
         return self._get_inspect_result().labels
+
+    @property
+    def scope(self) -> str:
+        return self._get_inspect_result().scope
+
+    @property
+    def options(self) -> Optional[Dict[str, str]]:
+        return self._get_inspect_result().options
 
     def remove(self) -> None:
         """Removes this volume"""
