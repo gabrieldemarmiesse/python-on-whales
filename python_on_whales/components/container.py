@@ -263,6 +263,11 @@ class NetworkSettings(DockerCamelModel):
     networks: Dict[str, NetworkInspectResult]
 
 
+class ContainerGraphDriver(DockerCamelModel):
+    name: str
+    data: Dict[str, Any]
+
+
 class ContainerInspectResult(DockerCamelModel):
     id: str
     created: datetime
@@ -284,7 +289,7 @@ class ContainerInspectResult(DockerCamelModel):
     app_armor_profile: str
     exec_ids: Optional[List[str]]
     host_config: ContainerHostConfig
-    graph_driver: Dict[str, Any]  # to rework
+    graph_driver: ContainerGraphDriver
     size_rw: Optional[int]
     size_root_fs: Optional[int]
     mounts: List[Mount]
@@ -398,7 +403,7 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().host_config
 
     @property
-    def graph_driver(self):
+    def graph_driver(self) -> ContainerGraphDriver:
         return self._get_inspect_result().graph_driver
 
     @property
