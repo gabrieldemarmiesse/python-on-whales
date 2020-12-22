@@ -1,5 +1,6 @@
 import shutil
 
+from docs_utils import add_links, generate_code_demo_volumes
 from keras_autodoc import DocumentationGenerator, get_methods
 
 from python_on_whales.utils import PROJECT_ROOT
@@ -97,15 +98,6 @@ doc_generator = MyDocumentationGenerator(
 )
 
 
-def add_links(text):
-    text = text.replace(
-        "`python_on_whales.Container`",
-        "[`python_on_whales.Container`](/docker_objects/containers/)",
-    )
-
-    return text
-
-
 destination = PROJECT_ROOT / "docs" / "generated_sources"
 doc_generator.generate(destination)
 shutil.copyfile(PROJECT_ROOT / "README.md", destination / "index.md")
@@ -117,3 +109,10 @@ bb = destination / "sub-commands" / "container.md"
 
 for file in destination.rglob("*.md"):
     file.write_text(add_links(file.read_text()))
+
+
+generated_code_volumes = generate_code_demo_volumes()
+volume_file = destination / "docker_objects/volumes.md"
+volume_file.write_text(
+    volume_file.read_text().replace("@INSERT_GENERATED_CODE@", generated_code_volumes)
+)
