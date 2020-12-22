@@ -97,6 +97,37 @@ class PortBinding(DockerCamelModel):
     host_port: str
 
 
+class ContainerMountBindOption(DockerCamelModel):
+    propagation: str
+    non_recursive: bool
+
+
+class ContainerVolumeDriverConfig(DockerCamelModel):
+    name: str
+    options: Dict[str, Any]
+
+
+class ContainerVolumeOptions(DockerCamelModel):
+    no_copy: Optional[bool]
+    labels: Dict[str, str]
+
+
+class ContainerTmpfsOptions(DockerCamelModel):
+    size_bytes: int
+    mode: int
+
+
+class ContainerMount(DockerCamelModel):
+    target: Path
+    source: str
+    type: str
+    read_only: Optional[bool]
+    consistency: Optional[str]
+    bind_options: Optional[ContainerMountBindOption]
+    volume_options: Optional[ContainerVolumeOptions]
+    tmpfs_options: Optional[ContainerTmpfsOptions]
+
+
 class ContainerHostConfig(DockerCamelModel):
     cpu_shares: int
     memory: int
@@ -137,7 +168,7 @@ class ContainerHostConfig(DockerCamelModel):
     auto_remove: bool
     volume_driver: str
     volumes_from: Optional[str]
-    mounts: Any  # needs reworking
+    mounts: Optional[List[ContainerMount]]
     capabilities: Optional[List[str]]
     cap_add: Optional[List[str]]
     cap_drop: Optional[List[str]]
@@ -276,9 +307,9 @@ class ContainerInspectResult(DockerCamelModel):
     state: ContainerState
     image: str
     resolv_conf_path: str
-    hostname_path: str
-    hosts_path: str
-    log_path: str
+    hostname_path: Path
+    hosts_path: Path
+    log_path: Path
     node: Any
     name: str
     restart_count: int
@@ -351,15 +382,15 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().resolv_conf_path
 
     @property
-    def hostname_path(self) -> str:
+    def hostname_path(self) -> Path:
         return self._get_inspect_result().hostname_path
 
     @property
-    def hosts_path(self) -> str:
+    def hosts_path(self) -> Path:
         return self._get_inspect_result().hosts_path
 
     @property
-    def log_path(self) -> str:
+    def log_path(self) -> Path:
         return self._get_inspect_result().log_path
 
     @property
