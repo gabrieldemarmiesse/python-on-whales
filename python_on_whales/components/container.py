@@ -97,6 +97,37 @@ class PortBinding(DockerCamelModel):
     host_port: str
 
 
+class ContainerMountBindOption(DockerCamelModel):
+    propagation: str
+    non_recursive: bool
+
+
+class ContainerVolumeDriverConfig(DockerCamelModel):
+    name: str
+    options: Dict[str, Any]
+
+
+class ContainerVolumeOptions(DockerCamelModel):
+    no_copy: Optional[bool]
+    labels: Dict[str, str]
+
+
+class ContainerTmpfsOptions(DockerCamelModel):
+    size_bytes: int
+    mode: int
+
+
+class ContainerMount(DockerCamelModel):
+    target: Path
+    source: str
+    type: str
+    read_only: Optional[bool]
+    consistency: Optional[str]
+    bind_options: Optional[ContainerMountBindOption]
+    volume_options: Optional[ContainerVolumeOptions]
+    tmpfs_options: Optional[ContainerTmpfsOptions]
+
+
 class ContainerHostConfig(DockerCamelModel):
     cpu_shares: int
     memory: int
@@ -137,7 +168,7 @@ class ContainerHostConfig(DockerCamelModel):
     auto_remove: bool
     volume_driver: str
     volumes_from: Optional[str]
-    mounts: Any  # needs reworking
+    mounts: Optional[List[ContainerMount]]
     capabilities: Optional[List[str]]
     cap_add: Optional[List[str]]
     cap_drop: Optional[List[str]]
