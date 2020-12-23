@@ -49,6 +49,51 @@ def generate_code_demo_networks() -> str:
     return "\n".join(result)
 
 
+def generate_code_demo_nodes() -> str:
+    result = []
+
+    docker.swarm.init()
+    node = docker.node.list()[0]
+    print(node.id)
+
+    to_evaluate = [
+        "node.id",
+        "node.version.index",
+        "node.created_at",
+        "node.updated_at",
+        "node.spec.name",
+        "node.spec.labels",
+        "node.spec.role",
+        "node.spec.availability",
+        "node.description.hostname",
+        "node.description.platform.architecture",
+        "node.description.platform.os",
+        "node.description.resources.nano_cpus",
+        "node.description.resources.memory_bytes",
+        "node.description.resources.generic_resources",
+        "node.description.engine.engine_version",
+        "node.description.engine.labels",
+        "node.description.engine.plugins",
+        "node.description.tls_info.trust_root",
+        "node.description.tls_info.cert_issuer_subject",
+        "node.description.tls_info.cert_issuer_public_key",
+        "node.status.state",
+        "node.status.message",
+        "node.status.addr",
+        "node.manager_status.leader",
+        "node.manager_status.reachability",
+        "node.manager_status.addr",
+    ]
+
+    for i, attribute_access in enumerate(to_evaluate):
+        value = eval(attribute_access)
+        result.append(write_code(i + 4, attribute_access, value))
+
+    docker.swarm.leave(force=True)
+
+    return "\n".join(result)
+
+
 def generate_code_demo_volumes() -> str:
     result = []
 
@@ -94,7 +139,7 @@ def generate_code_demo_builders() -> str:
 def generate_code_demo_images() -> str:
     result = []
 
-    image = docker.pull("ubuntu")
+    image = docker.image._pull_if_necessary("ubuntu")
     print(f"Generating example for {image.repo_tags}")
     to_evaluate = [
         "image.id",
