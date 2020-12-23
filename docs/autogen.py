@@ -4,6 +4,7 @@ from docs_utils import (
     add_links,
     generate_code_demo_containers,
     generate_code_demo_images,
+    generate_code_demo_networks,
     generate_code_demo_volumes,
 )
 from keras_autodoc import DocumentationGenerator, get_methods
@@ -115,6 +116,12 @@ bb = destination / "sub-commands" / "container.md"
 for file in destination.rglob("*.md"):
     file.write_text(add_links(file.read_text()))
 
+networks_file = destination / "docker_objects/networks.md"
+networks_file.write_text(
+    networks_file.read_text().replace(
+        "@INSERT_GENERATED_CODE@", generate_code_demo_networks()
+    )
+)
 
 generated_code_volumes = generate_code_demo_volumes()
 volume_file = destination / "docker_objects/volumes.md"
