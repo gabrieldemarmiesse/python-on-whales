@@ -1,7 +1,9 @@
 import shutil
 
 from docs_utils import (
+    add_code_example,
     add_links,
+    generate_code_demo_builders,
     generate_code_demo_containers,
     generate_code_demo_images,
     generate_code_demo_networks,
@@ -116,29 +118,9 @@ bb = destination / "sub-commands" / "container.md"
 for file in destination.rglob("*.md"):
     file.write_text(add_links(file.read_text()))
 
-networks_file = destination / "docker_objects/networks.md"
-networks_file.write_text(
-    networks_file.read_text().replace(
-        "@INSERT_GENERATED_CODE@", generate_code_demo_networks()
-    )
-)
 
-generated_code_volumes = generate_code_demo_volumes()
-volume_file = destination / "docker_objects/volumes.md"
-volume_file.write_text(
-    volume_file.read_text().replace("@INSERT_GENERATED_CODE@", generated_code_volumes)
-)
-
-generated_code_images = generate_code_demo_images()
-images_file = destination / "docker_objects/images.md"
-images_file.write_text(
-    images_file.read_text().replace("@INSERT_GENERATED_CODE@", generated_code_images)
-)
-
-generated_code_containers = generate_code_demo_containers()
-containers_file = destination / "docker_objects/containers.md"
-containers_file.write_text(
-    containers_file.read_text().replace(
-        "@INSERT_GENERATED_CODE@", generated_code_containers
-    )
-)
+add_code_example(destination, "networks.md", generate_code_demo_networks())
+add_code_example(destination, "volumes.md", generate_code_demo_volumes())
+add_code_example(destination, "images.md", generate_code_demo_images())
+add_code_example(destination, "containers.md", generate_code_demo_containers())
+add_code_example(destination, "builders.md", generate_code_demo_builders())
