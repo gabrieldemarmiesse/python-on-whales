@@ -83,7 +83,7 @@ class MyDocumentationGenerator(DocumentationGenerator):
 
 doc_generator = MyDocumentationGenerator(
     pages,
-    template_dir="./template",
+    template_dir=PROJECT_ROOT / "docs/template",
     extra_aliases=[
         "python_on_whales.Builder",
         "python_on_whales.Container",
