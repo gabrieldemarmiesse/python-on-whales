@@ -8,6 +8,47 @@ type = {type(value)}, value = {value}
     return string
 
 
+def generate_code_demo_networks() -> str:
+    result = []
+
+    network = docker.network.create("my-network")
+    with network:
+        container = docker.run(
+            "ubuntu",
+            ["sleep", "infinity"],
+            name="my_ubuntu",
+            detach=True,
+            networks=[network],
+            remove=True,
+        )
+        with container:
+            to_evaluate = [
+                "network.name",
+                "network.id",
+                "network.created",
+                "network.scope",
+                "network.driver",
+                "network.enable_ipv6",
+                "network.ipam.driver",
+                "network.ipam.config",
+                "network.ipam.options",
+                "network.internal",
+                "network.attachable",
+                "network.ingress",
+                "network.containers",
+                "network.options",
+                "network.labels",
+                "network.config_from",
+                "network.config_only",
+            ]
+
+            for i, attribute_access in enumerate(to_evaluate):
+                value = eval(attribute_access)
+                result.append(write_code(i + 5, attribute_access, value))
+
+    return "\n".join(result)
+
+
 def generate_code_demo_volumes() -> str:
     result = []
 
