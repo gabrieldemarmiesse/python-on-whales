@@ -7,6 +7,7 @@ from docs_utils import (
     generate_code_demo_containers,
     generate_code_demo_images,
     generate_code_demo_networks,
+    generate_code_demo_nodes,
     generate_code_demo_volumes,
 )
 from keras_autodoc import DocumentationGenerator, get_methods
@@ -124,3 +125,4 @@ add_code_example(destination, "volumes.md", generate_code_demo_volumes())
 add_code_example(destination, "images.md", generate_code_demo_images())
 add_code_example(destination, "containers.md", generate_code_demo_containers())
 add_code_example(destination, "builders.md", generate_code_demo_builders())
+add_code_example(destination, "nodes.md", generate_code_demo_nodes())
