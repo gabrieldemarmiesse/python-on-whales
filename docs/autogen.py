@@ -1,6 +1,11 @@
 import shutil
 
-from docs_utils import add_links, generate_code_demo_images, generate_code_demo_volumes
+from docs_utils import (
+    add_links,
+    generate_code_demo_containers,
+    generate_code_demo_images,
+    generate_code_demo_volumes,
+)
 from keras_autodoc import DocumentationGenerator, get_methods
 
 from python_on_whales.utils import PROJECT_ROOT
@@ -117,9 +122,16 @@ volume_file.write_text(
     volume_file.read_text().replace("@INSERT_GENERATED_CODE@", generated_code_volumes)
 )
 
-
 generated_code_images = generate_code_demo_images()
 images_file = destination / "docker_objects/images.md"
 images_file.write_text(
     images_file.read_text().replace("@INSERT_GENERATED_CODE@", generated_code_images)
+)
+
+generated_code_containers = generate_code_demo_containers()
+containers_file = destination / "docker_objects/containers.md"
+containers_file.write_text(
+    containers_file.read_text().replace(
+        "@INSERT_GENERATED_CODE@", generated_code_containers
+    )
 )
