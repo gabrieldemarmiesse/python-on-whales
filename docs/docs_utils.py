@@ -73,6 +73,24 @@ def generate_code_demo_volumes() -> str:
     return "\n".join(result)
 
 
+def generate_code_demo_builders() -> str:
+    result = []
+
+    builder = docker.buildx.create()
+
+    with builder:
+        to_evaluate = [
+            "builder.name",
+            "builder.driver",
+        ]
+
+        for i, attribute_access in enumerate(to_evaluate):
+            value = eval(attribute_access)
+            result.append(write_code(i + 4, attribute_access, value))
+
+    return "\n".join(result)
+
+
 def generate_code_demo_images() -> str:
     result = []
 
@@ -255,3 +273,8 @@ def add_links(text):
     )
 
     return text
+
+
+def add_code_example(destination, markdown_file: str, code: str):
+    path_file = destination / "docker_objects" / markdown_file
+    path_file.write_text(path_file.read_text().replace("@INSERT_GENERATED_CODE@", code))
