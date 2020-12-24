@@ -23,8 +23,8 @@ class Resources(DockerCamelModel):
 
 class ContainerSpec(DockerCamelModel):
     image: str
-    labels: Dict[str, str]
-    privileges: Dict[str, Optional[str]]
+    labels: Optional[Dict[str, str]]
+    privileges: Optional[Dict[str, Optional[str]]]
     stop_grace_period: Optional[int]
     isolation: str
     env: Optional[List[str]]
@@ -46,7 +46,7 @@ class ChangeConfig(DockerCamelModel):
 class ServiceSpec(DockerCamelModel):
     name: str
     labels: Dict[str, str]
-    mode: Dict[str, Any]
+    mode: Optional[Dict[str, Any]]
     update_config: Optional[ChangeConfig]
     rollback_config: Optional[ChangeConfig]
     task_template: TaskTemplate
@@ -65,7 +65,7 @@ class EndpointPortConfig(DockerCamelModel):
 
 
 class ServiceEndpointSpec(DockerCamelModel):
-    mode: str
+    mode: Optional[str]
     ports: Optional[List[EndpointPortConfig]]
 
 
@@ -77,7 +77,7 @@ class VirtualIP(DockerCamelModel):
 class ServiceEndpoint(DockerCamelModel):
     spec: ServiceEndpointSpec
     ports: Optional[List[EndpointPortConfig]]
-    virtual_ips: List[VirtualIP]
+    virtual_ips: Optional[List[VirtualIP]]
 
 
 class ServiceUpdateStatus(DockerCamelModel):
