@@ -130,6 +130,18 @@ class Service(ReloadableObjectFromJson):
     def spec(self) -> ServiceSpec:
         return self._get_inspect_result().spec
 
+    @property
+    def previous_spec(self) -> Optional[ServiceSpec]:
+        return self._get_inspect_result().previous_spec
+
+    @property
+    def endpoint(self) -> ServiceEndpoint:
+        return self._get_inspect_result().endpoint
+
+    @property
+    def update_status(self) -> Optional[ServiceUpdateStatus]:
+        return self._get_inspect_result().update_status
+
 
 ValidService = Union[str, Service]
 

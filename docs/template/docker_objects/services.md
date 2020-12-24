@@ -37,7 +37,7 @@ In [1]: from python_on_whales import docker
 
 In [2]: docker.swarm.init()
 
-In [3]: docker.node.list()[0]
+In [3]: my_service = docker.service.create("busybox", ["ping", "www.google.com"])
 
 In [4]: def super_print(obj):
    ...:     print(f"type = {type(obj)}, value = {obj}")
