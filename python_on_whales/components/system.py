@@ -1,4 +1,5 @@
 import json
+from typing import Any, List
 
 import pydantic
 
@@ -36,6 +37,27 @@ class DiskFreeResult:
         self.volumes = DockerItemsSummary.parse_obj(docker_items["Local Volumes"])
         self.build_cache: DockerItemsSummary
         self.build_cache = DockerItemsSummary.parse_obj(docker_items["Build Cache"])
+
+
+class Plugins(DockerCamelModel):
+    volumes: List[str]
+    network: List[str]
+    authorization: Any
+    log: List[str]
+
+
+class SystemInfoResults(DockerCamelModel):
+    id: str = pydantic.Field(alias="ID")
+    containers: int
+    containers_running: int
+    containers_paused: int
+    images: int
+    driver: str
+    driver_status: List[List[str]]
+    system_status: Any
+    plugins: Plugins
+    memory_limit: bool
+    # TODO: finish declaring the attributes
 
 
 class SystemCLI(DockerCLICaller):
