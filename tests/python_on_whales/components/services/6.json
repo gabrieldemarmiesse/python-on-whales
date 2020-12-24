@@ -1,0 +1,98 @@
+{
+    "ID": "3hf0mk2551bceek1g468ks0hj",
+    "Version": {
+        "Index": 11
+    },
+    "CreatedAt": "2020-12-24T08:00:49.1487607Z",
+    "UpdatedAt": "2020-12-24T08:00:49.1487607Z",
+    "Spec": {
+        "Name": "jovial_snyder",
+        "Labels": {},
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "busybox:latest@sha256:bde48e1751173b709090c2539fdf12d6ba64e88ec7a4301591227ce925f3c678",
+                "Args": [
+                    "ping",
+                    "www.google.com"
+                ],
+                "Init": false,
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {},
+                "Reservations": {}
+            },
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    },
+                    {
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "arm64",
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "386",
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "mips64le",
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "ppc64le",
+                        "OS": "linux"
+                    },
+                    {
+                        "Architecture": "s390x",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {}
+    }
+}
