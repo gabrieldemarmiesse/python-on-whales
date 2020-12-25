@@ -1,9 +1,10 @@
 import json
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pydantic
 
+import python_on_whales.components.node
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import DockerCamelModel, run
 
@@ -47,6 +48,16 @@ class Plugins(DockerCamelModel):
     log: List[str]
 
 
+class Runtime(DockerCamelModel):
+    path: str
+    runtime_args: Optional[List[str]]
+
+
+class Commit(DockerCamelModel):
+    id: str = pydantic.Field(alias="ID")
+    expected: str
+
+
 class SystemInfoResults(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     containers: int
@@ -69,8 +80,46 @@ class SystemInfoResults(DockerCamelModel):
     pids_limit: bool
     oom_kill_disable: bool
     ipv4_forwarding: bool
-
-    # TODO: finish declaring the attributes
+    bridge_nf_iptables: bool
+    bridge_nf_ip6tables: bool
+    debug: bool
+    nfd: int = pydantic.Field(alias="NFd")
+    n_goroutines: int
+    system_time: str
+    logging_driver: str
+    cgroup_driver: str
+    n_event_listener: int
+    kernel_version: int
+    operating_system: str
+    os_type: str = pydantic.Field(alias="OSType")
+    architecture: str
+    n_cpu: int
+    mem_total: int
+    index_server_address: str
+    registry_config: Dict[str, Any]
+    generic_resources: Optional[
+        List[python_on_whales.components.node.NodeGenericResource]
+    ]
+    http_proxy: str
+    https_proxy: str
+    no_proxy: str
+    name: str
+    labels: Dict[str, str]
+    experimental_build: bool
+    server_version: str
+    cluster_store: str
+    runtimes: Dict[str, Runtime]
+    default_runtime: str
+    swarm: dict  # TODO
+    live_restore_enabled: bool
+    isolation: str
+    init_binary: str
+    containerd_commit: Commit
+    runc_commit: Commit
+    init_commit: Commit
+    security_options: List[str]
+    product_license: str
+    warnings: List[str]
 
 
 class SystemCLI(DockerCLICaller):
