@@ -58,6 +58,20 @@ class Commit(DockerCamelModel):
     expected: str
 
 
+class RemoteManager(DockerCamelModel):
+    node_id: str
+    addr: str
+
+
+class SwarmInfo(DockerCamelModel):
+    node_id: str
+    node_addr: str
+    local_node_state: str
+    control_available: bool
+    error: str
+    remote_managers: List[RemoteManager]
+
+
 class SystemInfoResults(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     containers: int
