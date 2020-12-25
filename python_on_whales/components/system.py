@@ -1,5 +1,6 @@
 import json
-from typing import Any, List
+from pathlib import Path
+from typing import Any, List, Optional
 
 import pydantic
 
@@ -51,12 +52,24 @@ class SystemInfoResults(DockerCamelModel):
     containers: int
     containers_running: int
     containers_paused: int
+    containers_stopped: int
     images: int
     driver: str
     driver_status: List[List[str]]
-    system_status: Any
+    docker_root_dir: Path
+    system_status: Optional[List[str]]
     plugins: Plugins
     memory_limit: bool
+    swap_limit: bool
+    kernel_memory: bool
+    cpu_cfs_period: bool
+    cpu_cfs_quota: bool
+    cpu_shares: bool
+    cpu_set: bool
+    pids_limit: bool
+    oom_kill_disable: bool
+    ipv4_forwarding: bool
+
     # TODO: finish declaring the attributes
 
 
