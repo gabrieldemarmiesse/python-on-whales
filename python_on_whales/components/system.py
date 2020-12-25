@@ -125,7 +125,7 @@ class ClientInfo(DockerCamelModel):
     warnings: Optional[List[str]]
 
 
-class SystemInfoResults(DockerCamelModel):
+class SystemInfo(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     containers: int
     containers_running: int
@@ -221,10 +221,30 @@ class SystemCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def info(self) -> SystemInfoResults:
-        """Not yet implemented"""
+    def info(self) -> SystemInfo:
+        """Returns diverse information about the Docker client and daemon.
+
+        # Returns
+            A `python_on_whales.SystemInfo` object
+
+        As an example
+
+        ```python
+        from python_on_whales import docker
+
+        info = docker.system.info()
+        print(info.images)
+        # 40
+        print(info.plugins.volume)
+        # ["local"}
+        ...
+        ```
+
+        You can find all attributes available by looking up the [reference page for
+        system info](https://docs.docker.com/engine/api/v1.40/#operation/SystemInfo).
+        """
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
-        return SystemInfoResults.parse_raw(run(full_cmd))
+        return SystemInfo.parse_raw(run(full_cmd))
 
     def prune(self, all: bool = False, volumes: bool = False) -> None:
         """Remove unused docker data

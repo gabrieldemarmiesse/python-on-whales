@@ -5,6 +5,7 @@ from .components.network import Network
 from .components.node import Node
 from .components.service import Service
 from .components.stack import Stack
+from .components.system import SystemInfo
 from .components.volume import Volume
 from .docker_client import DockerClient
 from .utils import DockerException
