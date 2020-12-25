@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -42,7 +43,7 @@ class DiskFreeResult:
 
 
 class Plugins(DockerCamelModel):
-    volumes: List[str]
+    volume: List[str]
     network: List[str]
     authorization: Any
     log: List[str]
@@ -63,13 +64,65 @@ class RemoteManager(DockerCamelModel):
     addr: str
 
 
+class Orchestration(DockerCamelModel):
+    task_history_retention_limit: int
+
+
+class Raft(DockerCamelModel):
+    snapshot_interval: int
+    keep_old_snapshots: int
+    log_entries_for_slow_followers: int
+    election_tick: int
+    heartbeat_tick: int
+    # TODO: add the other attributes
+
+
+class SwarmSpec(DockerCamelModel):
+    name: str
+    labels: Dict[str, str]
+    orchestration: Orchestration
+    raft: Raft
+
+
+class ClusterInfo(DockerCamelModel):
+    id: str = pydantic.Field(alias="ID")
+    version: python_on_whales.components.node.NodeVersion
+    created_at: datetime
+    updated_at: datetime
+    spec: Dict  # TODO
+    tls_info: python_on_whales.components.node.NodeTLSInfo
+    root_rotation_in_progress: bool
+    data_path_port: int
+    default_addr_pool: List[str]
+    subnet_size: int
+
+
 class SwarmInfo(DockerCamelModel):
-    node_id: str
+    node_id: str = pydantic.Field(alias="NodeID")
     node_addr: str
     local_node_state: str
     control_available: bool
     error: str
-    remote_managers: List[RemoteManager]
+    remote_managers: Optional[List[RemoteManager]]
+    nodes: Optional[int]
+    managers: Optional[int]
+    cluster: Optional[ClusterInfo]
+
+
+class ClientPlugin(DockerCamelModel):
+    schema_version: str
+    vendor: str
+    version: str
+    short_description: str
+    name: str
+    path: Path
+    shadowed_paths: Optional[List[Path]]
+
+
+class ClientInfo(DockerCamelModel):
+    debug: bool
+    plugins: List[ClientPlugin]
+    warnings: Optional[List[str]]
 
 
 class SystemInfoResults(DockerCamelModel):
@@ -89,25 +142,25 @@ class SystemInfoResults(DockerCamelModel):
     kernel_memory: bool
     cpu_cfs_period: bool
     cpu_cfs_quota: bool
-    cpu_shares: bool
-    cpu_set: bool
+    cpu_shares: bool = pydantic.Field(alias="CPUShares")
+    cpu_set: bool = pydantic.Field(alias="CPUSet")
     pids_limit: bool
     oom_kill_disable: bool
-    ipv4_forwarding: bool
+    ipv4_forwarding: bool = pydantic.Field(alias="IPv4Forwarding")
     bridge_nf_iptables: bool
-    bridge_nf_ip6tables: bool
+    bridge_nf_ip6tables: bool = pydantic.Field(alias="BridgeNfIp6tables")
     debug: bool
     nfd: int = pydantic.Field(alias="NFd")
     n_goroutines: int
     system_time: str
     logging_driver: str
     cgroup_driver: str
-    n_event_listener: int
-    kernel_version: int
+    n_events_listener: int
+    kernel_version: str
     operating_system: str
     os_type: str = pydantic.Field(alias="OSType")
     architecture: str
-    n_cpu: int
+    n_cpu: int = pydantic.Field(alias="NCPU")
     mem_total: int
     index_server_address: str
     registry_config: Dict[str, Any]
@@ -124,7 +177,7 @@ class SystemInfoResults(DockerCamelModel):
     cluster_store: str
     runtimes: Dict[str, Runtime]
     default_runtime: str
-    swarm: dict  # TODO
+    swarm: SwarmInfo
     live_restore_enabled: bool
     isolation: str
     init_binary: str
@@ -132,8 +185,9 @@ class SystemInfoResults(DockerCamelModel):
     runc_commit: Commit
     init_commit: Commit
     security_options: List[str]
-    product_license: str
-    warnings: List[str]
+    product_license: Optional[str]
+    warnings: Optional[List[str]]
+    client_info: ClientInfo
 
 
 class SystemCLI(DockerCLICaller):
@@ -167,10 +221,10 @@ class SystemCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def info(self):
+    def info(self) -> SystemInfoResults:
         """Not yet implemented"""
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
-        return json.loads(run(full_cmd))
+        return SystemInfoResults.parse_raw(run(full_cmd))
 
     def prune(self, all: bool = False, volumes: bool = False) -> None:
         """Remove unused docker data
