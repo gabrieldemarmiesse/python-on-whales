@@ -60,7 +60,7 @@ class Commit(DockerCamelModel):
 
 
 class RemoteManager(DockerCamelModel):
-    node_id: str
+    node_id: str = pydantic.Field(alias="NodeID")
     addr: str
 
 

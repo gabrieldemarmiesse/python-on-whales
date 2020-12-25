@@ -1,0 +1,213 @@
+{
+  "ID": "LLUB:23FT:KBEL:N3NT:OLSA:RY6C:WMCT:TBYU:3SQC:AI42:FCH2:TIQ5",
+  "Containers": 30,
+  "ContainersRunning": 9,
+  "ContainersPaused": 0,
+  "ContainersStopped": 21,
+  "Images": 26,
+  "Driver": "overlay2",
+  "DriverStatus": [
+    [
+      "Backing Filesystem",
+      "extfs"
+    ],
+    [
+      "Supports d_type",
+      "true"
+    ],
+    [
+      "Native Overlay Diff",
+      "true"
+    ]
+  ],
+  "SystemStatus": null,
+  "Plugins": {
+    "Volume": [
+      "local"
+    ],
+    "Network": [
+      "bridge",
+      "host",
+      "ipvlan",
+      "macvlan",
+      "null",
+      "overlay"
+    ],
+    "Authorization": null,
+    "Log": [
+      "awslogs",
+      "fluentd",
+      "gcplogs",
+      "gelf",
+      "journald",
+      "json-file",
+      "local",
+      "logentries",
+      "splunk",
+      "syslog"
+    ]
+  },
+  "MemoryLimit": true,
+  "SwapLimit": true,
+  "KernelMemory": true,
+  "KernelMemoryTCP": true,
+  "CpuCfsPeriod": true,
+  "CpuCfsQuota": true,
+  "CPUShares": true,
+  "CPUSet": true,
+  "PidsLimit": true,
+  "IPv4Forwarding": true,
+  "BridgeNfIptables": true,
+  "BridgeNfIp6tables": true,
+  "Debug": false,
+  "NFd": 103,
+  "OomKillDisable": true,
+  "NGoroutines": 207,
+  "SystemTime": "2020-12-26T00:21:18.4682177+05:00",
+  "LoggingDriver": "json-file",
+  "CgroupDriver": "cgroupfs",
+  "NEventsListener": 0,
+  "KernelVersion": "4.19.84-microsoft-standard",
+  "OperatingSystem": "Ubuntu 18.04.5 LTS",
+  "OSType": "linux",
+  "Architecture": "x86_64",
+  "IndexServerAddress": "https://index.docker.io/v1/",
+  "RegistryConfig": {
+    "AllowNondistributableArtifactsCIDRs": [],
+    "AllowNondistributableArtifactsHostnames": [],
+    "InsecureRegistryCIDRs": [
+      "127.0.0.0/8"
+    ],
+    "IndexConfigs": {
+      "docker.io": {
+        "Name": "docker.io",
+        "Mirrors": [],
+        "Secure": true,
+        "Official": true
+      }
+    },
+    "Mirrors": []
+  },
+  "NCPU": 12,
+  "MemTotal": 7290585088,
+  "GenericResources": null,
+  "DockerRootDir": "/var/lib/docker",
+  "HttpProxy": "",
+  "HttpsProxy": "",
+  "NoProxy": "",
+  "Name": "fr-gdemarmiesse-inspi",
+  "Labels": [],
+  "ExperimentalBuild": false,
+  "ServerVersion": "19.03.13",
+  "ClusterStore": "",
+  "ClusterAdvertise": "",
+  "Runtimes": {
+    "runc": {
+      "path": "runc"
+    }
+  },
+  "DefaultRuntime": "runc",
+  "Swarm": {
+    "NodeID": "61ieim2iwpgim06vngtl8h6ru",
+    "NodeAddr": "172.22.66.111",
+    "LocalNodeState": "active",
+    "ControlAvailable": true,
+    "Error": "",
+    "RemoteManagers": [
+      {
+        "NodeID": "61ieim2iwpgim06vngtl8h6ru",
+        "Addr": "172.22.66.111:2377"
+      }
+    ],
+    "Nodes": 1,
+    "Managers": 1,
+    "Cluster": {
+      "ID": "9krelz4b24opei3coxaz94hhq",
+      "Version": {
+        "Index": 10
+      },
+      "CreatedAt": "2020-12-25T18:25:14.1500386Z",
+      "UpdatedAt": "2020-12-25T18:25:14.6814733Z",
+      "Spec": {
+        "Name": "default",
+        "Labels": {},
+        "Orchestration": {
+          "TaskHistoryRetentionLimit": 5
+        },
+        "Raft": {
+          "SnapshotInterval": 10000,
+          "KeepOldSnapshots": 0,
+          "LogEntriesForSlowFollowers": 500,
+          "ElectionTick": 10,
+          "HeartbeatTick": 1
+        },
+        "Dispatcher": {
+          "HeartbeatPeriod": 5000000000
+        },
+        "CAConfig": {
+          "NodeCertExpiry": 7776000000000000
+        },
+        "TaskDefaults": {},
+        "EncryptionConfig": {
+          "AutoLockManagers": false
+        }
+      },
+      "TLSInfo": {
+        "TrustRoot": "-----BEGIN CERTIFICATE-----\nMIIBazCCARCgAwIBAgIUYWQjk+/4a/pp53tLM81xDTO8S5kwCgYIKoZIzj0EAwIw\nEzERMA8GA1UEAxMIc3dhcm0tY2EwHhcNMjAxMjI1MTgyMDAwWhcNNDAxMjIwMTgy\nMDAwWjATMREwDwYDVQQDEwhzd2FybS1jYTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABPPAJ4cQD5D85cNs54pAuYPAbC6kldr8mHPwXBNbEHsaKWn6Be/vHF07Rxcn\nAdE7HMfSinaQHEGFD9fgVMvHF86jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMB\nAf8EBTADAQH/MB0GA1UdDgQWBBQ9IgsYIBApLPSpii0gCtK1AF03qjAKBggqhkjO\nPQQDAgNJADBGAiEAuzSPoYS4/hmlGX31QVtMREPoNKpSM9JkgiiipgN7f28CIQC+\n6UTYkZrqbae0coec/8zZMcIW7tucYWGnJtEhJ4l9pA==\n-----END CERTIFICATE-----\n",
+        "CertIssuerSubject": "MBMxETAPBgNVBAMTCHN3YXJtLWNh",
+        "CertIssuerPublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE88AnhxAPkPzlw2znikC5g8BsLqSV2vyYc/BcE1sQexopafoF7+8cXTtHFycB0Tscx9KKdpAcQYUP1+BUy8cXzg=="
+      },
+      "RootRotationInProgress": false,
+      "DefaultAddrPool": [
+        "10.0.0.0/8"
+      ],
+      "SubnetSize": 24,
+      "DataPathPort": 4789
+    }
+  },
+  "LiveRestoreEnabled": false,
+  "Isolation": "",
+  "InitBinary": "docker-init",
+  "ContainerdCommit": {
+    "ID": "8fba4e9a7d01810a393d5d25a3621dc101981175",
+    "Expected": "8fba4e9a7d01810a393d5d25a3621dc101981175"
+  },
+  "RuncCommit": {
+    "ID": "dc9208a3303feef5b3839f4323d9beb36df0a9dd",
+    "Expected": "dc9208a3303feef5b3839f4323d9beb36df0a9dd"
+  },
+  "InitCommit": {
+    "ID": "fec3683",
+    "Expected": "fec3683"
+  },
+  "SecurityOptions": [
+    "name=seccomp,profile=default"
+  ],
+  "Warnings": null,
+  "ClientInfo": {
+    "Debug": false,
+    "Plugins": [
+      {
+        "SchemaVersion": "0.1.0",
+        "Vendor": "Docker Inc.",
+        "Version": "v0.4.2",
+        "ShortDescription": "Build with BuildKit",
+        "Name": "buildx",
+        "Path": "/root/.docker/cli-plugins/docker-buildx",
+        "ShadowedPaths": [
+          "/usr/libexec/docker/cli-plugins/docker-buildx"
+        ]
+      },
+      {
+        "SchemaVersion": "0.1.0",
+        "Vendor": "Docker Inc.",
+        "Version": "v0.8.0",
+        "ShortDescription": "Docker Application",
+        "Experimental": true,
+        "Name": "app",
+        "Path": "/usr/libexec/docker/cli-plugins/docker-app"
+      }
+    ],
+    "Warnings": null
+  }
+}

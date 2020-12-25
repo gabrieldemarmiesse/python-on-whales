@@ -16,8 +16,8 @@ def test_disk_free():
 
 
 def test_info():
-    docker.system.info()
-    pass
+    info = docker.system.info()
+    assert "local" in info.plugins.volume
 
 
 def get_all_system_info_jsons() -> List[Path]:
