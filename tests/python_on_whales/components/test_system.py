@@ -1,10 +1,12 @@
+import json
+from datetime import date
 from pathlib import Path
 from typing import List
 
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.system import SystemInfo
+from python_on_whales.components.system import DockerEvent, SystemInfo
 
 
 def test_disk_free():
@@ -30,3 +32,11 @@ def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     SystemInfo.parse_raw(json_as_txt)
     # we could do more checks here if needed
+
+
+def test_parsing_events():
+    json_file = Path(__file__).parent / "events/0.json"
+    events = json.loads(json_file.read_text())["events"]
+    for event in events:
+        parsed: DockerEvent = DockerEvent.parse_obj(event)
+        assert parsed.time.date() == date(2020, 12, 28)

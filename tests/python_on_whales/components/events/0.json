@@ -1,0 +1,482 @@
+{
+  "events": [
+    {
+      "Type": "node",
+      "Action": "update",
+      "Actor": {
+        "ID": "l5lxf6bgxlsrr30nw2osgoub0",
+        "Attributes": {
+          "name": "fr-gdemarmiesse-inspi",
+          "state.new": "ready",
+          "state.old": "unknown"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170355,
+      "timeNano": 1609170355861295300
+    },
+    {
+      "Type": "network",
+      "Action": "create",
+      "Actor": {
+        "ID": "wuh6llx8ntki5bjrh1fux40o8",
+        "Attributes": {
+          "name": "ingress",
+          "type": "overlay"
+        }
+      },
+      "scope": "local",
+      "time": 1609170357,
+      "timeNano": 1609170357361161900
+    },
+    {
+      "Type": "network",
+      "Action": "create",
+      "Actor": {
+        "ID": "u2iicauxa3ltsh4h4norag1si",
+        "Attributes": {
+          "name": "my_stack_net"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170364,
+      "timeNano": 1609170364805278400
+    },
+    {
+      "Type": "network",
+      "Action": "update",
+      "Actor": {
+        "ID": "u2iicauxa3ltsh4h4norag1si",
+        "Attributes": {
+          "name": "my_stack_net"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170364,
+      "timeNano": 1609170364809101600
+    },
+    {
+      "Type": "service",
+      "Action": "create",
+      "Actor": {
+        "ID": "o2uj7cclcufbveoeuyu08d1pt",
+        "Attributes": {
+          "name": "my_stack_agent"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170375,
+      "timeNano": 1609170375236603800
+    },
+    {
+      "Type": "service",
+      "Action": "update",
+      "Actor": {
+        "ID": "o2uj7cclcufbveoeuyu08d1pt",
+        "Attributes": {
+          "name": "my_stack_agent"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170375,
+      "timeNano": 1609170375243897900
+    },
+    {
+      "Type": "node",
+      "Action": "update",
+      "Actor": {
+        "ID": "l5lxf6bgxlsrr30nw2osgoub0",
+        "Attributes": {
+          "name": "fr-gdemarmiesse-inspi"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170375,
+      "timeNano": 1609170375256458600
+    },
+    {
+      "Type": "network",
+      "Action": "create",
+      "Actor": {
+        "ID": "u2iicauxa3ltsh4h4norag1si",
+        "Attributes": {
+          "name": "my_stack_net",
+          "type": "overlay"
+        }
+      },
+      "scope": "local",
+      "time": 1609170376,
+      "timeNano": 1609170376649439200
+    },
+    {
+      "Type": "service",
+      "Action": "create",
+      "Actor": {
+        "ID": "j14vsboafa4wpswa5d8w30z1h",
+        "Attributes": {
+          "name": "my_stack_app"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170381,
+      "timeNano": 1609170381076642600
+    },
+    {
+      "Type": "service",
+      "Action": "update",
+      "Actor": {
+        "ID": "j14vsboafa4wpswa5d8w30z1h",
+        "Attributes": {
+          "name": "my_stack_app"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170381,
+      "timeNano": 1609170381083622100
+    },
+    {
+      "Type": "service",
+      "Action": "create",
+      "Actor": {
+        "ID": "nvir3b2jebu3ah1olgl5kei2l",
+        "Attributes": {
+          "name": "my_stack_db"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170387,
+      "timeNano": 1609170387373900900
+    },
+    {
+      "Type": "service",
+      "Action": "update",
+      "Actor": {
+        "ID": "nvir3b2jebu3ah1olgl5kei2l",
+        "Attributes": {
+          "name": "my_stack_db"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170387,
+      "timeNano": 1609170387386959500
+    },
+    {
+      "Type": "volume",
+      "Action": "create",
+      "Actor": {
+        "ID": "my_stack_db-data",
+        "Attributes": {
+          "driver": "local"
+        }
+      },
+      "scope": "local",
+      "time": 1609170387,
+      "timeNano": 1609170387574959800
+    },
+    {
+      "Type": "service",
+      "Action": "create",
+      "Actor": {
+        "ID": "kflvgjukjlwk0v1wvagx3h1yk",
+        "Attributes": {
+          "name": "my_stack_influxdb"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170400,
+      "timeNano": 1609170400919376800
+    },
+    {
+      "Type": "service",
+      "Action": "update",
+      "Actor": {
+        "ID": "kflvgjukjlwk0v1wvagx3h1yk",
+        "Attributes": {
+          "name": "my_stack_influxdb"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170400,
+      "timeNano": 1609170400926620800
+    },
+    {
+      "Type": "volume",
+      "Action": "create",
+      "Actor": {
+        "ID": "my_stack_influx-data",
+        "Attributes": {
+          "driver": "local"
+        }
+      },
+      "scope": "local",
+      "time": 1609170401,
+      "timeNano": 1609170401116970000
+    },
+    {
+      "Type": "volume",
+      "Action": "create",
+      "Actor": {
+        "ID": "my_stack_influx-data",
+        "Attributes": {
+          "driver": "local"
+        }
+      },
+      "scope": "local",
+      "time": 1609170416,
+      "timeNano": 1609170416397306500
+    },
+    {
+      "Type": "service",
+      "Action": "remove",
+      "Actor": {
+        "ID": "o2uj7cclcufbveoeuyu08d1pt",
+        "Attributes": {
+          "name": "my_stack_agent"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170417,
+      "timeNano": 1609170417150832000
+    },
+    {
+      "Type": "service",
+      "Action": "remove",
+      "Actor": {
+        "ID": "j14vsboafa4wpswa5d8w30z1h",
+        "Attributes": {
+          "name": "my_stack_app"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170417,
+      "timeNano": 1609170417162227600
+    },
+    {
+      "Type": "service",
+      "Action": "remove",
+      "Actor": {
+        "ID": "nvir3b2jebu3ah1olgl5kei2l",
+        "Attributes": {
+          "name": "my_stack_db"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170417,
+      "timeNano": 1609170417167576400
+    },
+    {
+      "Type": "service",
+      "Action": "remove",
+      "Actor": {
+        "ID": "kflvgjukjlwk0v1wvagx3h1yk",
+        "Attributes": {
+          "name": "my_stack_influxdb"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170417,
+      "timeNano": 1609170417174059600
+    },
+    {
+      "Type": "network",
+      "Action": "remove",
+      "Actor": {
+        "ID": "u2iicauxa3ltsh4h4norag1si",
+        "Attributes": {
+          "name": "my_stack_net"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170417,
+      "timeNano": 1609170417183963800
+    },
+    {
+      "Type": "node",
+      "Action": "update",
+      "Actor": {
+        "ID": "l5lxf6bgxlsrr30nw2osgoub0",
+        "Attributes": {
+          "name": "fr-gdemarmiesse-inspi"
+        }
+      },
+      "scope": "swarm",
+      "time": 1609170417,
+      "timeNano": 1609170417183740500
+    },
+    {
+      "Type": "network",
+      "Action": "destroy",
+      "Actor": {
+        "ID": "u2iicauxa3ltsh4h4norag1si",
+        "Attributes": {
+          "name": "my_stack_net",
+          "type": "overlay"
+        }
+      },
+      "scope": "local",
+      "time": 1609170419,
+      "timeNano": 1609170419960104500
+    },
+    {
+      "status": "create",
+      "id": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+      "from": "hello-world",
+      "Type": "container",
+      "Action": "create",
+      "Actor": {
+        "ID": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+        "Attributes": {
+          "image": "hello-world",
+          "name": "vigilant_ardinghelli"
+        }
+      },
+      "scope": "local",
+      "time": 1609170445,
+      "timeNano": 1609170445249071500
+    },
+    {
+      "status": "attach",
+      "id": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+      "from": "hello-world",
+      "Type": "container",
+      "Action": "attach",
+      "Actor": {
+        "ID": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+        "Attributes": {
+          "image": "hello-world",
+          "name": "vigilant_ardinghelli"
+        }
+      },
+      "scope": "local",
+      "time": 1609170445,
+      "timeNano": 1609170445275049100
+    },
+    {
+      "Type": "network",
+      "Action": "connect",
+      "Actor": {
+        "ID": "0374a2e3ebddd80ba723ae3728b552e9fa4c7af9becf929bbe3c56141c0b70d5",
+        "Attributes": {
+          "container": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+          "name": "bridge",
+          "type": "bridge"
+        }
+      },
+      "scope": "local",
+      "time": 1609170445,
+      "timeNano": 1609170445317344100
+    },
+    {
+      "status": "start",
+      "id": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+      "from": "hello-world",
+      "Type": "container",
+      "Action": "start",
+      "Actor": {
+        "ID": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+        "Attributes": {
+          "image": "hello-world",
+          "name": "vigilant_ardinghelli"
+        }
+      },
+      "scope": "local",
+      "time": 1609170445,
+      "timeNano": 1609170445947031600
+    },
+    {
+      "status": "die",
+      "id": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+      "from": "hello-world",
+      "Type": "container",
+      "Action": "die",
+      "Actor": {
+        "ID": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+        "Attributes": {
+          "exitCode": "0",
+          "image": "hello-world",
+          "name": "vigilant_ardinghelli"
+        }
+      },
+      "scope": "local",
+      "time": 1609170446,
+      "timeNano": 1609170446074842400
+    },
+    {
+      "Type": "network",
+      "Action": "disconnect",
+      "Actor": {
+        "ID": "0374a2e3ebddd80ba723ae3728b552e9fa4c7af9becf929bbe3c56141c0b70d5",
+        "Attributes": {
+          "container": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+          "name": "bridge",
+          "type": "bridge"
+        }
+      },
+      "scope": "local",
+      "time": 1609170446,
+      "timeNano": 1609170446300587100
+    },
+    {
+      "status": "destroy",
+      "id": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+      "from": "hello-world",
+      "Type": "container",
+      "Action": "destroy",
+      "Actor": {
+        "ID": "628ff799620816190f0b2a5c850f18b8d549f1451b390eccbc27bce43b23f6ad",
+        "Attributes": {
+          "image": "hello-world",
+          "name": "vigilant_ardinghelli"
+        }
+      },
+      "scope": "local",
+      "time": 1609170451,
+      "timeNano": 1609170451942178200
+    },
+    {
+      "status": "untag",
+      "id": "sha256:975176a9c454d4020440696d3397f1df9c399c5f8ac2e35484e11884da25603f",
+      "Type": "image",
+      "Action": "untag",
+      "Actor": {
+        "ID": "sha256:975176a9c454d4020440696d3397f1df9c399c5f8ac2e35484e11884da25603f",
+        "Attributes": {
+          "name": "sha256:975176a9c454d4020440696d3397f1df9c399c5f8ac2e35484e11884da25603f"
+        }
+      },
+      "scope": "local",
+      "time": 1609170457,
+      "timeNano": 1609170457392474600
+    },
+    {
+      "status": "delete",
+      "id": "sha256:975176a9c454d4020440696d3397f1df9c399c5f8ac2e35484e11884da25603f",
+      "Type": "image",
+      "Action": "delete",
+      "Actor": {
+        "ID": "sha256:975176a9c454d4020440696d3397f1df9c399c5f8ac2e35484e11884da25603f",
+        "Attributes": {
+          "name": "sha256:975176a9c454d4020440696d3397f1df9c399c5f8ac2e35484e11884da25603f"
+        }
+      },
+      "scope": "local",
+      "time": 1609170457,
+      "timeNano": 1609170457601502100
+    },
+    {
+      "status": "delete",
+      "id": "sha256:4bdfbb53a3da7e774151feb1f0da9db14dad5f6edc177dfccbe39069d30b7f97",
+      "Type": "image",
+      "Action": "delete",
+      "Actor": {
+        "ID": "sha256:4bdfbb53a3da7e774151feb1f0da9db14dad5f6edc177dfccbe39069d30b7f97",
+        "Attributes": {
+          "name": "sha256:4bdfbb53a3da7e774151feb1f0da9db14dad5f6edc177dfccbe39069d30b7f97"
+        }
+      },
+      "scope": "local",
+      "time": 1609170458,
+      "timeNano": 1609170458561619600
+    }
+  ]
+}
