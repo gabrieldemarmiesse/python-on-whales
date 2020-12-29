@@ -2,6 +2,7 @@ name: Publish docs via GitHub Pages
 on:
   release:
     types: [created]
+  workflow_dispatch: {}
 
 jobs:
   build:
