@@ -159,18 +159,28 @@ Use the right tool for the right job 🙂
 
 ## Where is the project now? Where is it going?
 
-Currently, about 85% of the Docker CLI API is covered. Of course the most used functions 
-were done first: docker run, docker pull, docker push, docker build (with buildx), docker volume...
+| sub-command  | Function implemented  |
+|---|---|
+|  app | 0/15  |
+| buildx  | 9/11 |
+| compose  | 0/24 |
+| config  | 0/4 |
+| container | 21/24 |
+| context  | 0/8 |
+| image  | 12/13 |
+| manifest  | 0/4 |
+| network  | 7/7 |
+| node  | 6/7 |
+| secret  | 4/4 |
+| service  | 6/9 |
+| stack  | 4/5 |
+| swarm  | 4/8 |
+| system  | 3/4 |
+| trust  | 0/3 |
+| volume  | 7/7 |
 
-If you look around the docs, you might find a few functions that are not implemented yet.
+Take those numbers with a grain of salt. The functions don't all need the same amount of work to implement.
 
-This project aims at a 100% feature parity between the Docker CLI and Python on whales. 
-
-This includes Docker buildx, Docker app, Docker Swarm, Docker stacks and Docker compose.
-
-You can consider that this software is in beta, some small API changes are still possible.
- 
- 
 ## What about the license?
 
 It's a MIT license, so quite permissive.
