@@ -161,7 +161,7 @@ Use the right tool for the right job 🙂
 
 | sub-command  | Function implemented  |
 |---|---|
-|  app | 0/15  |
+| app | 0/15  |
 | buildx  | 9/11 |
 | compose  | 0/24 |
 | config  | 0/4 |
