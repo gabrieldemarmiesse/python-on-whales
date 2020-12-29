@@ -179,7 +179,7 @@ Use the right tool for the right job 🙂
 | trust  | 0/3 |
 | volume  | 7/7 |
 
-Take those numbers with a grain of salt. The functions don't all need the same amount of work to implement.
+Take those numbers with a grain of salt. The functions don't all need the same amount of work to be implemented.
 
 ## What about the license?
 
