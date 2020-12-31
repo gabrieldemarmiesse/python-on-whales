@@ -91,7 +91,20 @@ class ConfigCLI(DockerCLICaller):
         labels: Dict[str, str] = {},
         template_driver: Optional[str] = None,
     ) -> Config:
-        """Not yet implemented"""
+        """Create a config from a file
+
+        See [the docker docs](https://docs.docker.com/engine/swarm/configs/)
+        for more information about swarm configs.
+
+        # Arguments
+            name: The config name.
+            file: Tbe file to be used as config.
+            labels: The labels to add to the config
+            template_driver: The template driver
+
+        # Returns
+            A `python_on_whales.Config` object.
+        """
         full_cmd = self.docker_cmd + ["config", "create"]
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.add_simple_arg("--template-driver", template_driver)
@@ -107,14 +120,29 @@ class ConfigCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Config, List[Config]]:
-        """Not yet implemented"""
+        """Returns a `python_on_whales.Config` object based on its name or id.
+
+        # Argument
+            x: An id or name or a list of ids/names.
+
+        # Returns
+            A `python_on_whales.Config` if a string was passed as argument. A
+            `List[python_on_whales.Config]` if a list of strings was passed as argument.
+        """
         if isinstance(x, str):
             return Config(self.client_config, x)
         else:
             return [Config(self.client_config, reference) for reference in x]
 
     def list(self, filters: Dict[str, str] = {}) -> List[Config]:
-        """Not yet implemented"""
+        """List all config available in the swarm.
+
+        # Arguments
+            filters: If you want to filter the results based on a given condition.
+
+        # Returns
+            A `List[python_on_whales.Config]`.
+        """
         full_cmd = self.docker_cmd + ["config", "list", "--quiet"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         output = run(full_cmd)
@@ -122,7 +150,7 @@ class ConfigCLI(DockerCLICaller):
         return [Config(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
     def remove(self, x: Union[ValidConfig, List[ValidConfig]]):
-        """Remove one or more config.
+        """Remove one or more configs.
 
         # Arguments
             x: One or a list of configs. Valid values are the id of the config or
