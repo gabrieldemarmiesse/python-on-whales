@@ -27,7 +27,7 @@ class ConfigSpec(DockerCamelModel):
     name: str
     labels: Dict[str, str]
     data: str
-    templating: ConfigSpecDriver
+    templating: Optional[ConfigSpecDriver]
 
 
 class ConfigInspectResult(DockerCamelModel):
@@ -42,7 +42,7 @@ class Config(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "ID", reference, is_immutable_id)
+        super().__init__(client_config, "id", reference, is_immutable_id)
 
     def __enter__(self):
         return self
@@ -58,6 +58,26 @@ class Config(ReloadableObjectFromJson):
 
     def remove(self):
         ConfigCLI(self.client_config).remove(self)
+
+    @property
+    def id(self) -> str:
+        return self._get_immutable_id()
+
+    @property
+    def version(self) -> int:
+        return self._get_inspect_result().version
+
+    @property
+    def created_at(self) -> datetime:
+        return self._get_inspect_result().created_at
+
+    @property
+    def updated_at(self) -> datetime:
+        return self._get_inspect_result().updated_at
+
+    @property
+    def spec(self) -> ConfigSpec:
+        return self._get_inspect_result().spec
 
 
 ValidConfig = Union[Config, str]
