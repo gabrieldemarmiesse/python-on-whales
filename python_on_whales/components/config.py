@@ -75,9 +75,19 @@ ValidConfig = Union[Config, str]
 
 
 class ConfigCLI(DockerCLICaller):
-    def create(self):
+    def create(
+        self,
+        name: str,
+        file: Union[str, Path],
+        labels: Dict[str, str] = {},
+        template_driver: Optional[str] = None,
+    ) -> Config:
         """Not yet implemented"""
-        raise NotImplementedError
+        full_cmd = self.docker_cmd + ["config", "create"]
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_simple_arg("--template-driver", template_driver)
+        full_cmd += [name, file]
+        return Config(self.client_config, run(full_cmd), is_immutable_id=True)
 
     @overload
     def inspect(self, x: str) -> Config:
