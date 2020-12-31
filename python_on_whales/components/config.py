@@ -79,13 +79,28 @@ class ConfigCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    @overload
+    def inspect(self, x: str) -> Config:
+        ...
 
-    def list(self):
+    @overload
+    def inspect(self, x: List[str]) -> List[Config]:
+        ...
+
+    def inspect(self, x: Union[str, List[str]]) -> Union[Config, List[Config]]:
         """Not yet implemented"""
-        raise NotImplementedError
+        if isinstance(x, str):
+            return Config(self.client_config, x)
+        else:
+            return [Config(self.client_config, reference) for reference in x]
+
+    def list(self, filters: Dict[str, str] = {}) -> List[Config]:
+        """Not yet implemented"""
+        full_cmd = self.docker_cmd + ["config", "list", "--quiet"]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        output = run(full_cmd)
+        ids = output.splitlines()
+        return [Config(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
     def remove(self, x: Union[ValidConfig, List[ValidConfig]]):
         """Remove one or more config.
