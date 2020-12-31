@@ -12,19 +12,6 @@ def get_all_nodes_jsons() -> List[Path]:
     return sorted(list(jsons_directory.iterdir()))
 
 
-@pytest.fixture
-def with_swarm():
-    docker.swarm.init()
-    yield
-    docker.swarm.leave(force=True)
-
-
-@pytest.mark.usefixtures("with_swarm")
-def test_list_nodes():
-    nodes = docker.node.list()
-    assert len(nodes) == 1
-
-
 @pytest.mark.parametrize("json_file", get_all_nodes_jsons())
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
@@ -39,3 +26,9 @@ def test_load_json(json_file):
             == "gpu-0"
         )
         assert a.description.resources.nano_cpus == 4000000001
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_list_nodes():
+    nodes = docker.node.list()
+    assert len(nodes) == 1
