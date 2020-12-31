@@ -59,13 +59,19 @@ class Config(ReloadableObjectFromJson):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.remove(force=True)
+        self.remove()
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["config", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
         return ConfigInspectResult.parse_obj(json_object)
+
+    def remove(self):
+        ConfigCLI(self.client_config).remove(self)
+
+
+ValidConfig = Union[Config, str]
 
 
 class ConfigCLI(DockerCLICaller):
@@ -81,6 +87,13 @@ class ConfigCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def remove(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def remove(self, x: Union[ValidConfig, List[ValidConfig]]):
+        """Remove one or more config.
+
+        # Arguments
+            x: One or a list of configs. Valid values are the id of the config or
+                a `python_on_whales.Config` object.
+        """
+        full_cmd = self.docker_cmd + ["config", "rm"]
+        full_cmd += to_list(x)
+        run(full_cmd)
