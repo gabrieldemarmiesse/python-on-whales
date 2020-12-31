@@ -46,3 +46,11 @@ def _docker_registry(login=True):
                     "localhost:5000", username="my_user", password="my_password"
                 )
             yield "localhost:5000"
+
+
+@pytest.fixture
+def swarm_mode():
+    docker.swarm.init()
+    yield
+    docker.swarm.leave(force=True)
+    time.sleep(1)
