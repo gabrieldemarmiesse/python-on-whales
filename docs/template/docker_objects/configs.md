@@ -36,7 +36,7 @@ An example is worth many lines of descriptions.
 ```
 In [1]: from python_on_whales import docker
 
-In [2]: config = docker.config.create("my_config_name", "my_config_file")
+In [2]: config = docker.config.create("my_config", "./config_file.cfg", labels=dict(hello="world"))
 
 In [3]: def super_print(obj):
    ...:     print(f"type={type(obj)}, value={obj}")
