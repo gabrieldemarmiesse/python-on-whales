@@ -57,6 +57,11 @@ class Config(ReloadableObjectFromJson):
         return ConfigInspectResult.parse_obj(json_object)
 
     def remove(self):
+        """Remove this config.
+
+        Note that you can also use a `python_on_whales.Config` as a context manager
+        to ensure it's removed even if an exception occurs.
+        """
         ConfigCLI(self.client_config).remove(self)
 
     @property
@@ -139,6 +144,7 @@ class ConfigCLI(DockerCLICaller):
 
         # Arguments
             filters: If you want to filter the results based on a given condition.
+                For example, `docker.config.list(filters=dict(label="my_label=hello"))`.
 
         # Returns
             A `List[python_on_whales.Config]`.
