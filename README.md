@@ -164,7 +164,7 @@ Use the right tool for the right job 🙂
 | app | 0/15  |
 | buildx  | 9/11 |
 | compose  | 0/24 |
-| config  | 0/4 |
+| config  | 4/4 |
 | container | 21/24 |
 | context  | 0/8 |
 | image  | 12/13 |

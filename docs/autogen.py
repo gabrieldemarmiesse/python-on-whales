@@ -59,6 +59,7 @@ pages = {
     ),
     "docker_objects/builders.md": get_methods("python_on_whales.Builder"),
     "docker_objects/containers.md": get_methods("python_on_whales.Container"),
+    "docker_objects/configs.md": get_methods("python_on_whales.Config"),
     "docker_objects/images.md": get_methods("python_on_whales.Image"),
     "docker_objects/networks.md": get_methods("python_on_whales.Network"),
     "docker_objects/nodes.md": get_methods("python_on_whales.Node"),
@@ -97,6 +98,7 @@ doc_generator = MyDocumentationGenerator(
     extra_aliases=[
         "python_on_whales.Builder",
         "python_on_whales.Container",
+        "python_on_whales.Config",
         "python_on_whales.Image",
         "python_on_whales.Network",
         "python_on_whales.Node",

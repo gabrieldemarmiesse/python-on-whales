@@ -26,6 +26,7 @@ nav:
     - docker volume: sub-commands/volume.md
   - Docker objects:
     - Builders: docker_objects/builders.md
+    - Configs: docker_objects/configs.md
     - Containers: docker_objects/containers.md
     - Images: docker_objects/images.md
     - Networks: docker_objects/networks.md
