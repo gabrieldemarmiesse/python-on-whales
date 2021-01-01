@@ -1,3 +1,6 @@
+import tempfile
+from pathlib import Path
+
 from python_on_whales import docker
 
 
@@ -115,6 +118,38 @@ def generate_code_demo_services() -> str:
     for i, attribute_access in enumerate(to_evaluate):
         value = eval(attribute_access)
         result.append(write_code(i + 4, attribute_access, value))
+
+    docker.swarm.leave(force=True)
+
+    return "\n".join(result)
+
+
+def generate_code_demo_configs() -> str:
+    result = []
+
+    docker.swarm.init()
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        config_file = Path(tmp_dir) / "file.conf"
+        config_file.write_text("Hello world!")
+        config = docker.config.create(
+            "my_config", config_file, labels=dict(hello="world")
+        )
+        print(config.id)
+
+        to_evaluate = [
+            "config.id",
+            "config.version.index",
+            "config.created_at",
+            "config.updated_at",
+            "config.spec.name",
+            "config.spec.labels",
+            "config.spec.data",
+            "config.spec.templating",
+        ]
+        for i, attribute_access in enumerate(to_evaluate):
+            value = eval(attribute_access)
+            result.append(write_code(i + 4, attribute_access, value))
 
     docker.swarm.leave(force=True)
 

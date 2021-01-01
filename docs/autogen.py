@@ -4,6 +4,7 @@ from docs_utils import (
     add_code_example,
     add_links,
     generate_code_demo_builders,
+    generate_code_demo_configs,
     generate_code_demo_containers,
     generate_code_demo_images,
     generate_code_demo_networks,
@@ -123,6 +124,7 @@ for file in destination.rglob("*.md"):
     file.write_text(add_links(file.read_text()))
 
 
+add_code_example(destination, "configs.md", generate_code_demo_configs())
 add_code_example(destination, "networks.md", generate_code_demo_networks())
 add_code_example(destination, "volumes.md", generate_code_demo_volumes())
 add_code_example(destination, "images.md", generate_code_demo_images())
