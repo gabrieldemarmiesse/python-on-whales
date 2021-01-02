@@ -127,9 +127,17 @@ class ContextCLI(DockerCLICaller):
         else:
             return [Context(self.client_config, ref) for ref in x]
 
-    def list(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def list(self) -> List[Context]:
+        """List all Docker contexts available
+
+        # Returns
+            `List[python_on_whales.Context]`
+        """
+
+        full_cmd = self.docker_cmd + ["context", "list", "--quiet"]
+
+        ids = run(full_cmd).splitlines()
+        return [Context(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
     def remove(self, x: Union[ValidContext, List[ValidContext]], force: bool = False):
         """Removes one or more contexts
