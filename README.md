@@ -166,7 +166,7 @@ Use the right tool for the right job 🙂
 | compose  | 0/24 |
 | config  | 4/4 |
 | container | 21/24 |
-| context  | 2/8 |
+| context  | 3/8 |
 | image  | 12/13 |
 | manifest  | 0/4 |
 | network  | 7/7 |
