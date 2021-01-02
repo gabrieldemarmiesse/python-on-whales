@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from python_on_whales import docker
 from python_on_whales.components.context import ContextInspectResult
 
 
@@ -15,3 +16,11 @@ def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     ContextInspectResult.parse_raw(json_as_txt)
     # we could do more checks here if needed
+
+
+def test_inpect():
+    default_context = docker.context.inspect()
+    assert default_context.name == "default"
+    assert default_context == docker.context.inspect("default")
+    a, b = docker.context.inspect(["default", "default"])
+    assert a == b

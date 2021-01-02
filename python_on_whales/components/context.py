@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union, overload
 
 import pydantic
 
@@ -32,7 +32,10 @@ class ContextInspectResult(DockerCamelModel):
 
 class Context(ReloadableObjectFromJson):
     def __init__(
-        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+        self,
+        client_config: ClientConfig,
+        reference: Optional[str],
+        is_immutable_id=False,
     ):
         super().__init__(client_config, "name", reference, is_immutable_id)
 
@@ -42,8 +45,11 @@ class Context(ReloadableObjectFromJson):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.remove(force=True)
 
-    def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["context", "inspect", reference])
+    def _fetch_inspect_result_json(self, reference: Optional[str]):
+        full_cmd = self.docker_cmd + ["context", "inspect"]
+        if reference is not None:
+            full_cmd.append(reference)
+        return run(full_cmd)
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
         return ContextInspectResult.parse_obj(json_object)
@@ -104,9 +110,22 @@ class ContextCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self):
+    @overload
+    def inspect(self, x: Union[None, str]) -> Context:
+        ...
+
+    @overload
+    def inspect(self, x: List[str]) -> List[Context]:
+        ...
+
+    def inspect(
+        self, x: Union[None, str, List[str]] = None
+    ) -> Union[Context, List[Context]]:
         """Not yet implemented"""
-        raise NotImplementedError
+        if isinstance(x, str) or x is None:
+            return Context(self.client_config, x)
+        else:
+            return [Context(self.client_config, ref) for ref in x]
 
     def list(self):
         """Not yet implemented"""
