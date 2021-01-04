@@ -1,0 +1,201 @@
+{
+    "ID": "pzqh7bxm0tl8f9u9f65g7tm69",
+    "Version": {
+        "Index": 11756176
+    },
+    "CreatedAt": "2020-12-21T10:27:42.110417229Z",
+    "UpdatedAt": "2021-01-05T08:09:28.731773192Z",
+    "Spec": {
+        "Name": "dodo_celery-default-worker",
+        "Labels": {
+            "com.docker.stack.image": "dkr.ecr.eu-west-1.amazonaws.com/celery-worker:1",
+            "com.docker.stack.namespace": "dodo"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "dkr.ecr.eu-west-1.amazonaws.com/celery-worker:1@sha256:7ac3c4a4207be4e9247431efae0d48c86d8bb52f2a5f36dcd4d49ef0f488929e",
+                "Labels": {
+                    "com.docker.stack.namespace": "dodo"
+                },
+                "Args": [
+                    "celery",
+                    "-A",
+                    "worker.celery_app",
+                    "worker",
+                    "--loglevel=info",
+                    "-Ofair",
+                    "--concurrency=10",
+                    "-Q",
+                    "default"
+                ],
+                "Env": [
+                    "WORKER_NAME=default-worker"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "bind",
+                        "Source": "/var/run/docker.sock",
+                        "Target": "/var/run/docker.sock"
+                    },
+                    {
+                        "Type": "bind",
+                        "Source": "/home/ubuntu/tasks/local",
+                        "Target": "/home"
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {},
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Constraints": [
+                    "node.labels.has-celery-workers==1"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "x4ymj7n0ul3xd8m1naztp3kqh",
+                    "Aliases": [
+                        "celery-default-worker"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "PreviousSpec": {
+        "Name": "dodo_celery-default-worker",
+        "Labels": {
+            "com.docker.stack.image": "dkr.ecr.eu-west-1.amazonaws.com/celery-worker:1",
+            "com.docker.stack.namespace": "dodo"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/celery-worker:1@sha256:7ac3c4a4207be4e9247431efae0d48c86d8bb52f2a5f36dcd4d49ef0f488929e",
+                "Labels": {
+                    "com.docker.stack.namespace": "dodo"
+                },
+                "Args": [
+                    "celery",
+                    "-A",
+                    "worker.celery_app",
+                    "worker",
+                    "--loglevel=info",
+                    "-Ofair",
+                    "--concurrency=10",
+                    "-Q",
+                    "default"
+                ],
+                "Env": [
+                    "WORKER_NAME=default-worker"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "bind",
+                        "Source": "/var/run/docker.sock",
+                        "Target": "/var/run/docker.sock"
+                    },
+                    {
+                        "Type": "bind",
+                        "Source": "/home/ubuntu/tasks/local",
+                        "Target": "/home"
+                    }
+                ],
+                "Isolation": "default"
+            },
+            "Resources": {},
+            "RestartPolicy": {
+                "Condition": "any",
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Constraints": [
+                    "node.labels.has-celery-workers==1"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "x4ymj7n0ul3xd8m1naztp3kqh",
+                    "Aliases": [
+                        "celery-default-worker"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "x4ymj7n0ul3xd8m1naztp3kqh",
+                "Addr": "10.0.1.28/24"
+            }
+        ]
+    },
+    "UpdateStatus": {
+        "State": "paused",
+        "StartedAt": "2021-01-05T08:09:24.5350388Z",
+        "Message": "update paused due to failure or early termination of task 1w0a9i6k4uxnd9aiknokren54"
+    }
+}
