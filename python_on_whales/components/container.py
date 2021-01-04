@@ -167,7 +167,7 @@ class ContainerHostConfig(DockerCamelModel):
     restart_policy: ContainerRestartPolicy
     auto_remove: bool
     volume_driver: str
-    volumes_from: Optional[str]
+    volumes_from: Optional[List[str]]
     mounts: Optional[List[ContainerMount]]
     capabilities: Optional[List[str]]
     cap_add: Optional[List[str]]
