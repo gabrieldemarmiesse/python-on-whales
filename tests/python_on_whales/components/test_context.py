@@ -28,3 +28,7 @@ def test_inpect():
 
 def test_list_contexts():
     assert docker.context.list() == [docker.context.inspect("default")]
+
+
+def test_use_context():
+    docker.context.use("default")
