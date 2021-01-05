@@ -102,14 +102,6 @@ class ContextCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def export(self):
-        """Not yet implemented"""
-        raise NotImplementedError
-
-    def import_(self):
-        """Not yet implemented"""
-        raise NotImplementedError
-
     @overload
     def inspect(self, x: Union[None, str]) -> Context:
         ...
@@ -121,7 +113,8 @@ class ContextCLI(DockerCLICaller):
     def inspect(
         self, x: Union[None, str, List[str]] = None
     ) -> Union[Context, List[Context]]:
-        """Not yet implemented"""
+        """Returns the context object. If no argument is provided, returns the
+        current context."""
         if isinstance(x, str) or x is None:
             return Context(self.client_config, x)
         else:
@@ -155,6 +148,11 @@ class ContextCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def use(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def use(self, context: ValidContext):
+        """Set the default context
+
+        # Arguments
+            context: The context to set as default
+        """
+        full_cmd = self.docker_cmd + ["context", "use", context]
+        run(full_cmd)
