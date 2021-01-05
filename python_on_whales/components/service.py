@@ -83,7 +83,7 @@ class ServiceEndpoint(DockerCamelModel):
 class ServiceUpdateStatus(DockerCamelModel):
     state: str
     started_at: str
-    completed_at: str
+    completed_at: Optional[str]
     message: str
 
 
