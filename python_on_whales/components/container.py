@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
+import pydantic
+
 import python_on_whales.components.image
 import python_on_whales.components.network
 import python_on_whales.components.volume
@@ -1833,6 +1835,36 @@ class ContainerCLI(DockerCLICaller):
         else:
             full_cmd.append(x)
             return int(run(full_cmd))
+
+
+class ContainerStats:
+    def __init__(self, json_dict: Dict[str, Any]):
+        """Takes a json_dict with container stats from the CLI and
+        parses it.
+        """
+        self.block_read: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["BlockIO"].split("/")[0]
+        )
+        self.block_write: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["BlockIO"].split("/")[1]
+        )
+        self.cpu_percentage: float = float(json_dict["CPUPerc"][:-1])
+        self.container: str = json_dict["Container"]
+        self.container_id: str = json_dict["ID"]
+        self.memory_percentage: float = float(json_dict["MemPerc"][:-1])
+        self.memory_used: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["MemUsage"].split("/")[0]
+        )
+        self.memory_limit: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["MemUsage"].split("/")[1]
+        )
+        self.container_name: str = json_dict["Name"]
+        self.net_upload: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["NetIO"].split("/")[0]
+        )
+        self.net_download: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["NetIO"].split("/")[1]
+        )
 
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:

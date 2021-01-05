@@ -1,3 +1,4 @@
+import json
 import sys
 import tempfile
 import time
@@ -8,7 +9,11 @@ import pytest
 
 import python_on_whales
 from python_on_whales import DockerException, Image, docker
-from python_on_whales.components.container import ContainerInspectResult, ContainerState
+from python_on_whales.components.container import (
+    ContainerInspectResult,
+    ContainerState,
+    ContainerStats,
+)
 from python_on_whales.test_utils import random_name
 
 
@@ -356,3 +361,15 @@ def test_pause_unpause():
         container.unpause()
         assert not container.state.paused
         assert container.state.running
+
+
+def get_all_stats_jsons():
+    jsons_directory = Path(__file__).parent / "stats"
+    return sorted(list(jsons_directory.iterdir()))
+
+
+@pytest.mark.parametrize("json_file", get_all_stats_jsons())
+def test_load_stats_json(json_file):
+    json_as_txt = json_file.read_text()
+    stats = ContainerStats(json.loads(json_as_txt))
+    assert stats.memory_used > 100
