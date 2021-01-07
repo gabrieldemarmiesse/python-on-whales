@@ -87,14 +87,44 @@ class Raft(DockerCamelModel):
     log_entries_for_slow_followers: int
     election_tick: int
     heartbeat_tick: int
-    # TODO: add the other attributes
+
+
+class SwarmDispatcher(DockerCamelModel):
+    heartbeat_period: int
+
+
+class SwarmCAConfig(DockerCamelModel):
+    node_cert_expiry: int
+    external_ca: Optional[List[Any]] = pydantic.Field(
+        alias="ExternalCA"
+    )  # TODO: set type
+    signing_ca_cert: Optional[str] = pydantic.Field(alias="SigningCACert")
+    signing_ca_key: Optional[str] = pydantic.Field(alias="SigningCAKey")
+    force_rotate: Optional[int]
+
+
+class SwarmEncryptionConfig(DockerCamelModel):
+    auto_lock_managers: bool
+
+
+class Driver(DockerCamelModel):
+    name: str
+    options: Dict[str, Any]
+
+
+class SwarmTasksDefault(DockerCamelModel):
+    log_driver: Optional[Driver]
 
 
 class SwarmSpec(DockerCamelModel):
     name: str
     labels: Dict[str, str]
-    orchestration: Orchestration
+    orchestration: Optional[Orchestration]
     raft: Raft
+    dispatcher: Optional[SwarmDispatcher]
+    ca_config: Optional[SwarmCAConfig] = pydantic.Field(alias="CAConfig")
+    encryption_config: SwarmEncryptionConfig
+    task_defaults: SwarmTasksDefault
 
 
 class ClusterInfo(DockerCamelModel):
@@ -102,7 +132,7 @@ class ClusterInfo(DockerCamelModel):
     version: python_on_whales.components.node.NodeVersion
     created_at: datetime
     updated_at: datetime
-    spec: Dict  # TODO
+    spec: SwarmSpec
     tls_info: python_on_whales.components.node.NodeTLSInfo
     root_rotation_in_progress: bool
     data_path_port: int

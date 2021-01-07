@@ -174,7 +174,7 @@ Use the right tool for the right job 🙂
 | secret  | 4/4 |
 | service  | 6/9 |
 | stack  | 4/5 |
-| swarm  | 4/8 |
+| swarm  | 5/8 |
 | system  | 3/4 |
 | trust  | 0/3 |
 | volume  | 7/7 |
