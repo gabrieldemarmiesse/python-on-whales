@@ -159,25 +159,25 @@ Use the right tool for the right job 🙂
 
 ## Where is the project now? Where is it going?
 
-| sub-command  | Function implemented  |
-|---|---|
-| app | 0/15  |
-| buildx  | 9/11 |
-| compose  | 0/24 |
-| config  | 4/4 |
-| container | 21/24 |
-| context  | 4/6 |
-| image  | 12/13 |
-| manifest  | 0/4 |
-| network  | 7/7 |
-| node  | 6/7 |
-| secret  | 4/4 |
-| service  | 6/9 |
-| stack  | 4/5 |
-| swarm  | 5/8 |
-| system  | 3/4 |
-| trust  | 0/3 |
-| volume  | 7/7 |
+| sub-command  | Functions implemented  | Progress |
+|---|---|---|
+| app | 0/15  | ![50%](https://progress-bar.dev/0) |
+| buildx  | 9/11 | ![50%](https://progress-bar.dev/81) |
+| compose  | 0/24 | ![50%](https://progress-bar.dev/0) |
+| config  | 4/4 | ![50%](https://progress-bar.dev/100) |
+| container | 22/24 | ![50%](https://progress-bar.dev/91) |
+| context  | 4/6 | ![50%](https://progress-bar.dev/67) |
+| image  | 12/13 | ![50%](https://progress-bar.dev/92) |
+| manifest  | 0/4 | ![50%](https://progress-bar.dev/0) |
+| network  | 7/7 | ![50%](https://progress-bar.dev/100) |
+| node  | 6/7 | ![50%](https://progress-bar.dev/85) |
+| secret  | 4/4 | ![50%](https://progress-bar.dev/100) |
+| service  | 6/9 | ![50%](https://progress-bar.dev/67) |
+| stack  | 4/5 | ![50%](https://progress-bar.dev/80) |
+| swarm  | 5/8 | ![50%](https://progress-bar.dev/50) |
+| system  | 3/4 | ![50%](https://progress-bar.dev/75) |
+| trust  | 0/3 | ![50%](https://progress-bar.dev/0) |
+| volume  | 7/7 | ![50%](https://progress-bar.dev/100) |
 
 Take those numbers with a grain of salt. The functions don't all need the same amount of work to be implemented.
 
