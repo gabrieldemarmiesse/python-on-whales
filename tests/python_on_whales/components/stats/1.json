@@ -1,0 +1,11 @@
+{
+  "BlockIO": "0B / 0B",
+  "CPUPerc": "0.00%",
+  "Container": "a05c11e66698",
+  "ID": "a05c11e66698ad24e819d96ce727451a3871057e8683528452384f035d3510de",
+  "MemPerc": "2.91%",
+  "MemUsage": "173.2MiB / 5.805GiB",
+  "Name": "gabriel_work_env",
+  "NetIO": "0B / 0B",
+  "PIDs": "23"
+}

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import inspect
+import json
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+
+import pydantic
 
 import python_on_whales.components.image
 import python_on_whales.components.network
@@ -1657,16 +1660,44 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def stats(self):
+    def stats(self, all: bool = False) -> List[ContainerStats]:
         """Get containers resource usage statistics
 
         Alias: `docker.stats(...)`
 
-        Not yet implemented
+        Usage:
+        ```python
+        from python_on_whales import docker
+
+        docker.run("redis", detach=True)
+        print(docker.stats())
+        # [<<class 'python_on_whales.components.container.ContainerStats'> object,
+        # attributes are block_read=0, block_write=0, cpu_percentage=0.08,
+        # container=e90ae41a5b17,
+        # container_id=e90ae41a5b17df998584141692f1e361c485e8d00c37ee21fdc360d3523dd1c1,
+        # memory_percentage=0.18, memory_used=11198791, memory_limit=6233071288,
+        # container_name=crazy_northcutt, net_upload=696, net_download=0>]
+        ```
+
+        The data unit is the byte.
+
+        # Arguments
+            all: Get the stats of all containers, not just running ones.
+
+        # Returns
+            A `List[python_on_whales.ContainerStats]`.
         """
-        # We can do something nice with
-        # docker stats --format "{{json .}}" --no-stream --no-trunc
-        raise NotImplementedError
+        full_cmd = self.docker_cmd + [
+            "container",
+            "stats",
+            "--format",
+            "{{json .}}",
+            "--no-stream",
+            "--no-trunc",
+        ]
+        full_cmd.add_flag("--all", all)
+        stats_output = run(full_cmd)
+        return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
 
     def stop(
         self,
@@ -1833,6 +1864,40 @@ class ContainerCLI(DockerCLICaller):
         else:
             full_cmd.append(x)
             return int(run(full_cmd))
+
+
+class ContainerStats:
+    def __init__(self, json_dict: Dict[str, Any]):
+        """Takes a json_dict with container stats from the CLI and
+        parses it.
+        """
+        self.block_read: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["BlockIO"].split("/")[0]
+        )
+        self.block_write: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["BlockIO"].split("/")[1]
+        )
+        self.cpu_percentage: float = float(json_dict["CPUPerc"][:-1])
+        self.container: str = json_dict["Container"]
+        self.container_id: str = json_dict["ID"]
+        self.memory_percentage: float = float(json_dict["MemPerc"][:-1])
+        self.memory_used: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["MemUsage"].split("/")[0]
+        )
+        self.memory_limit: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["MemUsage"].split("/")[1]
+        )
+        self.container_name: str = json_dict["Name"]
+        self.net_upload: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["NetIO"].split("/")[0]
+        )
+        self.net_download: int = pydantic.parse_obj_as(
+            pydantic.ByteSize, json_dict["NetIO"].split("/")[1]
+        )
+
+    def __repr__(self):
+        attr = ", ".join(f"{key}={value}" for key, value in self.__dict__.items())
+        return f"<{self.__class__} object, attributes are {attr}>"
 
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
