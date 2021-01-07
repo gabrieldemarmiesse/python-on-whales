@@ -1,4 +1,5 @@
-from typing import Optional
+from datetime import timedelta
+from typing import Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
@@ -120,6 +121,59 @@ class SwarmCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def update(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def update(
+        self,
+        autolock: Optional[bool] = None,
+        cert_expiry: Optional[timedelta] = None,
+        dispatcher_heartbeat: Optional[timedelta] = None,
+        external_ca: Optional[str] = None,
+        max_snapshots: Optional[int] = None,
+        snapshot_interval: Optional[int] = None,
+        task_history_limit: Optional[int] = None,
+    ):
+        """Update the swarm configuration
+
+        # Arguments
+            autolock: Change manager autolocking setting
+            cert_expiry: Validity period for node certificates, default
+                is `datetime.timedelta(days=90)`. If `int`, it's a number of seconds.
+            dispatcher_heartbeat: Dispatcher heartbeat period.
+            external_ca: Specifications of one or more certificate signing endpoints
+            max_snapshots: Number of additional Raft snapshots to retain
+            snapshot_interval: Number of log entries between Raft snapshots (default 10000)
+            task_history_limit: Task history retention limit (default 5)
+        """
+        full_cmd = self.docker_cmd + ["swarm", "update"]
+        autolock = format_bool_for_cli(autolock)
+        if autolock is not None:
+            full_cmd.append(f"--autolock={autolock}")
+        full_cmd.add_simple_arg(
+            "--cert-expiry", stringify_timedelta_for_docker_cli(cert_expiry)
+        )
+        full_cmd.add_simple_arg(
+            "--dispatcher-heartbeat",
+            stringify_timedelta_for_docker_cli(dispatcher_heartbeat),
+        )
+        full_cmd.add_simple_arg("--external-ci", external_ca)
+        full_cmd.add_simple_arg("--max-snapshots", max_snapshots)
+        full_cmd.add_simple_arg("--snapshot-interval", snapshot_interval)
+        full_cmd.add_simple_arg("--task-history-limit", task_history_limit)
+        run(full_cmd)
+
+
+def format_bool_for_cli(flag: Optional[bool]) -> Optional[str]:
+    if flag is None:
+        return
+    return str(flag).lower()
+
+
+def stringify_timedelta_for_docker_cli(
+    delta: Union[None, int, timedelta]
+) -> Optional[str]:
+    if delta is None:
+        return
+
+    if isinstance(delta, timedelta):
+        delta = delta.total_seconds()
+
+    return f"{delta}s"
