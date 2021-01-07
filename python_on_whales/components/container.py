@@ -1679,6 +1679,8 @@ class ContainerCLI(DockerCLICaller):
         # container_name=crazy_northcutt, net_upload=696, net_download=0>]
         ```
 
+        The data unit is the byte.
+
         # Arguments
             all: Get the stats of all containers, not just running ones.
 
