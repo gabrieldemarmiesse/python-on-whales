@@ -373,3 +373,15 @@ def test_load_stats_json(json_file):
     json_as_txt = json_file.read_text()
     stats = ContainerStats(json.loads(json_as_txt))
     assert stats.memory_used > 100
+
+
+def test_docker_stats():
+    with docker.run(
+        "busybox", ["sleep", "infinity"], detach=True, stop_timeout=1
+    ) as container:
+        for stat in docker.stats():
+            if stat.container_id == container.id:
+                break
+        assert stat.container_name == container.name
+        assert stat.cpu_percentage <= 5
+        assert stat.memory_used <= 100_000_000
