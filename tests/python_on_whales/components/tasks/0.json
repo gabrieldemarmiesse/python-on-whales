@@ -1,0 +1,127 @@
+{
+    "ID": "cttszdbciuopcbjfrnuknl1wp",
+    "Version": {
+        "Index": 82
+    },
+    "CreatedAt": "2021-01-09T08:52:31.0673735Z",
+    "UpdatedAt": "2021-01-09T08:52:44.6286726Z",
+    "Labels": {},
+    "Spec": {
+        "ContainerSpec": {
+            "Image": "swarmpit/agent:latest@sha256:f92ba65f7923794d43ebffc88fbd49bfe8cde8db48ca6888ece5747b9ab1375c",
+            "Labels": {
+                "com.docker.stack.namespace": "dodo"
+            },
+            "Env": [
+                "DOCKER_API_VERSION=1.35",
+                "SOME_OTHER_VARIABLE="
+            ],
+            "Privileges": {
+                "CredentialSpec": null,
+                "SELinuxContext": null
+            },
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/var/run/docker.sock",
+                    "Target": "/var/run/docker.sock",
+                    "ReadOnly": true
+                }
+            ],
+            "Isolation": "default"
+        },
+        "Resources": {
+            "Limits": {
+                "NanoCPUs": 100000000,
+                "MemoryBytes": 67108864
+            },
+            "Reservations": {
+                "NanoCPUs": 50000000,
+                "MemoryBytes": 33554432
+            }
+        },
+        "Placement": {
+            "Platforms": [
+                {
+                    "Architecture": "amd64",
+                    "OS": "linux"
+                },
+                {
+                    "Architecture": "arm64",
+                    "OS": "linux"
+                },
+                {
+                    "OS": "linux"
+                },
+                {
+                    "OS": "linux"
+                }
+            ]
+        },
+        "Networks": [
+            {
+                "Target": "afg48vk96tgv2k947sybsoqhj",
+                "Aliases": [
+                    "agent"
+                ]
+            }
+        ],
+        "ForceUpdate": 0
+    },
+    "ServiceID": "fu1y07uvtrz1iz2sw9f4m7amn",
+    "NodeID": "n5xpfqe9gmktcyirgx1dvkwtu",
+    "Status": {
+        "Timestamp": "2021-01-09T08:52:44.5586291Z",
+        "State": "running",
+        "Message": "started",
+        "ContainerStatus": {
+            "ContainerID": "6d11b98e237fcfa93fd672564f6d30574526b8d8747f69e93a6236a7b747e967",
+            "PID": 16992,
+            "ExitCode": 0
+        },
+        "PortStatus": {}
+    },
+    "DesiredState": "running",
+    "NetworksAttachments": [
+        {
+            "Network": {
+                "ID": "afg48vk96tgv2k947sybsoqhj",
+                "Version": {
+                    "Index": 53
+                },
+                "CreatedAt": "2021-01-09T08:52:25.0892136Z",
+                "UpdatedAt": "2021-01-09T08:52:25.0908479Z",
+                "Spec": {
+                    "Name": "dodo_net",
+                    "Labels": {
+                        "com.docker.stack.namespace": "dodo"
+                    },
+                    "DriverConfiguration": {
+                        "Name": "overlay"
+                    },
+                    "Scope": "swarm"
+                },
+                "DriverState": {
+                    "Name": "overlay",
+                    "Options": {
+                        "com.docker.network.driver.overlay.vxlanid_list": "4097"
+                    }
+                },
+                "IPAMOptions": {
+                    "Driver": {
+                        "Name": "default"
+                    },
+                    "Configs": [
+                        {
+                            "Subnet": "10.0.1.0/24",
+                            "Gateway": "10.0.1.1"
+                        }
+                    ]
+                }
+            },
+            "Addresses": [
+                "10.0.1.8/24"
+            ]
+        }
+    ]
+}
