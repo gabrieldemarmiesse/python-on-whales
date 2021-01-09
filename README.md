@@ -172,7 +172,7 @@ Use the right tool for the right job 🙂
 | network  | 7/7 | ![50%](https://progress-bar.dev/100) |
 | node  | 6/7 | ![50%](https://progress-bar.dev/85) |
 | secret  | 4/4 | ![50%](https://progress-bar.dev/100) |
-| service  | 6/9 | ![50%](https://progress-bar.dev/67) |
+| service  | 7/9 | ![50%](https://progress-bar.dev/78) |
 | stack  | 4/5 | ![50%](https://progress-bar.dev/80) |
 | swarm  | 5/8 | ![50%](https://progress-bar.dev/62) |
 | system  | 3/4 | ![50%](https://progress-bar.dev/75) |
