@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 
@@ -33,8 +33,8 @@ class AssignedGenericResources(DockerCamelModel):
 
 
 class ContainerStatus(DockerCamelModel):
-    container_id: str
-    pid: int
+    container_id: str = pydantic.Field(alias="ContainerID")
+    pid: int = pydantic.Field(alias="PID")
     exit_code: int
 
 
@@ -42,7 +42,7 @@ class TaskStatus(DockerCamelModel):
     timestamp: datetime
     state: str
     message: str
-    err: str
+    err: Optional[str]
     container_status: ContainerStatus
 
 
@@ -54,12 +54,12 @@ class LogDriver(DockerCamelModel):
 class NetworkAttachmentConfig(DockerCamelModel):
     target: str
     aliases: List[str]
-    driver_opts: Dict[str, str]
+    driver_opts: Optional[Dict[str, str]]
 
 
 class Platform(DockerCamelModel):
-    architecture: str
-    os: str = pydantic.Field(alias="OS")
+    architecture: Optional[str]
+    os: Optional[str] = pydantic.Field(alias="OS")
 
 
 class Spread(DockerCamelModel):
@@ -67,9 +67,9 @@ class Spread(DockerCamelModel):
 
 
 class Placement(DockerCamelModel):
-    constraints: List[str]
-    preferences: List[Spread]
-    max_replicas: int
+    constraints: Optional[List[str]]
+    preferences: Optional[List[Spread]]
+    max_replicas: Optional[int]
     platforms: List[Platform]
 
 
@@ -89,9 +89,9 @@ class TaskSpec(DockerCamelModel):
     restart_policy: Any
     placement: Placement
     force_update: int
-    runtime: str
+    runtime: Optional[str]
     networks: List[NetworkAttachmentConfig]
-    log_driver: LogDriver
+    log_driver: Optional[LogDriver]
 
 
 class TaskInspectResult(DockerCamelModel):
@@ -99,13 +99,13 @@ class TaskInspectResult(DockerCamelModel):
     version: ObjectVersion
     created_at: datetime
     updated_at: datetime
-    name: str
+    name: Optional[str]
     labels: Dict[str, str]
     spec: TaskSpec
-    service_id: str
-    slot: int
-    node_id: str
-    assigned_generic_resources: List[AssignedGenericResources]
+    service_id: str = pydantic.Field(alias="ServiceID")
+    slot: Optional[int]
+    node_id: str = pydantic.Field(alias="NodeID")
+    assigned_generic_resources: Optional[List[AssignedGenericResources]]
     status: TaskStatus
     desired_state: str
 
