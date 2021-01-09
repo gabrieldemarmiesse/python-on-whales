@@ -90,7 +90,7 @@ class TaskSpec(DockerCamelModel):
     placement: Placement
     force_update: int
     runtime: Optional[str]
-    networks: List[NetworkAttachmentConfig]
+    networks: Optional[List[NetworkAttachmentConfig]]
     log_driver: Optional[LogDriver]
 
 
@@ -127,8 +127,12 @@ class Task(ReloadableObjectFromJson):
         return self._get_immutable_id()
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         return self._get_inspect_result().name
+
+    @property
+    def desired_state(self) -> str:
+        return self._get_inspect_result().desired_state
 
 
 class TaskCLI(DockerCLICaller):

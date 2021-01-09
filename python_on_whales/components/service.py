@@ -3,6 +3,8 @@ from typing import Any, Dict, List, Optional, Union, overload
 
 from pydantic import Field
 
+import python_on_whales
+import python_on_whales.components.task
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -142,6 +144,10 @@ class Service(ReloadableObjectFromJson):
     def update_status(self) -> Optional[ServiceUpdateStatus]:
         return self._get_inspect_result().update_status
 
+    def ps(self) -> List[python_on_whales.components.task.Task]:
+        """Returns the list of tasks of this service."""
+        return ServiceCLI(self.client_config).ps(self)
+
 
 ValidService = Union[str, Service]
 
@@ -203,9 +209,37 @@ class ServiceCLI(DockerCLICaller):
 
         return [Service(self.client_config, x) for x in ids]
 
-    def ps(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def ps(
+        self, x: Union[ValidService, List[ValidService]]
+    ) -> List[python_on_whales.components.task.Task]:
+        """Returns the list of swarm tasks associated with this service.
+
+        You can pass multiple services at once at this function.
+
+        ```python
+        from python_on_whales import docker
+
+        tasks = docker.service.ps("my-service-name")
+        print(tasks[0].desired_state)
+        # running
+        ```
+
+        # Arguments
+            x: One or more services (can be id, name or `python_on_whales.Service` object.)
+
+        # Returns
+            `List[python_on_whales.Task]`
+        """
+        full_cmd = (
+            self.docker_cmd + ["service", "ps", "--quiet", "--no-trunc"] + to_list(x)
+        )
+        ids = run(full_cmd).splitlines()
+        return [
+            python_on_whales.components.task.Task(
+                self.client_config, id_, is_immutable_id=True
+            )
+            for id_ in ids
+        ]
 
     def remove(self, services: Union[ValidService, List[ValidService]]):
         """Removes a service

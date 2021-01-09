@@ -3,6 +3,7 @@ from typing import List
 
 import pytest
 
+from python_on_whales import docker
 from python_on_whales.components.service import ServiceInspectResult
 
 
@@ -16,3 +17,14 @@ def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     ServiceInspectResult.parse_raw(json_as_txt)
     # we could do more checks here if needed
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_tasks():
+    service = docker.service.create("busybox", ["sleep", "infinity"])
+
+    # Todo: use a context manager
+    tasks = service.ps()
+    assert len(tasks) > 0
+    assert tasks[0].desired_state == "running"
+    docker.service.remove(service)
