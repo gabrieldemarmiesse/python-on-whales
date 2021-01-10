@@ -78,19 +78,13 @@ class Context(ReloadableObjectFromJson):
         """Removes this context"""
         ContextCLI(self.client_config).remove(self, force)
 
-    def export(self) -> None:
-        """Export this context"""
-        raise NotImplementedError
-        ContextCLI(self.client_config).export(self)
-
     def update(self) -> None:
-        """Update this context"""
+        """Update this context, not yet implemented."""
         raise NotImplementedError
         ContextCLI(self.client_config).update(self)
 
     def use(self) -> None:
         """Use this context"""
-        raise NotImplementedError
         ContextCLI(self.client_config).use(self)
 
 
