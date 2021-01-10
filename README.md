@@ -174,7 +174,7 @@ Use the right tool for the right job 🙂
 | secret  | 4/4 | ![50%](https://progress-bar.dev/100) |
 | service  | 7/9 | ![50%](https://progress-bar.dev/78) |
 | stack  | 4/5 | ![50%](https://progress-bar.dev/80) |
-| swarm  | 5/8 | ![50%](https://progress-bar.dev/62) |
+| swarm  | 6/8 | ![50%](https://progress-bar.dev/75) |
 | system  | 3/4 | ![50%](https://progress-bar.dev/75) |
 | trust  | 0/3 | ![50%](https://progress-bar.dev/0) |
 | volume  | 7/7 | ![50%](https://progress-bar.dev/100) |
