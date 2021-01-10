@@ -122,13 +122,57 @@ class Task(ReloadableObjectFromJson):
     def _parse_json_object(self, json_object: Dict[str, Any]) -> TaskInspectResult:
         return TaskInspectResult.parse_obj(json_object)
 
+    def _get_inspect_result(self) -> TaskInspectResult:
+        """Only there to allow tools to know the return type"""
+        return super()._get_inspect_result()
+
     @property
     def id(self) -> str:
         return self._get_immutable_id()
 
     @property
+    def version(self) -> ObjectVersion:
+        return self._get_inspect_result().version
+
+    @property
+    def created_at(self) -> datetime:
+        return self._get_inspect_result().created_at
+
+    @property
+    def updated_at(self) -> datetime:
+        return self._get_inspect_result().updated_at
+
+    @property
     def name(self) -> Optional[str]:
         return self._get_inspect_result().name
+
+    @property
+    def labels(self) -> Dict[str, str]:
+        return self._get_inspect_result().labels
+
+    @property
+    def spec(self) -> TaskSpec:
+        return self._get_inspect_result().spec
+
+    @property
+    def service_id(self) -> str:
+        return self._get_inspect_result().service_id
+
+    @property
+    def slot(self) -> Optional[int]:
+        return self._get_inspect_result().slot
+
+    @property
+    def node_id(self) -> str:
+        return self._get_inspect_result().node_id
+
+    @property
+    def assigned_generic_resources(self) -> Optional[List[AssignedGenericResources]]:
+        return self._get_inspect_result().assigned_generic_resources
+
+    @property
+    def status(self) -> TaskStatus:
+        return self._get_inspect_result().status
 
     @property
     def desired_state(self) -> str:
