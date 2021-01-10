@@ -15,7 +15,7 @@ class SwarmCLI(DockerCLICaller):
         external_ca: str = None,
         rotate: bool = False,
     ):
-        """Display and rotate the root CA
+        """Get and rotate the root CA
 
         # Arguments
             ca_certificate: Path to the PEM-formatted root CA certificate
@@ -40,9 +40,11 @@ class SwarmCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--external-ca", external_ca)
         full_cmd.add_flag("--rotate", rotate)
 
-        output = run(full_cmd)
+        run(full_cmd)
         if not detach:
-            return output
+            # in "docker swarm ca --rotate", the progress is in stdout, not stderr
+            # so we need to run the command a second time to be clean.
+            return run(self.docker_cmd + ["swarm", "ca"])
 
     def init(
         self,

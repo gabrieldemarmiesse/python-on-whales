@@ -16,12 +16,13 @@ def test_swarm_update_retention_limit():
 
 @pytest.mark.usefixtures("swarm_mode")
 def test_swarm_change_certificate_expiry():
-    docker.swarm.ca(certificate_expiry=timedelta(days=1), rotate=True)
+    ca = docker.swarm.ca(certificate_expiry=timedelta(days=1), rotate=True)
     info = docker.system.info()
     node_cert_expiry = timedelta(
         microseconds=info.swarm.cluster.spec.ca_config.node_cert_expiry / 1000
     )
     assert node_cert_expiry == timedelta(days=1)
+    assert "BEGIN CERTIFICATE" in ca
 
 
 @pytest.mark.usefixtures("swarm_mode")
