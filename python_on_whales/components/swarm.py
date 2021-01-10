@@ -2,13 +2,49 @@ from datetime import timedelta
 from typing import Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.utils import run
+from python_on_whales.utils import ValidPath, run
 
 
 class SwarmCLI(DockerCLICaller):
-    def ca(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def ca(
+        self,
+        ca_certificate: ValidPath = None,
+        ca_key: ValidPath = None,
+        certificate_expiry: Union[int, timedelta] = None,
+        detach: bool = False,
+        external_ca: str = None,
+        rotate: bool = False,
+    ):
+        """Get and rotate the root CA
+
+        # Arguments
+            ca_certificate: Path to the PEM-formatted root CA certificate
+                to use for the new cluster
+            ca_key: Path to the PEM-formatted root CA key to use
+                for the new cluster
+            certificate_expiry: Validity period for node certificates
+            detach: Exit immediately instead of waiting for the root rotation
+                to converge. The function will return `None`.
+            external_ca: Specifications of one or more certificate signing endpoints
+            rotate: Rotate the swarm CA - if no certificate or key are provided,
+                new ones will be generated.
+        """
+        full_cmd = self.docker_cmd + ["swarm", "ca"]
+
+        full_cmd.add_simple_arg("--ca-cert", ca_certificate)
+        full_cmd.add_simple_arg("--ca-key", ca_key)
+        full_cmd.add_simple_arg(
+            "--cert-expiry", stringify_timedelta_for_docker_cli(certificate_expiry)
+        )
+        full_cmd.add_flag("--detach", detach)
+        full_cmd.add_simple_arg("--external-ca", external_ca)
+        full_cmd.add_flag("--rotate", rotate)
+
+        run(full_cmd)
+        if not detach:
+            # in "docker swarm ca --rotate", the progress is in stdout, not stderr
+            # so we need to run the command a second time to be clean.
+            return run(self.docker_cmd + ["swarm", "ca"])
 
     def init(
         self,
