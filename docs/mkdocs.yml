@@ -22,6 +22,7 @@ nav:
     - docker stack: sub-commands/stack.md
     - docker swarm: sub-commands/swarm.md
     - docker system: sub-commands/system.md
+    - docker task: sub-commands/task.md
     - docker trust: sub-commands/trust.md
     - docker volume: sub-commands/volume.md
   - Docker objects:
@@ -33,6 +34,7 @@ nav:
     - Nodes: docker_objects/nodes.md
     - Services: docker_objects/services.md
     - Stacks: docker_objects/stacks.md
+    - Tasks: docker_objects/tasks.md
     - Volumes: docker_objects/volumes.md
   - User guide:
       - docker.run() guide: user_guide/docker_run.md

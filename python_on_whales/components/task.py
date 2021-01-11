@@ -185,6 +185,7 @@ class TaskCLI(DockerCLICaller):
         raise NotImplementedError
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Task, List[Task]]:
+        """Returns a `python_on_whales.Task` object from its ID."""
         if isinstance(x, str):
             return Task(self.client_config, x)
         else:
