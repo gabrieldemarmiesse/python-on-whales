@@ -54,6 +54,7 @@ pages = {
     "sub-commands/system.md": get_methods(
         "python_on_whales.components.system.SystemCLI"
     ),
+    "sub-commands/task.md": get_methods("python_on_whales.components.task.TaskCLI"),
     "sub-commands/trust.md": get_methods("python_on_whales.components.trust.TrustCLI"),
     "sub-commands/volume.md": get_methods(
         "python_on_whales.components.volume.VolumeCLI"
@@ -89,6 +90,7 @@ class MyDocumentationGenerator(DocumentationGenerator):
         signature = signature.replace("SwarmCLI.", "docker.swarm.")
         signature = signature.replace("SystemCLI.", "docker.system.")
         signature = signature.replace("TrustCLI.", "docker.trust.")
+        signature = signature.replace("TaskCLI.", "docker.task.")
         signature = signature.replace("VolumeCLI.", "docker.volume.")
         return signature
 
@@ -105,6 +107,7 @@ doc_generator = MyDocumentationGenerator(
         "python_on_whales.Node",
         "python_on_whales.Service",
         "python_on_whales.Stack",
+        "python_on_whales.Task",
         "python_on_whales.Volume",
     ],
     titles_size="##",
