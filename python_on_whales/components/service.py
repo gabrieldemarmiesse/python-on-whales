@@ -106,6 +106,12 @@ class Service(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.remove()
+
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["service", "inspect", reference])
 
@@ -147,6 +153,50 @@ class Service(ReloadableObjectFromJson):
     def ps(self) -> List[python_on_whales.components.task.Task]:
         """Returns the list of tasks of this service."""
         return ServiceCLI(self.client_config).ps(self)
+
+    def remove(self) -> None:
+        """Removes this service
+
+        It's also possible to use a service as a context manager.
+        By using a context manager, you ensures that the service will be removed even
+        if an exception occurs.
+
+        ```python
+        from python_on_whales import docker
+
+        docker.swarm.init()
+        with docker.service.create("ubuntu", ["sleep", "infinity"]) as my_service:
+            print("I'm doing things with the service here")
+            print(my_service.update_status)
+
+        print("I'm out of the context manager, the service has been removed.")
+        ```
+        """
+        ServiceCLI(self.client_config).remove(self)
+
+    def scale(self, new_scale: int, detach: bool = False) -> None:
+        """Change the scale of a service.
+
+        See the [`docker.service.scale`](../sub-commands/service.md#scale) command for
+        information about the arguments.
+        """
+        ServiceCLI(self.client_config).scale({self: new_scale}, detach=detach)
+
+    def update(
+        self,
+        detach: bool = False,
+        force: bool = False,
+        image: Optional[str] = None,
+        with_registry_authentication: bool = False,
+    ):
+        """Updates a service
+
+        See the [`docker.service.update`](../sub-commands/service.md#update) command for
+        information about the arguments.
+        """
+        ServiceCLI(self.client_config).update(
+            self, detach, force, image, with_registry_authentication
+        )
 
 
 ValidService = Union[str, Service]
@@ -241,7 +291,7 @@ class ServiceCLI(DockerCLICaller):
             for id_ in ids
         ]
 
-    def remove(self, services: Union[ValidService, List[ValidService]]):
+    def remove(self, services: Union[ValidService, List[ValidService]]) -> None:
         """Removes a service
 
         # Arguments
@@ -258,7 +308,7 @@ class ServiceCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def scale(self, new_scales: Dict[ValidService, int], detach=False):
+    def scale(self, new_scales: Dict[ValidService, int], detach: bool = False) -> None:
         """Scale one or more services.
 
         # Arguments
@@ -282,7 +332,18 @@ class ServiceCLI(DockerCLICaller):
         image: Optional[str] = None,
         with_registry_authentication: bool = False,
     ):
-        """Update a service"""
+        """Update a service
+
+        More options coming soon
+
+        # Arguments
+            service: The service to update
+            detach: Exit immediately instead of waiting for the service to converge
+            force: Force update even if no changes require it
+            image: Service image tag
+            with_registry_authentication: Send registry authentication details
+                to swarm agents
+        """
         full_cmd = self.docker_cmd + ["service", "update"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_simple_arg("--image", image)
