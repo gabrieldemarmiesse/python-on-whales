@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 
+import python_on_whales.components.service
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -181,8 +182,13 @@ class Task(ReloadableObjectFromJson):
 
 class TaskCLI(DockerCLICaller):
     def list(self) -> List[Task]:
-        """Not Yet implemented"""
-        raise NotImplementedError
+        """Returns all tasks in the swarm
+
+        # Returns
+            `List[python_on_whales.Task]`
+        """
+        service_cli = python_on_whales.components.service.ServiceCLI(self.client_config)
+        return service_cli.ps(service_cli.list())
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Task, List[Task]]:
         """Returns a `python_on_whales.Task` object from its ID."""

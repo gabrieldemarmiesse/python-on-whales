@@ -18,6 +18,7 @@ from python_on_whales.components.service import ServiceCLI
 from python_on_whales.components.stack import StackCLI
 from python_on_whales.components.swarm import SwarmCLI
 from python_on_whales.components.system import SystemCLI
+from python_on_whales.components.task import TaskCLI
 from python_on_whales.components.trust import TrustCLI
 from python_on_whales.components.volume import VolumeCLI
 
@@ -99,6 +100,7 @@ class DockerClient(DockerCLICaller):
         self.stack = StackCLI(self.client_config)
         self.swarm = SwarmCLI(self.client_config)
         self.system = SystemCLI(self.client_config)
+        self.task = TaskCLI(self.client_config)
         self.trust = TrustCLI(self.client_config)
         self.volume = VolumeCLI(self.client_config)
 
