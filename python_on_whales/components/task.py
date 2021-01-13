@@ -81,12 +81,67 @@ class RestartPolicy(DockerCamelModel):
     window: int
 
 
+class PluginPrivilege(DockerCamelModel):
+    name: str
+    description: str
+    value: List[str]
+
+
+class PluginSpec(DockerCamelModel):
+    name: str
+    remote: str
+    disabled: bool
+    plugin_privilege: List[PluginPrivilege]
+
+
+class ContainerSpec(DockerCamelModel):
+    image: str
+    labels: Optional[Dict[str, str]]
+    command: Optional[List[str]]
+    args: Optional[List[str]]
+    hostname: Optional[str]
+    env: Optional[List[str]]
+    dir: Optional[str]
+    user: Optional[str]
+    groups: Optional[List[str]]
+    privileges: Any
+    tty: Optional[bool] = pydantic.Field(alias="TTY")
+    open_stdin: Optional[bool]
+    read_only: Optional[bool]
+    mounts: Optional[List[Any]]
+    stop_signal: Optional[str]
+    stop_grace_period: Optional[int]
+    health_check: Any
+    hosts: Optional[List[str]]
+    dns_config: Any
+    secrets: Optional[List[Any]]
+    configs: Optional[List[Any]]
+    isolation: Optional[str]
+    init: Optional[bool]
+    sysctls: Any
+
+
+class NetworkAttachmentSpec(DockerCamelModel):
+    container_id: str = pydantic.Field(alias="ContainerID")
+
+
+class ResourceObject(DockerCamelModel):
+    nano_cpus: Optional[int] = pydantic.Field(alias="NanoCPUs")
+    memory_bytes: Optional[int]
+    generic_resources: Optional[List[AssignedGenericResources]]
+
+
+class Resources(DockerCamelModel):
+    limits: Optional[ResourceObject]
+    reservation: Optional[ResourceObject]
+
+
 class TaskSpec(DockerCamelModel):
     # TODO: set types for Any
-    plugin_spec: Any
-    container_spec: Any
-    network_attachment_spec: Any
-    resources: Any
+    plugin_spec: Optional[PluginSpec]
+    container_spec: Optional[ContainerSpec]
+    network_attachment_spec: Optional[NetworkAttachmentSpec]
+    resources: Resources
     restart_policy: Any
     placement: Placement
     force_update: int
