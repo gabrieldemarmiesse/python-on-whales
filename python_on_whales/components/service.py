@@ -198,6 +198,12 @@ class Service(ReloadableObjectFromJson):
             self, detach, force, image, with_registry_authentication
         )
 
+    def exists(self) -> bool:
+        """Returns `True` if the service is still present in the swarm, `False`
+        if the service has been removed.
+        """
+        return self in ServiceCLI(self.client_config).list()
+
 
 ValidService = Union[str, Service]
 
