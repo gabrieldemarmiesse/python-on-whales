@@ -24,7 +24,6 @@ def test_load_json(json_file):
 def test_tasks():
     service = docker.service.create("busybox", ["sleep", "infinity"])
 
-    # Todo: use a context manager
     tasks = service.ps()
     assert len(tasks) > 0
     assert tasks[0].desired_state == "running"
