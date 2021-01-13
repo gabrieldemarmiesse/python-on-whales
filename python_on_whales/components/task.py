@@ -96,11 +96,11 @@ class PluginSpec(DockerCamelModel):
 
 class ContainerSpec(DockerCamelModel):
     image: str
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
     command: Optional[List[str]]
     args: Optional[List[str]]
     hostname: Optional[str]
-    env: List[str]
+    env: Optional[List[str]]
     dir: Optional[str]
     user: Optional[str]
     groups: Optional[List[str]]
@@ -108,7 +108,7 @@ class ContainerSpec(DockerCamelModel):
     tty: Optional[bool] = pydantic.Field(alias="TTY")
     open_stdin: Optional[bool]
     read_only: Optional[bool]
-    mounts: List[Any]
+    mounts: Optional[List[Any]]
     stop_signal: Optional[str]
     stop_grace_period: Optional[int]
     health_check: Any
