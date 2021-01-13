@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from typing import List
 
@@ -23,8 +24,29 @@ def test_load_json(json_file):
 def test_tasks():
     service = docker.service.create("busybox", ["sleep", "infinity"])
 
-    # Todo: use a context manager
     tasks = service.ps()
     assert len(tasks) > 0
     assert tasks[0].desired_state == "running"
     docker.service.remove(service)
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_service_scale():
+    service = docker.service.create("busybox", ["sleep", "infinity"])
+    service.scale(3)
+    time.sleep(0.4)
+    assert service.spec.mode["Replicated"] == {"Replicas": 3}
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_context_manager():
+
+    with pytest.raises(RuntimeError):
+        with docker.service.create("busybox", ["sleep", "infinity"]) as my_service:
+            assert my_service.spec.task_template.container_spec.image.startswith(
+                "busybox"
+            )
+            assert my_service.exists()
+            raise RuntimeError
+
+    assert not my_service.exists()
