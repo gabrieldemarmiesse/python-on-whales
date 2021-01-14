@@ -103,12 +103,16 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def up(self, services: List[str] = [], detach=False):
+    def up(self, services: List[str] = [], build: bool = False, detach: bool = False):
         """Start the containers.
 
         # Arguments
             services: The services to start. If empty (default), all services are
                 started.
+            build: If `True`, build the docker images before starting the containers
+                even if a docker image with this name already exists.
+                If `False` (the default), build only the docker images that do not already
+                exist.
             detach: If `True`, run the containers in the background. Only `True` is
                 supported at the moment.
         """
@@ -118,6 +122,8 @@ class ComposeCLI(DockerCLICaller):
             )
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_flag("--build", build)
+
         full_cmd += services
         run(full_cmd, capture_stdout=False)
 
