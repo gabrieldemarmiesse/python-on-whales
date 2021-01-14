@@ -163,7 +163,7 @@ Use the right tool for the right job 🙂
 |---|---|---|
 | app | 0/15  | ![50%](https://progress-bar.dev/0) |
 | buildx  | 9/11 | ![50%](https://progress-bar.dev/81) |
-| compose  | 0/24 | ![50%](https://progress-bar.dev/0) |
+| compose  | 3/24 | ![8%](https://progress-bar.dev/12) |
 | config  | 4/4 | ![50%](https://progress-bar.dev/100) |
 | container | 22/24 | ![50%](https://progress-bar.dev/91) |
 | context  | 4/6 | ![50%](https://progress-bar.dev/67) |
