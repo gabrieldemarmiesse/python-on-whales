@@ -1,14 +1,9 @@
-import os
-
-import pytest
-
 from python_on_whales import DockerClient
+from python_on_whales.utils import PROJECT_ROOT
 
-pytestmark = pytest.mark.skipif(
-    os.getenv("RUN_COMPOSE_TESTS", "0") == "0", reason="Do not run compose tests"
+docker = DockerClient(
+    compose_files=[PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"]
 )
-
-docker = DockerClient(compose_files=["./dummy_compose.yml"])
 
 
 def test_docker_compose_build():
