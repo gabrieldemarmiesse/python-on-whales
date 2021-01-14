@@ -63,13 +63,29 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def pull(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def pull(self, services: List[str] = []):
+        """Pull service images
 
-    def push(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+        # Arguments
+            services: The list of services to select. Only the images of those
+                services will be pulled. If no services are specified (the default
+                behavior) all images of all services are pulled.
+        """
+        full_cmd = self.docker_compose_cmd + ["pull"]
+        full_cmd += services
+        run(full_cmd)
+
+    def push(self, services: List[str] = []):
+        """Push service images
+
+        # Arguments
+            services: The list of services to select. Only the images of those
+                services will be pushed. If no services are specified (the default
+                behavior) all images of all services are pushed.
+        """
+        full_cmd = self.docker_compose_cmd + ["push"]
+        full_cmd += services
+        run(full_cmd)
 
     def restart(self):
         """Not yet implemented"""

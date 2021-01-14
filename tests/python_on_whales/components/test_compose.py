@@ -1,7 +1,7 @@
 import pytest
 
 import python_on_whales
-from python_on_whales import DockerClient
+from python_on_whales import DockerClient, DockerException
 from python_on_whales.utils import PROJECT_ROOT
 
 pytestmark = pytest.mark.skipif(
@@ -34,3 +34,16 @@ def test_docker_compose_up_build():
 def test_docker_compose_up_down_some_services():
     docker.compose.up(["my_service", "redis"], detach=True)
     docker.compose.down()
+
+
+def test_docker_compose_pull():
+    try:
+        docker.image.remove("redis")
+    except DockerException:
+        pass
+    try:
+        docker.image.remove("postgres")
+    except DockerException:
+        pass
+    docker.compose.pull(["redis", "my_postgres"])
+    docker.image.inspect(["redis", "postgres"])
