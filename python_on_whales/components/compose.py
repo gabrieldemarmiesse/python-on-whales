@@ -27,7 +27,7 @@ class ComposeCLI(DockerCLICaller):
         raise NotImplementedError
 
     def down(self):
-        """Stop and remove the containers"""
+        """Stops and removes the containers"""
         full_cmd = self.docker_compose_cmd + ["down"]
         run(full_cmd)
 
