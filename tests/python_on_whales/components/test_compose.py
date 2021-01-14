@@ -17,16 +17,18 @@ docker = DockerClient(
 def test_docker_compose_build():
     docker.compose.build()
     docker.compose.build(["my_service"])
+    docker.image.remove("some_random_image")
 
 
 def test_docker_compose_up_down():
     docker.compose.up(detach=True)
     docker.compose.down()
 
+
 def test_docker_compose_up_build():
     docker.compose.up(build=True, detach=True)
-
-    docker.compose.down()
+    with docker.image.inspect("some_random_image"):
+        docker.compose.down()
 
 
 def test_docker_compose_up_down_some_services():

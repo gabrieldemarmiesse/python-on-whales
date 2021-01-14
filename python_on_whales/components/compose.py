@@ -122,6 +122,8 @@ class ComposeCLI(DockerCLICaller):
             )
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_flag("--build", build)
+
         full_cmd += services
         run(full_cmd, capture_stdout=False)
 
