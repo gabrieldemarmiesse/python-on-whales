@@ -1,5 +1,13 @@
+import pytest
+
+import python_on_whales
 from python_on_whales import DockerClient
 from python_on_whales.utils import PROJECT_ROOT
+
+pytestmark = pytest.mark.skipif(
+    not python_on_whales.docker.compose.is_installed(),
+    reason="Those tests need docker compose.",
+)
 
 docker = DockerClient(
     compose_files=[PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"]
