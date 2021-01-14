@@ -23,6 +23,11 @@ def test_docker_compose_up_down():
     docker.compose.up(detach=True)
     docker.compose.down()
 
+def test_docker_compose_up_build():
+    docker.compose.up(build=True, detach=True)
+
+    docker.compose.down()
+
 
 def test_docker_compose_up_down_some_services():
     docker.compose.up(["my_service", "redis"], detach=True)
