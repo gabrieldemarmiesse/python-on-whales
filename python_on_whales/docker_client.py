@@ -13,6 +13,7 @@ from python_on_whales.components.image import ImageCLI
 from python_on_whales.components.manifest import ManifestCLI
 from python_on_whales.components.network import NetworkCLI
 from python_on_whales.components.node import NodeCLI
+from python_on_whales.components.plugin import PluginCLI
 from python_on_whales.components.secret import SecretCLI
 from python_on_whales.components.service import ServiceCLI
 from python_on_whales.components.stack import StackCLI
@@ -95,6 +96,7 @@ class DockerClient(DockerCLICaller):
         self.manifest = ManifestCLI(self.client_config)
         self.network = NetworkCLI(self.client_config)
         self.node = NodeCLI(self.client_config)
+        self.plugin = PluginCLI(self.client_config)
         self.secret = SecretCLI(self.client_config)
         self.service = ServiceCLI(self.client_config)
         self.stack = StackCLI(self.client_config)
