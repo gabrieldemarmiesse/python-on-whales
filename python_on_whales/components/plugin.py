@@ -21,8 +21,14 @@ class Plugin(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.remove(force=True)
+
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["node", "inspect", reference])
+        return run(self.docker_cmd + ["plugin", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> PluginInspectResult:
         return PluginInspectResult.parse_obj(json_object)
@@ -39,29 +45,40 @@ class Plugin(ReloadableObjectFromJson):
     def name(self) -> str:
         return self._get_inspect_result().name
 
-    def disable(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    @property
+    def _docker_plugin(self) -> PluginCLI:
+        return PluginCLI(self.client_config)
 
-    def enable(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def disable(self, force: bool = False) -> None:
+        """Disable this plugin"""
+        self._docker_plugin.disable(self, force=force)
 
-    def push(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def enable(self, timeout: int = None) -> None:
+        """Enable this plugin"""
+        self._docker_plugin.enable(self, timeout=timeout)
 
-    def remove(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def push(self, disable_content_trust: bool = True) -> None:
+        """Push this plugin"""
+        self._docker_plugin.push(self, disable_content_trust=disable_content_trust)
 
-    def set(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def remove(self, force: bool = False) -> None:
+        """Remove this plugin"""
+        self._docker_plugin.remove(self, force=force)
 
-    def upgrade(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def set(self, configuration: Dict[str, str]) -> None:
+        """Set the configuration for this plugin"""
+        self._docker_plugin.set(self, configuration)
+
+    def upgrade(
+        self,
+        remote: Optional[str] = None,
+        disable_content_trust: bool = True,
+        skip_remote_check: bool = False,
+    ) -> None:
+        """Upgrade this plugin"""
+        self._docker_plugin.upgrade(
+            self, remote, disable_content_trust, skip_remote_check
+        )
 
 
 ValidPlugin = Union[Plugin, str]
