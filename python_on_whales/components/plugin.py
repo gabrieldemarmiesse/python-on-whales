@@ -7,12 +7,24 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, run, to_list
+from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
+
+
+class PluginSettings(DockerCamelModel):
+    pass
+
+
+class PluginConfig(DockerCamelModel):
+    pass
 
 
 class PluginInspectResult(DockerCamelModel):
     id: str
     name: str
+    enabled: bool
+    settings: PluginSettings
+    plugin_reference: str
+    config: PluginConfig
 
 
 class Plugin(ReloadableObjectFromJson):
@@ -44,6 +56,22 @@ class Plugin(ReloadableObjectFromJson):
     @property
     def name(self) -> str:
         return self._get_inspect_result().name
+
+    @property
+    def enabled(self) -> bool:
+        return self._get_inspect_result().enabled
+
+    @property
+    def settings(self) -> PluginSettings:
+        return self._get_inspect_result().settings
+
+    @property
+    def plugin_reference(self) -> str:
+        return self._get_inspect_result().plugin_reference
+
+    @property
+    def config(self) -> PluginConfig:
+        return self._get_inspect_result().config
 
     @property
     def _docker_plugin(self) -> PluginCLI:
@@ -85,9 +113,21 @@ ValidPlugin = Union[Plugin, str]
 
 
 class PluginCLI(DockerCLICaller):
-    def create(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def create(
+        self, plugin_name: str, plugin_data_directory: ValidPath, compress: bool = False
+    ) -> Plugin:
+        """Create a plugin from a rootfs and configuration.
+
+        # Arguments
+            plugin_name: The name you want to give to your plugin
+            plugin_data_directory: Must contain config.json and rootfs directory.
+            compress: Compress the context using gzip
+        """
+        full_cmd = self.docker_cmd + ["plugin", "create"]
+        full_cmd.add_flag("--compress", compress)
+        full_cmd += [plugin_name, plugin_data_directory]
+        run(full_cmd)
+        return Plugin(self.client_config, plugin_name)
 
     def disable(self, plugin: ValidPlugin, force: bool = False) -> None:
         """Disable a plugin
