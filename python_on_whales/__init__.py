@@ -5,6 +5,7 @@ from .components.context import Context
 from .components.image import Image
 from .components.network import Network
 from .components.node import Node
+from .components.plugin import Plugin
 from .components.service import Service
 from .components.stack import Stack
 from .components.system import SystemInfo

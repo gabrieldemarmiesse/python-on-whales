@@ -21,8 +21,14 @@ class Plugin(ReloadableObjectFromJson):
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.remove(force=True)
+
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["node", "inspect", reference])
+        return run(self.docker_cmd + ["plugin", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> PluginInspectResult:
         return PluginInspectResult.parse_obj(json_object)
