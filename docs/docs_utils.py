@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from python_on_whales import docker
+from python_on_whales import DockerException, docker
 
 
 def write_code(i: int, attribute_access: str, value) -> str:
@@ -240,6 +240,31 @@ def generate_code_demo_images() -> str:
         "image.root_fs.layers",
         "image.root_fs.base_layer",
         "image.metadata",
+    ]
+
+    for i, attribute_access in enumerate(to_evaluate):
+        value = eval(attribute_access)
+        result.append(write_code(i + 4, attribute_access, value))
+
+    return "\n".join(result)
+
+
+def generate_code_demo_plugins() -> str:
+    result = []
+
+    try:
+        plugin = docker.plugin.inspect("mochoa/s3fs-volume-plugin")
+    except DockerException:
+        plugin = docker.plugin.install("mochoa/s3fs-volume-plugin")
+
+    print(f"Generating example for {plugin.name}")
+    to_evaluate = [
+        "plugin.id",
+        "plugin.name",
+        "plugin.enabled",
+        "plugin.settings",
+        "plugin.plugin_reference",
+        "plugin.config",
     ]
 
     for i, attribute_access in enumerate(to_evaluate):

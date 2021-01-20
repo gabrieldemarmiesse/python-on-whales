@@ -10,12 +10,33 @@ from python_on_whales.client_config import (
 from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
 
 
+class PluginMount(DockerCamelModel):
+    pass
+
+
+class PluginDevice(DockerCamelModel):
+    pass
+
+
 class PluginSettings(DockerCamelModel):
+    mounts: List[PluginMount]
+    env: List[str]
+    args: List[str]
+    devices: List[PluginDevice]
+
+
+class Interface(DockerCamelModel):
     pass
 
 
 class PluginConfig(DockerCamelModel):
-    pass
+    docker_version: str
+    description: str
+    documentation: str
+    interface: Interface
+    entrypoint: List[str]
+    work_dir: str
+    # TODO: add missing attributes
 
 
 class PluginInspectResult(DockerCamelModel):
