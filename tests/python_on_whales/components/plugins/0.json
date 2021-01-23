@@ -1,0 +1,134 @@
+{
+  "Config": {
+    "Args": {
+      "Description": "",
+      "Name": "",
+      "Settable": null,
+      "Value": null
+    },
+    "Description": "sshFS plugin for Docker",
+    "DockerVersion": "18.05.0-ce-rc1",
+    "Documentation": "https://docs.docker.com/engine/extend/plugins/",
+    "Entrypoint": [
+      "/docker-volume-sshfs"
+    ],
+    "Env": [
+      {
+        "Description": "",
+        "Name": "DEBUG",
+        "Settable": [
+          "value"
+        ],
+        "Value": "0"
+      }
+    ],
+    "Interface": {
+      "Socket": "sshfs.sock",
+      "Types": [
+        "docker.volumedriver/1.0"
+      ]
+    },
+    "IpcHost": false,
+    "Linux": {
+      "AllowAllDevices": false,
+      "Capabilities": [
+        "CAP_SYS_ADMIN"
+      ],
+      "Devices": [
+        {
+          "Description": "",
+          "Name": "",
+          "Path": "/dev/fuse",
+          "Settable": null
+        }
+      ]
+    },
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/mnt/state",
+        "Name": "state",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "/var/lib/docker/plugins/",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/root/.ssh",
+        "Name": "sshkey",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "",
+        "Type": "bind"
+      }
+    ],
+    "Network": {
+      "Type": "host"
+    },
+    "PidHost": false,
+    "PropagatedMount": "/mnt/volumes",
+    "User": {},
+    "WorkDir": "",
+    "rootfs": {
+      "diff_ids": [
+        "sha256:ce2b7a99c5db05cfe263bcd3640f2c1ce7c6f4619339633d44e65a8168ec3587"
+      ],
+      "type": "layers"
+    }
+  },
+  "Enabled": true,
+  "Id": "be8917f5982eac8d3b48a065ec3704b05e086c5fd763e18536fdbd553bf3c0ca",
+  "Name": "vieux/sshfs:latest",
+  "PluginReference": "docker.io/vieux/sshfs:latest",
+  "Settings": {
+    "Args": [],
+    "Devices": [
+      {
+        "Description": "",
+        "Name": "",
+        "Path": "/dev/fuse",
+        "Settable": null
+      }
+    ],
+    "Env": [
+      "DEBUG=0"
+    ],
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/mnt/state",
+        "Name": "state",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "/var/lib/docker/plugins/",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/root/.ssh",
+        "Name": "sshkey",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "",
+        "Type": "bind"
+      }
+    ]
+  }
+}

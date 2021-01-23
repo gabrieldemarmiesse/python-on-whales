@@ -1,0 +1,64 @@
+{
+  "Config": {
+    "Args": {
+      "Description": "",
+      "Name": "",
+      "Settable": null,
+      "Value": null
+    },
+    "Description": "Loki Logging Driver",
+    "DockerVersion": "17.09.0-ce",
+    "Documentation": "https://github.com/grafana/loki",
+    "Entrypoint": [
+      "/bin/docker-driver"
+    ],
+    "Env": [
+      {
+        "Description": "Set log level to output for plugin logs",
+        "Name": "LOG_LEVEL",
+        "Settable": [
+          "value"
+        ],
+        "Value": "info"
+      }
+    ],
+    "Interface": {
+      "Socket": "loki.sock",
+      "Types": [
+        "docker.logdriver/1.0"
+      ]
+    },
+    "IpcHost": false,
+    "Linux": {
+      "AllowAllDevices": false,
+      "Capabilities": null,
+      "Devices": null
+    },
+    "Mounts": null,
+    "Network": {
+      "Type": "host"
+    },
+    "PidHost": false,
+    "PropagatedMount": "",
+    "User": {},
+    "WorkDir": "",
+    "rootfs": {
+      "diff_ids": [
+        "sha256:aa5fc4f4b08f49edb5063426eddf16ac6900f17417a8c3ec472af3816a9526fd"
+      ],
+      "type": "layers"
+    }
+  },
+  "Enabled": true,
+  "Id": "a730873a76f2844ed980a8e318aca07e19e50ca5b6116231e37190f6f12f2914",
+  "Name": "grafana/loki-docker-driver:latest",
+  "PluginReference": "docker.io/grafana/loki-docker-driver:latest",
+  "Settings": {
+    "Args": [],
+    "Devices": [],
+    "Env": [
+      "LOG_LEVEL=info"
+    ],
+    "Mounts": []
+  }
+}

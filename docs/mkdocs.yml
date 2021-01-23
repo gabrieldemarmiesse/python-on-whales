@@ -17,6 +17,7 @@ nav:
     - docker manifest: sub-commands/manifest.md
     - docker network: sub-commands/network.md
     - docker node: sub-commands/node.md
+    - docker plugin: sub-commands/plugin.md
     - docker secret: sub-commands/secret.md
     - docker service: sub-commands/service.md
     - docker stack: sub-commands/stack.md
@@ -32,6 +33,7 @@ nav:
     - Images: docker_objects/images.md
     - Networks: docker_objects/networks.md
     - Nodes: docker_objects/nodes.md
+    - Plugins: docker_objects/plugins.md
     - Services: docker_objects/services.md
     - Stacks: docker_objects/stacks.md
     - Tasks: docker_objects/tasks.md

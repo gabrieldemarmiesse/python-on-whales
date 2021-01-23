@@ -9,6 +9,7 @@ from docs_utils import (
     generate_code_demo_images,
     generate_code_demo_networks,
     generate_code_demo_nodes,
+    generate_code_demo_plugins,
     generate_code_demo_services,
     generate_code_demo_volumes,
 )
@@ -43,6 +44,9 @@ pages = {
         "python_on_whales.components.network.NetworkCLI"
     ),
     "sub-commands/node.md": get_methods("python_on_whales.components.node.NodeCLI"),
+    "sub-commands/plugin.md": get_methods(
+        "python_on_whales.components.plugin.PluginCLI"
+    ),
     "sub-commands/secret.md": get_methods(
         "python_on_whales.components.secret.SecretCLI"
     ),
@@ -65,6 +69,7 @@ pages = {
     "docker_objects/images.md": get_methods("python_on_whales.Image"),
     "docker_objects/networks.md": get_methods("python_on_whales.Network"),
     "docker_objects/nodes.md": get_methods("python_on_whales.Node"),
+    "docker_objects/plugins.md": get_methods("python_on_whales.Plugin"),
     "docker_objects/services.md": get_methods("python_on_whales.Service"),
     "docker_objects/stacks.md": get_methods("python_on_whales.Stack"),
     "docker_objects/volumes.md": get_methods("python_on_whales.Volume"),
@@ -84,6 +89,7 @@ class MyDocumentationGenerator(DocumentationGenerator):
         signature = signature.replace("ManifestCLI.", "docker.manifest.")
         signature = signature.replace("NetworkCLI.", "docker.network.")
         signature = signature.replace("NodeCLI.", "docker.node.")
+        signature = signature.replace("PluginCLI.", "docker.plugin.")
         signature = signature.replace("SecretCLI.", "docker.secret.")
         signature = signature.replace("ServiceCLI.", "docker.service.")
         signature = signature.replace("StackCLI.", "docker.stack.")
@@ -105,6 +111,7 @@ doc_generator = MyDocumentationGenerator(
         "python_on_whales.Image",
         "python_on_whales.Network",
         "python_on_whales.Node",
+        "python_on_whales.Plugin",
         "python_on_whales.Service",
         "python_on_whales.Stack",
         "python_on_whales.Task",
@@ -126,7 +133,7 @@ bb = destination / "sub-commands" / "container.md"
 for file in destination.rglob("*.md"):
     file.write_text(add_links(file.read_text()))
 
-
+add_code_example(destination, "plugins.md", generate_code_demo_plugins())
 add_code_example(destination, "configs.md", generate_code_demo_configs())
 add_code_example(destination, "networks.md", generate_code_demo_networks())
 add_code_example(destination, "volumes.md", generate_code_demo_volumes())

@@ -1,0 +1,274 @@
+{
+  "Config": {
+    "Args": {
+      "Description": "",
+      "Name": "",
+      "Settable": null,
+      "Value": null
+    },
+    "Description": "REX-Ray for Amazon EBS",
+    "DockerVersion": "18.06.1-ce",
+    "Documentation": "https://github.com/thecodeteam/rexray/.docker/plugins/ebs",
+    "Entrypoint": [
+      "/rexray.sh",
+      "rexray",
+      "start",
+      "-f",
+      "--nopid"
+    ],
+    "Env": [
+      {
+        "Description": "",
+        "Name": "DOCKER_LEGACY",
+        "Settable": [
+          "value"
+        ],
+        "Value": "true"
+      },
+      {
+        "Description": "",
+        "Name": "REXRAY_FSTYPE",
+        "Settable": [
+          "value"
+        ],
+        "Value": "ext4"
+      },
+      {
+        "Description": "",
+        "Name": "REXRAY_LOGLEVEL",
+        "Settable": [
+          "value"
+        ],
+        "Value": "warn"
+      },
+      {
+        "Description": "",
+        "Name": "REXRAY_PREEMPT",
+        "Settable": [
+          "value"
+        ],
+        "Value": "false"
+      },
+      {
+        "Description": "",
+        "Name": "HTTP_PROXY",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "LIBSTORAGE_INTEGRATION_VOLUME_OPERATIONS_MOUNT_ROOTPATH",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "LINUX_VOLUME_ROOTPATH",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "LINUX_VOLUME_FILEMODE",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_ACCESSKEY",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_ENDPOINT",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_KMSKEYID",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_MAXRETRIES",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_REGION",
+        "Settable": [
+          "value"
+        ],
+        "Value": "us-east-1"
+      },
+      {
+        "Description": "",
+        "Name": "EBS_SECRETKEY",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_STATUSINITIALDELAY",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_STATUSMAXATTEMPTS",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_STATUSTIMEOUT",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EBS_USELARGEDEVICERANGE",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "CSI_ENDPOINT",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "The name of the CSI plug-in used by the CSI module.",
+        "Name": "X_CSI_DRIVER",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "A flag that disables the CSI to libStorage bridge.",
+        "Name": "X_CSI_NATIVE",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      }
+    ],
+    "Interface": {
+      "Socket": "rexray.sock",
+      "Types": [
+        "docker.volumedriver/1.0"
+      ]
+    },
+    "IpcHost": false,
+    "Linux": {
+      "AllowAllDevices": true,
+      "Capabilities": [
+        "CAP_SYS_ADMIN"
+      ],
+      "Devices": null
+    },
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/dev",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/dev",
+        "Type": "bind"
+      }
+    ],
+    "Network": {
+      "Type": "host"
+    },
+    "PidHost": false,
+    "PropagatedMount": "/var/lib/rexray",
+    "User": {},
+    "WorkDir": "",
+    "rootfs": {
+      "diff_ids": [
+        "sha256:b2c960c43bff259e6eb1059f687731cd9a288a9d026f6676989331fb2566f98f"
+      ],
+      "type": "layers"
+    }
+  },
+  "Enabled": false,
+  "Id": "744e3c3615468a38b52c6ca4d89bda0ed04c312413cab6e0b2cf1dd723660de6",
+  "Name": "rexray/ebs:latest",
+  "PluginReference": "docker.io/rexray/ebs:latest",
+  "Settings": {
+    "Args": [],
+    "Devices": [],
+    "Env": [
+      "DOCKER_LEGACY=true",
+      "REXRAY_FSTYPE=ext4",
+      "REXRAY_LOGLEVEL=warn",
+      "REXRAY_PREEMPT=false",
+      "HTTP_PROXY=",
+      "LIBSTORAGE_INTEGRATION_VOLUME_OPERATIONS_MOUNT_ROOTPATH=",
+      "LINUX_VOLUME_ROOTPATH=",
+      "LINUX_VOLUME_FILEMODE=",
+      "EBS_ACCESSKEY=dodo",
+      "EBS_ENDPOINT=",
+      "EBS_KMSKEYID=",
+      "EBS_MAXRETRIES=",
+      "EBS_REGION=us-east-1",
+      "EBS_SECRETKEY=",
+      "EBS_STATUSINITIALDELAY=",
+      "EBS_STATUSMAXATTEMPTS=",
+      "EBS_STATUSTIMEOUT=",
+      "EBS_USELARGEDEVICERANGE=",
+      "CSI_ENDPOINT=",
+      "X_CSI_DRIVER=",
+      "X_CSI_NATIVE="
+    ],
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/dev",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/dev",
+        "Type": "bind"
+      }
+    ]
+  }
+}

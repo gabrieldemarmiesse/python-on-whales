@@ -1,0 +1,33 @@
+from pathlib import Path
+from typing import List
+
+import pytest
+
+from python_on_whales import docker
+from python_on_whales.components.plugin import PluginInspectResult
+
+test_plugin_name = "vieux/sshfs:latest"
+
+
+def get_all_plugins_jsons() -> List[Path]:
+    jsons_directory = Path(__file__).parent / "plugins"
+    return sorted(list(jsons_directory.iterdir()))
+
+
+@pytest.mark.parametrize("json_file", get_all_plugins_jsons())
+def test_load_json(json_file):
+    json_as_txt = json_file.read_text()
+    PluginInspectResult.parse_raw(json_as_txt)
+    # we could do more checks here if needed
+
+
+def test_install_plugin_disable_enable():
+    with docker.plugin.install(test_plugin_name) as my_plugin:
+        my_plugin.disable()
+        my_plugin.enable()
+
+
+def test_plugin_upgrade():
+    with docker.plugin.install(test_plugin_name) as my_plugin:
+        my_plugin.disable()
+        my_plugin.upgrade()
