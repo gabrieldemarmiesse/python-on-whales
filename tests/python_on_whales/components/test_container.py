@@ -17,11 +17,6 @@ from python_on_whales.components.container import (
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
-def get_all_containers_jsons():
-    jsons_directory = Path(__file__).parent / "containers"
-    return sorted(list(jsons_directory.iterdir()))
-
-
 @pytest.mark.parametrize("json_file", get_all_jsons("containers"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
@@ -363,12 +358,7 @@ def test_pause_unpause():
         assert container.state.running
 
 
-def get_all_stats_jsons():
-    jsons_directory = Path(__file__).parent / "stats"
-    return sorted(list(jsons_directory.iterdir()))
-
-
-@pytest.mark.parametrize("json_file", get_all_stats_jsons())
+@pytest.mark.parametrize("json_file", get_all_jsons("stats"))
 def test_load_stats_json(json_file):
     json_as_txt = json_file.read_text()
     stats = ContainerStats(json.loads(json_as_txt))
