@@ -1,19 +1,11 @@
-from pathlib import Path
-from typing import List
-
 import pytest
 
 from python_on_whales import DockerException, docker
 from python_on_whales.components.network import NetworkInspectResult
-from python_on_whales.test_utils import random_name
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
-def get_all_networks_jsons() -> List[Path]:
-    jsons_directory = Path(__file__).parent / "networks"
-    return sorted(list(jsons_directory.iterdir()))
-
-
-@pytest.mark.parametrize("json_file", get_all_networks_jsons())
+@pytest.mark.parametrize("json_file", get_all_jsons("networks"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     NetworkInspectResult.parse_raw(json_as_txt)

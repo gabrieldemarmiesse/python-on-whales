@@ -14,7 +14,7 @@ from python_on_whales.components.container import (
     ContainerState,
     ContainerStats,
 )
-from python_on_whales.test_utils import random_name
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
 def get_all_containers_jsons():
@@ -22,7 +22,7 @@ def get_all_containers_jsons():
     return sorted(list(jsons_directory.iterdir()))
 
 
-@pytest.mark.parametrize("json_file", get_all_containers_jsons())
+@pytest.mark.parametrize("json_file", get_all_jsons("containers"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     ContainerInspectResult.parse_raw(json_as_txt)
