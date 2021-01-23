@@ -1,0 +1,128 @@
+{
+  "Config": {
+    "Args": {
+      "Description": "",
+      "Name": "",
+      "Settable": null,
+      "Value": null
+    },
+    "Description": "CernVM-FS graphdriver as a plugin",
+    "DockerVersion": "17.09.0-ce",
+    "Documentation": "v0.4",
+    "Entrypoint": [
+      "/usr/local/bin/entrypoint.sh"
+    ],
+    "Env": null,
+    "Interface": {
+      "Socket": "plugin.sock",
+      "Types": [
+        "docker.graphdriver/1.0"
+      ]
+    },
+    "IpcHost": false,
+    "Linux": {
+      "AllowAllDevices": false,
+      "Capabilities": [
+        "CAP_MKNOD",
+        "CAP_SYS_ADMIN"
+      ],
+      "Devices": [
+        {
+          "Description": "",
+          "Name": "",
+          "Path": "/dev/fuse",
+          "Settable": null
+        }
+      ]
+    },
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/cvmfs_ext_config",
+        "Name": "cvmfs_ext_config",
+        "Options": [
+          "bind",
+          "ro"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "/tmp",
+        "Type": "none"
+      },
+      {
+        "Description": "",
+        "Destination": "/minio_ext_config",
+        "Name": "minio_ext_config",
+        "Options": [
+          "bind",
+          "ro"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "/tmp",
+        "Type": "none"
+      }
+    ],
+    "Network": {
+      "Type": "host"
+    },
+    "PidHost": false,
+    "PropagatedMount": "/mnt",
+    "User": {},
+    "WorkDir": "",
+    "rootfs": {
+      "diff_ids": [
+        "sha256:a72719e3dacc3fff43802f8f6bf6120430a0dc76fcf0850e89afbde8cf7475ea"
+      ],
+      "type": "layers"
+    }
+  },
+  "Enabled": false,
+  "Id": "11a71ac3ef3147bd648de9f3a8cb82c6e2210a3949680f3acb44a681bd950bc3",
+  "Name": "cvmfs/overlay2-graphdriver:latest",
+  "PluginReference": "docker.io/cvmfs/overlay2-graphdriver:latest",
+  "Settings": {
+    "Args": [],
+    "Devices": [
+      {
+        "Description": "",
+        "Name": "",
+        "Path": "/dev/fuse",
+        "Settable": null
+      }
+    ],
+    "Env": [],
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/cvmfs_ext_config",
+        "Name": "cvmfs_ext_config",
+        "Options": [
+          "bind",
+          "ro"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "/tmp",
+        "Type": "none"
+      },
+      {
+        "Description": "",
+        "Destination": "/minio_ext_config",
+        "Name": "minio_ext_config",
+        "Options": [
+          "bind",
+          "ro"
+        ],
+        "Settable": [
+          "source"
+        ],
+        "Source": "/tmp",
+        "Type": "none"
+      }
+    ]
+  }
+}

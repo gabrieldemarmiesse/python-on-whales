@@ -1,0 +1,127 @@
+{
+  "Config": {
+    "Args": {
+      "Description": "",
+      "Name": "",
+      "Settable": null,
+      "Value": null
+    },
+    "Description": "cloud storage plugin for Docker",
+    "DockerVersion": "17.05.0-ce",
+    "Documentation": "https://docs.docker.com/engine/extend/plugins/",
+    "Entrypoint": [
+      "/cloudstor"
+    ],
+    "Env": [
+      {
+        "Description": "",
+        "Name": "CLOUD_PLATFORM",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "AZURE_STORAGE_ACCOUNT",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "AZURE_STORAGE_ACCOUNT_KEY",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EFS_ID_REGULAR",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "EFS_ID_MAXIO",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "",
+        "Name": "DEBUG",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      }
+    ],
+    "Interface": {
+      "Socket": "cloudstor.sock",
+      "Types": [
+        "docker.volumedriver/1.0"
+      ]
+    },
+    "IpcHost": false,
+    "Linux": {
+      "AllowAllDevices": false,
+      "Capabilities": [
+        "CAP_DAC_OVERRIDE",
+        "CAP_DAC_READ_SEARCH",
+        "CAP_SYS_ADMIN"
+      ],
+      "Devices": [
+        {
+          "Description": "",
+          "Name": "",
+          "Path": "/dev/fuse",
+          "Settable": null
+        }
+      ]
+    },
+    "Mounts": null,
+    "Network": {
+      "Type": "host"
+    },
+    "PidHost": false,
+    "PropagatedMount": "/mnt",
+    "User": {},
+    "WorkDir": "",
+    "rootfs": {
+      "diff_ids": [
+        "sha256:b42e8d49a6caad2fc8ecbb8c290e3f5ebb332af35e4af9bbfe23edb1aad326eb"
+      ],
+      "type": "layers"
+    }
+  },
+  "Enabled": false,
+  "Id": "990978ad575d354752e9a2ec14a08e3a449c07a88ffcd4afcaf4bb3f23703dea",
+  "Name": "docker4x/cloudstor:latest",
+  "PluginReference": "docker.io/docker4x/cloudstor:latest",
+  "Settings": {
+    "Args": [],
+    "Devices": [
+      {
+        "Description": "",
+        "Name": "",
+        "Path": "/dev/fuse",
+        "Settable": null
+      }
+    ],
+    "Env": [
+      "CLOUD_PLATFORM=",
+      "AZURE_STORAGE_ACCOUNT=",
+      "AZURE_STORAGE_ACCOUNT_KEY=",
+      "EFS_ID_REGULAR=",
+      "EFS_ID_MAXIO=",
+      "DEBUG="
+    ],
+    "Mounts": []
+  }
+}
