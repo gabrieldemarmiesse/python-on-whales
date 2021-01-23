@@ -1,12 +1,12 @@
 import json
 from datetime import date
 from pathlib import Path
-from typing import List
 
 import pytest
 
 from python_on_whales import docker
 from python_on_whales.components.system import DockerEvent, SystemInfo
+from python_on_whales.test_utils import get_all_jsons
 
 
 def test_disk_free():
@@ -22,12 +22,7 @@ def test_info():
     assert "local" in info.plugins.volume
 
 
-def get_all_system_info_jsons() -> List[Path]:
-    jsons_directory = Path(__file__).parent / "system_info"
-    return sorted(list(jsons_directory.iterdir()))
-
-
-@pytest.mark.parametrize("json_file", get_all_system_info_jsons())
+@pytest.mark.parametrize("json_file", get_all_jsons("system_info"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     SystemInfo.parse_raw(json_as_txt)
@@ -35,7 +30,7 @@ def test_load_json(json_file):
 
 
 def test_parsing_events():
-    json_file = Path(__file__).parent / "events/0.json"
+    json_file = Path(__file__).parent / "jsons/events/0.json"
     events = json.loads(json_file.read_text())["events"]
     for event in events:
         parsed: DockerEvent = DockerEvent.parse_obj(event)
