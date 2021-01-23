@@ -8,7 +8,7 @@ from python_on_whales.components.volume import VolumeInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 
-@pytest.mark.parametrize("json_file", get_all_jsons("contexts"))
+@pytest.mark.parametrize("json_file", get_all_jsons("volumes"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     a = VolumeInspectResult.parse_raw(json_as_txt)

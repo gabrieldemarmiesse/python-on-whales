@@ -5,7 +5,7 @@ from python_on_whales.components.image import ImageInspectResult
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
-@pytest.mark.parametrize("json_file", get_all_jsons("contexts"))
+@pytest.mark.parametrize("json_file", get_all_jsons("images"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     ImageInspectResult.parse_raw(json_as_txt)

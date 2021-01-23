@@ -30,7 +30,7 @@ def test_load_json(json_file):
 
 
 def test_parsing_events():
-    json_file = Path(__file__).parent / "events/0.json"
+    json_file = Path(__file__).parent / "jsons/events/0.json"
     events = json.loads(json_file.read_text())["events"]
     for event in events:
         parsed: DockerEvent = DockerEvent.parse_obj(event)
