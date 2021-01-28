@@ -425,3 +425,15 @@ def add_code_example(destination, markdown_file: str, code: str):
     path_file = destination / "docker_objects" / markdown_file
     path_file.write_text(path_file.read_text().replace("@INSERT_GENERATED_CODE@", code))
     print("added code example for", markdown_file)
+
+
+def add_all_code_examples(destination):
+    add_code_example(destination, "plugins.md", generate_code_demo_plugins())
+    add_code_example(destination, "configs.md", generate_code_demo_configs())
+    add_code_example(destination, "networks.md", generate_code_demo_networks())
+    add_code_example(destination, "volumes.md", generate_code_demo_volumes())
+    add_code_example(destination, "images.md", generate_code_demo_images())
+    add_code_example(destination, "containers.md", generate_code_demo_containers())
+    add_code_example(destination, "builders.md", generate_code_demo_builders())
+    add_code_example(destination, "nodes.md", generate_code_demo_nodes())
+    add_code_example(destination, "services.md", generate_code_demo_services())
