@@ -24,4 +24,4 @@ def get_all_jsons(object_types: str) -> List[Path]:
     jsons_directory = (
         PROJECT_ROOT / "tests/python_on_whales/components/jsons" / object_types
     )
-    return sorted(list(jsons_directory.iterdir()))
+    return sorted(list(jsons_directory.iterdir()), key=lambda x: int(x.stem))
