@@ -1,18 +1,6 @@
 import shutil
 
-from docs_utils import (
-    add_code_example,
-    add_links,
-    generate_code_demo_builders,
-    generate_code_demo_configs,
-    generate_code_demo_containers,
-    generate_code_demo_images,
-    generate_code_demo_networks,
-    generate_code_demo_nodes,
-    generate_code_demo_plugins,
-    generate_code_demo_services,
-    generate_code_demo_volumes,
-)
+from docs_utils import add_all_code_examples, add_links
 from keras_autodoc import DocumentationGenerator, get_methods
 
 from python_on_whales.utils import PROJECT_ROOT
@@ -133,12 +121,4 @@ bb = destination / "sub-commands" / "container.md"
 for file in destination.rglob("*.md"):
     file.write_text(add_links(file.read_text()))
 
-add_code_example(destination, "plugins.md", generate_code_demo_plugins())
-add_code_example(destination, "configs.md", generate_code_demo_configs())
-add_code_example(destination, "networks.md", generate_code_demo_networks())
-add_code_example(destination, "volumes.md", generate_code_demo_volumes())
-add_code_example(destination, "images.md", generate_code_demo_images())
-add_code_example(destination, "containers.md", generate_code_demo_containers())
-add_code_example(destination, "builders.md", generate_code_demo_builders())
-add_code_example(destination, "nodes.md", generate_code_demo_nodes())
-add_code_example(destination, "services.md", generate_code_demo_services())
+add_all_code_examples(destination)
