@@ -73,10 +73,10 @@ class ContainerDevice(DockerCamelModel):
 
 class ContainerDeviceRequest(DockerCamelModel):
     driver: str
-    count: str
-    device_ids: List[str]
-    capabilities: List[str]
-    options: Any
+    count: int
+    device_ids: Optional[List[str]] = pydantic.Field(alias="DeviceIDs")
+    capabilities: List[Any]
+    options: Dict[str, str]
 
 
 class ContainerUlimit(DockerCamelModel):
