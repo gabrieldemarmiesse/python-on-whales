@@ -118,12 +118,16 @@ class Service(ReloadableObjectFromJson):
     def _parse_json_object(self, json_object: Dict[str, Any]) -> ServiceInspectResult:
         return ServiceInspectResult.parse_obj(json_object)
 
+    def _get_inspect_result(self) -> ServiceInspectResult:
+        """Only there to allow tools to know the return type"""
+        return super()._get_inspect_result()
+
     @property
     def id(self) -> str:
         return self._get_immutable_id()
 
     @property
-    def version(self) -> Dict[str, Any]:
+    def version(self) -> ServiceVersion:
         return self._get_inspect_result().version
 
     @property
