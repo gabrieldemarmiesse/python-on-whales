@@ -177,7 +177,7 @@ Use the right tool for the right job 🙂
 | sub-command  | Functions implemented  | Progress |
 |---|---|---|
 | app | 0/15  | ![50%](https://progress-bar.dev/0) |
-| buildx  | 9/11 | ![50%](https://progress-bar.dev/81) |
+| buildx  | 10/11 | ![50%](https://progress-bar.dev/92) |
 | compose  | 3/24 | ![8%](https://progress-bar.dev/12) |
 | config  | 4/4 | ![50%](https://progress-bar.dev/100) |
 | container | 22/24 | ![50%](https://progress-bar.dev/91) |
