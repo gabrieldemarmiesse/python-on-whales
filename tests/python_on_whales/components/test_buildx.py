@@ -429,3 +429,5 @@ def test_list():
     builders = docker.buildx.list()
     assert docker.buildx.inspect() in builders
     assert docker.buildx.inspect("default") in builders
+    for builder in builders:
+        assert builder.driver in ["docker", "docker-container"]
