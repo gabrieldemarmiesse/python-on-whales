@@ -1,0 +1,178 @@
+
+{
+    "ID": "8yygxms9qqs7nittabjwu20z1",
+    "Version": {
+        "Index": 19
+    },
+    "CreatedAt": "2021-01-30T17:03:58.8345219Z",
+    "UpdatedAt": "2021-01-30T17:03:59.0584575Z",
+    "Labels": {},
+    "Spec": {
+        "ContainerSpec": {
+            "Image": "swarmpit/swarmpit:latest@sha256:ffb279401b73daa9db01c54bd47a5bd7af002a042928562896ed0de90a08be6f",
+            "Labels": {
+                "com.docker.stack.namespace": "some_stack"
+            },
+            "Env": [
+                "SWARMPIT_DB=http://db:5984",
+                "SWARMPIT_INFLUXDB=http://influxdb:8086"
+            ],
+            "Privileges": {
+                "CredentialSpec": null,
+                "SELinuxContext": null
+            },
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/var/run/docker.sock",
+                    "Target": "/var/run/docker.sock",
+                    "ReadOnly": true
+                }
+            ],
+            "Healthcheck": {
+                "Test": [
+                    "CMD",
+                    "curl",
+                    "-f",
+                    "http://localhost:8080"
+                ],
+                "Interval": 60000000000,
+                "Timeout": 10000000000,
+                "Retries": 3
+            },
+            "Isolation": "default"
+        },
+        "Resources": {
+            "Limits": {
+                "NanoCPUs": 500000000,
+                "MemoryBytes": 1073741824
+            },
+            "Reservations": {
+                "NanoCPUs": 250000000,
+                "MemoryBytes": 536870912
+            }
+        },
+        "Placement": {
+            "Constraints": [
+                "node.role == manager"
+            ],
+            "Platforms": [
+                {
+                    "Architecture": "amd64",
+                    "OS": "linux"
+                },
+                {
+                    "Architecture": "arm64",
+                    "OS": "linux"
+                },
+                {
+                    "OS": "linux"
+                },
+                {
+                    "OS": "linux"
+                }
+            ]
+        },
+        "Networks": [
+            {
+                "Target": "9wwq9zch8bva1pyu52aintvhj",
+                "Aliases": [
+                    "app"
+                ]
+            }
+        ],
+        "ForceUpdate": 0
+    },
+    "ServiceID": "9sdwzbkhs85brkyce0fvkxm1p",
+    "Slot": 1,
+    "NodeID": "40n1d6hs1t5b7xo8k1nvydlii",
+    "Status": {
+        "Timestamp": "2021-01-30T17:03:59.0034613Z",
+        "State": "preparing",
+        "Message": "preparing",
+        "PortStatus": {}
+    },
+    "DesiredState": "running",
+    "NetworksAttachments": [
+        {
+            "Network": {
+                "ID": "xgf1h4dukyllhpfzxut9sj2kw",
+                "Version": {
+                    "Index": 6
+                },
+                "CreatedAt": "2021-01-30T17:03:56.5440231Z",
+                "UpdatedAt": "2021-01-30T17:03:56.5565936Z",
+                "Spec": {
+                    "Name": "ingress",
+                    "Labels": {},
+                    "DriverConfiguration": {},
+                    "Ingress": true,
+                    "IPAMOptions": {
+                        "Driver": {}
+                    },
+                    "Scope": "swarm"
+                },
+                "DriverState": {
+                    "Name": "overlay",
+                    "Options": {
+                        "com.docker.network.driver.overlay.vxlanid_list": "4096"
+                    }
+                },
+                "IPAMOptions": {
+                    "Driver": {
+                        "Name": "default"
+                    },
+                    "Configs": [
+                        {
+                            "Subnet": "10.0.0.0/24",
+                            "Gateway": "10.0.0.1"
+                        }
+                    ]
+                }
+            },
+            "Addresses": [
+                "10.0.0.4/24"
+            ]
+        },
+        {
+            "Network": {
+                "ID": "9wwq9zch8bva1pyu52aintvhj",
+                "Version": {
+                    "Index": 12
+                },
+                "CreatedAt": "2021-01-30T17:03:57.237885Z",
+                "UpdatedAt": "2021-01-30T17:03:57.2397694Z",
+                "Spec": {
+                    "Name": "some_stack_net",
+                    "Labels": {
+                        "com.docker.stack.namespace": "some_stack"
+                    },
+                    "DriverConfiguration": {
+                        "Name": "overlay"
+                    },
+                    "Scope": "swarm"
+                },
+                "DriverState": {
+                    "Name": "overlay",
+                    "Options": {
+                        "com.docker.network.driver.overlay.vxlanid_list": "4097"
+                    }
+                },
+                "IPAMOptions": {
+                    "Driver": {
+                        "Name": "default"
+                    },
+                    "Configs": [
+                        {
+                            "Subnet": "10.0.1.0/24",
+                            "Gateway": "10.0.1.1"
+                        }
+                    ]
+                }
+            },
+            "Addresses": [
+                "10.0.1.3/24"
+            ]
+        }
+    ]
+}
