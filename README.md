@@ -184,10 +184,10 @@ Use the right tool for the right job 🙂
 | context  | 4/6 | ![50%](https://progress-bar.dev/67) |
 | image  | 12/13 | ![50%](https://progress-bar.dev/92) |
 | manifest  | 0/4 | ![50%](https://progress-bar.dev/0) |
-| network  | 7/7 | ![50%](https://progress-bar.dev/100) |
-| node  | 6/7 | ![50%](https://progress-bar.dev/85) |
+| network  | 7/7 | ![100%](https://progress-bar.dev/100) |
+| node  | 7/7 | ![100%](https://progress-bar.dev/100) |
 | plugins  | 9/10 | ![50%](https://progress-bar.dev/100) |
-| secret  | 4/4 | ![50%](https://progress-bar.dev/100) |
+| secret  | 4/4 | ![100%](https://progress-bar.dev/100) |
 | service  | 7/9 | ![50%](https://progress-bar.dev/78) |
 | stack  | 4/5 | ![50%](https://progress-bar.dev/80) |
 | swarm  | 6/8 | ![50%](https://progress-bar.dev/75) |
