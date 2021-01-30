@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import python_on_whales.components.service
+import python_on_whales.components.task
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import ValidPath, read_env_files, run, to_list
 
@@ -91,9 +92,32 @@ class StackCLI(DockerCLICaller):
         stacks_names = run(full_cmd).splitlines()
         return [Stack(self.client_config, name) for name in stacks_names]
 
-    def ps(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def ps(self, x: ValidStack) -> List[python_on_whales.components.task.Task]:
+        """Returns the list of swarm tasks in this stack.
+
+        ```python
+        from python_on_whales import docker
+
+        tasks = docker.stack.ps("my-stack")
+        print(tasks[0].desired_state)
+        # running
+        ```
+
+        # Arguments
+            x: A stack . It can be name or a `python_on_whales.Stack` object.
+
+        # Returns
+            `List[python_on_whales.Task]`
+        """
+        full_cmd = self.docker_cmd + ["stack", "ps", "--quiet", "--no-trunc", x]
+
+        ids = run(full_cmd).splitlines()
+        return [
+            python_on_whales.components.task.Task(
+                self.client_config, id_, is_immutable_id=True
+            )
+            for id_ in ids
+        ]
 
     def remove(self, x: Union[ValidStack, List[ValidStack]]) -> None:
         """Removes one or more stacks.
