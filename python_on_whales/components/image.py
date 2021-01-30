@@ -82,6 +82,10 @@ class Image(ReloadableObjectFromJson):
     def _parse_json_object(self, json_object: Dict[str, Any]) -> ImageInspectResult:
         return ImageInspectResult.parse_obj(json_object)
 
+    def _get_inspect_result(self) -> ImageInspectResult:
+        """Only there to allow tools to know the return type"""
+        return super()._get_inspect_result()
+
     @property
     def id(self) -> str:
         return self._get_immutable_id()

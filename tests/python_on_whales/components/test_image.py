@@ -1,18 +1,11 @@
-from pathlib import Path
-
 import pytest
 
 from python_on_whales import DockerException, docker
 from python_on_whales.components.image import ImageInspectResult
-from python_on_whales.test_utils import random_name
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
-def get_all_images_jsons():
-    jsons_directory = Path(__file__).parent / "images"
-    return sorted(list(jsons_directory.iterdir()))
-
-
-@pytest.mark.parametrize("json_file", get_all_images_jsons())
+@pytest.mark.parametrize("json_file", get_all_jsons("images"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     ImageInspectResult.parse_raw(json_as_txt)

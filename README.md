@@ -17,6 +17,21 @@ pip install python-on-whales
 
 ## Some cool examples
 
+Start by doing
+```python
+from python_on_whales import docker
+```
+and then:
+
+* `docker run hello-world` -> [`docker.run("hello-world")`](./sub-commands/container.md#run)
+* `docker pull ubuntu` -> [`docker.pull("ubuntu")`](./sub-commands/image.md#pull)
+* `docker build ./` -> [`docker.build("./")`](./sub-commands/buildx.md#build)
+* `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](./sub-commands/compose.md#up)
+* `docker image ls` -> [`docker.image.list()`](./sub-commands/image.md#list)
+* `docker ps` -> [`docker.ps()`](./sub-commands/container.md#list)
+
+You get the idea 🙂 it's the same as the CLI we all know and love.
+
 ```python
 >>> from python_on_whales import docker
 

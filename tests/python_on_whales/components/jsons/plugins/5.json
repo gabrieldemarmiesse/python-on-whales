@@ -1,0 +1,195 @@
+{
+  "Config": {
+    "Args": {
+      "Description": "",
+      "Name": "",
+      "Settable": null,
+      "Value": null
+    },
+    "Description": "Weave Net plugin for Docker",
+    "DockerVersion": "17.05.0-ce",
+    "Documentation": "https://weave.works",
+    "Entrypoint": [
+      "/home/weave/launch.sh"
+    ],
+    "Env": [
+      {
+        "Description": "Extra args to `weaver` and `plugin`",
+        "Name": "EXTRA_ARGS",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "Encryption password",
+        "Name": "WEAVE_PASSWORD",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "MTU",
+        "Name": "WEAVE_MTU",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "Enable multicast for all Weave networks",
+        "Name": "WEAVE_MULTICAST",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      },
+      {
+        "Description": "The range of IP addresses used by Weave Net",
+        "Name": "IPALLOC_RANGE",
+        "Settable": [
+          "value"
+        ],
+        "Value": ""
+      }
+    ],
+    "Interface": {
+      "Socket": "weave.sock",
+      "Types": [
+        "docker.networkdriver/1.0"
+      ]
+    },
+    "IpcHost": false,
+    "Linux": {
+      "AllowAllDevices": false,
+      "Capabilities": [
+        "CAP_NET_ADMIN",
+        "CAP_SYS_ADMIN"
+      ],
+      "Devices": null
+    },
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/host/proc/",
+        "Name": "",
+        "Options": [
+          "rbind",
+          "rw"
+        ],
+        "Settable": null,
+        "Source": "/proc/",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/var/run/docker.sock",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/var/run/docker.sock",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/host/var/lib/",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/var/lib/",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/host/etc/",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/etc/",
+        "Type": "bind"
+      }
+    ],
+    "Network": {
+      "Type": "host"
+    },
+    "PidHost": false,
+    "PropagatedMount": "",
+    "User": {},
+    "WorkDir": "",
+    "rootfs": {
+      "diff_ids": [
+        "sha256:27b4982c179f9ef9be021674200ea4b8289a743a45ffb2030b18bc6bb4ee0af7"
+      ],
+      "type": "layers"
+    }
+  },
+  "Enabled": false,
+  "Id": "17ee6cc064233d08f5ea29fc37d87894f6a6cc36602707e89504b88a7543bd8a",
+  "Name": "weaveworks/net-plugin:latest",
+  "PluginReference": "docker.io/weaveworks/net-plugin:latest",
+  "Settings": {
+    "Args": [],
+    "Devices": [],
+    "Env": [
+      "EXTRA_ARGS=",
+      "WEAVE_PASSWORD=",
+      "WEAVE_MTU=",
+      "WEAVE_MULTICAST=",
+      "IPALLOC_RANGE="
+    ],
+    "Mounts": [
+      {
+        "Description": "",
+        "Destination": "/host/proc/",
+        "Name": "",
+        "Options": [
+          "rbind",
+          "rw"
+        ],
+        "Settable": null,
+        "Source": "/proc/",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/var/run/docker.sock",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/var/run/docker.sock",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/host/var/lib/",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/var/lib/",
+        "Type": "bind"
+      },
+      {
+        "Description": "",
+        "Destination": "/host/etc/",
+        "Name": "",
+        "Options": [
+          "rbind"
+        ],
+        "Settable": null,
+        "Source": "/etc/",
+        "Type": "bind"
+      }
+    ]
+  }
+}
