@@ -429,9 +429,19 @@ class BuildxCLI(DockerCLICaller):
         """
         return Builder(self.client_config, x, is_immutable_id=False)
 
-    def list(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def list(self) -> List[Builder]:
+        """Returns the list of `python_on_whales.Builder` available."""
+        full_cmd = self.docker_cmd + ["buildx", "ls"]
+        output = run(full_cmd)
+        lines = output.splitlines()
+        # the first line have the headers
+        lines = lines[1:]
+        # if the line starts by a " ", it's not a builder, it's a node
+        lines = list(filter(lambda x: not x.startswith(" "), lines))
+        builders_names = [x.split(" ")[0] for x in lines]
+        return [
+            Builder(self.client_config, x, is_immutable_id=True) for x in builders_names
+        ]
 
     def prune(self, all: bool = False, filters: Dict[str, str] = {}) -> None:
         """Remove build cache on the current builder.

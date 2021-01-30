@@ -423,3 +423,11 @@ def test_bake_with_variables_2(only_print, monkeypatch):
 
 def test_prune():
     docker.buildx.prune(filters=dict(until="3m"))
+
+
+def test_list():
+    builders = docker.buildx.list()
+    assert docker.buildx.inspect() in builders
+    assert docker.buildx.inspect("default") in builders
+    for builder in builders:
+        assert builder.driver in ["docker", "docker-container"]
