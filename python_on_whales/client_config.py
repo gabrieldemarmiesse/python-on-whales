@@ -1,9 +1,12 @@
 import json
 import shutil
+import tempfile
 import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
+
+import pydantic
 
 from python_on_whales.download_binaries import DOCKER_BINARY_PATH, download_docker_cli
 from python_on_whales.utils import to_list
@@ -11,6 +14,10 @@ from python_on_whales.utils import to_list
 from .utils import ValidPath, run
 
 CACHE_VALIDITY_PERIOD = 0.01
+
+
+class ParsingError(Exception):
+    pass
 
 
 class Command(list):
@@ -201,7 +208,23 @@ class ReloadableObjectFromJson(ReloadableObject):
     def _fetch_and_parse_inspect_result(self, reference: str):
         json_str = self._fetch_inspect_result_json(reference)
         json_object = json.loads(json_str)[0]
-        return self._parse_json_object(json_object)
+        try:
+            return self._parse_json_object(json_object)
+        except pydantic.error_wrappers.ValidationError as err:
+            fd, json_response_file = tempfile.mkstemp(suffix=".json", text=True)
+            with open(json_response_file, "w") as f:
+                f.write(json_str)
+
+            raise ParsingError(
+                f"There was an error parsing the json response from the Docker daemon. \n"
+                f"This is a bug with python-on-whales itself. Please head to \n"
+                f"https://github.com/gabrieldemarmiesse/python-on-whales/issues \n"
+                f"and open an issue. You should copy this error message and \n"
+                f"the json response from the Docker daemon. The json response was put \n"
+                f"in {json_response_file} because it's a bit too big to be printed \n"
+                f"on the screen. Make sure that there are no sensitive data in the \n"
+                f"json file before copying it in the github issue."
+            ) from err
 
 
 def bulk_reload(docker_objects: List[ReloadableObjectFromJson]):

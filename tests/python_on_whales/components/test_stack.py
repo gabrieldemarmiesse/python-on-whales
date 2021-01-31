@@ -26,6 +26,17 @@ def test_services_inspect():
     assert set(all_services) == set(docker.stack.services("some_stack"))
 
 
+@pytest.mark.usefixtures("with_test_stack")
+def test_stack_ps():
+    all_services = docker.service.list()
+    stack_tasks = set(docker.stack.ps("some_stack"))
+    services_tasks = set(docker.service.ps(all_services))
+    assert stack_tasks == services_tasks
+    assert len(stack_tasks) > 0
+    for task in stack_tasks:
+        assert task.desired_state == "running"
+
+
 @pytest.mark.usefixtures("swarm_mode")
 def test_stack_variables():
     docker.stack.deploy(

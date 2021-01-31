@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union, overload
 
 from pydantic import Field
 
+import python_on_whales.components.task
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -110,6 +111,10 @@ class Node(ReloadableObjectFromJson):
     def _parse_json_object(self, json_object: Dict[str, Any]) -> NodeInspectResult:
         return NodeInspectResult.parse_obj(json_object)
 
+    def _get_inspect_result(self) -> NodeInspectResult:
+        """Only there to allow tools to know the return type"""
+        return super()._get_inspect_result()
+
     @property
     def id(self) -> str:
         return self._get_immutable_id()
@@ -157,6 +162,15 @@ class Node(ReloadableObjectFromJson):
         NodeCLI(self.client_config).update(
             self, availability, labels_add, rm_labels, role
         )
+
+    def ps(self) -> List[python_on_whales.components.task.Task]:
+        """Returns the list of tasks running on this node
+
+        # Returns
+            A `List[python_on_whales.Task]` object.
+
+        """
+        return NodeCLI(self.client_config).ps(self)
 
 
 ValidNode = Union[Node, str]
@@ -216,9 +230,36 @@ class NodeCLI(DockerCLICaller):
         full_cmd += to_list(x)
         run(full_cmd)
 
-    def ps(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def ps(
+        self, x: Union[ValidNode, List[ValidNode]] = []
+    ) -> List[python_on_whales.components.task.Task]:
+        """Returns the list of swarm tasks running on one or more nodes.
+
+        ```python
+        from python_on_whales import docker
+
+        tasks = docker.node.ps("my-node-name")
+        print(tasks[0].desired_state)
+        # running
+        ```
+
+        # Arguments
+            x: One or more nodes (can be id, name or `python_on_whales.Node` object.).
+                If the argument is not provided, it defaults to the current node.
+
+        # Returns
+            `List[python_on_whales.Task]`
+        """
+        full_cmd = (
+            self.docker_cmd + ["node", "ps", "--quiet", "--no-trunc"] + to_list(x)
+        )
+        ids = run(full_cmd).splitlines()
+        return [
+            python_on_whales.components.task.Task(
+                self.client_config, id_, is_immutable_id=True
+            )
+            for id_ in ids
+        ]
 
     def remove(self, x: Union[ValidNode, List[ValidNode]], force: bool = False):
         """Remove one or more nodes from the swarm

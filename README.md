@@ -22,12 +22,13 @@ Start by doing
 from python_on_whales import docker
 ```
 and then:
-* `docker run hello-world` -> `docker.run("hello-world")`
-* `docker pull ubuntu` -> `docker.pull("ubuntu")`
-* `docker build ./` -> `docker.build("./")` 
-* `docker compose up my_service` -> `docker.compose.up(["my_service"])`
-* `docker image ls` -> `docker.image.list()`
-* `docker ps` -> `docker.ps()`
+
+* `docker run hello-world` -> [`docker.run("hello-world")`](./sub-commands/container.md#run)
+* `docker pull ubuntu` -> [`docker.pull("ubuntu")`](./sub-commands/image.md#pull)
+* `docker build ./` -> [`docker.build("./")`](./sub-commands/buildx.md#build)
+* `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](./sub-commands/compose.md#up)
+* `docker image ls` -> [`docker.image.list()`](./sub-commands/image.md#list)
+* `docker ps` -> [`docker.ps()`](./sub-commands/container.md#list)
 
 You get the idea 🙂 it's the same as the CLI we all know and love.
 
@@ -176,19 +177,19 @@ Use the right tool for the right job 🙂
 | sub-command  | Functions implemented  | Progress |
 |---|---|---|
 | app | 0/15  | ![50%](https://progress-bar.dev/0) |
-| buildx  | 9/11 | ![50%](https://progress-bar.dev/81) |
+| buildx  | 10/11 | ![50%](https://progress-bar.dev/92) |
 | compose  | 3/24 | ![8%](https://progress-bar.dev/12) |
 | config  | 4/4 | ![50%](https://progress-bar.dev/100) |
 | container | 22/24 | ![50%](https://progress-bar.dev/91) |
 | context  | 4/6 | ![50%](https://progress-bar.dev/67) |
 | image  | 12/13 | ![50%](https://progress-bar.dev/92) |
 | manifest  | 0/4 | ![50%](https://progress-bar.dev/0) |
-| network  | 7/7 | ![50%](https://progress-bar.dev/100) |
-| node  | 6/7 | ![50%](https://progress-bar.dev/85) |
+| network  | 7/7 | ![100%](https://progress-bar.dev/100) |
+| node  | 7/7 | ![100%](https://progress-bar.dev/100) |
 | plugins  | 9/10 | ![50%](https://progress-bar.dev/100) |
-| secret  | 4/4 | ![50%](https://progress-bar.dev/100) |
+| secret  | 4/4 | ![100%](https://progress-bar.dev/100) |
 | service  | 7/9 | ![50%](https://progress-bar.dev/78) |
-| stack  | 4/5 | ![50%](https://progress-bar.dev/80) |
+| stack  | 5/5 | ![100%](https://progress-bar.dev/100) |
 | swarm  | 6/8 | ![50%](https://progress-bar.dev/75) |
 | system  | 3/4 | ![50%](https://progress-bar.dev/75) |
 | trust  | 0/3 | ![50%](https://progress-bar.dev/0) |

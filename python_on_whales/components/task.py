@@ -44,7 +44,7 @@ class TaskStatus(DockerCamelModel):
     state: str
     message: str
     err: Optional[str]
-    container_status: ContainerStatus
+    container_status: Optional[ContainerStatus]
 
 
 class LogDriver(DockerCamelModel):

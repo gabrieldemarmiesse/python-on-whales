@@ -25,3 +25,14 @@ def test_load_json(json_file):
 def test_list_nodes():
     nodes = docker.node.list()
     assert len(nodes) == 1
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_tasks():
+    service = docker.service.create("busybox", ["sleep", "infinity"])
+
+    current_node = docker.node.list()[0]
+    tasks = current_node.ps()
+    assert len(tasks) > 0
+    assert tasks[0].desired_state == "running"
+    docker.service.remove(service)

@@ -73,10 +73,10 @@ class ContainerDevice(DockerCamelModel):
 
 class ContainerDeviceRequest(DockerCamelModel):
     driver: str
-    count: str
-    device_ids: List[str]
-    capabilities: List[str]
-    options: Any
+    count: int
+    device_ids: Optional[List[str]] = pydantic.Field(alias="DeviceIDs")
+    capabilities: List[Any]
+    options: Dict[str, str]
 
 
 class ContainerUlimit(DockerCamelModel):
@@ -353,6 +353,10 @@ class Container(ReloadableObjectFromJson):
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
         return ContainerInspectResult.parse_obj(json_object)
+
+    def _get_inspect_result(self) -> ContainerInspectResult:
+        """Only there to allow tools to know the return type"""
+        return super()._get_inspect_result()
 
     # ----------------------------------------------------------------
     # attributes taken from the json inspect result
