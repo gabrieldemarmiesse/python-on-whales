@@ -12,10 +12,12 @@ services:
 
     environment:
      - DATADOG_HOST=something
-  redis:
-    image: library/redis:latest
-  my_postgres:
-    image: library/postgres:latest
+  busybox:
+    image: busybox:latest
+    command: sleep infinity
+  alpine:
+    image: alpine:latest
+    command: sleep infinity
     environment:
      - DD_API_KEY=__your_datadog_api_key_here__
      - POSTGRES_HOST_AUTH_METHOD=trust
