@@ -375,3 +375,16 @@ def test_docker_stats():
         assert stat.container_name == container.name
         assert stat.cpu_percentage <= 5
         assert stat.memory_used <= 100_000_000
+
+
+def test_remove_anonymous_volume_too():
+    container = docker.run("postgres:9.6.20-alpine", detach=True)
+
+    volume_id = container.mounts[0].name
+    volume = docker.volume.inspect(volume_id)
+
+    with container:
+        pass
+
+    assert volume not in docker.volume.list()
+    assert container not in docker.ps(all=True)
