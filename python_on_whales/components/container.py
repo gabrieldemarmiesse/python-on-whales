@@ -336,7 +336,6 @@ class Container(ReloadableObjectFromJson):
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
         super().__init__(client_config, "id", reference, is_immutable_id)
-        self.remove = self.remove
 
     def __enter__(self):
         return self
@@ -346,7 +345,7 @@ class Container(ReloadableObjectFromJson):
         if self.state.running:
             self.stop()
         if not autoremove:
-            self.remove()
+            self.remove(volumes=True)
 
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["container", "inspect", reference])
@@ -1224,7 +1223,7 @@ class ContainerCLI(DockerCLICaller):
         for container in to_list(containers):
             full_cmd.append(str(container))
 
-        run(full_cmd).splitlines()
+        run(full_cmd)
 
     def run(
         self,
