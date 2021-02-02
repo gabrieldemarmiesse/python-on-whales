@@ -24,7 +24,7 @@ class VolumeInspectResult(DockerCamelModel):
     mountpoint: Path
     created_at: datetime
     status: Optional[Dict[str, Any]]
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
     scope: str
     options: Optional[Dict[str, str]]
 
