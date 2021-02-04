@@ -32,3 +32,14 @@ def test_swarm_update_auto_lock_managers():
     )
     docker.swarm.update(autolock=True)
     assert docker.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_swarm_unlock_key():
+    docker.swarm.update(autolock=True)
+    first_key = docker.swarm.unlock_key()
+    # make sure is doesn't change
+    assert first_key == docker.swarm.unlock_key()
+
+    # make sure it changes:
+    assert first_key != docker.swarm.unlock_key(rotate=True)

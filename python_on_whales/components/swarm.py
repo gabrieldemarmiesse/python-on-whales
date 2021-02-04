@@ -149,13 +149,26 @@ class SwarmCLI(DockerCLICaller):
         full_cmd.add_flag("--force", force)
         run(full_cmd)
 
-    def unlock(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def unlock(self, key: str) -> None:
+        """Unlock a swarm after the `--autolock` parameter was used and
+        the daemon restarted.
 
-    def unlock_key(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+        # Arguments:
+            key: The key to unlock the swarm. The key can be obtained on any manager
+                with `docker.swarm.unlock_key()`.
+        """
+        full_cmd = self.docker_cmd + ["swarm", "unlock"]
+        run(full_cmd, input=key.encode("utf-8"))
+
+    def unlock_key(self, rotate: bool = False) -> str:
+        """Gives you the key needed to unlock the swarm after a manager daemon reboot.
+
+        # Arguments
+            rotate: Rotate the unlock key.
+        """
+        full_cmd = self.docker_cmd + ["swarm", "unlock-key", "--quiet"]
+        full_cmd.add_flag("--rotate", rotate)
+        return run(full_cmd)
 
     def update(
         self,

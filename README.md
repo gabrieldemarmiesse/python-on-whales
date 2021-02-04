@@ -190,7 +190,7 @@ Use the right tool for the right job 🙂
 | secret  | 4/4 | ![100%](https://progress-bar.dev/100) |
 | service  | 7/9 | ![50%](https://progress-bar.dev/78) |
 | stack  | 5/5 | ![100%](https://progress-bar.dev/100) |
-| swarm  | 6/8 | ![50%](https://progress-bar.dev/75) |
+| swarm  | 8/8 | ![100%](https://progress-bar.dev/100) |
 | system  | 3/4 | ![50%](https://progress-bar.dev/75) |
 | trust  | 0/3 | ![50%](https://progress-bar.dev/0) |
 | volume  | 7/7 | ![50%](https://progress-bar.dev/100) |
