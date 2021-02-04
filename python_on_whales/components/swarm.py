@@ -153,9 +153,15 @@ class SwarmCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def unlock_key(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def unlock_key(self, rotate: bool = False) -> str:
+        """Gives you the key needed to unlock the swarm after a manager daemon reboot.
+
+        # Arguments
+            rotate: Rotate the unlock key.
+        """
+        full_cmd = self.docker_cmd + ["swarm", "unlock-key", "--quiet"]
+        full_cmd.add_flag("--rotate", rotate)
+        return run(full_cmd)
 
     def update(
         self,
