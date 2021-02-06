@@ -186,7 +186,7 @@ Use the right tool for the right job 🙂
 | manifest  | 0/4 | ![50%](https://progress-bar.dev/0) |
 | network  | 7/7 | ![100%](https://progress-bar.dev/100) |
 | node  | 7/7 | ![100%](https://progress-bar.dev/100) |
-| plugins  | 9/10 | ![50%](https://progress-bar.dev/100) |
+| plugins  | 10/10 | ![50%](https://progress-bar.dev/100) |
 | secret  | 4/4 | ![100%](https://progress-bar.dev/100) |
 | service  | 7/9 | ![50%](https://progress-bar.dev/78) |
 | stack  | 5/5 | ![100%](https://progress-bar.dev/100) |
