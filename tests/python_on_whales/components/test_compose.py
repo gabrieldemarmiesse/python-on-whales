@@ -36,6 +36,14 @@ def test_docker_compose_up_down_some_services():
     docker.compose.down()
 
 
+def test_docker_compose_ps():
+    docker.compose.up(["my_service", "busybox"], detach=True)
+    containers = docker.compose.ps()
+    names = set(x.name for x in containers)
+    assert names == {"components_my_service_1", "components_busybox_1"}
+    docker.compose.down()
+
+
 @pytest.mark.skipif(
     True,
     reason="TODO: Fixme. For some reason it works locally but not in "
