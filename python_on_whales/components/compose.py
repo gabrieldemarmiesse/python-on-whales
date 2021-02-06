@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
+import python_on_whales.components.container
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
 
@@ -59,9 +60,22 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def ps(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def ps(self) -> List[python_on_whales.components.container.Container]:
+        """Returns the containers that were created by the current project.
+
+        # Returns
+            A `List[python_on_whales.Container]`
+        """
+        full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
+        result = run(full_cmd)
+        ids = result.splitlines()
+        # The first line might be a warning for experimental
+        # See https://github.com/docker/compose-cli/issues/1108
+        if "experimental" in ids[0]:
+            ids.pop(0)
+
+        Container = python_on_whales.components.container.Container
+        return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def pull(self, services: List[str] = []):
         """Pull service images
