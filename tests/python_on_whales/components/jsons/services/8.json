@@ -1,0 +1,237 @@
+{
+    "ID": "ocmcopbbbhzyo2xaqck1ccf2l",
+    "Version": {
+        "Index": 12553745
+    },
+    "CreatedAt": "2021-02-08T14:10:51.646134268Z",
+    "UpdatedAt": "2021-02-09T12:40:26.533760645Z",
+    "Spec": {
+        "Name": "dododada_superset",
+        "Labels": {
+            "com.docker.stack.image": "amancevice/superset:0.34.0",
+            "com.docker.stack.namespace": "dododada",
+            "traefik.enable": "true",
+            "traefik.http.routers.superset.tls": "true",
+            "traefik.http.routers.superset.tls.certresolver": "myresolver",
+            "traefik.http.services.superset.loadbalancer.server.port": "8088"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "amancevice/superset:0.34.0@sha256:feecedf5c50da1933b7b91e7f216b6e7b1626917e8bae35d601af3b4f1b27856",
+                "Labels": {
+                    "com.docker.stack.namespace": "dododada",
+                    "traefik.enable": "true",
+                    "traefik.http.routers.superset.tls": "true",
+                    "traefik.http.routers.superset.tls.certresolver": "myresolver",
+                    "traefik.http.services.superset.loadbalancer.server.port": "8088"
+                },
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "volume",
+                        "Source": "dododada_superset",
+                        "Target": "/var/lib/superset",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "dododada"
+                            }
+                        }
+                    },
+                    {
+                        "Type": "volume",
+                        "Source": "dododada_superset_config",
+                        "Target": "/etc/superset",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "dododada"
+                            }
+                        }
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {},
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Constraints": [
+                    "node.labels.has-postgis-slave-data==1"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "l1f35j0abgdwbkcg4xyq8xoy5",
+                    "Aliases": [
+                        "superset"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip",
+            "Ports": [
+                {
+                    "Protocol": "tcp",
+                    "TargetPort": 8088,
+                    "PublishMode": "ingress"
+                }
+            ]
+        }
+    },
+    "PreviousSpec": {
+        "Name": "dododada_superset",
+        "Labels": {
+            "com.docker.stack.image": "amancevice/superset:0.34.0",
+            "com.docker.stack.namespace": "dododada",
+            "traefik.enable": "true",
+            "traefik.http.routers.superset.middlewares": "traefik-forward-auth-earthcube-only",
+            "traefik.http.routers.superset.rule": "Host(`superset-prod.earthcube.eu`)",
+            "traefik.http.routers.superset.tls": "true",
+            "traefik.http.routers.superset.tls.certresolver": "myresolver",
+            "traefik.http.services.superset.loadbalancer.server.port": "8088"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "amancevice/superset:0.34.0@sha256:feecedf5c50da1933b7b91e7f216b6e7b1626917e8bae35d601af3b4f1b27856",
+                "Labels": {
+                    "com.docker.stack.namespace": "dododada",
+                    "traefik.enable": "true",
+                    "traefik.http.routers.superset.middlewares": "traefik-forward-auth-earthcube-only",
+                    "traefik.http.routers.superset.rule": "Host(`superset-prod.earthcube.eu`)",
+                    "traefik.http.routers.superset.tls": "true",
+                    "traefik.http.routers.superset.tls.certresolver": "myresolver",
+                    "traefik.http.services.superset.loadbalancer.server.port": "8088"
+                },
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "volume",
+                        "Source": "dododada_superset",
+                        "Target": "/var/lib/superset",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "dododada"
+                            }
+                        }
+                    },
+                    {
+                        "Type": "volume",
+                        "Source": "dododada_superset_config",
+                        "Target": "/etc/superset",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "dododada"
+                            }
+                        }
+                    }
+                ],
+                "Isolation": "default"
+            },
+            "Resources": {},
+            "Placement": {
+                "Constraints": [
+                    "node.labels.has-postgis-slave-data==1"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "l1f35j0abgdwbkcg4xyq8xoy5",
+                    "Aliases": [
+                        "superset"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "EndpointSpec": {
+            "Mode": "vip",
+            "Ports": [
+                {
+                    "Protocol": "tcp",
+                    "TargetPort": 8088,
+                    "PublishMode": "ingress"
+                }
+            ]
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip",
+            "Ports": [
+                {
+                    "Protocol": "tcp",
+                    "TargetPort": 8088,
+                    "PublishMode": "ingress"
+                }
+            ]
+        },
+        "Ports": [
+            {
+                "Protocol": "tcp",
+                "TargetPort": 8088,
+                "PublishedPort": 30002,
+                "PublishMode": "ingress"
+            }
+        ],
+        "VirtualIPs": [
+            {
+                "NetworkID": "sfb94kg2forpvbkjsrur8tkb3",
+                "Addr": "10.0.0.221/24"
+            },
+            {
+                "NetworkID": "l1f35j0abgdwbkcg4xyq8xoy5",
+                "Addr": "10.0.3.50/24"
+            }
+        ]
+    }
+}
