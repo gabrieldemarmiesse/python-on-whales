@@ -64,7 +64,7 @@ class EndpointPortConfig(DockerCamelModel):
     name: Optional[str]
     protocol: str
     target_port: int
-    published_port: int
+    published_port: Optional[int]
     publish_mode: str
 
 
