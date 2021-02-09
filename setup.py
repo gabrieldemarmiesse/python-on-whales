@@ -11,7 +11,7 @@ def get_long_description() -> str:
 
 setup(
     name="python-on-whales",
-    version="0.13.0",
+    version="0.13.1",
     description="A Docker client for Python, designed to be fun and intuivive!",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
