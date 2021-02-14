@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  my_service:
+    build:
+      context: my_service_build
+    image: some_random_image
+    ports:
+     - "5000:5000"
+    volumes:
+     - /tmp:/tmp
+
+    environment:
+     - DATADOG_HOST=something
+  busybox:
+    image: busybox:latest
+    command: ping -c 7 www.google.com
+  alpine:
+    image: alpine:latest
+    command: sh -c "ping -c 5 www.google.com"
+    environment:
+     - DD_API_KEY=__your_datadog_api_key_here__
+     - POSTGRES_HOST_AUTH_METHOD=trust
