@@ -136,6 +136,8 @@ class ComposeCLI(DockerCLICaller):
     def up(self, services: List[str] = [], build: bool = False, detach: bool = False):
         """Start the containers.
 
+        Reading the logs of the containers is not yet implemented.
+
         # Arguments
             services: The services to start. If empty (default), all services are
                 started.
@@ -143,13 +145,14 @@ class ComposeCLI(DockerCLICaller):
                 even if a docker image with this name already exists.
                 If `False` (the default), build only the docker images that do not already
                 exist.
-            detach: If `True`, run the containers in the background. Only `True` is
-                supported at the moment.
+            detach: If `True`, run the containers in the background. If `False` this
+                function returns only when all containers have stopped.
+
+        # Returns
+            `None` at the moment. The plan is to be able to capture and stream the logs later.
+            It's not yet implemented.
+
         """
-        if not detach:
-            raise NotImplementedError(
-                "Only detaching containers is supported at the moment."
-            )
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--build", build)

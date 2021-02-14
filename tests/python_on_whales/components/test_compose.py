@@ -21,6 +21,16 @@ def test_docker_compose_build():
 
 
 def test_docker_compose_up_down():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ]
+    )
+    docker.compose.up(["busybox", "alpine"])
+
+
+def test_docker_compose_up_detach_down():
     docker.compose.up(detach=True)
     docker.compose.down()
 
