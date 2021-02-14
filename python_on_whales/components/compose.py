@@ -147,6 +147,11 @@ class ComposeCLI(DockerCLICaller):
                 exist.
             detach: If `True`, run the containers in the background. If `False` this
                 function returns only when all containers have stopped.
+
+        # Returns
+            `None` at the moment. The plan is to be able to capture and stream the logs later.
+            It's not yet implemented.
+
         """
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--detach", detach)
