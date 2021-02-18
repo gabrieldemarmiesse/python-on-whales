@@ -1,0 +1,185 @@
+{
+    "ID": "uiwnxpdl7z6dui1yl003lxz27",
+    "Version": {
+        "Index": 5859782
+    },
+    "CreatedAt": "2020-11-23T18:30:58.478269584Z",
+    "UpdatedAt": "2020-12-18T15:58:35.741139242Z",
+    "Spec": {
+        "Name": "swarmpit_db",
+        "Labels": {
+            "com.docker.stack.image": "766286138643.dkr.ecr.eu-west-1.amazonaws.com/couchdb:2.3.0",
+            "com.docker.stack.namespace": "swarmpit"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "766286138643.dkr.ecr.eu-west-1.amazonaws.com/couchdb:2.3.0@sha256:4b63800b20f5457673fef2fb2c95f45aea8a7edc1f79638ac0c2c9cab2094b06",
+                "Labels": {
+                    "com.docker.stack.namespace": "swarmpit"
+                },
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "volume",
+                        "Source": "swarmpit_db-data",
+                        "Target": "/opt/couchdb/data",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "swarmpit"
+                            },
+                            "DriverConfig": {
+                                "Name": "local"
+                            }
+                        }
+                    }
+                ],
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 1000000000,
+                    "MemoryBytes": 1073741824
+                },
+                "Reservations": {
+                    "NanoCPUs": 400000000,
+                    "MemoryBytes": 536870912
+                }
+            },
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {
+                "Constraints": [
+                    "node.labels.has-swarmpit-db-data==1"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "x4ymj7n0ul3xd8m1naztp3kqh",
+                    "Aliases": [
+                        "db"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "PreviousSpec": {
+        "Name": "swarmpit_db",
+        "Labels": {
+            "com.docker.stack.image": "766286138643.dkr.ecr.eu-west-1.amazonaws.com/couchdb:2.3.0",
+            "com.docker.stack.namespace": "swarmpit"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "766286138643.dkr.ecr.eu-west-1.amazonaws.com/couchdb:2.3.0@sha256:4b63800b20f5457673fef2fb2c95f45aea8a7edc1f79638ac0c2c9cab2094b06",
+                "Labels": {
+                    "com.docker.stack.namespace": "swarmpit"
+                },
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null
+                },
+                "Mounts": [
+                    {
+                        "Type": "volume",
+                        "Source": "swarmpit_db-data",
+                        "Target": "/opt/couchdb/data",
+                        "VolumeOptions": {
+                            "Labels": {
+                                "com.docker.stack.namespace": "swarmpit"
+                            },
+                            "DriverConfig": {
+                                "Name": "local"
+                            }
+                        }
+                    }
+                ],
+                "Isolation": "default"
+            },
+            "Resources": {
+                "Limits": {
+                    "NanoCPUs": 1000000000,
+                    "MemoryBytes": 1073741824
+                },
+                "Reservations": {
+                    "NanoCPUs": 400000000,
+                    "MemoryBytes": 536870912
+                }
+            },
+            "Placement": {
+                "Constraints": [
+                    "node.labels.has-swarmpit-db-data==1"
+                ],
+                "Platforms": [
+                    {
+                        "Architecture": "amd64",
+                        "OS": "linux"
+                    }
+                ]
+            },
+            "Networks": [
+                {
+                    "Target": "x4ymj7n0ul3xd8m1naztp3kqh",
+                    "Aliases": [
+                        "db"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "x4ymj7n0ul3xd8m1naztp3kqh",
+                "Addr": "10.0.1.112/24"
+            }
+        ]
+    }
+}

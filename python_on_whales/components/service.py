@@ -42,9 +42,9 @@ class TaskTemplate(DockerCamelModel):
 class ChangeConfig(DockerCamelModel):
     parallelism: int
     failure_action: str
-    monitor: int
-    max_failure_ratio: int
-    order: str
+    monitor: Optional[int]
+    max_failure_ratio: Optional[int]
+    order: Optional[str]
 
 
 class ServiceSpec(DockerCamelModel):
