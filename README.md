@@ -150,6 +150,10 @@ implementing new features much easier and safer. For example, it's
 [unlikely that docker-py supports Buildx/buildkit](https://github.com/docker/docker-py/issues/2230#issuecomment-454344497)
 anytime soon because rewriting a large Go codebase in Python is hard work.
 
+
+![](./img/docker_clients.png)
+
+
 ## Should I use Docker-py or Python on Whales?
 
 Well, it's written in each project's description!

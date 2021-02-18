@@ -113,6 +113,7 @@ destination = PROJECT_ROOT / "docs" / "generated_sources"
 doc_generator.generate(destination)
 shutil.copyfile(PROJECT_ROOT / "README.md", destination / "index.md")
 shutil.copyfile(PROJECT_ROOT / "img/full.png", destination / "img/full.png")
+shutil.copyfile(PROJECT_ROOT / "img/docker_clients.png", destination / "img/docker_clients.png")
 
 
 bb = destination / "sub-commands" / "container.md"
