@@ -61,7 +61,7 @@ class ImageInspectResult(DockerCamelModel):
     virtual_size: int
     graph_driver: ImageGraphDriver
     root_fs: ImageRootFS
-    metadata: Dict[str, str]
+    metadata: Optional[Dict[str, str]]
 
 
 class Image(ReloadableObjectFromJson):
@@ -159,7 +159,7 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().root_fs
 
     @property
-    def metadata(self) -> Dict[str, str]:
+    def metadata(self) -> Optional[Dict[str, str]]:
         return self._get_inspect_result().metadata
 
     def remove(self, force: bool = False, prune: bool = True):

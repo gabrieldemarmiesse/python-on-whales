@@ -40,8 +40,8 @@ class NetworkInspectResult(DockerCamelModel):
     containers: Dict[str, NetworkContainer]
     options: Dict[str, Any]
     labels: Dict[str, str]
-    config_from: dict
-    config_only: bool
+    config_from: Optional[dict]
+    config_only: Optional[bool]
 
 
 class Network(ReloadableObjectFromJson):

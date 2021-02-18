@@ -29,14 +29,14 @@ class DiscreteResourceSpec(DockerCamelModel):
 
 
 class AssignedGenericResources(DockerCamelModel):
-    named_resource_spec: NamedResourceSpec
-    discrete_resource_spec: DiscreteResourceSpec
+    named_resource_spec: Optional[NamedResourceSpec]
+    discrete_resource_spec: Optional[DiscreteResourceSpec]
 
 
 class ContainerStatus(DockerCamelModel):
     container_id: str = pydantic.Field(alias="ContainerID")
     pid: int = pydantic.Field(alias="PID")
-    exit_code: int
+    exit_code: Optional[int]
 
 
 class TaskStatus(DockerCamelModel):
@@ -71,7 +71,7 @@ class Placement(DockerCamelModel):
     constraints: Optional[List[str]]
     preferences: Optional[List[Spread]]
     max_replicas: Optional[int]
-    platforms: List[Platform]
+    platforms: Optional[List[Platform]]
 
 
 class RestartPolicy(DockerCamelModel):
@@ -144,7 +144,7 @@ class TaskSpec(DockerCamelModel):
     resources: Resources
     restart_policy: Any
     placement: Placement
-    force_update: int
+    force_update: Optional[int]
     runtime: Optional[str]
     networks: Optional[List[NetworkAttachmentConfig]]
     log_driver: Optional[LogDriver]
@@ -156,7 +156,7 @@ class TaskInspectResult(DockerCamelModel):
     created_at: datetime
     updated_at: datetime
     name: Optional[str]
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
     spec: TaskSpec
     service_id: str = pydantic.Field(alias="ServiceID")
     slot: Optional[int]
