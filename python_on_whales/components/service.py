@@ -30,7 +30,7 @@ class ContainerSpec(DockerCamelModel):
     labels: Optional[Dict[str, str]]
     privileges: Optional[Dict[str, Optional[str]]]
     stop_grace_period: Optional[int]
-    isolation: str
+    isolation: Optional[str]
     env: Optional[List[str]]
 
 
@@ -49,7 +49,7 @@ class ChangeConfig(DockerCamelModel):
 
 class ServiceSpec(DockerCamelModel):
     name: str
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
     mode: Optional[Dict[str, Any]]
     update_config: Optional[ChangeConfig]
     rollback_config: Optional[ChangeConfig]
@@ -65,7 +65,7 @@ class EndpointPortConfig(DockerCamelModel):
     protocol: str
     target_port: int
     published_port: Optional[int]
-    publish_mode: str
+    publish_mode: Optional[str]
 
 
 class ServiceEndpointSpec(DockerCamelModel):
