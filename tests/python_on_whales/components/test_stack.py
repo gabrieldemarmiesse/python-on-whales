@@ -9,13 +9,13 @@ from python_on_whales.utils import PROJECT_ROOT
 
 @pytest.fixture
 def with_test_stack(swarm_mode):
-    docker.stack.deploy(
+    some_stack = docker.stack.deploy(
         "some_stack",
         [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
     )
     time.sleep(1)
-    yield
-    docker.stack.remove("some_stack")
+    yield some_stack
+    some_stack.remove()
     time.sleep(1)
 
 
@@ -26,10 +26,15 @@ def test_services_inspect():
     assert set(all_services) == set(docker.stack.services("some_stack"))
 
 
-@pytest.mark.usefixtures("with_test_stack")
-def test_stack_ps():
+def test_stack_ps_and_services(with_test_stack):
+
     all_services = docker.service.list()
+
+    assert set(all_services) == set(with_test_stack.services())
+
     stack_tasks = set(docker.stack.ps("some_stack"))
+    assert stack_tasks == set(with_test_stack.ps())
+
     services_tasks = set(docker.service.ps(all_services))
     assert stack_tasks == services_tasks
     assert len(stack_tasks) > 0

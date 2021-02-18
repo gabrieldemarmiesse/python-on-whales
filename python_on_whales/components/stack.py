@@ -24,6 +24,12 @@ class Stack:
     def remove(self) -> None:
         StackCLI(self.client_config).remove(self)
 
+    def ps(self) -> List[python_on_whales.components.task.Task]:
+        return StackCLI(self.client_config).ps(self)
+
+    def services(self) -> List[python_on_whales.components.service.Service]:
+        return StackCLI(self.client_config).services(self)
+
 
 ValidStack = Union[str, Stack]
 
