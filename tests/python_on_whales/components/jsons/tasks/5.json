@@ -1,0 +1,118 @@
+{
+    "ID": "f7tpoi3my38p0vk1j96sbhalf",
+    "Version": {
+        "Index": 1058705
+    },
+    "CreatedAt": "2021-02-19T14:07:51.1034515Z",
+    "UpdatedAt": "2021-02-19T14:07:51.2120791Z",
+    "Labels": {},
+    "Spec": {
+        "ContainerSpec": {
+            "Image": "test:2.3.0131",
+            "Labels": {
+                "com.docker.stack.namespace": "test1"
+            },
+            "Env": [
+                "DOMAIN=localhost",
+                "STACK_NAME=test1",
+                "discovery.type=single-node"
+            ],
+            "Privileges": {
+                "CredentialSpec": null,
+                "SELinuxContext": null
+            },
+            "Mounts": [
+                {
+                    "Type": "volume",
+                    "Source": "test1_app-es-data",
+                    "Target": "/usr/share/elasticsearch/data",
+                    "VolumeOptions": {
+                        "Labels": {
+                            "com.docker.stack.namespace": "test1"
+                        }
+                    }
+                }
+            ],
+            "Isolation": "default",
+            "Ulimits": [
+                {
+                    "Name": "memlock",
+                    "Hard": -1,
+                    "Soft": -1
+                }
+            ]
+        },
+        "Resources": {},
+        "RestartPolicy": {
+            "Condition": "on-failure",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+        },
+        "Placement": {
+            "Constraints": [
+                "node.labels.test1.app-es-data == true"
+            ]
+        },
+        "Networks": [
+            {
+                "Target": "orlu6efwwazflqzaolup1v960",
+                "Aliases": [
+                    "elasticsearch"
+                ]
+            }
+        ],
+        "ForceUpdate": 0
+    },
+    "ServiceID": "rkys3vcykrycd0cwb9myt7wp7",
+    "Slot": 1,
+    "Status": {
+        "Timestamp": "2021-02-19T14:07:51.2118683Z",
+        "State": "pending",
+        "Message": "pending task scheduling",
+        "Err": "no suitable node (scheduling constraints not satisfied on 1 node)",
+        "PortStatus": {}
+    },
+    "DesiredState": "running",
+    "NetworksAttachments": [
+        {
+            "Network": {
+                "ID": "orlu6efwwazflqzaolup1v960",
+                "Version": {
+                    "Index": 1058665
+                },
+                "CreatedAt": "2021-02-19T14:07:26.4206155Z",
+                "UpdatedAt": "2021-02-19T14:07:26.4264181Z",
+                "Spec": {
+                    "Name": "test1_default",
+                    "Labels": {
+                        "com.docker.stack.namespace": "test1"
+                    },
+                    "DriverConfiguration": {
+                        "Name": "overlay"
+                    },
+                    "Scope": "swarm"
+                },
+                "DriverState": {
+                    "Name": "overlay",
+                    "Options": {
+                        "com.docker.network.driver.overlay.vxlanid_list": "4113"
+                    }
+                },
+                "IPAMOptions": {
+                    "Driver": {
+                        "Name": "default"
+                    },
+                    "Configs": [
+                        {
+                            "Subnet": "10.0.17.0/24",
+                            "Gateway": "10.0.17.1"
+                        }
+                    ]
+                }
+            },
+            "Addresses": [
+                "10.0.17.12/24"
+            ]
+        }
+    ]
+}
