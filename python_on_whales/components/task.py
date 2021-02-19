@@ -160,7 +160,7 @@ class TaskInspectResult(DockerCamelModel):
     spec: TaskSpec
     service_id: str = pydantic.Field(alias="ServiceID")
     slot: Optional[int]
-    node_id: str = pydantic.Field(alias="NodeID")
+    node_id: Optional[str] = pydantic.Field(alias="NodeID")
     assigned_generic_resources: Optional[List[AssignedGenericResources]]
     status: TaskStatus
     desired_state: str
