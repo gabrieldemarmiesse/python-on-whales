@@ -56,13 +56,13 @@ class ContainerState(DockerCamelModel):
 
 
 class ContainerWeightDevice(DockerCamelModel):
-    path: Path
-    weight: int
+    path: Optional[Path]
+    weight: Optional[int]
 
 
 class ContainerThrottleDevice(DockerCamelModel):
-    path: Path
-    rate: int
+    path: Optional[Path]
+    rate: Optional[int]
 
 
 class ContainerDevice(DockerCamelModel):
@@ -80,9 +80,9 @@ class ContainerDeviceRequest(DockerCamelModel):
 
 
 class ContainerUlimit(DockerCamelModel):
-    name: str
-    soft: int
-    hard: int
+    name: Optional[str]
+    soft: Optional[int]
+    hard: Optional[int]
 
 
 class ContainerLogConfig(DockerCamelModel):
@@ -134,7 +134,7 @@ class ContainerMount(DockerCamelModel):
 class ContainerHostConfig(DockerCamelModel):
     cpu_shares: int
     memory: int
-    cgroup_parent: Path
+    cgroup_parent: Optional[Path]
     blkio_weight: int
     blkio_weight_device: Optional[List[ContainerWeightDevice]]
     blkio_device_read_bps: Optional[List[ContainerThrottleDevice]]
@@ -142,7 +142,7 @@ class ContainerHostConfig(DockerCamelModel):
     blkio_device_read_iops: Optional[List[ContainerThrottleDevice]]
     blkio_device_write_iops: Optional[List[ContainerThrottleDevice]]
     cpu_period: int
-    cpu_quota: int
+    cpu_quota: Optional[int]
     cpu_realtime_period: int
     cpu_realtime_runtime: int
     cpuset_cpus: str
@@ -151,16 +151,16 @@ class ContainerHostConfig(DockerCamelModel):
     device_cgroup_rules: Optional[List[str]]
     device_requests: Optional[List[ContainerDeviceRequest]]
     kernel_memory: int
-    kernel_memory_tcp: int
+    kernel_memory_tcp: Optional[int]
     memory_reservation: int
     memory_swap: int
     memory_swappiness: Optional[int]
-    nano_cpus: int
+    nano_cpus: Optional[int]
     oom_kill_disable: bool
     init: Optional[bool]
     pids_limit: Optional[int]
     ulimits: Optional[List[ContainerUlimit]]
-    cpu_count: int
+    cpu_count: Optional[int]
     cpu_percent: int
     binds: Optional[List[str]]
     container_id_file: Path
@@ -168,7 +168,7 @@ class ContainerHostConfig(DockerCamelModel):
     network_mode: str
     port_bindings: Optional[Dict[str, Optional[List[PortBinding]]]]
     restart_policy: ContainerRestartPolicy
-    auto_remove: bool
+    auto_remove: Optional[bool]
     volume_driver: str
     volumes_from: Optional[List[str]]
     mounts: Optional[List[ContainerMount]]
@@ -181,7 +181,7 @@ class ContainerHostConfig(DockerCamelModel):
     extra_hosts: Optional[Dict[str, str]]
     group_add: Optional[List[str]]
     ipc_mode: str
-    cgroup: str
+    cgroup: Optional[str]
     links: Optional[List[str]]
     oom_score_adj: int
     pid_mode: str
@@ -191,12 +191,12 @@ class ContainerHostConfig(DockerCamelModel):
     security_opt: Optional[List[str]]
     storage_opt: Any
     tmpfs: Optional[Dict[Path, str]]
-    uts_mode: str
-    userns_mode: str
+    uts_mode: Optional[str]
+    userns_mode: Optional[str]
     shm_size: int
     sysctls: Optional[Dict[str, Any]]
-    runtime: str
-    console_size: Tuple[int, int]
+    runtime: Optional[str]
+    console_size: Optional[Tuple[int, int]]
     isolation: Optional[str]
     masked_paths: Optional[List[Path]]
     readonly_paths: Optional[List[Path]]
@@ -204,10 +204,10 @@ class ContainerHostConfig(DockerCamelModel):
 
 class ContainerHealthCheck(DockerCamelModel):
     test: List[str]
-    interval: int
-    timeout: int
-    retries: int
-    start_period: int
+    interval: Optional[int]
+    timeout: Optional[int]
+    retries: Optional[int]
+    start_period: Optional[int]
 
 
 class ContainerConfig(DockerCamelModel):
@@ -239,7 +239,7 @@ class ContainerConfig(DockerCamelModel):
 
 
 class Mount(DockerCamelModel):
-    type: str
+    type: Optional[str]
     name: Optional[str]
     source: str
     destination: str
@@ -282,7 +282,7 @@ class NetworkSettings(DockerCamelModel):
     hairpin_mode: bool
     link_local_ipv6_address: str
     link_local_ipv6_prefix_lenght: int
-    ports: dict  # to rework
+    ports: Optional[dict]  # to rework
     sandbox_key: Path
     secondary_ip_addresses: Optional[List[ContainerNetworkAddress]]
     secondary_ipv6_addresses: Optional[List[ContainerNetworkAddress]]
@@ -317,13 +317,13 @@ class ContainerInspectResult(DockerCamelModel):
     name: str
     restart_count: int
     driver: str
-    platform: str
+    platform: Optional[str]
     mount_label: str
     process_label: str
     app_armor_profile: str
     exec_ids: Optional[List[str]]
     host_config: ContainerHostConfig
-    graph_driver: ContainerGraphDriver
+    graph_driver: Optional[ContainerGraphDriver]
     size_rw: Optional[int]
     size_root_fs: Optional[int]
     mounts: List[Mount]
