@@ -1,4 +1,3 @@
-typeguard
 pydantic
 requests
 tqdm

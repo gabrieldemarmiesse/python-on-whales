@@ -6,7 +6,7 @@ RUN chmod a+x /docker-buildx
 #-----------------------------------------------------------------------------
 FROM python:3.7 as python_dependencies
 
-RUN pip install typeguard pydantic requests tqdm
+RUN pip install pydantic requests tqdm
 
 COPY tests/test-requirements.txt /tmp/
 COPY requirements.txt /tmp/
