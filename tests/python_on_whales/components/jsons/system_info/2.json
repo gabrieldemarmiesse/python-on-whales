@@ -1,0 +1,175 @@
+{
+  "ID": "C3JG:YIIN:P2HL:G3S4:SDG5:UNTG:AOEU:7J4K:LTQQ:GFSE:IAKI:PSJ5",
+  "Containers": 37,
+  "ContainersRunning": 37,
+  "ContainersPaused": 0,
+  "ContainersStopped": 0,
+  "Images": 35,
+  "Driver": "overlay2",
+  "DriverStatus": [
+    [
+      "Backing Filesystem",
+      "extfs"
+    ],
+    [
+      "Supports d_type",
+      "true"
+    ],
+    [
+      "Native Overlay Diff",
+      "true"
+    ]
+  ],
+  "Plugins": {
+    "Volume": [
+      "local"
+    ],
+    "Network": [
+      "bridge",
+      "host",
+      "ipvlan",
+      "macvlan",
+      "null",
+      "overlay"
+    ],
+    "Authorization": null,
+    "Log": [
+      "awslogs",
+      "fluentd",
+      "gcplogs",
+      "gelf",
+      "journald",
+      "json-file",
+      "local",
+      "logentries",
+      "splunk",
+      "syslog"
+    ]
+  },
+  "MemoryLimit": true,
+  "SwapLimit": true,
+  "KernelMemory": true,
+  "KernelMemoryTCP": true,
+  "CpuCfsPeriod": true,
+  "CpuCfsQuota": true,
+  "CPUShares": true,
+  "CPUSet": true,
+  "PidsLimit": true,
+  "IPv4Forwarding": true,
+  "BridgeNfIptables": true,
+  "BridgeNfIp6tables": true,
+  "Debug": true,
+  "NFd": 146,
+  "OomKillDisable": true,
+  "NGoroutines": 126,
+  "SystemTime": "2021-02-22T20:10:44.1953211Z",
+  "LoggingDriver": "json-file",
+  "CgroupDriver": "cgroupfs",
+  "CgroupVersion": "1",
+  "NEventsListener": 3,
+  "KernelVersion": "4.19.121-linuxkit",
+  "OperatingSystem": "Docker Desktop",
+  "OSVersion": "",
+  "OSType": "linux",
+  "Architecture": "x86_64",
+  "IndexServerAddress": "https://index.docker.io/v1/",
+  "RegistryConfig": {
+    "AllowNondistributableArtifactsCIDRs": [],
+    "AllowNondistributableArtifactsHostnames": [],
+    "InsecureRegistryCIDRs": [
+      "127.0.0.0/8"
+    ],
+    "IndexConfigs": {
+      "docker.io": {
+        "Name": "docker.io",
+        "Mirrors": [
+          "https://url.com/"
+        ],
+        "Secure": true,
+        "Official": true
+      }
+    },
+    "Mirrors": [
+      "https://url.com/"
+    ]
+  },
+  "NCPU": 1,
+  "MemTotal": 2087440384,
+  "GenericResources": null,
+  "DockerRootDir": "/var/lib/docker",
+  "HttpProxy": "gateway.docker.internal:3128",
+  "HttpsProxy": "gateway.docker.internal:3129",
+  "NoProxy": "",
+  "Name": "docker-desktop",
+  "Labels": [],
+  "ExperimentalBuild": false,
+  "ServerVersion": "20.10.2",
+  "Runtimes": {
+    "io.containerd.runc.v2": {
+      "path": "runc"
+    },
+    "io.containerd.runtime.v1.linux": {
+      "path": "runc"
+    },
+    "runc": {
+      "path": "runc"
+    }
+  },
+  "DefaultRuntime": "runc",
+  "Swarm": {
+    "NodeID": "",
+    "NodeAddr": "",
+    "LocalNodeState": "inactive",
+    "ControlAvailable": false,
+    "Error": "",
+    "RemoteManagers": null
+  },
+  "LiveRestoreEnabled": false,
+  "Isolation": "",
+  "InitBinary": "docker-init",
+  "ContainerdCommit": {
+    "ID": "269548fa27e0089a8b8278fc4fc781d7f65a939b",
+    "Expected": "269548fa27e0089a8b8278fc4fc781d7f65a939b"
+  },
+  "RuncCommit": {
+    "ID": "ff819c7e9184c13b7c2607fe6c30ae19403a7aff",
+    "Expected": "ff819c7e9184c13b7c2607fe6c30ae19403a7aff"
+  },
+  "InitCommit": {
+    "ID": "de40ad0",
+    "Expected": "de40ad0"
+  },
+  "Warnings": null,
+  "ClientInfo": {
+    "Debug": false,
+    "Context": "default",
+    "Plugins": [
+      {
+        "SchemaVersion": "0.1.0",
+        "Vendor": "Docker Inc.",
+        "Version": "v0.9.1-beta3",
+        "ShortDescription": "Docker App",
+        "Experimental": true,
+        "Name": "app",
+        "Path": "/usr/local/lib/docker/cli-plugins/docker-app"
+      },
+      {
+        "SchemaVersion": "0.1.0",
+        "Vendor": "Docker Inc.",
+        "Version": "v0.5.1-docker",
+        "ShortDescription": "Build with BuildKit",
+        "Name": "buildx",
+        "Path": "/usr/local/lib/docker/cli-plugins/docker-buildx"
+      },
+      {
+        "SchemaVersion": "0.1.0",
+        "Vendor": "Docker Inc.",
+        "Version": "v0.5.0",
+        "ShortDescription": "Docker Scan",
+        "Name": "scan",
+        "Path": "/usr/local/lib/docker/cli-plugins/docker-scan"
+      }
+    ],
+    "Warnings": null
+  }
+}

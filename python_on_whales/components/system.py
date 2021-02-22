@@ -217,7 +217,7 @@ class SystemInfo(DockerCamelModel):
     labels: Dict[str, str]
     experimental_build: bool
     server_version: str
-    cluster_store: str
+    cluster_store: Optional[str]
     runtimes: Dict[str, Runtime]
     default_runtime: str
     swarm: SwarmInfo
@@ -227,7 +227,7 @@ class SystemInfo(DockerCamelModel):
     containerd_commit: Commit
     runc_commit: Commit
     init_commit: Commit
-    security_options: List[str]
+    security_options: Optional[List[str]]
     product_license: Optional[str]
     warnings: Optional[List[str]]
     client_info: ClientInfo
