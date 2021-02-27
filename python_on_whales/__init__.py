@@ -2,8 +2,8 @@ from .components.buildx import Builder
 from .components.config import Config
 from .components.container import Container, ContainerStats
 from .components.context import Context
-from .components.image import Image
-from .components.network import Network
+from .components.image.docker_object import Image
+from .components.network.docker_object import Network
 from .components.node import Node
 from .components.plugin import Plugin
 from .components.service import Service

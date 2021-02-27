@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 from typing import Dict, List, Optional, Union, overload
 
 import python_on_whales.components.container
+import python_on_whales.components.network.docker_object
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.network.docker_object import Network, ValidNetwork
 from python_on_whales.utils import format_dict_for_cli, run, to_list
 
 
 class NetworkCLI(DockerCLICaller):
     def connect(
         self,
-        network: ValidNetwork,
+        network: python_on_whales.components.network.docker_object.ValidNetwork,
         container: python_on_whales.components.container.ValidContainer,
         alias: Optional[str] = None,
         driver_options: List[str] = [],
@@ -34,7 +36,7 @@ class NetworkCLI(DockerCLICaller):
         gateway: Optional[str] = None,
         subnet: Optional[str] = None,
         options: List[str] = [],
-    ) -> Network:
+    ) -> python_on_whales.components.network.docker_object.Network:
         """Creates a Docker network.
 
         # Arguments
@@ -50,11 +52,13 @@ class NetworkCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--subnet", subnet)
         full_cmd.add_args_list("--opt", options)
         full_cmd.append(name)
-        return Network(self.client_config, run(full_cmd), is_immutable_id=True)
+        return python_on_whales.components.network.docker_object.Network(
+            self.client_config, run(full_cmd), is_immutable_id=True
+        )
 
     def disconnect(
         self,
-        network: ValidNetwork,
+        network: python_on_whales.components.network.docker_object.ValidNetwork,
         container: python_on_whales.components.container.ValidContainer,
         force: bool = False,
     ):
@@ -64,32 +68,61 @@ class NetworkCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Network:
+    def inspect(
+        self, x: str
+    ) -> python_on_whales.components.network.docker_object.Network:
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Network]:
+    def inspect(
+        self, x: List[str]
+    ) -> List[python_on_whales.components.network.docker_object.Network]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Network, List[Network]]:
+    def inspect(
+        self, x: Union[str, List[str]]
+    ) -> Union[
+        python_on_whales.components.network.docker_object.Network,
+        List[python_on_whales.components.network.docker_object.Network],
+    ]:
         if isinstance(x, str):
-            return Network(self.client_config, x)
+            return python_on_whales.components.network.docker_object.Network(
+                self.client_config, x
+            )
         else:
-            return [Network(self.client_config, reference) for reference in x]
+            return [
+                python_on_whales.components.network.docker_object.Network(
+                    self.client_config, reference
+                )
+                for reference in x
+            ]
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Network]:
+    def list(
+        self, filters: Dict[str, str] = {}
+    ) -> List[python_on_whales.components.network.docker_object.Network]:
         full_cmd = self.docker_cmd + ["network", "list", "--no-trunc", "--quiet"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         ids = run(full_cmd).splitlines()
-        return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
+        return [
+            python_on_whales.components.network.docker_object.Network(
+                self.client_config, id_, is_immutable_id=True
+            )
+            for id_ in ids
+        ]
 
     def prune(self, filters: Dict[str, str] = {}):
         full_cmd = self.docker_cmd + ["network", "prune", "--force"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
-    def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
+    def remove(
+        self,
+        networks: Union[
+            python_on_whales.components.network.docker_object.ValidNetwork,
+            List[python_on_whales.components.network.docker_object.ValidNetwork],
+        ],
+    ):
         """Removes a Docker network
 
         # Arguments
