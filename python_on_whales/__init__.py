@@ -1,6 +1,6 @@
 from .components.buildx import Builder
 from .components.config import Config
-from .components.container import Container, ContainerStats
+from .components.container.docker_object import Container, ContainerStats
 from .components.context import Context
 from .components.image.docker_object import Image
 from .components.network.docker_object import Network

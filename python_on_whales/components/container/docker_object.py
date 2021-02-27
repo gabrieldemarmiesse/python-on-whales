@@ -4,9 +4,9 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
 
+import python_on_whales.components.container.cli_wrapper
 import python_on_whales.components.image.docker_object
 from python_on_whales.client_config import ClientConfig, ReloadableObjectFromJson
-from python_on_whales.components.container.cli_wrapper import ContainerCLI
 from python_on_whales.components.container.models import (
     ContainerConfig,
     ContainerGraphDriver,
@@ -168,15 +168,19 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.commit`](../sub-commands/container.md) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).commit(
-            self, tag, author, message, pause
-        )
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).commit(self, tag, author, message, pause)
 
     def copy_from(self, container_path: ValidPath, local_path: ValidPath):
-        return ContainerCLI(self.client_config).copy((self, container_path), local_path)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).copy((self, container_path), local_path)
 
     def copy_to(self, local_path: ValidPath, container_path: ValidPath):
-        return ContainerCLI(self.client_config).copy(local_path, (self, container_path))
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).copy(local_path, (self, container_path))
 
     def diff(self) -> Dict[str, str]:
         """Returns the diff of this container filesystem.
@@ -184,7 +188,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.diff`](../sub-commands/container.md) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).diff(self)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).diff(self)
 
     def execute(self, command: Union[str, List[str]], detach: bool = False):
         """Execute a command in this container
@@ -192,7 +198,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.execute`](../sub-commands/container.md#execute)
         command for information about the arguments.
         """
-        return ContainerCLI(self.client_config).execute(self, command, detach)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).execute(self, command, detach)
 
     def export(self, output: ValidPath) -> None:
         """Export this container filesystem.
@@ -200,7 +208,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.export`](../sub-commands/container.md) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).export(self, output)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).export(self, output)
 
     def kill(self, signal: str = None):
         """Kill this container
@@ -208,7 +218,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.kill`](../sub-commands/container.md#kill) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).kill(self, signal)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).kill(self, signal)
 
     def logs(
         self,
@@ -223,9 +235,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.logs`](../sub-commands/container.md#logs) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).logs(
-            self, details, since, tail, timestamps, until
-        )
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).logs(self, details, since, tail, timestamps, until)
 
     def pause(self) -> None:
         """Pause this container.
@@ -233,7 +245,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.pause`](../sub-commands/container.md#pause) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).pause(self)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).pause(self)
 
     def unpause(self) -> None:
         """Unpause the container
@@ -241,7 +255,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.unpause`](../sub-commands/container.md#unpause) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).unpause(self)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).unpause(self)
 
     def rename(self, new_name: str) -> None:
         """Rename this container
@@ -249,7 +265,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.rename`](../sub-commands/container.md#rename) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).rename(self, new_name)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).rename(self, new_name)
 
     def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
         """Restarts this container.
@@ -257,7 +275,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.restart`](../sub-commands/container.md#restart) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).restart(self, time)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).restart(self, time)
 
     def remove(self, force: bool = False, volumes: bool = False) -> None:
         """Remove this container.
@@ -265,7 +285,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.remove`](../sub-commands/container.md#remove) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).remove(self, force, volumes)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).remove(self, force, volumes)
 
     def start(
         self, attach: bool = False, stream: bool = False
@@ -275,7 +297,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).start(self, attach, stream)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).start(self, attach, stream)
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
@@ -283,7 +307,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.stop`](../sub-commands/container.md#stop) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).stop(self, time)
+        return python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        ).stop(self, time)
 
 
 class ContainerStats:

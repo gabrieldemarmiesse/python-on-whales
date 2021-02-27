@@ -7,7 +7,7 @@ from python_on_whales.components.app import AppCLI
 from python_on_whales.components.buildx import BuildxCLI
 from python_on_whales.components.compose import ComposeCLI
 from python_on_whales.components.config import ConfigCLI
-from python_on_whales.components.container import ContainerCLI
+from python_on_whales.components.container.cli_wrapper import ContainerCLI
 from python_on_whales.components.context import ContextCLI
 from python_on_whales.components.image.cli_wrapper import ImageCLI
 from python_on_whales.components.manifest import ManifestCLI
