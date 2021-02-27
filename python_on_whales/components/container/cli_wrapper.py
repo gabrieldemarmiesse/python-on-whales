@@ -3,610 +3,22 @@ from __future__ import annotations
 import inspect
 import json
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import Dict, Iterable, List, Optional, Tuple, Union, overload
 
-import pydantic
-
-import python_on_whales.components.image
+import python_on_whales.components
+import python_on_whales.components.container.docker_object
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.image.docker_object
-import python_on_whales.components.network
 import python_on_whales.components.network.docker_object
 import python_on_whales.components.volume
-from python_on_whales.client_config import (
-    ClientConfig,
-    DockerCLICaller,
-    ReloadableObjectFromJson,
-)
+from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import (
-    DockerCamelModel,
     ValidPath,
     format_dict_for_cli,
-    removeprefix,
     run,
     stream_stdout_and_stderr,
     to_list,
 )
-
-
-class ContainerHealthcheckResult(DockerCamelModel):
-    start: datetime
-    end: datetime
-    exit_code: int
-    output: str
-
-
-class ContainerHealth(DockerCamelModel):
-    status: str
-    failing_streak: int
-    log: List[ContainerHealthcheckResult]
-
-
-class ContainerState(DockerCamelModel):
-    status: str
-    running: bool
-    paused: bool
-    restarting: bool
-    oom_killed: bool
-    dead: bool
-    pid: int
-    exit_code: int
-    error: str
-    started_at: datetime
-    finished_at: datetime
-    health: Optional[ContainerHealth]
-
-
-class ContainerWeightDevice(DockerCamelModel):
-    path: Optional[Path]
-    weight: Optional[int]
-
-
-class ContainerThrottleDevice(DockerCamelModel):
-    path: Optional[Path]
-    rate: Optional[int]
-
-
-class ContainerDevice(DockerCamelModel):
-    path_on_host: Path
-    path_in_container: Path
-    cgroup_permissions: str
-
-
-class ContainerDeviceRequest(DockerCamelModel):
-    driver: str
-    count: int
-    device_ids: Optional[List[str]] = pydantic.Field(alias="DeviceIDs")
-    capabilities: List[Any]
-    options: Dict[str, str]
-
-
-class ContainerUlimit(DockerCamelModel):
-    name: Optional[str]
-    soft: Optional[int]
-    hard: Optional[int]
-
-
-class ContainerLogConfig(DockerCamelModel):
-    type: str
-    config: Any
-
-
-class ContainerRestartPolicy(DockerCamelModel):
-    name: str
-    maximum_retry_count: Optional[int]
-
-
-class PortBinding(DockerCamelModel):
-    host_ip: str
-    host_port: str
-
-
-class ContainerMountBindOption(DockerCamelModel):
-    propagation: str
-    non_recursive: bool
-
-
-class ContainerVolumeDriverConfig(DockerCamelModel):
-    name: str
-    options: Dict[str, Any]
-
-
-class ContainerVolumeOptions(DockerCamelModel):
-    no_copy: Optional[bool]
-    labels: Dict[str, str]
-
-
-class ContainerTmpfsOptions(DockerCamelModel):
-    size_bytes: int
-    mode: int
-
-
-class ContainerMount(DockerCamelModel):
-    target: Path
-    source: str
-    type: str
-    read_only: Optional[bool]
-    consistency: Optional[str]
-    bind_options: Optional[ContainerMountBindOption]
-    volume_options: Optional[ContainerVolumeOptions]
-    tmpfs_options: Optional[ContainerTmpfsOptions]
-
-
-class ContainerHostConfig(DockerCamelModel):
-    cpu_shares: int
-    memory: int
-    cgroup_parent: Optional[Path]
-    blkio_weight: int
-    blkio_weight_device: Optional[List[ContainerWeightDevice]]
-    blkio_device_read_bps: Optional[List[ContainerThrottleDevice]]
-    blkio_device_write_bps: Optional[List[ContainerThrottleDevice]]
-    blkio_device_read_iops: Optional[List[ContainerThrottleDevice]]
-    blkio_device_write_iops: Optional[List[ContainerThrottleDevice]]
-    cpu_period: int
-    cpu_quota: Optional[int]
-    cpu_realtime_period: int
-    cpu_realtime_runtime: int
-    cpuset_cpus: str
-    cpuset_mems: str
-    devices: Optional[List[ContainerDevice]]
-    device_cgroup_rules: Optional[List[str]]
-    device_requests: Optional[List[ContainerDeviceRequest]]
-    kernel_memory: int
-    kernel_memory_tcp: Optional[int]
-    memory_reservation: int
-    memory_swap: int
-    memory_swappiness: Optional[int]
-    nano_cpus: Optional[int]
-    oom_kill_disable: bool
-    init: Optional[bool]
-    pids_limit: Optional[int]
-    ulimits: Optional[List[ContainerUlimit]]
-    cpu_count: Optional[int]
-    cpu_percent: int
-    binds: Optional[List[str]]
-    container_id_file: Path
-    log_config: ContainerLogConfig
-    network_mode: str
-    port_bindings: Optional[Dict[str, Optional[List[PortBinding]]]]
-    restart_policy: ContainerRestartPolicy
-    auto_remove: Optional[bool]
-    volume_driver: str
-    volumes_from: Optional[List[str]]
-    mounts: Optional[List[ContainerMount]]
-    capabilities: Optional[List[str]]
-    cap_add: Optional[List[str]]
-    cap_drop: Optional[List[str]]
-    dns: Optional[List[str]]
-    dns_options: Optional[List[str]]
-    dns_search: Optional[List[str]]
-    extra_hosts: Optional[Dict[str, str]]
-    group_add: Optional[List[str]]
-    ipc_mode: str
-    cgroup: Optional[str]
-    links: Optional[List[str]]
-    oom_score_adj: int
-    pid_mode: str
-    privileged: bool
-    publish_all_ports: bool
-    readonly_rootfs: bool
-    security_opt: Optional[List[str]]
-    storage_opt: Any
-    tmpfs: Optional[Dict[Path, str]]
-    uts_mode: Optional[str]
-    userns_mode: Optional[str]
-    shm_size: int
-    sysctls: Optional[Dict[str, Any]]
-    runtime: Optional[str]
-    console_size: Optional[Tuple[int, int]]
-    isolation: Optional[str]
-    masked_paths: Optional[List[Path]]
-    readonly_paths: Optional[List[Path]]
-
-
-class ContainerHealthCheck(DockerCamelModel):
-    test: List[str]
-    interval: Optional[int]
-    timeout: Optional[int]
-    retries: Optional[int]
-    start_period: Optional[int]
-
-
-class ContainerConfig(DockerCamelModel):
-    hostname: str
-    domainname: str
-    user: str
-    attach_stdin: bool
-    attach_stdout: bool
-    attach_stderr: bool
-    exposed_ports: Optional[dict]
-    tty: bool
-    open_stdin: bool
-    stdin_once: bool
-    env: Optional[List[str]]
-    cmd: Optional[List[str]]
-    healthcheck: Optional[ContainerHealthCheck]
-    args_escaped: Optional[bool]
-    image: str
-    volumes: Optional[dict]
-    working_dir: Path
-    entrypoint: Optional[List[str]]
-    network_disabled: Optional[bool]
-    mac_address: Optional[str]
-    on_build: Optional[List[str]]
-    labels: Optional[Dict[str, str]]
-    stop_signal: Optional[str]
-    stop_timeout: Optional[int]
-    shell: Optional[List[str]]
-
-
-class Mount(DockerCamelModel):
-    type: Optional[str]
-    name: Optional[str]
-    source: str
-    destination: str
-    driver: Optional[str]
-    mode: str
-    rw: bool
-    propagation: str
-
-
-class ContainerEndpointIPAMConfig(DockerCamelModel):
-    ipv4_address: str
-    ipv6_address: str
-    link_local_ips: List[str]
-
-
-class NetworkInspectResult(DockerCamelModel):
-    ipam_config: Optional[ContainerEndpointIPAMConfig]
-    links: Optional[List[str]]
-    aliases: Optional[List[str]]
-    network_id: str
-    endpoint_id: str
-    gateway: str
-    ip_address: str
-    ip_prefix_lenght: int
-    ipv6_gateway: str
-    global_ipv6_address: str
-    global_ipv6_prefix_lenght: int
-    mac_address: str
-    driver_options: Optional[dict]
-
-
-class ContainerNetworkAddress(DockerCamelModel):
-    addr: str
-    prefix_len: int
-
-
-class NetworkSettings(DockerCamelModel):
-    bridge: str
-    sandbox_id: str
-    hairpin_mode: bool
-    link_local_ipv6_address: str
-    link_local_ipv6_prefix_lenght: int
-    ports: Optional[dict]  # to rework
-    sandbox_key: Path
-    secondary_ip_addresses: Optional[List[ContainerNetworkAddress]]
-    secondary_ipv6_addresses: Optional[List[ContainerNetworkAddress]]
-    endpoint_id: str
-    gateway: str
-    global_ipv6_address: str
-    global_ipv6_prefix_lenght: int
-    ip_adress: str
-    ip_prefix_lenght: int
-    ipv6_gateway: str
-    mac_address: str
-    networks: Dict[str, NetworkInspectResult]
-
-
-class ContainerGraphDriver(DockerCamelModel):
-    name: str
-    data: Dict[str, Any]
-
-
-class ContainerInspectResult(DockerCamelModel):
-    id: str
-    created: datetime
-    path: str
-    args: List[str]
-    state: ContainerState
-    image: str
-    resolv_conf_path: str
-    hostname_path: Path
-    hosts_path: Path
-    log_path: Path
-    node: Any
-    name: str
-    restart_count: int
-    driver: str
-    platform: Optional[str]
-    mount_label: str
-    process_label: str
-    app_armor_profile: str
-    exec_ids: Optional[List[str]]
-    host_config: ContainerHostConfig
-    graph_driver: Optional[ContainerGraphDriver]
-    size_rw: Optional[int]
-    size_root_fs: Optional[int]
-    mounts: List[Mount]
-    config: ContainerConfig
-    network_settings: NetworkSettings
-
-
-class Container(ReloadableObjectFromJson):
-    def __init__(
-        self, client_config: ClientConfig, reference: str, is_immutable_id=False
-    ):
-        super().__init__(client_config, "id", reference, is_immutable_id)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        autoremove = self.host_config.auto_remove
-        if self.state.running:
-            self.stop()
-        if not autoremove:
-            self.remove(volumes=True)
-
-    def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["container", "inspect", reference])
-
-    def _parse_json_object(self, json_object: Dict[str, Any]):
-        return ContainerInspectResult.parse_obj(json_object)
-
-    def _get_inspect_result(self) -> ContainerInspectResult:
-        """Only there to allow tools to know the return type"""
-        return super()._get_inspect_result()
-
-    # ----------------------------------------------------------------
-    # attributes taken from the json inspect result
-    @property
-    def id(self) -> str:
-        return self._get_immutable_id()
-
-    @property
-    def created(self) -> datetime:
-        return self._get_inspect_result().created
-
-    @property
-    def path(self) -> str:
-        return self._get_inspect_result().path
-
-    @property
-    def args(self) -> List[str]:
-        return self._get_inspect_result().args
-
-    @property
-    def state(self) -> ContainerState:
-        return self._get_inspect_result().state
-
-    @property
-    def image(self) -> str:
-        return self._get_inspect_result().image
-
-    @property
-    def resolv_conf_path(self) -> str:
-        return self._get_inspect_result().resolv_conf_path
-
-    @property
-    def hostname_path(self) -> Path:
-        return self._get_inspect_result().hostname_path
-
-    @property
-    def hosts_path(self) -> Path:
-        return self._get_inspect_result().hosts_path
-
-    @property
-    def log_path(self) -> Path:
-        return self._get_inspect_result().log_path
-
-    @property
-    def node(self) -> Any:
-        return self._get_inspect_result().node
-
-    @property
-    def name(self) -> str:
-        return removeprefix(self._get_inspect_result().name, "/")
-
-    @property
-    def restart_count(self) -> int:
-        return self._get_inspect_result().restart_count
-
-    @property
-    def driver(self) -> str:
-        return self._get_inspect_result().driver
-
-    @property
-    def platform(self) -> str:
-        return self._get_inspect_result().platform
-
-    @property
-    def mount_label(self) -> str:
-        return self._get_inspect_result().mount_label
-
-    @property
-    def process_label(self) -> str:
-        return self._get_inspect_result().process_label
-
-    @property
-    def app_armor_profile(self) -> str:
-        return self._get_inspect_result().app_armor_profile
-
-    @property
-    def exec_ids(self) -> Optional[List[str]]:
-        return self._get_inspect_result().exec_ids
-
-    @property
-    def host_config(self) -> ContainerHostConfig:
-        return self._get_inspect_result().host_config
-
-    @property
-    def graph_driver(self) -> ContainerGraphDriver:
-        return self._get_inspect_result().graph_driver
-
-    @property
-    def size_rw(self) -> Optional[int]:
-        return self._get_inspect_result().size_rw
-
-    @property
-    def size_root_fs(self) -> Optional[int]:
-        return self._get_inspect_result().size_root_fs
-
-    @property
-    def mounts(self) -> List[Mount]:
-        return self._get_inspect_result().mounts
-
-    @property
-    def config(self) -> ContainerConfig:
-        return self._get_inspect_result().config
-
-    @property
-    def network_settings(self) -> NetworkSettings:
-        return self._get_inspect_result().network_settings
-
-    # --------------------------------------------------------------------
-    # public methods
-
-    def commit(
-        self,
-        tag: Optional[str] = None,
-        author: Optional[str] = None,
-        message: Optional[str] = None,
-        pause: bool = True,
-    ) -> python_on_whales.components.image.docker_object.Image:
-        """Create a new image from the container's changes.
-
-        Alias: `docker.commit(...)`
-
-        See the [`docker.container.commit`](../sub-commands/container.md) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).commit(
-            self, tag, author, message, pause
-        )
-
-    def copy_from(self, container_path: ValidPath, local_path: ValidPath):
-        return ContainerCLI(self.client_config).copy((self, container_path), local_path)
-
-    def copy_to(self, local_path: ValidPath, container_path: ValidPath):
-        return ContainerCLI(self.client_config).copy(local_path, (self, container_path))
-
-    def diff(self) -> Dict[str, str]:
-        """Returns the diff of this container filesystem.
-
-        See the [`docker.container.diff`](../sub-commands/container.md) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).diff(self)
-
-    def execute(self, command: Union[str, List[str]], detach: bool = False):
-        """Execute a command in this container
-
-        See the [`docker.container.execute`](../sub-commands/container.md#execute)
-        command for information about the arguments.
-        """
-        return ContainerCLI(self.client_config).execute(self, command, detach)
-
-    def export(self, output: ValidPath) -> None:
-        """Export this container filesystem.
-
-        See the [`docker.container.export`](../sub-commands/container.md) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).export(self, output)
-
-    def kill(self, signal: str = None):
-        """Kill this container
-
-        See the [`docker.container.kill`](../sub-commands/container.md#kill) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).kill(self, signal)
-
-    def logs(
-        self,
-        details: bool = False,
-        since: Union[None, datetime, timedelta] = None,
-        tail: Optional[int] = None,
-        timestamps: bool = False,
-        until: Union[None, datetime, timedelta] = None,
-    ) -> str:
-        """Returns the logs of the container
-
-        See the [`docker.container.logs`](../sub-commands/container.md#logs) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).logs(
-            self, details, since, tail, timestamps, until
-        )
-
-    def pause(self) -> None:
-        """Pause this container.
-
-        See the [`docker.container.pause`](../sub-commands/container.md#pause) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).pause(self)
-
-    def unpause(self) -> None:
-        """Unpause the container
-
-        See the [`docker.container.unpause`](../sub-commands/container.md#unpause) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).unpause(self)
-
-    def rename(self, new_name: str) -> None:
-        """Rename this container
-
-        See the [`docker.container.rename`](../sub-commands/container.md#rename) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).rename(self, new_name)
-
-    def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
-        """Restarts this container.
-
-        See the [`docker.container.restart`](../sub-commands/container.md#restart) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).restart(self, time)
-
-    def remove(self, force: bool = False, volumes: bool = False) -> None:
-        """Remove this container.
-
-        See the [`docker.container.remove`](../sub-commands/container.md#remove) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).remove(self, force, volumes)
-
-    def start(
-        self, attach: bool = False, stream: bool = False
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
-        """Starts this container.
-
-        See the [`docker.container.start`](../sub-commands/container.md#start) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).start(self, attach, stream)
-
-    def stop(self, time: Union[int, timedelta] = None) -> None:
-        """Stops this container.
-
-        See the [`docker.container.stop`](../sub-commands/container.md#stop) command for
-        information about the arguments.
-        """
-        return ContainerCLI(self.client_config).stop(self, time)
-
-
-ContainerPath = Tuple[Union[Container, str], ValidPath]
-ValidContainer = Union[Container, str]
-ValidPortMapping = Union[
-    Tuple[Union[str, int], Union[str, int]],
-    Tuple[Union[str, int], Union[str, int], str],
-]
 
 
 class ContainerCLI(DockerCLICaller):
@@ -620,7 +32,7 @@ class ContainerCLI(DockerCLICaller):
 
     def commit(
         self,
-        container: ValidContainer,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
         tag: Optional[str] = None,
         author: Optional[str] = None,
         message: Optional[str] = None,
@@ -754,7 +166,9 @@ class ContainerCLI(DockerCLICaller):
         kernel_memory: Union[int, str, None] = None,
         labels: Dict[str, str] = {},
         label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
+        link: List[
+            python_on_whales.components.container.docker_object.ValidContainer
+        ] = [],
         link_local_ip: List[str] = [],
         log_driver: Optional[str] = None,
         log_options: List[str] = [],
@@ -797,9 +211,11 @@ class ContainerCLI(DockerCLICaller):
             List[python_on_whales.components.volume.VolumeDefinition]
         ] = [],
         volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
+        volumes_from: List[
+            python_on_whales.components.container.docker_object.ValidContainer
+        ] = [],
         workdir: Optional[ValidPath] = None,
-    ) -> Container:
+    ) -> python_on_whales.components.container.docker_object.Container:
         """Creates a container, but does not start it.
 
         Alias: `docker.create(...)`
@@ -964,9 +380,14 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.append(image)
         full_cmd += command
-        return Container(self.client_config, run(full_cmd), is_immutable_id=True)
+        return python_on_whales.components.container.docker_object.Container(
+            self.client_config, run(full_cmd), is_immutable_id=True
+        )
 
-    def diff(self, container: ValidContainer) -> Dict[str, str]:
+    def diff(
+        self,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
+    ) -> Dict[str, str]:
         """List all the files modified, added or deleted since the container started.
 
         Alias: `docker.diff(...)`
@@ -989,7 +410,7 @@ class ContainerCLI(DockerCLICaller):
 
     def execute(
         self,
-        container: ValidContainer,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
         command: Union[str, List[str]],
         detach: bool = False,
     ) -> Optional[str]:
@@ -1020,7 +441,11 @@ class ContainerCLI(DockerCLICaller):
         else:
             return result
 
-    def export(self, container: ValidContainer, output: ValidPath) -> None:
+    def export(
+        self,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
+        output: ValidPath,
+    ) -> None:
         """Export a container's filesystem as a tar archive
 
         Alias: `docker.export(...)`
@@ -1039,14 +464,23 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Container:
+    def inspect(
+        self, x: str
+    ) -> python_on_whales.components.container.docker_object.Container:
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Container]:
+    def inspect(
+        self, x: List[str]
+    ) -> List[python_on_whales.components.container.docker_object.Container]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Container, List[Container]]:
+    def inspect(
+        self, x: Union[str, List[str]]
+    ) -> Union[
+        python_on_whales.components.container.docker_object.Container,
+        List[python_on_whales.components.container.docker_object.Container],
+    ]:
         """Returns a container object from a name or ID.
 
         # Arguments
@@ -1058,13 +492,23 @@ class ContainerCLI(DockerCLICaller):
             if a list of IDs was passed as input.
         """
         if isinstance(x, list):
-            return [Container(self.client_config, reference) for reference in x]
+            return [
+                python_on_whales.components.container.docker_object.Container(
+                    self.client_config, reference
+                )
+                for reference in x
+            ]
         else:
-            return Container(self.client_config, x)
+            return python_on_whales.components.container.docker_object.Container(
+                self.client_config, x
+            )
 
     def kill(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
         signal: str = None,
     ):
         """Kill a container.
@@ -1086,7 +530,9 @@ class ContainerCLI(DockerCLICaller):
 
     def logs(
         self,
-        container: Union[Container, str],
+        container: Union[
+            python_on_whales.components.container.docker_object.Container, str
+        ],
         details: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -1120,7 +566,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--until", format_time_arg(until))
         return run(full_cmd + [container])
 
-    def list(self, all: bool = False, filters: Dict[str, str] = {}) -> List[Container]:
+    def list(
+        self, all: bool = False, filters: Dict[str, str] = {}
+    ) -> List[python_on_whales.components.container.docker_object.Container]:
         """List the containers on the host.
 
         Alias: `docker.ps(...)`
@@ -1139,11 +587,19 @@ class ContainerCLI(DockerCLICaller):
         # TODO: add a test for the fix of is_immutable_id, without it, we get
         # race conditions (we read the attributes of a container but it might not exist.
         return [
-            Container(self.client_config, x, is_immutable_id=True)
+            python_on_whales.components.container.docker_object.Container(
+                self.client_config, x, is_immutable_id=True
+            )
             for x in run(full_cmd).splitlines()
         ]
 
-    def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
+    def pause(
+        self,
+        containers: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
+    ):
         """Pauses one or more containers
 
         Alias: `docker.pause(...)`
@@ -1168,7 +624,11 @@ class ContainerCLI(DockerCLICaller):
             full_cmd += ["--filter", filter_]
         run(full_cmd)
 
-    def rename(self, container: ValidContainer, new_name: str) -> None:
+    def rename(
+        self,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
+        new_name: str,
+    ) -> None:
         """Changes the name of a container.
 
         Alias: `docker.rename(...)`
@@ -1182,7 +642,10 @@ class ContainerCLI(DockerCLICaller):
 
     def restart(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
         time: Optional[Union[int, timedelta]] = None,
     ):
         """Restarts one or more container.
@@ -1208,7 +671,15 @@ class ContainerCLI(DockerCLICaller):
 
     def remove(
         self,
-        containers: Union[Container, str, List[Union[Container, str]]],
+        containers: Union[
+            python_on_whales.components.container.docker_object.Container,
+            str,
+            List[
+                Union[
+                    python_on_whales.components.container.docker_object.Container, str
+                ]
+            ],
+        ],
         force: bool = False,
         volumes: bool = False,
     ) -> None:
@@ -1283,7 +754,9 @@ class ContainerCLI(DockerCLICaller):
         kernel_memory: Union[int, str, None] = None,
         labels: Dict[str, str] = {},
         label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
+        link: List[
+            python_on_whales.components.container.docker_object.ValidContainer
+        ] = [],
         link_local_ip: List[str] = [],
         log_driver: Optional[str] = None,
         log_options: List[str] = [],
@@ -1327,9 +800,15 @@ class ContainerCLI(DockerCLICaller):
             List[python_on_whales.components.volume.VolumeDefinition]
         ] = [],
         volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
+        volumes_from: List[
+            python_on_whales.components.container.docker_object.ValidContainer
+        ] = [],
         workdir: Optional[ValidPath] = None,
-    ) -> Union[Container, str, Iterable[Tuple[str, bytes]]]:
+    ) -> Union[
+        python_on_whales.components.container.docker_object.Container,
+        str,
+        Iterable[Tuple[str, bytes]],
+    ]:
         """Runs a container
 
         You can use `docker.run` or `docker.container.run` to call this function.
@@ -1632,7 +1111,9 @@ class ContainerCLI(DockerCLICaller):
                 "the same time."
             )
         if detach:
-            return Container(self.client_config, run(full_cmd))
+            return python_on_whales.components.container.docker_object.Container(
+                self.client_config, run(full_cmd)
+            )
         elif stream:
             return stream_stdout_and_stderr(full_cmd)
         else:
@@ -1640,7 +1121,10 @@ class ContainerCLI(DockerCLICaller):
 
     def start(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
         attach: bool = False,
         stream: bool = False,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
@@ -1670,7 +1154,9 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def stats(self, all: bool = False) -> List[ContainerStats]:
+    def stats(
+        self, all: bool = False
+    ) -> List[python_on_whales.components.container.docker_object.ContainerStats]:
         """Get containers resource usage statistics
 
         Alias: `docker.stats(...)`
@@ -1707,11 +1193,19 @@ class ContainerCLI(DockerCLICaller):
         ]
         full_cmd.add_flag("--all", all)
         stats_output = run(full_cmd)
-        return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
+        return [
+            python_on_whales.components.container.docker_object.ContainerStats(
+                json.loads(x)
+            )
+            for x in stats_output.splitlines()
+        ]
 
     def stop(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
         time: Union[int, timedelta] = None,
     ):
         """Stops one or more running containers
@@ -1745,7 +1239,13 @@ class ContainerCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, x: Union[ValidContainer, List[ValidContainer]]):
+    def unpause(
+        self,
+        x: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
+    ):
         """Unpause all processes within one or more containers
 
         Alias: `docker.unpause(...)`
@@ -1759,7 +1259,10 @@ class ContainerCLI(DockerCLICaller):
 
     def update(
         self,
-        x: Union[ValidContainer, List[ValidContainer]],
+        x: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
         blkio_weight: Optional[int] = None,
         cpu_period: Optional[int] = None,
         cpu_quota: Optional[int] = None,
@@ -1821,15 +1324,24 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def wait(self, x: ValidContainer) -> int:
+    def wait(
+        self, x: python_on_whales.components.container.docker_object.ValidContainer
+    ) -> int:
         ...
 
     @overload
-    def wait(self, x: List[ValidContainer]) -> List[int]:
+    def wait(
+        self,
+        x: List[python_on_whales.components.container.docker_object.ValidContainer],
+    ) -> List[int]:
         ...
 
     def wait(
-        self, x: Union[ValidContainer, List[ValidContainer]]
+        self,
+        x: Union[
+            python_on_whales.components.container.docker_object.ValidContainer,
+            List[python_on_whales.components.container.docker_object.ValidContainer],
+        ],
     ) -> Union[int, List[int]]:
         """Block until one or more containers stop, then returns their exit codes
 
@@ -1876,38 +1388,13 @@ class ContainerCLI(DockerCLICaller):
             return int(run(full_cmd))
 
 
-class ContainerStats:
-    def __init__(self, json_dict: Dict[str, Any]):
-        """Takes a json_dict with container stats from the CLI and
-        parses it.
-        """
-        self.block_read: int = pydantic.parse_obj_as(
-            pydantic.ByteSize, json_dict["BlockIO"].split("/")[0]
-        )
-        self.block_write: int = pydantic.parse_obj_as(
-            pydantic.ByteSize, json_dict["BlockIO"].split("/")[1]
-        )
-        self.cpu_percentage: float = float(json_dict["CPUPerc"][:-1])
-        self.container: str = json_dict["Container"]
-        self.container_id: str = json_dict["ID"]
-        self.memory_percentage: float = float(json_dict["MemPerc"][:-1])
-        self.memory_used: int = pydantic.parse_obj_as(
-            pydantic.ByteSize, json_dict["MemUsage"].split("/")[0]
-        )
-        self.memory_limit: int = pydantic.parse_obj_as(
-            pydantic.ByteSize, json_dict["MemUsage"].split("/")[1]
-        )
-        self.container_name: str = json_dict["Name"]
-        self.net_upload: int = pydantic.parse_obj_as(
-            pydantic.ByteSize, json_dict["NetIO"].split("/")[0]
-        )
-        self.net_download: int = pydantic.parse_obj_as(
-            pydantic.ByteSize, json_dict["NetIO"].split("/")[1]
-        )
-
-    def __repr__(self):
-        attr = ", ".join(f"{key}={value}" for key, value in self.__dict__.items())
-        return f"<{self.__class__} object, attributes are {attr}>"
+ContainerPath = Tuple[
+    Union[python_on_whales.components.container.docker_object.Container, str], ValidPath
+]
+ValidPortMapping = Union[
+    Tuple[Union[str, int], Union[str, int]],
+    Tuple[Union[str, int], Union[str, int], str],
+]
 
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:

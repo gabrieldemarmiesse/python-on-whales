@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, Iterator, List, Optional, Union
 
 import python_on_whales.components.container
+import python_on_whales.components.container.models
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import ClientConfig, ReloadableObjectFromJson
 from python_on_whales.components.image.models import (
@@ -65,7 +66,9 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().container
 
     @property
-    def container_config(self) -> python_on_whales.components.container.ContainerConfig:
+    def container_config(
+        self,
+    ) -> python_on_whales.components.container.models.ContainerConfig:
         return self._get_inspect_result().container_config
 
     @property
@@ -77,7 +80,7 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().author
 
     @property
-    def config(self) -> python_on_whales.components.container.ContainerConfig:
+    def config(self) -> python_on_whales.components.container.models.ContainerConfig:
         return self._get_inspect_result().config
 
     @property

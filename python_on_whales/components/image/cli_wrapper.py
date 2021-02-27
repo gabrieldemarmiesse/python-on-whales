@@ -5,6 +5,7 @@ from subprocess import PIPE, Popen
 from typing import Dict, Iterator, List, Optional, Union, overload
 
 import python_on_whales.components.buildx
+import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.image.docker_object import Image, ValidImage
 from python_on_whales.utils import (
@@ -305,7 +306,7 @@ class ImageCLI(DockerCLICaller):
     def copy_from(
         self, image: ValidImage, path_in_image: ValidPath, destination: ValidPath
     ):
-        with python_on_whales.components.container.ContainerCLI(
+        with python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
         ).create(image) as tmp_container:
             tmp_container.copy_from(path_in_image, destination)
@@ -317,7 +318,7 @@ class ImageCLI(DockerCLICaller):
         path_in_image: ValidPath,
         new_tag: Optional[str] = None,
     ) -> Image:
-        with python_on_whales.components.container.ContainerCLI(
+        with python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
         ).create(base_image) as tmp_container:
             tmp_container.copy_to(local_path, path_in_image)

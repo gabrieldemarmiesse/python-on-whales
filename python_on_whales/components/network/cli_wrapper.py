@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Union, overload
 
 import python_on_whales.components.container
+import python_on_whales.components.container.docker_object
 import python_on_whales.components.network.docker_object
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import format_dict_for_cli, run, to_list
@@ -12,12 +13,14 @@ class NetworkCLI(DockerCLICaller):
     def connect(
         self,
         network: python_on_whales.components.network.docker_object.ValidNetwork,
-        container: python_on_whales.components.container.ValidContainer,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
         alias: Optional[str] = None,
         driver_options: List[str] = [],
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
-        links: List[python_on_whales.components.container.ValidContainer] = [],
+        links: List[
+            python_on_whales.components.container.docker_object.ValidContainer
+        ] = [],
     ) -> None:
         full_cmd = self.docker_cmd + ["network", "connect"]
         full_cmd.add_simple_arg("--alias", alias)
@@ -59,7 +62,7 @@ class NetworkCLI(DockerCLICaller):
     def disconnect(
         self,
         network: python_on_whales.components.network.docker_object.ValidNetwork,
-        container: python_on_whales.components.container.ValidContainer,
+        container: python_on_whales.components.container.docker_object.ValidContainer,
         force: bool = False,
     ):
         full_cmd = self.docker_cmd + ["network", "disconnet"]

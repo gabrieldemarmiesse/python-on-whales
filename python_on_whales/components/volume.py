@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union, overload
 
 import python_on_whales.components.buildx
 import python_on_whales.components.container
+import python_on_whales.components.container.cli_wrapper
 import python_on_whales.components.image
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
@@ -257,7 +258,7 @@ class VolumeCLI(DockerCLICaller):
                 temp_dir, tags=image_name, progress=False, load=True
             )
 
-        container = python_on_whales.components.container.ContainerCLI(
+        container = python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
         )
         volume_in_container = Path("/volume")
