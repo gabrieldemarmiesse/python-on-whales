@@ -12,6 +12,7 @@ import python_on_whales.components.image
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.image.docker_object
 import python_on_whales.components.network
+import python_on_whales.components.network.docker_object
 import python_on_whales.components.volume
 from python_on_whales.client_config import (
     ClientConfig,
@@ -764,7 +765,9 @@ class ContainerCLI(DockerCLICaller):
         memory_swappiness: Optional[int] = None,
         mounts: List[List[str]] = [],
         name: Optional[str] = None,
-        networks: List[python_on_whales.components.network.ValidNetwork] = [],
+        networks: List[
+            python_on_whales.components.network.docker_object.ValidNetwork
+        ] = [],
         network_aliases: List[str] = [],
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
@@ -1291,7 +1294,9 @@ class ContainerCLI(DockerCLICaller):
         memory_swappiness: Optional[int] = None,
         mounts: List[List[str]] = [],
         name: Optional[str] = None,
-        networks: List[python_on_whales.components.network.ValidNetwork] = [],
+        networks: List[
+            python_on_whales.components.network.docker_object.ValidNetwork
+        ] = [],
         network_aliases: List[str] = [],
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
