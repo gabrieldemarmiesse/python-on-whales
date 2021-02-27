@@ -2,7 +2,7 @@ from pathlib import Path
 from subprocess import PIPE, Popen
 from typing import Dict, Iterator, List, Optional, Union, overload
 
-import python_on_whales.components
+import python_on_whales.components.buildx
 from python_on_whales import DockerException
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.image.docker_object import Image, ValidImage
