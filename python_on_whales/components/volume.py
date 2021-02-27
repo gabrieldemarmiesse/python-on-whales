@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union, overload
 import python_on_whales.components.buildx
 import python_on_whales.components.container
 import python_on_whales.components.image
+import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -282,9 +283,9 @@ class VolumeCLI(DockerCLICaller):
         else:
             raise ValueError("source or destination should be a tuple.")
         dummy_container.remove()
-        python_on_whales.components.image.ImageCLI(self.client_config).remove(
-            image_name
-        )
+        python_on_whales.components.image.cli_wrapper.ImageCLI(
+            self.client_config
+        ).remove(image_name)
 
 
 VolumeDefinition = Union[

@@ -9,6 +9,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 import pydantic
 
 import python_on_whales.components.image
+import python_on_whales.components.image.cli_wrapper
+import python_on_whales.components.image.docker_object
 import python_on_whales.components.network
 import python_on_whales.components.volume
 from python_on_whales.client_config import (
@@ -472,7 +474,7 @@ class Container(ReloadableObjectFromJson):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ) -> python_on_whales.components.image.Image:
+    ) -> python_on_whales.components.image.docker_object.Image:
         """Create a new image from the container's changes.
 
         Alias: `docker.commit(...)`
@@ -622,7 +624,7 @@ class ContainerCLI(DockerCLICaller):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ) -> python_on_whales.components.image.Image:
+    ) -> python_on_whales.components.image.docker_object.Image:
         """Create a new image from a container's changes
 
         # Arguments
@@ -647,7 +649,7 @@ class ContainerCLI(DockerCLICaller):
         if tag is not None:
             full_cmd.append(tag)
 
-        return python_on_whales.components.image.Image(
+        return python_on_whales.components.image.docker_object.Image(
             self.client_config, run(full_cmd), is_immutable_id=True
         )
 
@@ -810,7 +812,7 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
-        python_on_whales.components.image.ImageCLI(
+        python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )._pull_if_necessary(image)
         full_cmd = self.docker_cmd + ["create"]
@@ -1227,7 +1229,7 @@ class ContainerCLI(DockerCLICaller):
 
     def run(
         self,
-        image: python_on_whales.components.image.ValidImage,
+        image: python_on_whales.components.image.docker_object.ValidImage,
         command: List[str] = [],
         *,
         add_hosts: List[Tuple[str, str]] = [],
@@ -1468,7 +1470,7 @@ class ContainerCLI(DockerCLICaller):
             and a `python_on_whales.Container` if detach is `True`.
         """
 
-        python_on_whales.components.image.ImageCLI(
+        python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )._pull_if_necessary(image)
 
