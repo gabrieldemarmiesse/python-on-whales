@@ -4,7 +4,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
 
-import python_on_whales.components
+import python_on_whales.components.image.docker_object
 from python_on_whales.client_config import ClientConfig, ReloadableObjectFromJson
 from python_on_whales.components.container.cli_wrapper import ContainerCLI
 from python_on_whales.components.container.models import (
