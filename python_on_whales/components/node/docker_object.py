@@ -3,9 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
-import python_on_whales.components
+import python_on_whales.components.task
 from python_on_whales.client_config import ClientConfig, ReloadableObjectFromJson
-from python_on_whales.components.node import (
+from python_on_whales.components.node.cli_wrapper import NodeCLI
+from python_on_whales.components.node.models import (
     NodeDescription,
     NodeInspectResult,
     NodeManagerStatus,
@@ -13,7 +14,6 @@ from python_on_whales.components.node import (
     NodeStatus,
     NodeVersion,
 )
-from python_on_whales.components.node.cli_wrapper import NodeCLI
 from python_on_whales.utils import run
 
 

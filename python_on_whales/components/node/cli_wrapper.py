@@ -2,14 +2,20 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Union, overload
 
-import python_on_whales.components
+import python_on_whales.components.node.docker_object
+import python_on_whales.components.task
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.node import Node, ValidNode
 from python_on_whales.utils import run, to_list
 
 
 class NodeCLI(DockerCLICaller):
-    def demote(self, x: Union[ValidNode, List[ValidNode]]):
+    def demote(
+        self,
+        x: Union[
+            python_on_whales.components.node.docker_object.ValidNode,
+            List[python_on_whales.components.node.docker_object.ValidNode],
+        ],
+    ):
         """Demote one or more nodes from manager in the swarm
 
         # Arguments
@@ -20,14 +26,21 @@ class NodeCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Node:
+    def inspect(self, x: str) -> python_on_whales.components.node.docker_object.Node:
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Node]:
+    def inspect(
+        self, x: List[str]
+    ) -> List[python_on_whales.components.node.docker_object.Node]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Node, List[Node]]:
+    def inspect(
+        self, x: Union[str, List[str]]
+    ) -> Union[
+        python_on_whales.components.node.docker_object.Node,
+        List[python_on_whales.components.node.docker_object.Node],
+    ]:
         """Returns a `python_on_whales.Node` object from a string
         (id or hostname of the node)
 
@@ -38,11 +51,18 @@ class NodeCLI(DockerCLICaller):
             One or a list of `python_on_whales.Node`
         """
         if isinstance(x, str):
-            return Node(self.client_config, x)
+            return python_on_whales.components.node.docker_object.Node(
+                self.client_config, x
+            )
         else:
-            return [Node(self.client_config, reference) for reference in x]
+            return [
+                python_on_whales.components.node.docker_object.Node(
+                    self.client_config, reference
+                )
+                for reference in x
+            ]
 
-    def list(self) -> List[Node]:
+    def list(self) -> List[python_on_whales.components.node.docker_object.Node]:
         """Returns the list of nodes in this swarm.
 
         # Returns
@@ -50,9 +70,20 @@ class NodeCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["node", "list", "--quiet"]
         all_ids = run(full_cmd).splitlines()
-        return [Node(self.client_config, x, is_immutable_id=True) for x in all_ids]
+        return [
+            python_on_whales.components.node.docker_object.Node(
+                self.client_config, x, is_immutable_id=True
+            )
+            for x in all_ids
+        ]
 
-    def promote(self, x: Union[ValidNode, List[ValidNode]]):
+    def promote(
+        self,
+        x: Union[
+            python_on_whales.components.node.docker_object.ValidNode,
+            List[python_on_whales.components.node.docker_object.ValidNode],
+        ],
+    ):
         """Promote one or more nodes to manager in the swarm
 
         # Arguments
@@ -63,7 +94,11 @@ class NodeCLI(DockerCLICaller):
         run(full_cmd)
 
     def ps(
-        self, x: Union[ValidNode, List[ValidNode]] = []
+        self,
+        x: Union[
+            python_on_whales.components.node.docker_object.ValidNode,
+            List[python_on_whales.components.node.docker_object.ValidNode],
+        ] = [],
     ) -> List[python_on_whales.components.task.Task]:
         """Returns the list of swarm tasks running on one or more nodes.
 
@@ -93,7 +128,14 @@ class NodeCLI(DockerCLICaller):
             for id_ in ids
         ]
 
-    def remove(self, x: Union[ValidNode, List[ValidNode]], force: bool = False):
+    def remove(
+        self,
+        x: Union[
+            python_on_whales.components.node.docker_object.ValidNode,
+            List[python_on_whales.components.node.docker_object.ValidNode],
+        ],
+        force: bool = False,
+    ):
         """Remove one or more nodes from the swarm
 
         # Arguments
@@ -108,7 +150,7 @@ class NodeCLI(DockerCLICaller):
 
     def update(
         self,
-        node: ValidNode,
+        node: python_on_whales.components.node.docker_object.ValidNode,
         availability: Optional[str] = None,
         labels_add: Dict[str, str] = {},
         rm_labels: List[str] = [],

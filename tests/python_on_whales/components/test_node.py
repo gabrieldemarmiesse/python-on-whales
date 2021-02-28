@@ -1,7 +1,7 @@
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.node import NodeInspectResult
+from python_on_whales.components.node.models import NodeInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 

@@ -4,7 +4,7 @@ from .components.container.docker_object import Container, ContainerStats
 from .components.context import Context
 from .components.image.docker_object import Image
 from .components.network.docker_object import Network
-from .components.node import Node
+from .components.node.docker_object import Node
 from .components.plugin import Plugin
 from .components.service import Service
 from .components.stack import Stack

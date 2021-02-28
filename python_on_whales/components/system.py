@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 import pydantic
 
 import python_on_whales.components.node
+import python_on_whales.components.node.models
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import DockerCamelModel, run
 
@@ -129,11 +130,11 @@ class SwarmSpec(DockerCamelModel):
 
 class ClusterInfo(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
-    version: python_on_whales.components.node.NodeVersion
+    version: python_on_whales.components.node.models.NodeVersion
     created_at: datetime
     updated_at: datetime
     spec: SwarmSpec
-    tls_info: python_on_whales.components.node.NodeTLSInfo
+    tls_info: python_on_whales.components.node.models.NodeTLSInfo
     root_rotation_in_progress: bool
     data_path_port: int
     default_addr_pool: List[str]
@@ -208,7 +209,7 @@ class SystemInfo(DockerCamelModel):
     index_server_address: str
     registry_config: Dict[str, Any]
     generic_resources: Optional[
-        List[python_on_whales.components.node.NodeGenericResource]
+        List[python_on_whales.components.node.models.NodeGenericResource]
     ]
     http_proxy: str
     https_proxy: str

@@ -12,7 +12,7 @@ from python_on_whales.components.context import ContextCLI
 from python_on_whales.components.image.cli_wrapper import ImageCLI
 from python_on_whales.components.manifest import ManifestCLI
 from python_on_whales.components.network.cli_wrapper import NetworkCLI
-from python_on_whales.components.node import NodeCLI
+from python_on_whales.components.node.cli_wrapper import NodeCLI
 from python_on_whales.components.plugin import PluginCLI
 from python_on_whales.components.secret import SecretCLI
 from python_on_whales.components.service import ServiceCLI
