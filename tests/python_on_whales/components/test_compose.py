@@ -30,6 +30,10 @@ def test_docker_compose_up_down():
     docker.compose.up(["busybox", "alpine"])
 
 
+def test_no_containers():
+    assert docker.compose.ps() == []
+
+
 def test_docker_compose_up_detach_down():
     docker.compose.up(detach=True)
     docker.compose.down()

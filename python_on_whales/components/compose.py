@@ -71,7 +71,7 @@ class ComposeCLI(DockerCLICaller):
         ids = result.splitlines()
         # The first line might be a warning for experimental
         # See https://github.com/docker/compose-cli/issues/1108
-        if "experimental" in ids[0]:
+        if len(ids) > 0 and "experimental" in ids[0]:
             ids.pop(0)
 
         Container = python_on_whales.components.container.Container
