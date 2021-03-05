@@ -23,7 +23,7 @@ RUN black --check ./
 
 #-----------------------------------------------------------------------------
 FROM python_dependencies as tests_with_binaries
-COPY --from=docker:19.03 /usr/local/bin/docker /usr/bin/
+COPY --from=docker:20.10 /usr/local/bin/docker /usr/bin/
 COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/
 RUN curl -L https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
 WORKDIR /python-on-whales
