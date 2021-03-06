@@ -12,8 +12,12 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
+from python_on_whales.components.image.models import (
+    ImageGraphDriver,
+    ImageInspectResult,
+    ImageRootFS,
+)
 from python_on_whales.utils import (
-    DockerCamelModel,
     DockerException,
     ValidPath,
     format_dict_for_cli,
@@ -21,47 +25,6 @@ from python_on_whales.utils import (
     stream_stdout_and_stderr,
     to_list,
 )
-
-
-class ImageHealthcheck(DockerCamelModel):
-    test: List[str]
-    interval: int
-    timeout: int
-    retries: int
-    start_period: int
-
-
-class ImageGraphDriver(DockerCamelModel):
-    name: str
-    data: Any
-
-
-class ImageRootFS(DockerCamelModel):
-    type: str
-    layers: List[str]
-    base_layer: Optional[str]
-
-
-class ImageInspectResult(DockerCamelModel):
-    id: str
-    repo_tags: List[str]
-    repo_digests: List[str]
-    parent: str
-    comment: str
-    created: datetime
-    container: str
-    container_config: python_on_whales.components.container.ContainerConfig
-    docker_version: str
-    author: str
-    config: python_on_whales.components.container.ContainerConfig
-    architecture: str
-    os: str
-    os_version: Optional[str]
-    size: int
-    virtual_size: int
-    graph_driver: ImageGraphDriver
-    root_fs: ImageRootFS
-    metadata: Optional[Dict[str, str]]
 
 
 class Image(ReloadableObjectFromJson):
