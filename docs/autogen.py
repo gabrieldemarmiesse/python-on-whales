@@ -24,7 +24,9 @@ pages = {
     "sub-commands/context.md": get_methods(
         "python_on_whales.components.context.ContextCLI"
     ),
-    "sub-commands/image.md": get_methods("python_on_whales.components.image.ImageCLI"),
+    "sub-commands/image.md": get_methods(
+        "python_on_whales.components.image.cli_wrapper.ImageCLI"
+    ),
     "sub-commands/manifest.md": get_methods(
         "python_on_whales.components.manifest.ManifestCLI"
     ),

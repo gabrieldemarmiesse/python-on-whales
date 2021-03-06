@@ -214,7 +214,7 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-    ) -> Optional[python_on_whales.components.image.Image]:
+    ) -> Optional[python_on_whales.components.image.cli_wrapper.Image]:
         """Build a Docker image with builkit as backend.
 
         Alias: `docker.build(...)`
@@ -326,7 +326,9 @@ class BuildxCLI(DockerCLICaller):
             run(full_cmd, capture_stderr=progress is False)
             return
 
-        docker_image = python_on_whales.components.image.ImageCLI(self.client_config)
+        docker_image = python_on_whales.components.image.cli_wrapper.ImageCLI(
+            self.client_config
+        )
         if self._method_to_get_image(builder) == GetImageMethod.TAG:
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)

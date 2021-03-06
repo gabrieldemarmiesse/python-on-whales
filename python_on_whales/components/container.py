@@ -472,7 +472,7 @@ class Container(ReloadableObjectFromJson):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ) -> python_on_whales.components.image.Image:
+    ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Create a new image from the container's changes.
 
         Alias: `docker.commit(...)`
@@ -622,7 +622,7 @@ class ContainerCLI(DockerCLICaller):
         author: Optional[str] = None,
         message: Optional[str] = None,
         pause: bool = True,
-    ) -> python_on_whales.components.image.Image:
+    ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Create a new image from a container's changes
 
         # Arguments
@@ -647,7 +647,7 @@ class ContainerCLI(DockerCLICaller):
         if tag is not None:
             full_cmd.append(tag)
 
-        return python_on_whales.components.image.Image(
+        return python_on_whales.components.image.cli_wrapper.Image(
             self.client_config, run(full_cmd), is_immutable_id=True
         )
 
@@ -810,7 +810,7 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
-        python_on_whales.components.image.ImageCLI(
+        python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )._pull_if_necessary(image)
         full_cmd = self.docker_cmd + ["create"]
@@ -1468,7 +1468,7 @@ class ContainerCLI(DockerCLICaller):
             and a `python_on_whales.Container` if detach is `True`.
         """
 
-        python_on_whales.components.image.ImageCLI(
+        python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )._pull_if_necessary(image)
 
