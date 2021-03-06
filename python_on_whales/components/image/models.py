@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import python_on_whales.components
+import python_on_whales.components.container
 from python_on_whales.utils import DockerCamelModel
 
 
