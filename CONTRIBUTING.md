@@ -27,6 +27,62 @@ cd ./docs/
 python autogen.py && mkdocs generate
 ```
 
-### Open your browser
+#### Open your browser
 
 http://localhost:8000
+
+
+## Running the tests
+
+Install all dependencies and install python-on-whales in editable mode:
+```
+pip install -r requirements.txt -r tests/test-requirements.txt
+pip install -e ./
+```
+
+Then:
+
+```bash
+pytest -v ./tests/
+```
+
+
+## Exploring the codebase
+
+The sources are in the `python_on_whales` directory. Everytime a class has something to 
+do with the Docker daemon, a `client_config` attribute is there and must be passed around.
+
+This `client_config` tells the Docker CLI how to connect to the daemon. 
+You can think of it of the collection of all the arguments that are at the start of the CLI.
+For example `docker -H ssh://my_user@my_ip ...`.
+
+Each sub-component of the CLI is in a separate directory. 
+
+#### Component structure
+
+The structure is the following for calling `docker image ...`.
+
+`ImageCLI` is in charge of calling the `docker image` commande. This class appears when you call
+```python
+from python_on_whales import docker
+print(docker.image)
+```
+`ImageCLI` is in `python_on_whales/components/image/cli_wrapper.py`.
+
+`Image` is in charge of holding all the metadata of a Docker image and has all 
+the attributes that you could find by doing `docker image inspect ...`.
+
+It has some methods for convenience. For example:
+
+```python
+from python_on_whales import docker
+
+my_ubuntu = docker.pull("ubuntu")
+
+my_ubuntu.remove()
+# is the same as
+docker.image.remove(my_ubuntu)
+```
+
+Since `Image` has all the information you can find with `docker image inspect ...`, we need 
+to parse the json output. All parsing models are found in `python_on_whales/components/image/models.py`.
