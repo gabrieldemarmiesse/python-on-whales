@@ -4,7 +4,7 @@ from typing import List
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.plugin import PluginInspectResult
+from python_on_whales.components.plugin.models import PluginInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 test_plugin_name = "vieux/sshfs:latest"

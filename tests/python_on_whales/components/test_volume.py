@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.volume import VolumeInspectResult
+from python_on_whales.components.volume.models import VolumeInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 

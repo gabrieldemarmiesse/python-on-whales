@@ -10,48 +10,58 @@ pages = {
     + get_methods("python_on_whales.docker_client.DockerClient"),
     "sub-commands/app.md": get_methods("python_on_whales.components.app.AppCLI"),
     "sub-commands/buildx.md": get_methods(
-        "python_on_whales.components.buildx.BuildxCLI"
+        "python_on_whales.components.buildx.cli_wrapper.BuildxCLI"
     ),
     "sub-commands/compose.md": get_methods(
-        "python_on_whales.components.compose.ComposeCLI"
+        "python_on_whales.components.compose.cli_wrapper.ComposeCLI"
     ),
     "sub-commands/config.md": get_methods(
-        "python_on_whales.components.config.ConfigCLI"
+        "python_on_whales.components.config.cli_wrapper.ConfigCLI"
     ),
     "sub-commands/container.md": get_methods(
-        "python_on_whales.components.container.ContainerCLI"
+        "python_on_whales.components.container.cli_wrapper.ContainerCLI"
     ),
     "sub-commands/context.md": get_methods(
-        "python_on_whales.components.context.ContextCLI"
+        "python_on_whales.components.context.cli_wrapper.ContextCLI"
     ),
     "sub-commands/image.md": get_methods(
         "python_on_whales.components.image.cli_wrapper.ImageCLI"
     ),
     "sub-commands/manifest.md": get_methods(
-        "python_on_whales.components.manifest.ManifestCLI"
+        "python_on_whales.components.manifest.cli_wrapper.ManifestCLI"
     ),
     "sub-commands/network.md": get_methods(
-        "python_on_whales.components.network.NetworkCLI"
+        "python_on_whales.components.network.cli_wrapper.NetworkCLI"
     ),
-    "sub-commands/node.md": get_methods("python_on_whales.components.node.NodeCLI"),
+    "sub-commands/node.md": get_methods(
+        "python_on_whales.components.node.cli_wrapper.NodeCLI"
+    ),
     "sub-commands/plugin.md": get_methods(
-        "python_on_whales.components.plugin.PluginCLI"
+        "python_on_whales.components.plugin.cli_wrapper.PluginCLI"
     ),
     "sub-commands/secret.md": get_methods(
-        "python_on_whales.components.secret.SecretCLI"
+        "python_on_whales.components.secret.cli_wrapper.SecretCLI"
     ),
     "sub-commands/service.md": get_methods(
-        "python_on_whales.components.service.ServiceCLI"
+        "python_on_whales.components.service.cli_wrapper.ServiceCLI"
     ),
-    "sub-commands/stack.md": get_methods("python_on_whales.components.stack.StackCLI"),
-    "sub-commands/swarm.md": get_methods("python_on_whales.components.swarm.SwarmCLI"),
+    "sub-commands/stack.md": get_methods(
+        "python_on_whales.components.stack.cli_wrapper.StackCLI"
+    ),
+    "sub-commands/swarm.md": get_methods(
+        "python_on_whales.components.swarm.cli_wrapper.SwarmCLI"
+    ),
     "sub-commands/system.md": get_methods(
-        "python_on_whales.components.system.SystemCLI"
+        "python_on_whales.components.system.cli_wrapper.SystemCLI"
     ),
-    "sub-commands/task.md": get_methods("python_on_whales.components.task.TaskCLI"),
-    "sub-commands/trust.md": get_methods("python_on_whales.components.trust.TrustCLI"),
+    "sub-commands/task.md": get_methods(
+        "python_on_whales.components.task.cli_wrapper.TaskCLI"
+    ),
+    "sub-commands/trust.md": get_methods(
+        "python_on_whales.components.trust.cli_wrapper.TrustCLI"
+    ),
     "sub-commands/volume.md": get_methods(
-        "python_on_whales.components.volume.VolumeCLI"
+        "python_on_whales.components.volume.cli_wrapper.VolumeCLI"
     ),
     "docker_objects/builders.md": get_methods("python_on_whales.Builder"),
     "docker_objects/containers.md": get_methods("python_on_whales.Container"),

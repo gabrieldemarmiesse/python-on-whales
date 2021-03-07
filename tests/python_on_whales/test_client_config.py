@@ -24,7 +24,7 @@ fake_json_message = """
 
 def test_pretty_exception_message_and_report(mocker):
     mocker.patch(
-        "python_on_whales.components.volume.Volume._fetch_inspect_result_json",
+        "python_on_whales.components.volume.cli_wrapper.Volume._fetch_inspect_result_json",
         lambda x, y: fake_json_message,
     )
     with pytest.raises(ParsingError) as err:

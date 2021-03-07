@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import python_on_whales.components.container
+import python_on_whales.components.container.models
 from python_on_whales.utils import DockerCamelModel
 
 
@@ -32,10 +32,10 @@ class ImageInspectResult(DockerCamelModel):
     comment: str
     created: datetime
     container: str
-    container_config: python_on_whales.components.container.ContainerConfig
+    container_config: python_on_whales.components.container.models.ContainerConfig
     docker_version: str
     author: str
-    config: python_on_whales.components.container.ContainerConfig
+    config: python_on_whales.components.container.models.ContainerConfig
     architecture: str
     os: str
     os_version: Optional[str]

@@ -3,25 +3,25 @@ import os
 from typing import List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
-from python_on_whales.components.app import AppCLI
-from python_on_whales.components.buildx import BuildxCLI
-from python_on_whales.components.compose import ComposeCLI
-from python_on_whales.components.config import ConfigCLI
-from python_on_whales.components.container import ContainerCLI
-from python_on_whales.components.context import ContextCLI
+from python_on_whales.components.app.cli_wrapper import AppCLI
+from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
+from python_on_whales.components.compose.cli_wrapper import ComposeCLI
+from python_on_whales.components.config.cli_wrapper import ConfigCLI
+from python_on_whales.components.container.cli_wrapper import ContainerCLI
+from python_on_whales.components.context.cli_wrapper import ContextCLI
 from python_on_whales.components.image.cli_wrapper import ImageCLI
-from python_on_whales.components.manifest import ManifestCLI
-from python_on_whales.components.network import NetworkCLI
-from python_on_whales.components.node import NodeCLI
-from python_on_whales.components.plugin import PluginCLI
-from python_on_whales.components.secret import SecretCLI
-from python_on_whales.components.service import ServiceCLI
-from python_on_whales.components.stack import StackCLI
-from python_on_whales.components.swarm import SwarmCLI
-from python_on_whales.components.system import SystemCLI
-from python_on_whales.components.task import TaskCLI
-from python_on_whales.components.trust import TrustCLI
-from python_on_whales.components.volume import VolumeCLI
+from python_on_whales.components.manifest.cli_wrapper import ManifestCLI
+from python_on_whales.components.network.cli_wrapper import NetworkCLI
+from python_on_whales.components.node.cli_wrapper import NodeCLI
+from python_on_whales.components.plugin.cli_wrapper import PluginCLI
+from python_on_whales.components.secret.cli_wrapper import SecretCLI
+from python_on_whales.components.service.cli_wrapper import ServiceCLI
+from python_on_whales.components.stack.cli_wrapper import StackCLI
+from python_on_whales.components.swarm.cli_wrapper import SwarmCLI
+from python_on_whales.components.system.cli_wrapper import SystemCLI
+from python_on_whales.components.task.cli_wrapper import TaskCLI
+from python_on_whales.components.trust.cli_wrapper import TrustCLI
+from python_on_whales.components.volume.cli_wrapper import VolumeCLI
 
 from .utils import ValidPath, run
 
