@@ -1,7 +1,7 @@
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.task import TaskInspectResult
+from python_on_whales.components.task.models import TaskInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 

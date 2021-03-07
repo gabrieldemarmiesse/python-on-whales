@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
@@ -6,13 +5,8 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import (
-    DockerCamelModel,
-    ValidPath,
-    format_dict_for_cli,
-    run,
-    to_list,
-)
+from python_on_whales.components.secret.models import SecretInspectResult
+from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 
 class Secret(ReloadableObjectFromJson):

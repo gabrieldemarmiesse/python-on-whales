@@ -1,3 +1,10 @@
+from typing import Dict
+
+import pydantic
+
+from python_on_whales.utils import DockerCamelModel
+
+
 class ContextEndpoint(DockerCamelModel):
     host: str
     skip_tls_verify: bool = pydantic.Field(alias="SkipTLSVerify")

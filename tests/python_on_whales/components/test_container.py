@@ -9,7 +9,7 @@ import pytest
 
 import python_on_whales
 from python_on_whales import DockerException, Image, docker
-from python_on_whales.components.container import (
+from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
     ContainerStats,

@@ -1,3 +1,8 @@
+from typing import List
+
+from docker_cli_wrapper.utils import DockerCamelModel
+
+
 class PluginMount(DockerCamelModel):
     pass
 

@@ -3,16 +3,20 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
-from pydantic import Field
-
-import python_on_whales
-import python_on_whales.components.task
+import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, run, to_list
+from python_on_whales.components.service.models import (
+    ServiceEndpoint,
+    ServiceInspectResult,
+    ServiceSpec,
+    ServiceUpdateStatus,
+    ServiceVersion,
+)
+from python_on_whales.utils import run, to_list
 
 
 class Service(ReloadableObjectFromJson):
@@ -69,7 +73,7 @@ class Service(ReloadableObjectFromJson):
     def update_status(self) -> Optional[ServiceUpdateStatus]:
         return self._get_inspect_result().update_status
 
-    def ps(self) -> List[python_on_whales.components.task.Task]:
+    def ps(self) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of tasks of this service."""
         return ServiceCLI(self.client_config).ps(self)
 
@@ -186,7 +190,7 @@ class ServiceCLI(DockerCLICaller):
 
     def ps(
         self, x: Union[ValidService, List[ValidService]]
-    ) -> List[python_on_whales.components.task.Task]:
+    ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks associated with this service.
 
         You can pass multiple services at once at this function.
@@ -210,7 +214,7 @@ class ServiceCLI(DockerCLICaller):
         )
         ids = run(full_cmd).splitlines()
         return [
-            python_on_whales.components.task.Task(
+            python_on_whales.components.task.cli_wrapper.Task(
                 self.client_config, id_, is_immutable_id=True
             )
             for id_ in ids

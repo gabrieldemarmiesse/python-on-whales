@@ -14,8 +14,9 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
+from python_on_whales.components.volume.models import VolumeInspectResult
 from python_on_whales.test_utils import random_name
-from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
+from python_on_whales.utils import ValidPath, run, to_list
 
 
 class Volume(ReloadableObjectFromJson):
@@ -239,13 +240,15 @@ class VolumeCLI(DockerCLICaller):
             temp_dir = Path(temp_dir)
             content = "FROM scratch\nCOPY Dockerfile /\nCMD /Dockerfile"
             (temp_dir / "Dockerfile").write_text(content)
-            buildx = python_on_whales.components.buildx.BuildxCLI(self.client_config)
+            buildx = python_on_whales.components.buildx.cli_wrapper.BuildxCLI(
+                self.client_config
+            )
             image_name = random_name()
             dummy_image = buildx.build(
                 temp_dir, tags=image_name, progress=False, load=True
             )
 
-        container = python_on_whales.components.container.ContainerCLI(
+        container = python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
         )
         volume_in_container = Path("/volume")

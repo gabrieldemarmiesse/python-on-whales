@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
-import python_on_whales.components.task
+import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -84,7 +84,7 @@ class Node(ReloadableObjectFromJson):
             self, availability, labels_add, rm_labels, role
         )
 
-    def ps(self) -> List[python_on_whales.components.task.Task]:
+    def ps(self) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of tasks running on this node
 
         # Returns
@@ -153,7 +153,7 @@ class NodeCLI(DockerCLICaller):
 
     def ps(
         self, x: Union[ValidNode, List[ValidNode]] = []
-    ) -> List[python_on_whales.components.task.Task]:
+    ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks running on one or more nodes.
 
         ```python
@@ -176,7 +176,7 @@ class NodeCLI(DockerCLICaller):
         )
         ids = run(full_cmd).splitlines()
         return [
-            python_on_whales.components.task.Task(
+            python_on_whales.components.task.cli_wrapper.Task(
                 self.client_config, id_, is_immutable_id=True
             )
             for id_ in ids

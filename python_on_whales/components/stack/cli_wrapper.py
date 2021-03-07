@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-import python_on_whales.components.service
-import python_on_whales.components.task
+import python_on_whales.components.service.cli_wrapper
+import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import ValidPath, read_env_files, run, to_list
 
@@ -24,10 +24,10 @@ class Stack:
     def remove(self) -> None:
         StackCLI(self.client_config).remove(self)
 
-    def ps(self) -> List[python_on_whales.components.task.Task]:
+    def ps(self) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         return StackCLI(self.client_config).ps(self)
 
-    def services(self) -> List[python_on_whales.components.service.Service]:
+    def services(self) -> List[python_on_whales.components.service.cli_wrapper.Service]:
         return StackCLI(self.client_config).services(self)
 
 
@@ -98,7 +98,9 @@ class StackCLI(DockerCLICaller):
         stacks_names = run(full_cmd).splitlines()
         return [Stack(self.client_config, name) for name in stacks_names]
 
-    def ps(self, x: ValidStack) -> List[python_on_whales.components.task.Task]:
+    def ps(
+        self, x: ValidStack
+    ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks in this stack.
 
         ```python
@@ -119,7 +121,7 @@ class StackCLI(DockerCLICaller):
 
         ids = run(full_cmd).splitlines()
         return [
-            python_on_whales.components.task.Task(
+            python_on_whales.components.task.cli_wrapper.Task(
                 self.client_config, id_, is_immutable_id=True
             )
             for id_ in ids
@@ -137,7 +139,7 @@ class StackCLI(DockerCLICaller):
 
     def services(
         self, stack: ValidStack
-    ) -> List[python_on_whales.components.service.Service]:
+    ) -> List[python_on_whales.components.service.cli_wrapper.Service]:
         """List the services present in the stack.
 
         # Arguments
@@ -149,6 +151,8 @@ class StackCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["stack", "services", "--quiet", stack]
         ids = run(full_cmd).splitlines()
         return [
-            python_on_whales.components.service.Service(self.client_config, id_)
+            python_on_whales.components.service.cli_wrapper.Service(
+                self.client_config, id_
+            )
             for id_ in ids
         ]

@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union, overload
 
-import pydantic
-
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, run, to_list
+from python_on_whales.components.context.models import (
+    ContextEndpoint,
+    ContextInspectResult,
+    ContextStorage,
+)
+from python_on_whales.utils import run, to_list
 
 
 class Context(ReloadableObjectFromJson):

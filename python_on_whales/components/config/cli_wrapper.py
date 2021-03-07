@@ -4,14 +4,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, overload
 
-import pydantic
-
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, format_dict_for_cli, run, to_list
+from python_on_whales.components.config.models import (
+    ConfigInspectResult,
+    ConfigSpec,
+    DockerObjectVersion,
+)
+from python_on_whales.utils import format_dict_for_cli, run, to_list
 
 
 class Config(ReloadableObjectFromJson):

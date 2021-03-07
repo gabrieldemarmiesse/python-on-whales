@@ -1,7 +1,7 @@
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.context import ContextInspectResult
+from python_on_whales.components.context.models import ContextInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 

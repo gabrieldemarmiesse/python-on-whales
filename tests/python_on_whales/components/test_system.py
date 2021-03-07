@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.system import DockerEvent, SystemInfo
+from python_on_whales.components.system.models import DockerEvent, SystemInfo
 from python_on_whales.test_utils import get_all_jsons
 
 

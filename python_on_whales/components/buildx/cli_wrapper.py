@@ -3,17 +3,17 @@ from __future__ import annotations
 import json
 import os
 import tempfile
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import python_on_whales.components.image
+import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObject,
 )
+from python_on_whales.components.buildx.models import BuilderInspectResult
 from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 

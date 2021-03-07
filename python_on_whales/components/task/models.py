@@ -1,3 +1,11 @@
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import pydantic
+
+from python_on_whales.utils import DockerCamelModel
+
+
 class ObjectVersion(DockerCamelModel):
     index: int
 

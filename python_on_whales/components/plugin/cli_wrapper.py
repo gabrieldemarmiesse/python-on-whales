@@ -7,7 +7,12 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, ValidPath, run, to_list
+from python_on_whales.components.plugin.models import (
+    PluginConfig,
+    PluginInspectResult,
+    PluginSettings,
+)
+from python_on_whales.utils import ValidPath, run, to_list
 
 
 class Plugin(ReloadableObjectFromJson):

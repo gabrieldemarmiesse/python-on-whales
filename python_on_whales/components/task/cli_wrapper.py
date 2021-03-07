@@ -3,15 +3,20 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
-import pydantic
-
-import python_on_whales.components.service
+import python_on_whales.components.service.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, run
+from python_on_whales.components.task.models import (
+    AssignedGenericResources,
+    ObjectVersion,
+    TaskInspectResult,
+    TaskSpec,
+    TaskStatus,
+)
+from python_on_whales.utils import run
 
 
 class Task(ReloadableObjectFromJson):
@@ -90,7 +95,9 @@ class TaskCLI(DockerCLICaller):
         # Returns
             `List[python_on_whales.Task]`
         """
-        service_cli = python_on_whales.components.service.ServiceCLI(self.client_config)
+        service_cli = python_on_whales.components.service.cli_wrapper.ServiceCLI(
+            self.client_config
+        )
         return service_cli.ps(service_cli.list())
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Task, List[Task]]:

@@ -3,7 +3,7 @@ import time
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.service import ServiceInspectResult
+from python_on_whales.components.service.models import ServiceInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
 

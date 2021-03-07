@@ -3,13 +3,18 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
-import python_on_whales.components.container
+import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.utils import DockerCamelModel, format_dict_for_cli, run, to_list
+from python_on_whales.components.network.models import (
+    NetworkContainer,
+    NetworkInspectResult,
+    NetworkIPAM,
+)
+from python_on_whales.utils import format_dict_for_cli, run, to_list
 
 
 class Network(ReloadableObjectFromJson):
@@ -125,12 +130,14 @@ class NetworkCLI(DockerCLICaller):
     def connect(
         self,
         network: ValidNetwork,
-        container: python_on_whales.components.container.ValidContainer,
+        container: python_on_whales.components.container.cli_wrapper.ValidContainer,
         alias: Optional[str] = None,
         driver_options: List[str] = [],
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
-        links: List[python_on_whales.components.container.ValidContainer] = [],
+        links: List[
+            python_on_whales.components.container.cli_wrapper.ValidContainer
+        ] = [],
     ) -> None:
         full_cmd = self.docker_cmd + ["network", "connect"]
         full_cmd.add_simple_arg("--alias", alias)
@@ -170,7 +177,7 @@ class NetworkCLI(DockerCLICaller):
     def disconnect(
         self,
         network: ValidNetwork,
-        container: python_on_whales.components.container.ValidContainer,
+        container: python_on_whales.components.container.cli_wrapper.ValidContainer,
         force: bool = False,
     ):
         full_cmd = self.docker_cmd + ["network", "disconnet"]

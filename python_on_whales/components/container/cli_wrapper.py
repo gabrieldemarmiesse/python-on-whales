@@ -8,16 +8,24 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 import pydantic
 
-import python_on_whales.components.image
-import python_on_whales.components.network
-import python_on_whales.components.volume
+import python_on_whales.components.image.cli_wrapper
+import python_on_whales.components.network.cli_wrapper
+import python_on_whales.components.volume.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
+from python_on_whales.components.container.models import (
+    ContainerConfig,
+    ContainerGraphDriver,
+    ContainerHostConfig,
+    ContainerInspectResult,
+    ContainerState,
+    Mount,
+    NetworkSettings,
+)
 from python_on_whales.utils import (
-    DockerCamelModel,
     ValidPath,
     format_dict_for_cli,
     removeprefix,
@@ -458,7 +466,9 @@ class ContainerCLI(DockerCLICaller):
         memory_swappiness: Optional[int] = None,
         mounts: List[List[str]] = [],
         name: Optional[str] = None,
-        networks: List[python_on_whales.components.network.ValidNetwork] = [],
+        networks: List[
+            python_on_whales.components.network.cli_wrapper.ValidNetwork
+        ] = [],
         network_aliases: List[str] = [],
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
@@ -485,7 +495,7 @@ class ContainerCLI(DockerCLICaller):
         userns: Optional[str] = None,
         uts: Optional[str] = None,
         volumes: Optional[
-            List[python_on_whales.components.volume.VolumeDefinition]
+            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
         ] = [],
         volume_driver: Optional[str] = None,
         volumes_from: List[ValidContainer] = [],
@@ -923,7 +933,7 @@ class ContainerCLI(DockerCLICaller):
 
     def run(
         self,
-        image: python_on_whales.components.image.ValidImage,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
         command: List[str] = [],
         *,
         add_hosts: List[Tuple[str, str]] = [],
@@ -985,7 +995,9 @@ class ContainerCLI(DockerCLICaller):
         memory_swappiness: Optional[int] = None,
         mounts: List[List[str]] = [],
         name: Optional[str] = None,
-        networks: List[python_on_whales.components.network.ValidNetwork] = [],
+        networks: List[
+            python_on_whales.components.network.cli_wrapper.ValidNetwork
+        ] = [],
         network_aliases: List[str] = [],
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
@@ -1013,7 +1025,7 @@ class ContainerCLI(DockerCLICaller):
         userns: Optional[str] = None,
         uts: Optional[str] = None,
         volumes: Optional[
-            List[python_on_whales.components.volume.VolumeDefinition]
+            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
         ] = [],
         volume_driver: Optional[str] = None,
         volumes_from: List[ValidContainer] = [],

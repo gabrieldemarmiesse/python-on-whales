@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-import python_on_whales.components.container
+import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
 
@@ -60,7 +60,7 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def ps(self) -> List[python_on_whales.components.container.Container]:
+    def ps(self) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
         # Returns
@@ -74,7 +74,7 @@ class ComposeCLI(DockerCLICaller):
         if len(ids) > 0 and "experimental" in ids[0]:
             ids.pop(0)
 
-        Container = python_on_whales.components.container.Container
+        Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def pull(self, services: List[str] = []):
