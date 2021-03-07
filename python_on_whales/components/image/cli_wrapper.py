@@ -5,8 +5,8 @@ from pathlib import Path
 from subprocess import PIPE, Popen
 from typing import Any, Dict, Iterator, List, Optional, Union, overload
 
-import python_on_whales.components.buildx
-import python_on_whales.components.container
+import python_on_whales.components.buildx.cli_wrapper
+import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
@@ -78,7 +78,9 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().container
 
     @property
-    def container_config(self) -> python_on_whales.components.container.ContainerConfig:
+    def container_config(
+        self,
+    ) -> python_on_whales.components.container.cli_wrapper.ContainerConfig:
         return self._get_inspect_result().container_config
 
     @property
@@ -90,7 +92,9 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().author
 
     @property
-    def config(self) -> python_on_whales.components.container.ContainerConfig:
+    def config(
+        self,
+    ) -> python_on_whales.components.container.cli_wrapper.ContainerConfig:
         return self._get_inspect_result().config
 
     @property
@@ -180,7 +184,9 @@ ValidImage = Union[str, Image]
 class ImageCLI(DockerCLICaller):
     def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
-        self.build = python_on_whales.components.buildx.BuildxCLI(client_config).build
+        self.build = python_on_whales.components.buildx.cli_wrapper.BuildxCLI(
+            client_config
+        ).build
 
     def history(self):
         """Not yet implemented"""
@@ -465,7 +471,7 @@ class ImageCLI(DockerCLICaller):
     def copy_from(
         self, image: ValidImage, path_in_image: ValidPath, destination: ValidPath
     ):
-        with python_on_whales.components.container.ContainerCLI(
+        with python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
         ).create(image) as tmp_container:
             tmp_container.copy_from(path_in_image, destination)
@@ -477,7 +483,7 @@ class ImageCLI(DockerCLICaller):
         path_in_image: ValidPath,
         new_tag: Optional[str] = None,
     ) -> Image:
-        with python_on_whales.components.container.ContainerCLI(
+        with python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
         ).create(base_image) as tmp_container:
             tmp_container.copy_to(local_path, path_in_image)

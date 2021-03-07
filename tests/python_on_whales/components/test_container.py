@@ -9,10 +9,10 @@ import pytest
 
 import python_on_whales
 from python_on_whales import DockerException, Image, docker
-from python_on_whales.components.container import (
+from python_on_whales.components.container.cli_wrapper import ContainerStats
+from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
-    ContainerStats,
 )
 from python_on_whales.test_utils import get_all_jsons, random_name
 
