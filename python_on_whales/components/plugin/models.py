@@ -1,6 +1,6 @@
 from typing import List
 
-from docker_cli_wrapper.utils import DockerCamelModel
+from python_on_whales.utils import DockerCamelModel
 
 
 class PluginMount(DockerCamelModel):
