@@ -1134,6 +1134,9 @@ class ContainerCLI(DockerCLICaller):
             isolation: Container isolation technology
             kernel_memory: Kernel memory limit. `int` represents the number of bytes,
                 but you can use `"4k"` or `2g` for example.
+            labels: Set meta data on a container. The labels can be used later when filtering
+                containers with `docker.ps(filters='...')`. The labels can also be found on
+                each container with the attribute `my_container.config.labels`.
             log_driver: Logging driver for the container
             mac_adress: Container MAC address (e.g., `"92:d0:c6:0a:29:33"`)
             memory:  Memory limit, valid values are `1024` (ints are bytes) or
