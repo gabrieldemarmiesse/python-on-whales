@@ -89,3 +89,29 @@ Thread 1: docker.logs(my_container)  # will fail because the container was remov
 
 In the end, unless you use this type of logic in your code, 
 Python-on-whales is safe to use with multithreading and multiprocessing.
+
+
+# The Docker CLI
+
+Python-on-whales needs the Docker CLI to work (unlike docker-py).
+Most of the time, users already have the CLI installed on their machines. It's possible to 
+verify that the CLI is there by doing `docker --help` in the command line.
+
+Sometimes, the CLI might not be available on the system, it can happen if you want to control
+Docker from within a container with `-v /var/run/docker.sock:/var/run/docker.sock`, or if you
+want to connect to a remote daemon with the `host` argument.
+
+In this case, when using python-on-whales, the CLI will be downloaded automatically 
+(it's a single binary), and will be put in 
+```python
+pathlib.Path.home() / ".cache/python-on-whales/docker"
+```
+Since it's not in the PATH and was not downloaded with the package manager, it's only seen and 
+used by python-on-whales.
+
+If you want to trigger the download manually (to avoid downloading the CLI at runtime),
+you can run from your shell:
+```bash
+python-on-whales download-cli
+```
+
