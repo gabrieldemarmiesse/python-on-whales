@@ -13,6 +13,7 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObject,
 )
+from python_on_whales.components.buildx.imagetools.cli_wrapper import ImagetoolsCLI
 from python_on_whales.components.buildx.models import BuilderInspectResult
 from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
@@ -80,6 +81,10 @@ ValidBuilder = Union[str, Builder]
 
 
 class BuildxCLI(DockerCLICaller):
+    def __init__(self, client_config: ClientConfig):
+        super().__init__(client_config)
+        self.imagetools = ImagetoolsCLI(self.client_config)
+
     def bake(
         self,
         targets: Union[str, List[str]] = [],
