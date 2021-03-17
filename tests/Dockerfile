@@ -44,7 +44,7 @@ COPY . .
 
 RUN pip install -e .
 
-CMD pytest -v --durations=10 ./tests/python_on_whales/components/test_buildx.py
+CMD pytest -v --durations=10 ./tests/python_on_whales/components/buildx
 
 
 #-----------------------------------------------------------------------------
@@ -70,4 +70,4 @@ COPY . .
 
 RUN pip install -e .
 
-CMD pytest -v --durations=10 ./tests/python_on_whales/components/test_buildx.py
+CMD pytest -v --durations=10 ./tests/python_on_whales/components/buildx
