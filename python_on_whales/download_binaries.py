@@ -10,7 +10,7 @@ import requests
 from tqdm import tqdm
 
 DOCKER_VERSION = "20.10.5"
-BUILDX_VERSION = "0.4.2"
+BUILDX_VERSION = "0.5.1"
 
 CACHE_DIR = Path.home() / ".cache" / "python-on-whales"
 
