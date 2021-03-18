@@ -5,14 +5,18 @@ from keras_autodoc import DocumentationGenerator, get_methods
 
 from python_on_whales.utils import PROJECT_ROOT
 
+a = get_methods(
+    "python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI"
+)
+print(a)
 pages = {
     "docker_client.md": ["python_on_whales.DockerClient"]
     + get_methods("python_on_whales.docker_client.DockerClient"),
-    "sub-commands/app.md": get_methods(
-        "python_on_whales.components.app.cli_wrapper.AppCLI"
-    ),
     "sub-commands/buildx.md": get_methods(
         "python_on_whales.components.buildx.cli_wrapper.BuildxCLI"
+    )
+    + get_methods(
+        "python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI"
     ),
     "sub-commands/compose.md": get_methods(
         "python_on_whales.components.compose.cli_wrapper.ComposeCLI"
@@ -81,8 +85,8 @@ pages = {
 class MyDocumentationGenerator(DocumentationGenerator):
     def process_signature(self, signature):
         signature = signature.replace("DockerClient.", "docker.")
-        signature = signature.replace("AppCLI.", "docker.app.")
         signature = signature.replace("BuildxCLI.", "docker.buildx.")
+        signature = signature.replace("ImagetoolsCLI.", "docker.buildx.imagetools.")
         signature = signature.replace("ComposeCLI.", "docker.compose.")
         signature = signature.replace("ConfigCLI.", "docker.config.")
         signature = signature.replace("ContextCLI.", "docker.context.")
