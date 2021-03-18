@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional, Union
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.utils import run
+from python_on_whales.utils import run, to_list
 
 
 class ComposeCLI(DockerCLICaller):
@@ -44,9 +44,19 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def kill(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def kill(self, services: Union[str, List[str]] = [], signal: Optional[str] = None):
+        """Kills the container(s) of a service
+
+        # Arguments
+            services: One or more service(s) to kill
+            signal: the signal to send to the container. Default is `"SIGKILL"`
+        """
+        services = to_list(services)
+
+        full_cmd = self.docker_compose_cmd + ["kill"]
+        full_cmd.add_simple_arg("--signal", signal)
+        full_cmd += services
+        run(full_cmd)
 
     def logs(self):
         """Not yet implemented"""
