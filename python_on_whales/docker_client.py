@@ -3,7 +3,6 @@ import os
 from typing import List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
-from python_on_whales.components.app.cli_wrapper import AppCLI
 from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
 from python_on_whales.components.compose.cli_wrapper import ComposeCLI
 from python_on_whales.components.config.cli_wrapper import ConfigCLI
@@ -86,7 +85,6 @@ class DockerClient(DockerCLICaller):
             )
         super().__init__(client_config)
 
-        self.app = AppCLI(self.client_config)
         self.buildx = BuildxCLI(self.client_config)
         self.compose = ComposeCLI(self.client_config)
         self.config = ConfigCLI(self.client_config)

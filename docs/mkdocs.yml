@@ -7,7 +7,6 @@ site_description: 'Python on whales docs'
 nav:
   - Docker client: docker_client.md
   - Sub-commands:
-    - docker app: sub-commands/app.md
     - docker buildx: sub-commands/buildx.md
     - docker compose: sub-commands/compose.md
     - docker config: sub-commands/config.md
