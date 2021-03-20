@@ -23,13 +23,34 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def create(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def create(
+        self,
+        services: Union[str, List[str]] = [],
+        build: bool = False,
+        force_recreate: bool = False,
+        no_build: bool = False,
+        no_recreate=False,
+    ):
+        """Creates containers for a service."""
+        full_cmd = self.docker_compose_cmd + ["create"]
+        full_cmd.add_flag("--build", build)
+        full_cmd.add_flag("--force-recreate", force_recreate)
+        full_cmd.add_flag("--no-build", no_build)
+        full_cmd.add_flag("--no-recreate", no_recreate)
+        full_cmd += to_list(services)
+        run(full_cmd, capture_stdout=False)
 
-    def down(self):
+    def down(
+        self,
+        remove_orphans: bool = False,
+        remove_images: Optional[str] = None,
+        timeout: Optional[int] = None,
+    ):
         """Stops and removes the containers"""
         full_cmd = self.docker_compose_cmd + ["down"]
+        full_cmd.add_flag("--remove-orphans", remove_orphans)
+        full_cmd.add_simple_arg("--rmi", remove_images)
+        full_cmd.add_simple_arg("--timeout", timeout)
         run(full_cmd)
 
     def events(self):
