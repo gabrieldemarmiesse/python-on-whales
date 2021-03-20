@@ -23,13 +23,52 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def create(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def create(
+        self,
+        services: Union[str, List[str]] = [],
+        build: bool = False,
+        force_recreate: bool = False,
+        no_build: bool = False,
+        no_recreate=False,
+    ):
+        """Creates containers for a service.
 
-    def down(self):
-        """Stops and removes the containers"""
+        # Arguments
+            build: Build images before starting containers.
+            force_recreate: Recreate containers even if their configuration and
+                image haven't changed.
+            no_build: Don't build an image, even if it's missing.
+            no_recreate: If containers already exist, don't recreate them.
+                Incompatible with `force_recreate=True`.
+        """
+        full_cmd = self.docker_compose_cmd + ["create"]
+        full_cmd.add_flag("--build", build)
+        full_cmd.add_flag("--force-recreate", force_recreate)
+        full_cmd.add_flag("--no-build", no_build)
+        full_cmd.add_flag("--no-recreate", no_recreate)
+        full_cmd += to_list(services)
+        run(full_cmd, capture_stdout=False)
+
+    def down(
+        self,
+        remove_orphans: bool = False,
+        remove_images: Optional[str] = None,
+        timeout: Optional[int] = None,
+    ):
+        """Stops and removes the containers
+
+        # Arguments
+            remove_orphans: Remove containers for services not defined in
+                the Compose file.
+            remove_images: Remove images used by services.
+                `"local"` remove only images that don't have a custom
+                tag. Possible values are `"local"` and `"all"`.
+            timeout: Specify a shutdown timeout in seconds (default 10).
+        """
         full_cmd = self.docker_compose_cmd + ["down"]
+        full_cmd.add_flag("--remove-orphans", remove_orphans)
+        full_cmd.add_simple_arg("--rmi", remove_images)
+        full_cmd.add_simple_arg("--timeout", timeout)
         run(full_cmd)
 
     def events(self):

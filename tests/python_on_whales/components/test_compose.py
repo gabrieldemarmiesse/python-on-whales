@@ -39,6 +39,23 @@ def test_docker_compose_up_detach_down():
     docker.compose.down()
 
 
+def test_docker_compose_create_down():
+    docker.compose.create()
+    docker.compose.down()
+
+
+def test_docker_compose_create_extra_options_down():
+    docker.compose.create(build=True, force_recreate=True)
+    docker.compose.create(build=True, force_recreate=True)
+    docker.compose.create(no_build=True, no_recreate=True)
+    docker.compose.down()
+
+
+def test_docker_compose_up_detach_down_extra_options():
+    docker.compose.up(detach=True)
+    docker.compose.down(remove_orphans=True, remove_images="all", timeout=3)
+
+
 def test_docker_compose_up_build():
     docker.compose.up(build=True, detach=True)
     with docker.image.inspect("some_random_image"):
