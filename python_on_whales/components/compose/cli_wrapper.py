@@ -101,9 +101,11 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def pause(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def pause(self, services: Union[str, List[str]] = []):
+        """Pause one or more services"""
+        full_cmd = self.docker_compose_cmd + ["pause"]
+        full_cmd += to_list(services)
+        run(full_cmd)
 
     def port(self):
         """Not yet implemented"""
@@ -178,9 +180,11 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def unpause(self, services: Union[str, List[str]] = []):
+        """Unpause one or more services"""
+        full_cmd = self.docker_compose_cmd + ["unpause"]
+        full_cmd += to_list(services)
+        run(full_cmd)
 
     def up(self, services: List[str] = [], build: bool = False, detach: bool = False):
         """Start the containers.
