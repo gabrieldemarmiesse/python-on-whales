@@ -62,6 +62,14 @@ def test_docker_compose_create_down():
     docker.compose.down()
 
 
+def test_docker_compose_config():
+    compose_config = docker.compose.config()
+    assert compose_config.services["alpine"].image == "alpine:latest"
+
+    compose_config = docker.compose.config(return_json=True)
+    assert compose_config["services"]["alpine"]["image"] == "alpine:latest"
+
+
 def test_docker_compose_create_extra_options_down():
     docker.compose.create(build=True, force_recreate=True)
     docker.compose.create(build=True, force_recreate=True)

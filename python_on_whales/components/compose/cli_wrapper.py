@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import List, Optional, Union
+import json
+from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.utils import run, to_list
 
 
@@ -19,9 +21,34 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += services
         run(full_cmd, capture_stdout=False)
 
-    def config(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
+        """Returns the configuration of the compose stack for further inspection.
+
+        For example
+        ```python
+        from python_on_whales import docker
+        project_config = docker.compose.config()
+        print(project_config.services["my_first_service"].image)
+        "redis"
+        ```
+
+        # Arguments
+            return_json: If `False`, a `ComposeConfig` object will be returned, and you
+                'll be able to take advantage of your IDE autocompletion. If you want the
+                full json output, you may use `return_json`. In this case, you'll get
+                lists and dicts corresponding to the json response, unmodified.
+                It may be useful if you just want to print the config or want to access
+                a field that was not in the `ComposeConfig` class.
+
+        # Returns
+            A `ComposeConfig` object if `return_json` is `False`, and a `dict` otherwise.
+        """
+        full_cmd = self.docker_compose_cmd + ["config", "--format", "json"]
+        result = run(full_cmd, capture_stdout=True)
+        if return_json:
+            return json.loads(result)
+        else:
+            return ComposeConfig.parse_raw(result)
 
     def create(
         self,
