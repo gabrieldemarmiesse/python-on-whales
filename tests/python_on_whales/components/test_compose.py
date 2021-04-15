@@ -39,6 +39,24 @@ def test_docker_compose_up_detach_down():
     docker.compose.down()
 
 
+def test_docker_compose_pause_unpause():
+    docker.compose.up(detach=True)
+    docker.compose.pause()
+    for container in docker.compose.ps():
+        assert container.state.paused
+
+    docker.compose.unpause()
+    for container in docker.compose.ps():
+        assert not container.state.paused
+
+    docker.compose.pause(["my_service", "busybox"])
+
+    assert docker.container.inspect("components_my_service_1").state.paused
+    assert docker.container.inspect("components_busybox_1").state.paused
+
+    docker.compose.down()
+
+
 def test_docker_compose_create_down():
     docker.compose.create()
     docker.compose.down()
