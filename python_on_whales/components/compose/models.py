@@ -14,7 +14,7 @@ class DependencyCondition(BaseModel):
 
 
 class ComposeConfigService(BaseModel):
-    deploy: ServiceDeployConfig
+    deploy: Optional[ServiceDeployConfig]
     blkio_config: Any
     cpu_count: Optional[float]
     cpu_percent: Optional[float]
@@ -27,7 +27,7 @@ class ComposeConfigService(BaseModel):
     command: Optional[List[str]]
     configs: Any
     container_name: Optional[str]
-    depends_on: Dict[str, DependencyCondition]
+    depends_on: Dict[str, DependencyCondition] = Field(default_factory=dict)
     device_cgroup_rules: List[str] = Field(default_factory=list)
     devices: Any
     environment: Optional[Dict[str, Optional[str]]]
