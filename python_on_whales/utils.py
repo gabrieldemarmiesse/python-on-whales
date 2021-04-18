@@ -1,3 +1,4 @@
+import os
 import subprocess
 import warnings
 from pathlib import Path
@@ -104,7 +105,8 @@ def run(
     args = [str(x) for x in args]
     if args[1] == "buildx":
         install_buildx_if_needed(args[0])
-        env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
+        os.environ["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
+        env = None
     if env == {}:
         env = None
     if capture_stdout:
