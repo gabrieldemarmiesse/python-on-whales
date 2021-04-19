@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import tempfile
 from enum import Enum
 from pathlib import Path
@@ -170,8 +169,7 @@ class BuildxCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--file", file)
         full_cmd.add_args_list("--set", format_dict_for_cli(set))
         targets = to_list(targets)
-        env = dict(os.environ)
-        env.update(variables)
+        env = dict(variables)
         if print:
             return json.loads(run(full_cmd + targets, env=env))
         else:

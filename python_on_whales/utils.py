@@ -1,3 +1,4 @@
+import os
 import subprocess
 import warnings
 from pathlib import Path
@@ -102,11 +103,11 @@ def run(
     env: Dict[str, str] = {},
 ) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
+    subprocess_env = dict(os.environ)
+    subprocess_env.update(env)
     if args[1] == "buildx":
         install_buildx_if_needed(args[0])
-        env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
-    if env == {}:
-        env = None
+        subprocess_env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
     if capture_stdout:
         stdout_dest = subprocess.PIPE
     else:
@@ -116,7 +117,7 @@ def run(
     else:
         stderr_dest = None
     completed_process = subprocess.run(
-        args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=env
+        args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=subprocess_env
     )
 
     if completed_process.returncode != 0:
