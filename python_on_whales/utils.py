@@ -6,9 +6,9 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-import sys
+
 import pydantic
-import logging
+
 from python_on_whales.download_binaries import download_buildx
 
 PROJECT_ROOT = Path(__file__).parents[1]
