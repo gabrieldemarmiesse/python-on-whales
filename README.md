@@ -131,6 +131,7 @@ attributes are updated in real-time!
 context, the Docker object is removed automatically, even if an exception occurs.
 * A fully typed API (Mypy and IDE-friendly) compatible with `pathlib` and `os.path`
 * All Docker objects and the Docker client are safe to use with multithreading and multiprocessing.
+* Display the commands called and the environment variables used by setting the environment variable `PYTHON_ON_WHALES_DEBUG=1`.
 
 ## Why another project? Why not build on Docker-py?
 

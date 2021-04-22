@@ -116,6 +116,11 @@ def run(
         stderr_dest = subprocess.PIPE
     else:
         stderr_dest = None
+    if os.environ.get("PYTHON_ON_WHALES_DEBUG", "0") == "1":
+        print("------------------------------")
+        print("command: " + " ".join(args))
+        print(f"Env: {subprocess_env}")
+        print("------------------------------")
     completed_process = subprocess.run(
         args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=subprocess_env
     )
