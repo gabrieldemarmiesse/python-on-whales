@@ -6,9 +6,9 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-
+import sys
 import pydantic
-
+import logging
 from python_on_whales.download_binaries import download_buildx
 
 PROJECT_ROOT = Path(__file__).parents[1]
@@ -116,6 +116,11 @@ def run(
         stderr_dest = subprocess.PIPE
     else:
         stderr_dest = None
+    if os.environ.get("PYTHON_ON_WHALES_DEBUG", "0") == "1":
+        print("------------------------------")
+        print("command: " + " ".join(args))
+        print(f"Env: {subprocess_env}")
+        print("------------------------------")
     completed_process = subprocess.run(
         args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=subprocess_env
     )
