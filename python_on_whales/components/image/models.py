@@ -20,7 +20,7 @@ class ImageGraphDriver(DockerCamelModel):
 
 class ImageRootFS(DockerCamelModel):
     type: str
-    layers: List[str]
+    layers: Optional[List[str]]
     base_layer: Optional[str]
 
 
