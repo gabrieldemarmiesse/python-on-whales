@@ -1,0 +1,65 @@
+{
+    "Id": "sha256:71de1148337f4d1845be01eb4caf15d78e4eb15a1ab96030809826698a5b7e30",
+    "RepoTags": [],
+    "RepoDigests": [],
+    "Parent": "",
+    "Comment": "",
+    "Created": "0001-01-01T00:00:00Z",
+    "Container": "",
+    "ContainerConfig": {
+        "Hostname": "",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": null,
+        "Cmd": null,
+        "Image": "",
+        "Volumes": null,
+        "WorkingDir": "",
+        "Entrypoint": null,
+        "OnBuild": null,
+        "Labels": null
+    },
+    "DockerVersion": "",
+    "Author": "",
+    "Config": {
+        "Hostname": "",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": null,
+        "Image": "",
+        "Volumes": null,
+        "WorkingDir": "/",
+        "Entrypoint": null,
+        "OnBuild": null,
+        "Labels": null
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 0,
+    "VirtualSize": 0,
+    "GraphDriver": {
+        "Data": null,
+        "Name": "overlay2"
+    },
+    "RootFS": {
+        "Type": "layers"
+    },
+    "Metadata": {
+        "LastTagTime": "0001-01-01T00:00:00Z"
+    }
+}
