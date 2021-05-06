@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union, overload
 
 import python_on_whales.components.task.cli_wrapper
@@ -9,6 +9,7 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
+from python_on_whales.components.container.cli_wrapper import to_seconds
 from python_on_whales.components.service.models import (
     ServiceEndpoint,
     ServiceInspectResult,
@@ -16,7 +17,7 @@ from python_on_whales.components.service.models import (
     ServiceUpdateStatus,
     ServiceVersion,
 )
-from python_on_whales.utils import run, to_list
+from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 
 class Service(ReloadableObjectFromJson):
@@ -136,6 +137,34 @@ class ServiceCLI(DockerCLICaller):
         self,
         image: str,
         command: Union[str, List[str], None],
+        cap_add: List[str] = [],
+        cap_drop: List[str] = [],
+        constraints: List[str] = [],
+        detach: bool = False,
+        dns: List[str] = [],
+        dns_options: List[str] = [],
+        dns_search: List[str] = [],
+        endpoint_mode: Optional[str] = None,
+        entrypoint: Optional[str] = None,
+        envs: Dict[str, str] = {},
+        env_files: Union[ValidPath, List[ValidPath]] = [],
+        generic_resources: List[str] = [],
+        groups: List[str] = [],
+        healthcheck: bool = True,
+        health_cmd: Optional[str] = None,
+        health_interval: Union[None, int, timedelta] = None,
+        health_retries: Optional[int] = None,
+        health_start_period: Union[None, int, timedelta] = None,
+        health_timeout: Union[None, int, timedelta] = None,
+        hosts: Dict[str, str] = {},
+        hostname: Optional[str] = None,
+        init: bool = False,
+        isolation: Optional[str] = None,
+        labels: Dict[str, str] = {},
+        limit_cpu: Optional[float] = None,
+        limit_memory: Optional[str] = None,
+        limit_pids: Optional[int] = None,
+        log_driver: Optional[str] = None,
     ):
         """Creates a Docker swarm service.
 
@@ -148,6 +177,44 @@ class ServiceCLI(DockerCLICaller):
             command: The command to execute in the container(s).
         """
         full_cmd = self.docker_cmd + ["service", "create", "--quiet"]
+
+        full_cmd.add_args_list("--cap-add", cap_add)
+        full_cmd.add_args_list("--cap-drop", cap_drop)
+        full_cmd.add_args_list("--constraint", constraints)
+
+        full_cmd.add_flag("--detach", detach)
+        full_cmd.add_args_list("--dns", dns)
+        full_cmd.add_args_list("--dns-option", dns_options)
+        full_cmd.add_args_list("--dns-search", dns_search)
+        full_cmd.add_simple_arg("--endpoint-mode", endpoint_mode)
+        full_cmd.add_simple_arg("--entrypoint", entrypoint)
+
+        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
+        full_cmd.add_args_list("--env-file", env_files)
+
+        full_cmd.add_args_list("--generic-resource", generic_resources)
+        full_cmd.add_args_list("--group", groups)
+
+        full_cmd.add_flag("--no-healthcheck", not healthcheck)
+        full_cmd.add_simple_arg("--health-cmd", health_cmd)
+        full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
+        full_cmd.add_simple_arg("--health-retries", health_retries)
+        full_cmd.add_simple_arg(
+            "--health-start-period", to_seconds(health_start_period)
+        )
+        full_cmd.add_simple_arg("--health-timeout", to_seconds(health_timeout))
+        for key, value in hosts:
+            full_cmd += ["--host", f"{key}:{value}"]
+
+        full_cmd.add_simple_arg("--hostname", hostname)
+
+        full_cmd.add_flag("--init", init)
+        full_cmd.add_simple_arg("--isolation", isolation)
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_simple_arg("--limit-cpu", limit_cpu)
+        full_cmd.add_simple_arg("--limit-memory", limit_memory)
+        full_cmd.add_simple_arg("--limit-pids", limit_pids)
+        full_cmd.add_simple_arg("--log-driver", log_driver)
 
         full_cmd.append(image)
         if command is not None:
