@@ -1,5 +1,4 @@
 import base64
-import os
 from typing import List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
@@ -203,10 +202,13 @@ class DockerClient(DockerCLICaller):
         ```
         """
         import botocore.session
-        client = botocore.session.get_session().create_client('ecr', aws_access_key_id=aws_access_key_id,
-                                       aws_secret_access_key=aws_secret_access_key,
-                                       region_name=region_name)
 
+        client = botocore.session.get_session().create_client(
+            "ecr",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            region_name=region_name,
+        )
 
         response = client.get_authorization_token()["authorizationData"][0]
         credentials = base64.b64decode(response["authorizationToken"]).decode()
