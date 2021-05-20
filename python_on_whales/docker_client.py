@@ -200,6 +200,8 @@ class DockerClient(DockerCLICaller):
         ```python
         botocore.session.get_session().create_client(...)
         ```
+
+        You need botocore to run this function. Use `pip install botocore` to install it.
         """
         import botocore.session
 
