@@ -193,12 +193,22 @@ class DockerClient(DockerCLICaller):
         """Login to the aws ECR registry. Credentials are taken from the
         environment variables as defined in
         [the aws docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
-        """
-        import boto3
-        from botocore.config import Config
 
-        aws_client = boto3.client(service_name="ecr", config=Config())
-        response = aws_client.get_authorization_token()["authorizationData"][0]
+        If you don't have a profile or your environment variables configured, you can also
+        use the function arguments `aws_access_key_id`, `aws_secret_access_key`, `region_name`.
+
+        Behind the scenes, those arguments are passed directly to
+        ```python
+        botocore.session.get_session().create_client(...)
+        ```
+        """
+        import botocore.session
+        client = botocore.session.get_session().create_client('ecr', aws_access_key_id=aws_access_key_id,
+                                       aws_secret_access_key=aws_secret_access_key,
+                                       region_name=region_name)
+
+
+        response = client.get_authorization_token()["authorizationData"][0]
         credentials = base64.b64decode(response["authorizationToken"]).decode()
         username, password = credentials.split(":")
         registry = response["proxyEndpoint"]
