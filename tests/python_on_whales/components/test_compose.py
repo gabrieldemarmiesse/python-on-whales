@@ -143,3 +143,14 @@ def test_docker_compose_pull():
         pass
     docker.compose.pull(["busybox", "alpine"])
     docker.image.inspect(["busybox", "alpine"])
+
+
+def test_docker_compose_up_abort_on_container_exit():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ]
+    )
+    docker.compose.up(["alpine"], abort_on_container_exit=True)
+    assert docker.compose.ps() == []

@@ -251,7 +251,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += to_list(services)
         run(full_cmd)
 
-    def up(self, services: List[str] = [], build: bool = False, detach: bool = False):
+    def up(self, services: List[str] = [], build: bool = False, detach: bool = False, abort_on_container_exit: bool = False):
         """Start the containers.
 
         Reading the logs of the containers is not yet implemented.
@@ -264,7 +264,11 @@ class ComposeCLI(DockerCLICaller):
                 If `False` (the default), build only the docker images that do not already
                 exist.
             detach: If `True`, run the containers in the background. If `False` this
-                function returns only when all containers have stopped.
+                function returns only when all containers have stopped. 
+                Incompatible with --abort-on-container-exit
+            abort_on_container_exit: If `True` stops all containers if any container was
+                stopped. 
+                Incompatible with --detach
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -274,6 +278,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--build", build)
+        full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
 
         full_cmd += services
         run(full_cmd, capture_stdout=False)
