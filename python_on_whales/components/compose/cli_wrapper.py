@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import timedelta
 from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.container.cli_wrapper
@@ -183,9 +184,30 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def rm(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def rm(
+        self,
+        services: Union[str, List[str]] = [],
+        stop: bool = False,
+        volumes: bool = False,
+    ):
+        """
+        Removes stopped service containers
+
+        By default, anonymous volumes attached to containers will not be removed. You
+        can override this with `volumes=True`.
+
+        Any data which is not in a volume will be lost.
+
+        # Arguments
+            services: The names of one or more services to remove (str or list of str)
+            stop: Stop the containers, if required, before removing
+            volumes: Remove any anonymous volumes attached to containers
+        """
+        full_cmd = self.docker_compose_cmd + ["rm", "--force"]
+        full_cmd.add_flag("--stop", stop)
+        full_cmd.add_flag("--volumes", volumes)
+        full_cmd += to_list(services)
+        run(full_cmd)
 
     def run(self):
         """Not yet implemented"""
@@ -199,9 +221,25 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def stop(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def stop(
+        self,
+        services: Union[str, List[str]] = [],
+        timeout: Union[int, timedelta, None] = None,
+    ):
+        """Stop services
+
+        # Arguments
+            services: The names of one or more services to stop (str or list of str)
+            timeout: Number of seconds or timedelta (will be converted to seconds).
+                Specify a shutdown timeout. Default is 10s.
+        """
+        if isinstance(timeout, timedelta):
+            timeout = int(timeout.total_seconds())
+
+        full_cmd = self.docker_compose_cmd + ["stop"]
+        full_cmd.add_simple_arg("--timeout", timeout)
+        full_cmd += to_list(services)
+        run(full_cmd)
 
     def top(self):
         """Not yet implemented"""
