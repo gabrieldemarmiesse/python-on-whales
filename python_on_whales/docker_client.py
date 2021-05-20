@@ -1,5 +1,4 @@
 import base64
-import os
 from typing import List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
@@ -190,48 +189,30 @@ class DockerClient(DockerCLICaller):
         aws_secret_access_key: Optional[str] = None,
         region_name: Optional[str] = None,
     ):
-        """Login to the aws ECR registry. If the credentials are not provided as
-        arguments, they are taken from the environment variables as defined
-        in [the aws docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
+        """Login to the aws ECR registry. Credentials are taken from the
+        environment variables as defined in
+        [the aws docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
 
-        Those are `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`.
+        If you don't have a profile or your environment variables configured, you can also
+        use the function arguments `aws_access_key_id`, `aws_secret_access_key`, `region_name`.
+
+        Behind the scenes, those arguments are passed directly to
+        ```python
+        botocore.session.get_session().create_client(...)
+        ```
+
+        You need botocore to run this function. Use `pip install botocore` to install it.
         """
-        import boto3
+        import botocore.session
 
-        if aws_access_key_id is None:
-            try:
-                aws_access_key_id = os.environ["AWS_ACCESS_KEY_ID"]
-            except KeyError:
-                raise KeyError(
-                    "AWS_ACCESS_KEY_ID isn't in the environment variables and "
-                    "aws_access_key_id wasn't set when calling login_ecr."
-                )
-        if aws_secret_access_key is None:
-            try:
-                aws_secret_access_key = os.environ["AWS_SECRET_ACCESS_KEY"]
-            except KeyError:
-                raise KeyError(
-                    "AWS_SECRET_ACCESS_KEY isn't in the environment variables and "
-                    "aws_secret_access_key wasn't set when calling login_ecr."
-                )
-
-        if region_name is None:
-            try:
-                region_name = os.environ["AWS_DEFAULT_REGION"]
-            except KeyError:
-                raise KeyError(
-                    "AWS_DEFAULT_REGION isn't in the environment variables and "
-                    "region_name wasn't set when calling login_ecr."
-                )
-
-        aws_client = boto3.client(
-            service_name="ecr",
+        client = botocore.session.get_session().create_client(
+            "ecr",
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
             region_name=region_name,
         )
 
-        response = aws_client.get_authorization_token()["authorizationData"][0]
+        response = client.get_authorization_token()["authorizationData"][0]
         credentials = base64.b64decode(response["authorizationToken"]).decode()
         username, password = credentials.split(":")
         registry = response["proxyEndpoint"]
