@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import pytest
 
 import python_on_whales
@@ -86,6 +88,17 @@ def test_docker_compose_up_build():
     docker.compose.up(build=True, detach=True)
     with docker.image.inspect("some_random_image"):
         docker.compose.down()
+
+
+def test_docker_compose_up_stop_rm():
+    docker.compose.up(build=True, detach=True)
+    docker.compose.stop(timeout=timedelta(seconds=3))
+    docker.compose.rm(volumes=True)
+
+
+def test_docker_compose_up_rm():
+    docker.compose.up(build=True, detach=True)
+    docker.compose.rm(stop=True, volumes=True)
 
 
 def test_docker_compose_up_down_some_services():
