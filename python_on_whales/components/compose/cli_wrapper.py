@@ -264,11 +264,10 @@ class ComposeCLI(DockerCLICaller):
                 If `False` (the default), build only the docker images that do not already
                 exist.
             detach: If `True`, run the containers in the background. If `False` this
-                function returns only when all containers have stopped. 
-                Incompatible with --abort-on-container-exit
+                function returns only when all containers have stopped.
+                Incompatible with --abort-on-container-exit.
             abort_on_container_exit: If `True` stops all containers if any container was
-                stopped. 
-                Incompatible with --detach
+                stopped. Incompatible with --detach.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
