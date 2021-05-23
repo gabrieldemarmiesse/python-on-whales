@@ -251,7 +251,13 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += to_list(services)
         run(full_cmd)
 
-    def up(self, services: List[str] = [], build: bool = False, detach: bool = False, abort_on_container_exit: bool = False):
+    def up(
+        self,
+        services: List[str] = [],
+        build: bool = False,
+        detach: bool = False,
+        abort_on_container_exit: bool = False,
+    ):
         """Start the containers.
 
         Reading the logs of the containers is not yet implemented.
