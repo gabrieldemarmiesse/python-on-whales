@@ -271,9 +271,9 @@ class ComposeCLI(DockerCLICaller):
                 exist.
             detach: If `True`, run the containers in the background. If `False` this
                 function returns only when all containers have stopped.
-                Incompatible with --abort-on-container-exit.
+                Incompatible with `abort_on_container_exit=True`.
             abort_on_container_exit: If `True` stops all containers if any container was
-                stopped. Incompatible with --detach.
+                stopped. Incompatible with `detach=True`.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
