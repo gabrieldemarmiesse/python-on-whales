@@ -1,7 +1,5 @@
-import os
 import platform
 import shutil
-import stat
 import tempfile
 import warnings
 from pathlib import Path
@@ -18,11 +16,9 @@ TEMPLATE_CLI = (
     "https://download.docker.com/{os}/static/stable/{arch}/docker-{version}.tgz"
 )
 WINDOWS_CLI_URL = "https://github.com/StefanScherer/docker-cli-builder/releases/download/{version}/docker.exe"
-TEMPLATE_BUILDX = "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.{os}-{arch}"
 
 
 DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
-BUILDX_BINARY_PATH = Path.home() / ".docker" / "cli-plugins" / "docker-buildx"
 
 
 def get_docker_cli_url():
@@ -31,29 +27,6 @@ def get_docker_cli_url():
         return WINDOWS_CLI_URL.format(version=DOCKER_VERSION)
     arch = get_arch_for_docker_cli_url()
     return TEMPLATE_CLI.format(os=user_os, arch=arch, version=DOCKER_VERSION)
-
-
-def get_buildx_url():
-    user_os = platform.system().lower()
-    arch = get_arch_for_buildx_url()
-    url = TEMPLATE_BUILDX.format(version=BUILDX_VERSION, os=user_os, arch=arch)
-    if user_os == "windows":
-        url += ".exe"
-    return url
-
-
-def download_buildx():
-    BUILDX_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
-    download_from_url(get_buildx_url(), BUILDX_BINARY_PATH)
-
-    st = os.stat(BUILDX_BINARY_PATH)
-    os.chmod(BUILDX_BINARY_PATH, st.st_mode | stat.S_IEXEC)
-    warnings.warn(
-        f"The docker buildx binary file {BUILDX_VERSION} was downloaded and put "
-        f"in `{BUILDX_BINARY_PATH.absolute()}`. \n"
-        f"You can feel free to remove it if you wish, Python on whales will download "
-        f"it again if needed."
-    )
 
 
 def download_docker_cli():
@@ -144,33 +117,4 @@ def get_arch_for_docker_cli_url():
             f"https://github.com/gabrieldemarmiesse/python-on-whales/issues "
             f"and make sure to copy past this error message. \n"
             f"In the meantime, install Docker manually on your system."
-        )
-
-
-def get_arch_for_buildx_url():
-    arch = platform.architecture()[0]
-
-    # I don't know the exact list of possible architectures,
-    # so if a user reports a NotImplementedError, we can easily add
-    # his/her platform here.
-    arch_mapping = {
-        "NotImplementedError": "arm-v6",
-        "NotImplementedError2": "arm-v7",
-        "NotImplementedError3": "arm64",
-        "NotImplementedError4": "ppc64le",
-        "NotImplementedError5": "s390x",
-        "64bit": "amd64",
-    }
-
-    try:
-        return arch_mapping[arch]
-    except KeyError:
-        raise NotImplementedError(
-            f"The architecture detected on your system is `{arch}`, the list of "
-            f"available architectures is {list(arch_mapping.values())}. \n"
-            f"Please open an issue at \n"
-            f"https://github.com/gabrieldemarmiesse/python-on-whales/issues "
-            f"and make sure to copy past this error message. \n"
-            f"In the meantime, install Docker buildx manually on your system: \n"
-            f"https://github.com/docker/buildx"
         )

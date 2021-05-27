@@ -1,6 +1,5 @@
 import os
 import subprocess
-import warnings
 from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
@@ -8,8 +7,6 @@ from threading import Thread
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
-
-from python_on_whales.download_binaries import download_buildx
 
 PROJECT_ROOT = Path(__file__).parents[1]
 
@@ -106,7 +103,6 @@ def run(
     subprocess_env = dict(os.environ)
     subprocess_env.update(env)
     if args[1] == "buildx":
-        install_buildx_if_needed(args[0])
         subprocess_env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
     if capture_stdout:
         stdout_dest = subprocess.PIPE
@@ -174,33 +170,6 @@ def removeprefix(string: str, prefix: str) -> str:
         return string[len(prefix) :]
     else:
         return string
-
-
-def install_buildx_if_needed(docker_binary: str):
-    completed_process = subprocess.run(
-        [docker_binary, "buildx"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        env={"DOCKER_CLI_EXPERIMENTAL": "enabled"},
-    )
-    if completed_process.returncode == 0:
-        return
-
-    stderr = completed_process.stderr.decode()
-    if "is not a docker command" in stderr:
-        warnings.warn(
-            "It seems that docker buildx is not installed on your system. \n"
-            "It's going to be downloaded for you. It's only a one time thing."
-            "The next calls to the buildx command won't trigger the "
-            "download again."
-        )
-        download_buildx()
-    else:
-        raise RuntimeError(
-            f"It seems buildx is not properly installed. When running "
-            f"'docker buildx', here is the result:\n"
-            f"{stderr}"
-        )
 
 
 def reader(pipe, pipe_name, queue):
