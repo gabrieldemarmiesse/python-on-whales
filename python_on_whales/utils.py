@@ -102,6 +102,8 @@ def run(
     args = [str(x) for x in args]
     subprocess_env = dict(os.environ)
     subprocess_env.update(env)
+    if args[1] == "buildx":
+        subprocess_env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
     if capture_stdout:
         stdout_dest = subprocess.PIPE
     else:
