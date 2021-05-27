@@ -39,6 +39,9 @@ CMD pytest -v --durations=10 ./tests
 
 #-----------------------------------------------------------------------------
 FROM python_dependencies as tests_without_any_binary
+
+COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/
+
 WORKDIR /python-on-whales
 COPY . .
 
