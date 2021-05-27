@@ -117,13 +117,13 @@ def test_docker_compose_ps():
 
 def test_docker_compose_kill():
     docker.compose.up(["my_service", "busybox"], detach=True)
-    names = set(x.name for x in docker.compose.ps())
-    assert names == {"components_my_service_1", "components_busybox_1"}
+
+    for container in docker.compose.ps():
+        assert container.state.running
 
     docker.compose.kill("busybox")
 
-    names = set(x.name for x in docker.compose.ps())
-    assert names == {"components_my_service_1"}
+    assert not docker.container.inspect("components_busybox_1").state.running
 
     docker.compose.down()
 
