@@ -30,6 +30,7 @@ def test_docker_compose_up_down():
         ]
     )
     docker.compose.up(["busybox", "alpine"])
+    docker.compose.down()
 
 
 def test_no_containers():
