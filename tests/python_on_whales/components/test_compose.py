@@ -154,4 +154,6 @@ def test_docker_compose_up_abort_on_container_exit():
         ]
     )
     docker.compose.up(["alpine"], abort_on_container_exit=True)
-    assert docker.compose.ps() == []
+    for container in docker.compose.ps():
+        assert not container.state.running
+    docker.compose.down()
