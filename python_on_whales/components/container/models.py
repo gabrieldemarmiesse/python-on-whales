@@ -92,7 +92,7 @@ class ContainerVolumeDriverConfig(DockerCamelModel):
 
 class ContainerVolumeOptions(DockerCamelModel):
     no_copy: Optional[bool]
-    labels: Dict[str, str]
+    labels: Optional[Dict[str, str]]
 
 
 class ContainerTmpfsOptions(DockerCamelModel):
