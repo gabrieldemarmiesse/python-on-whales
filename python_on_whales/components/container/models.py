@@ -158,7 +158,7 @@ class ContainerHostConfig(DockerCamelModel):
     dns: Optional[List[str]]
     dns_options: Optional[List[str]]
     dns_search: Optional[List[str]]
-    extra_hosts: Optional[Dict[str, str]]
+    extra_hosts: Optional[List[str]]
     group_add: Optional[List[str]]
     ipc_mode: str
     cgroup: Optional[str]
