@@ -758,6 +758,7 @@ class ContainerCLI(DockerCLICaller):
             A `python_on_whales.Container` object or a list of those
             if a list of IDs was passed as input.
         """
+
         if isinstance(x, list):
             return [Container(self.client_config, reference) for reference in x]
         else:
@@ -776,12 +777,14 @@ class ContainerCLI(DockerCLICaller):
             containers: One or more containers to kill
             signal: The signal to send the container
         """
+        containers = to_list(containers)
+        if not containers:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["container", "kill"]
 
         full_cmd.add_simple_arg("--signal", signal)
-
-        for container in to_list(containers):
-            full_cmd.append(container)
+        full_cmd += containers
 
         run(full_cmd)
 
@@ -852,6 +855,10 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             containers: One or more containers to pause
         """
+        containers = to_list(containers)
+        if not containers:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["pause"]
         for container in to_list(containers):
             full_cmd.append(str(container))
@@ -895,6 +902,10 @@ class ContainerCLI(DockerCLICaller):
             time: Amount of to wait for stop before killing the container (default 10s).
                 If `int`, the unit is seconds.
         """
+        containers = to_list(containers)
+        if not containers:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["restart"]
 
         if time is not None:
@@ -902,7 +913,7 @@ class ContainerCLI(DockerCLICaller):
                 time = time.total_seconds()
             full_cmd += ["--time", str(time)]
 
-        for container in to_list(containers):
+        for container in containers:
             full_cmd.append(str(container))
 
         run(full_cmd)
@@ -922,11 +933,15 @@ class ContainerCLI(DockerCLICaller):
             force: Force the removal of a running container (uses SIGKILL)
             volumes: Remove anonymous volumes associated with the container
         """
+        containers = to_list(containers)
+        if not containers:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["container", "rm"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--volumes", volumes)
 
-        for container in to_list(containers):
+        for container in containers:
             full_cmd.append(str(container))
 
         run(full_cmd)
@@ -1356,6 +1371,10 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             containers: One or a list of containers.
         """
+        containers = to_list(containers)
+        if not containers:
+            # nothing to do
+            return
         if attach and isinstance(containers, list):
             raise ValueError("Attaching multiple containers on start is not supported.")
         if not attach and stream:
@@ -1365,7 +1384,7 @@ class ContainerCLI(DockerCLICaller):
             )
         full_cmd = self.docker_cmd + ["container", "start"]
         full_cmd.add_flag("--attach", attach)
-        full_cmd += to_list(containers)
+        full_cmd += containers
 
         if stream:
             return stream_stdout_and_stderr(full_cmd)
@@ -1429,6 +1448,10 @@ class ContainerCLI(DockerCLICaller):
             containers: One or a list of containers.
             time: Seconds to wait for stop before killing a container (default 10)
         """
+        containers = to_list(containers)
+        if not containers:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["container", "stop"]
         if isinstance(time, timedelta):
             time = time.total_seconds()
@@ -1436,7 +1459,7 @@ class ContainerCLI(DockerCLICaller):
         if time is not None:
             full_cmd += ["--time", str(time)]
 
-        for container in to_list(containers):
+        for container in containers:
             full_cmd.append(container)
 
         run(full_cmd)
@@ -1457,8 +1480,12 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             x: One or more containers (name, id or `python_on_whales.Container` object).
         """
+        x = to_list(x)
+        if not x:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["container", "unpause"]
-        full_cmd += to_list(x)
+        full_cmd += x
         run(full_cmd)
 
     def update(
@@ -1505,6 +1532,10 @@ class ContainerCLI(DockerCLICaller):
             pids_limit: Tune container pids limit (set `-1` for unlimited)
             restart: Restart policy to apply when a container exits (default "no")
         """
+        x = to_list(x)
+        if not x:
+            # nothing to do
+            return
         full_cmd = self.docker_cmd + ["container", "update"]
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
@@ -1521,7 +1552,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
         full_cmd.add_simple_arg("--pids-limit", pids_limit)
         full_cmd.add_simple_arg("--restart", restart)
-        full_cmd += to_list(x)
+        full_cmd += x
         run(full_cmd)
 
     @overload
@@ -1570,6 +1601,10 @@ class ContainerCLI(DockerCLICaller):
         docker.container.remove([cont_1, cont_2])
         ```
         """
+        x = to_list(x)
+        if not x:
+            # nothing to do
+            return []
         full_cmd = self.docker_cmd + ["container", "wait"]
         if isinstance(x, list):
             full_cmd += x

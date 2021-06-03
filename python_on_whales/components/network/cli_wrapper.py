@@ -217,7 +217,8 @@ class NetworkCLI(DockerCLICaller):
         # Arguments
             networks: One or more networks.
         """
+        if networks == []:
+            return
         full_cmd = self.docker_cmd + ["network", "remove"]
-        for network in to_list(networks):
-            full_cmd.append(network)
+        full_cmd += to_list(networks)
         run(full_cmd)

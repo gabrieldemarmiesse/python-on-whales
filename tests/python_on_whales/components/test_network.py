@@ -34,3 +34,7 @@ def test_context_manager():
             # but the network will be removed anyway.
 
     assert my_net not in docker.network.list()
+
+
+def test_remove_nothing():
+    docker.network.remove([])
