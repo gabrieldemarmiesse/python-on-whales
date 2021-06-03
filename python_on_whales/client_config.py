@@ -158,6 +158,8 @@ class ReloadableObject(DockerCLICaller):
             self._immutable_id = getattr(self._inspect_result, self._id_in_inspect)
 
     def __eq__(self, other):
+        if not isinstance(other, ReloadableObject):
+            return False
         return (
             self._get_immutable_id() == other._get_immutable_id()
             and self.client_config == other.client_config
