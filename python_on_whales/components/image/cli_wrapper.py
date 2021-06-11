@@ -334,8 +334,10 @@ class ImageCLI(DockerCLICaller):
         Alias: `docker.pull(...)`
 
         # Arguments
-            x: The image name(s) . Can be a string or a list of strings. In case of list,
-                multithreading is used to pull the images.
+            x: The image name(s) . Can be a string or a list of strings. In case of
+                list, multithreading is used to pull the images.
+                The progress bars might look strange as multiple
+                processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
 
         # Returns:
@@ -374,7 +376,10 @@ class ImageCLI(DockerCLICaller):
         Alias: `docker.push(...)`
 
         # Arguments
-            tag_or_repo: Tag or repo to push
+            tag_or_repo: Tag(s) or repo(s) to push. Can be a string or a list of strings.
+                If it's a list of string, python-on-whales will push all the images with
+                multiple threads. The progress bars might look strange as multiple
+                processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
         """
         tag_or_repo = to_list(tag_or_repo)
