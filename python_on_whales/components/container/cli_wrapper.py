@@ -1601,8 +1601,7 @@ class ContainerCLI(DockerCLICaller):
         docker.container.remove([cont_1, cont_2])
         ```
         """
-        x = to_list(x)
-        if not x:
+        if x == []:
             # nothing to do
             return []
         full_cmd = self.docker_cmd + ["container", "wait"]
