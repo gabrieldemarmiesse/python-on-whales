@@ -388,3 +388,15 @@ def test_remove_anonymous_volume_too():
 
     assert volume not in docker.volume.list()
     assert container not in docker.ps(all=True)
+
+
+def test_remove_nothing():
+    docker.container.remove([])
+
+
+def test_stop_nothing():
+    docker.container.stop([])
+
+
+def test_kill_nothing():
+    docker.container.stop([])
