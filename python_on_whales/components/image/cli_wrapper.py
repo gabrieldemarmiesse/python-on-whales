@@ -289,7 +289,7 @@ class ImageCLI(DockerCLICaller):
             raise DockerException(full_cmd, exit_code)
         return stdout.decode().splitlines()
 
-    def list(self) -> List[Image]:
+    def list(self, filters: Dict[str, str] = {}) -> List[Image]:
         """Returns the list of Docker images present on the machine.
 
         Alias: `docker.images()`
@@ -305,6 +305,7 @@ class ImageCLI(DockerCLICaller):
             "--quiet",
             "--no-trunc",
         ]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         ids = run(full_cmd).splitlines()
         # the list of tags is bigger than the number of images. We uniquify

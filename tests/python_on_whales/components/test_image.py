@@ -37,6 +37,16 @@ def test_save_iterator_bytes():
     assert i != 0
 
 
+def test_filter_when_listing():
+    docker.pull("hello-world")
+    images_listed = docker.image.list(filters=dict(reference="hello-world"))
+    tags = set()
+    for image in images_listed:
+        for tag in image.repo_tags:
+            tags.add(tag)
+    assert tags == {"hello-world:latest"}
+
+
 def test_save_iterator_bytes_fails():
     docker.image.pull("busybox:1", quiet=True)
     iterator = docker.image.save("busybox:42")
