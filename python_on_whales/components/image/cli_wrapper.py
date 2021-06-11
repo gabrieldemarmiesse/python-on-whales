@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
 from subprocess import PIPE, Popen
 from typing import Any, Dict, Iterator, List, Optional, Union, overload
@@ -325,18 +326,41 @@ class ImageCLI(DockerCLICaller):
         full_cmd.add_args_list("--filter", format_dict_for_cli(filter))
         run(full_cmd)
 
-    def pull(self, image_name: str, quiet: bool = False) -> Image:
-        """Pull a docker image
+    def pull(
+        self, x: Union[str, List[str]], quiet: bool = False
+    ) -> Union[Image, List[Image]]:
+        """Pull one or more docker image(s)
 
         Alias: `docker.pull(...)`
 
         # Arguments
-            image_name: The image name
+            x: The image name(s) . Can be a string or a list of strings. In case of
+                list, multithreading is used to pull the images.
+                The progress bars might look strange as multiple
+                processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
 
         # Returns:
             The Docker image loaded (`python_on_whales.Image` object).
+            If a list was passed as input, then a `List[python_on_whales.Image]` will
+            be returned.
         """
+
+        if x == []:
+            return []
+        elif isinstance(x, str):
+            return self._pull_single_tag(x, quiet=quiet)
+        elif isinstance(x, list) and len(x) == 1:
+            return [self._pull_single_tag(x[0], quiet=quiet)]
+        elif len(x) >= 2:
+            pool = ThreadPool(4)
+            generator = self._generate_args_push_pull(x, quiet)
+            all_images = pool.starmap(self._pull_single_tag, generator)
+            pool.close()
+            pool.join()
+            return all_images
+
+    def _pull_single_tag(self, image_name: str, quiet: bool):
         full_cmd = self.docker_cmd + ["image", "pull"]
 
         if quiet:
@@ -346,15 +370,35 @@ class ImageCLI(DockerCLICaller):
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
         return Image(self.client_config, image_name)
 
-    def push(self, tag_or_repo: str, quiet: bool = False):
+    def push(self, x: Union[str, List[str]], quiet: bool = False):
         """Push a tag or a repository to a registry
 
         Alias: `docker.push(...)`
 
         # Arguments
-            tag_or_repo: Tag or repo to push
+            x: Tag(s) or repo(s) to push. Can be a string or a list of strings.
+                If it's a list of string, python-on-whales will push all the images with
+                multiple threads. The progress bars might look strange as multiple
+                processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
         """
+        x = to_list(x)
+        if len(x) == 0:
+            return
+        elif len(x) == 1:
+            self._push_single_tag(x[0], quiet=quiet)
+        elif len(x) >= 2:
+            pool = ThreadPool(4)
+            generator = self._generate_args_push_pull(x, quiet)
+            pool.starmap(self._push_single_tag, generator)
+            pool.close()
+            pool.join()
+
+    def _generate_args_push_pull(self, _list: List[str], quiet: bool):
+        for tag in _list:
+            yield tag, quiet
+
+    def _push_single_tag(self, tag_or_repo: str, quiet: bool):
         full_cmd = self.docker_cmd + ["image", "push"]
 
         full_cmd.append(tag_or_repo)

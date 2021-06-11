@@ -18,6 +18,7 @@ def test_login_logout(docker_registry_without_login):
         in (Path.home() / ".docker" / "config.json").read_text()
     )
     docker.push(f"{docker_registry_without_login}/my_busybox")
+    docker.push([f"{docker_registry_without_login}/my_busybox" for _ in range(2)])
     docker.pull(f"{docker_registry_without_login}/my_busybox")
     docker.logout(docker_registry_without_login)
     assert (
