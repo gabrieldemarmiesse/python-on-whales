@@ -1375,7 +1375,7 @@ class ContainerCLI(DockerCLICaller):
         if not containers:
             # nothing to do
             return
-        if attach and isinstance(containers, list):
+        if attach and len(containers) > 1:
             raise ValueError("Attaching multiple containers on start is not supported.")
         if not attach and stream:
             raise ValueError(
