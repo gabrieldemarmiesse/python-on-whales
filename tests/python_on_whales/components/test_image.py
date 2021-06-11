@@ -123,6 +123,30 @@ def test_pull_not_quiet():
     assert "busybox:1" in image.repo_tags
 
 
+def test_pull_not_quiet_multiple_images():
+    images_names = ["busybox:1", "hello-world:latest"]
+    try:
+        docker.image.remove(images_names)
+    except DockerException:
+        pass
+    images = docker.pull(images_names)
+    for image_name, image in zip(images_names, images):
+        assert image_name in image.repo_tags
+
+
+def test_pull_not_quiet_multiple_images_break():
+    images_names = ["busybox:1", "hellstuff"]
+    try:
+        docker.image.remove(images_names)
+    except DockerException:
+        pass
+
+    with pytest.raises(DockerException) as err:
+        docker.pull(images_names)
+
+    assert "docker image pull hellstuff" in str(err.value)
+
+
 def test_copy_from_and_to(tmp_path):
     my_image = docker.pull("busybox:1")
     (tmp_path / "dodo.txt").write_text("Hello world!")
