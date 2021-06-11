@@ -370,26 +370,26 @@ class ImageCLI(DockerCLICaller):
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
         return Image(self.client_config, image_name)
 
-    def push(self, tag_or_repo: Union[str, List[str]], quiet: bool = False):
+    def push(self, x: Union[str, List[str]], quiet: bool = False):
         """Push a tag or a repository to a registry
 
         Alias: `docker.push(...)`
 
         # Arguments
-            tag_or_repo: Tag(s) or repo(s) to push. Can be a string or a list of strings.
+            x: Tag(s) or repo(s) to push. Can be a string or a list of strings.
                 If it's a list of string, python-on-whales will push all the images with
                 multiple threads. The progress bars might look strange as multiple
                 processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
         """
-        tag_or_repo = to_list(tag_or_repo)
-        if len(tag_or_repo) == 0:
+        x = to_list(x)
+        if len(x) == 0:
             return
-        elif len(tag_or_repo) == 1:
-            self._push_single_tag(tag_or_repo[0], quiet=quiet)
-        elif len(tag_or_repo) >= 2:
+        elif len(x) == 1:
+            self._push_single_tag(x[0], quiet=quiet)
+        elif len(x) >= 2:
             pool = ThreadPool(4)
-            generator = self._generate_args_push_pull(tag_or_repo, quiet)
+            generator = self._generate_args_push_pull(x, quiet)
             pool.starmap(self._push_single_tag, generator)
             pool.close()
             pool.join()
