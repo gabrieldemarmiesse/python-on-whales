@@ -1,2 +1,3 @@
 global-include *.txt
 global-include *.md
+py.typed
