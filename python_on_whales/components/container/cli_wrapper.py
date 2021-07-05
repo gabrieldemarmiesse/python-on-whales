@@ -693,6 +693,13 @@ class ContainerCLI(DockerCLICaller):
         container: ValidContainer,
         command: Union[str, List[str]],
         detach: bool = False,
+        envs: Dict[str, str] = {},
+        env_files: Union[ValidPath, List[ValidPath]] = [],
+        interactive: bool = False,
+        privileged: bool = False,
+        tty: bool = False,
+        user: Optional[str] = None,
+        workdir: Optional[ValidPath] = None,
     ) -> Optional[str]:
         """Execute a command inside a container
 
@@ -703,6 +710,13 @@ class ContainerCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with `None`. If `False`,
                 returns the command stdout as string.
+            envs: Set environment variables
+            env_files: Read one or more files of environment variables
+            interactive: Keep STDIN open even if not attached
+            privileged: Give extended privileges to the container.
+            tty: Allocate a pseudo-TTY
+            user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
+            workdir: Working directory inside the container
 
         # Returns:
             Optional[str]
@@ -710,6 +724,16 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["exec"]
 
         full_cmd.add_flag("--detach", detach)
+
+        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
+        full_cmd.add_args_list("--env-file", env_files)
+
+        full_cmd.add_flag("--interactive", interactive)
+        full_cmd.add_flag("--privileged", privileged)
+        full_cmd.add_flag("--tty", tty)
+
+        full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(container)
         for arg in to_list(command):
