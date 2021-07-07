@@ -66,7 +66,7 @@ class DockerClient(DockerCLICaller):
         tlsverify: Optional[bool] = None,
         client_config: Optional[ClientConfig] = None,
         compose_files: List[ValidPath] = [],
-        env_file: Optional[ValidPath] = None
+        env_file: Optional[ValidPath] = None,
     ):
 
         if client_config is None:
