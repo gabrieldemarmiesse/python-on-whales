@@ -66,7 +66,7 @@ class DockerClient(DockerCLICaller):
         tlsverify: Optional[bool] = None,
         client_config: Optional[ClientConfig] = None,
         compose_files: List[ValidPath] = [],
-        env_file: Optional[ValidPath] = None,
+        compose_env_file: Optional[ValidPath] = None,
     ):
 
         if client_config is None:
@@ -82,7 +82,7 @@ class DockerClient(DockerCLICaller):
                 tlskey=tlskey,
                 tlsverify=tlsverify,
                 compose_files=compose_files,
-                env_file=env_file,
+                compose_env_file=compose_env_file,
             )
         super().__init__(client_config)
 
