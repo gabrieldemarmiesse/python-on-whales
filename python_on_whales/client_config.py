@@ -51,6 +51,7 @@ class ClientConfig:
     tlsverify: Optional[bool] = None
     client_binary_path: Optional[ValidPath] = None
     compose_files: List[ValidPath] = field(default_factory=list)
+    env_file: Optional[ValidPath] = None
 
     def get_docker_path(self) -> ValidPath:
         if self.client_binary_path is None:
@@ -119,6 +120,9 @@ class ClientConfig:
     def docker_compose_cmd(self) -> Command:
         base_cmd = self.docker_cmd + ["compose"]
         base_cmd.add_args_list("--file", self.compose_files)
+        if self.env_file:
+            base_cmd.add_simple_arg("--env-file", self.env_file)
+
         return base_cmd
 
 
