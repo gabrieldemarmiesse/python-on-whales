@@ -50,6 +50,9 @@ class DockerClient(DockerCLICaller):
            (default "info")
         tls:  Use TLS; implied by `tlsverify`
         tlscacert: Trust certs signed only by this CA (default "~/.docker/ca.pem")
+        compose_files: Docker compose yaml file
+        compose_env_file: .env file containing the environments variables to inject
+            into the compose project. By default, it uses `./.env`.
     """
 
     def __init__(
