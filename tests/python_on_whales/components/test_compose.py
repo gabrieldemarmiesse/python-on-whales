@@ -1,4 +1,5 @@
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 
@@ -157,3 +158,18 @@ def test_docker_compose_up_abort_on_container_exit():
     for container in docker.compose.ps():
         assert not container.state.running
     docker.compose.down()
+
+
+def test_passing_env_files(tmp_path: Path):
+    compose_env_file = tmp_path / "dodo.env"
+    compose_env_file.write_text("SOME_VARIABLE_TO_INSERT=hello\n")
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_env_file=compose_env_file,
+    )
+    output = docker.compose.config()
+
+    assert output.services["alpine"].environment["SOME_VARIABLE"] == "hello"
