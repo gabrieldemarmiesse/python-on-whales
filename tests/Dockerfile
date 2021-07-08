@@ -3,6 +3,7 @@ FROM busybox as get_buildx
 RUN wget -O /docker-buildx https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-amd64
 RUN chmod a+x /docker-buildx
 
+#-----------------------------------------------------------------------------
 FROM busybox as get_compose
 
 RUN wget -O /docker-compose https://github.com/docker/compose-cli/releases/download/v2.0.0-beta.6/docker-compose-linux-amd64
