@@ -1,0 +1,271 @@
+{
+    "Id": "349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b",
+    "Created": "2021-05-28T10:38:18.316288044Z",
+    "Path": "docker-entrypoint.sh",
+    "Args": [
+        "-c",
+        "log_statement=all",
+        "-c",
+        "log_destination=stderr"
+    ],
+    "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1286729,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2021-05-28T10:41:41.754118374Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+    },
+    "Image": "sha256:4b131fd7f84e715e3417a9ad3689cf550c73cbbb2b0cb981ccabb61bbf61814d",
+    "ResolvConfPath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/resolv.conf",
+    "HostnamePath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/hostname",
+    "HostsPath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/hosts",
+    "LogPath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b-json.log",
+    "Name": "/scube_postgis_1",
+    "RestartCount": 0,
+    "Driver": "overlay2",
+    "Platform": "linux",
+    "MountLabel": "",
+    "ProcessLabel": "",
+    "AppArmorProfile": "docker-default",
+    "ExecIDs": null,
+    "HostConfig": {
+        "Binds": [],
+        "ContainerIDFile": "",
+        "LogConfig": {
+            "Type": "json-file",
+            "Config": {}
+        },
+        "NetworkMode": "scube_default",
+        "PortBindings": {
+            "5432/tcp": [
+                {
+                    "HostIp": "",
+                    "HostPort": "5432"
+                }
+            ]
+        },
+        "RestartPolicy": {
+            "Name": "on-failure",
+            "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": [],
+        "CapAdd": null,
+        "CapDrop": null,
+        "CgroupnsMode": "host",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": null,
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "SecurityOpt": null,
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "runc",
+        "ConsoleSize": [
+            0,
+            0
+        ],
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 0,
+        "NanoCpus": 0,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "KernelMemory": 0,
+        "KernelMemoryTCP": 0,
+        "MemoryReservation": 0,
+        "MemorySwap": 0,
+        "MemorySwappiness": null,
+        "OomKillDisable": false,
+        "PidsLimit": null,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Target": "/var/lib/postgresql/data",
+                "VolumeOptions": {}
+            },
+            {
+                "Type": "volume",
+                "Target": "/db-dumps",
+                "VolumeOptions": {}
+            }
+        ],
+        "MaskedPaths": [
+            "/proc/asound",
+            "/proc/acpi",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/sys/firmware"
+        ],
+        "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+        ]
+    },
+    "GraphDriver": {
+        "Data": {
+            "LowerDir": "/var/lib/docker/overlay2/0780e6ef8e78e8b727def9f35408393f2b1f33cf75b73a7d0433010babc6832a-init/diff:/var/lib/docker/overlay2/c6261b6c9b0244dba66096404ae20fdc91e99b867ca7e0e61631320da26c2dcb/diff:/var/lib/docker/overlay2/2a88cbfea106bddd439745f1d950dfcf0ad3e29fd8a2ca9e7157d5bd6e5a4ba8/diff:/var/lib/docker/overlay2/56ef01c3c679be41e63bc6e1735de35892326ba671b08305000abb8e6d7e449e/diff:/var/lib/docker/overlay2/84d083b924ab258e79c9555a2e4aaad9657bd04c26ed515265650e9d0fb919d6/diff:/var/lib/docker/overlay2/25a4a96c1246c4e4b66a646c0dbdf04d61794db2f5a667b61c64d1a3bc88cb71/diff:/var/lib/docker/overlay2/0100fbe3f59c0ca181222f6a8ae6efd1d56130f7a37d98323a4e5e880a2191ac/diff:/var/lib/docker/overlay2/bd8d2a487d8514eb117b62cee34d1c3cc919668c049ed61ddc613dbf9524c5ff/diff:/var/lib/docker/overlay2/670b8cbbcf669ea6d872f97194a890cf4ada4e4dfd9fad38af14c7888e3ac7f0/diff:/var/lib/docker/overlay2/12b92601df158850f1be575b76766e884235b83bc383e17ea8bda2da41b0bed2/diff:/var/lib/docker/overlay2/f7cc93d72fdc5721f5545444e105726bbec78835b53f32193afa68e4fef1cf09/diff:/var/lib/docker/overlay2/aa03e8189c6bac6a6fabc8f2d40a947a24e0420af9838ac5be364eb5ca940aec/diff:/var/lib/docker/overlay2/8401c9779bd66509ed231c8db1082ea332dd6c6f81c17714438ed16bdeba6da5/diff:/var/lib/docker/overlay2/feeea8c83ba1029d491f299ff3ba76cc80e5b07d5ca939639b911704de52f085/diff:/var/lib/docker/overlay2/1cd9f6b8493534f1e2b8383b68983bbc63e528b27b9ac010cd6e29a2e7bdd82c/diff:/var/lib/docker/overlay2/d278595270fce5dcf013326eebb9ad706b9d707a7b447c61c3130af574f42925/diff:/var/lib/docker/overlay2/2b65ccf35d499916de4cb2a64992410c92f336d1187abe2aa0ca77a6bac279c4/diff:/var/lib/docker/overlay2/ea253c5ec03ac76712f4e18deb012cc89cb7e3fe83aced7b2958e340f3a271cd/diff:/var/lib/docker/overlay2/e1d38cb959a0812f970ddea717cda96a4fd265bba42d5a18fa1e5e4fda442b23/diff:/var/lib/docker/overlay2/60645d373b1169711d63907cf9233d16823856a2ac0fe79ba933463fecbb0771/diff:/var/lib/docker/overlay2/61f92a87e596619088a8981c0d208c0f2fd7ee071d30e8940af9228d47e7b38f/diff:/var/lib/docker/overlay2/b1db42c4b2cb0cb2e8d8313fc3bdc586d202e1b8da1bcb9dc0d6e124744f1410/diff:/var/lib/docker/overlay2/d990db0dc1fbed80f7ff720e02eeb7406cedd5bea9db1d76e83e1e54edd25923/diff:/var/lib/docker/overlay2/0d9880759c3b5327689e7b967c28a9a46d3908dc4f0cf2f718051c266cb21524/diff:/var/lib/docker/overlay2/2c63782e2abc51d95cdb301ac379137eae8eee36de11b5b4b29b2c7233adb6af/diff:/var/lib/docker/overlay2/428daf0076951f727c1c4c4767ea5357b5701d4222006674dd2ef217d609d7a4/diff:/var/lib/docker/overlay2/2f61bf8f528e88a98b1dc54616b7aa13de244823b2664cdc051dc5bdc039b4eb/diff:/var/lib/docker/overlay2/ded6ce9835fd68e663adf30071fc3c035eda3e180d60d67d4c921b66b0b48a38/diff",
+            "MergedDir": "/var/lib/docker/overlay2/0780e6ef8e78e8b727def9f35408393f2b1f33cf75b73a7d0433010babc6832a/merged",
+            "UpperDir": "/var/lib/docker/overlay2/0780e6ef8e78e8b727def9f35408393f2b1f33cf75b73a7d0433010babc6832a/diff",
+            "WorkDir": "/var/lib/docker/overlay2/0780e6ef8e78e8b727def9f35408393f2b1f33cf75b73a7d0433010babc6832a/work"
+        },
+        "Name": "overlay2"
+    },
+    "Mounts": [
+        {
+            "Type": "volume",
+            "Name": "scube_postgis-data",
+            "Destination": "/var/lib/postgresql/data",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+        },
+        {
+            "Type": "volume",
+            "Name": "scube_postgis-data-dumps",
+            "Destination": "/db-dumps",
+            "Driver": "local",
+            "Mode": "z",
+            "RW": true,
+            "Propagation": ""
+        }
+    ],
+    "Config": {
+        "Hostname": "349556945f4e",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "AttachStderr": true,
+        "ExposedPorts": {
+            "5432/tcp": {}
+        },
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "POSTGIS_VERSION=2.5.5+dfsg-1.pgdg90+2"
+        ],
+        "Cmd": [
+            "-c",
+            "log_statement=all",
+            "-c",
+            "log_destination=stderr"
+        ],
+        "Image": "sha256:4b131fd7f84e715e3417a9ad3689cf550c73cbbb2b0cb981ccabb61bbf61814d",
+        "Volumes": {
+            "/db-dumps": {},
+            "/var/lib/postgresql/data": {}
+        },
+        "WorkingDir": "/db-migrations",
+        "Entrypoint": [
+            "docker-entrypoint.sh"
+        ],
+        "OnBuild": null,
+        "Labels": {
+            "com.docker.compose.config-hash": "f9c82edff1bea51788b6e2bb9e1f2d95a1af728ae5cc807bd9c0dc43c29b869f",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "scube",
+            "com.docker.compose.service": "postgis",
+            "com.docker.compose.version": "1.0-alpha",
+            "maintainer": "PostGIS Project - https://postgis.net"
+        },
+        "StopSignal": "SIGINT"
+    },
+    "NetworkSettings": {
+        "Bridge": "",
+        "SandboxID": "83efce2f9551774ba8b1f9062adb00e9dcca954b8251b44948736a082a1f4487",
+        "HairpinMode": false,
+        "LinkLocalIPv6Address": "",
+        "LinkLocalIPv6PrefixLen": 0,
+        "Ports": {
+            "5432/tcp": [
+                {
+                    "HostIp": "0.0.0.0",
+                    "HostPort": "5432"
+                },
+                {
+                    "HostIp": "::",
+                    "HostPort": "5432"
+                }
+            ]
+        },
+        "SandboxKey": "/var/run/docker/netns/83efce2f9551",
+        "SecondaryIPAddresses": null,
+        "SecondaryIPv6Addresses": null,
+        "EndpointID": "",
+        "Gateway": "",
+        "GlobalIPv6Address": "",
+        "GlobalIPv6PrefixLen": 0,
+        "IPAddress": "",
+        "IPPrefixLen": 0,
+        "IPv6Gateway": "",
+        "MacAddress": "",
+        "Networks": {
+            "scube_default": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": [
+                    "postgis",
+                    "349556945f4e"
+                ],
+                "NetworkID": "1e3fa577774b1be911c3ed13d9ea5f0704cfa153cf2270016b51cd5d0eee4b26",
+                "EndpointID": "d38e076cd94a252358673cb12d36813df6805b4bf6f62e81bd06f09dae6db493",
+                "Gateway": "172.21.0.1",
+                "IPAddress": "172.21.0.2",
+                "IPPrefixLen": 16,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "MacAddress": "02:42:ac:15:00:02",
+                "DriverOpts": null
+            }
+        }
+    }
+}
