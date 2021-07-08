@@ -221,7 +221,7 @@ class ContainerConfig(DockerCamelModel):
 class Mount(DockerCamelModel):
     type: Optional[str]
     name: Optional[str]
-    source: str
+    source: Optional[str]
     destination: str
     driver: Optional[str]
     mode: str
