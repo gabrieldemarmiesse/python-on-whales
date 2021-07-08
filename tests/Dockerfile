@@ -3,6 +3,12 @@ FROM busybox as get_buildx
 RUN wget -O /docker-buildx https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-amd64
 RUN chmod a+x /docker-buildx
 
+FROM busybox as get_compose
+
+RUN wget -O /docker-compose https://github.com/docker/compose-cli/releases/download/v2.0.0-beta.6/docker-compose-linux-amd64
+RUN chmod a+x /docker-compose
+
+
 #-----------------------------------------------------------------------------
 FROM python:3.7 as python_dependencies
 
@@ -25,7 +31,8 @@ RUN black --check ./
 FROM python_dependencies as tests_with_binaries
 COPY --from=docker:20.10 /usr/local/bin/docker /usr/bin/
 COPY --from=get_buildx /docker-buildx /root/.docker/cli-plugins/
-RUN curl -L https://raw.githubusercontent.com/docker/compose-cli/v1.0.17/scripts/install/install_linux.sh | sh
+COPY --from=get_compose /docker-compose /root/.docker/cli-plugins/
+
 WORKDIR /python-on-whales
 ENV HOME=/root
 
