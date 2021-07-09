@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 import pydantic
 
-from python_on_whales.utils import DockerCamelModel
+from python_on_whales.utils import DockerCamelModel, all_fields_optional
 
 
 class ObjectVersion(DockerCamelModel):
@@ -44,10 +44,11 @@ class LogDriver(DockerCamelModel):
     options: Dict[str, str]
 
 
+@all_fields_optional
 class NetworkAttachmentConfig(DockerCamelModel):
     target: str
     aliases: List[str]
-    driver_opts: Optional[Dict[str, str]]
+    driver_opts: Dict[str, str]
 
 
 class Platform(DockerCamelModel):
