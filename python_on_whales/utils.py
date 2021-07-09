@@ -226,3 +226,10 @@ def read_env_files(env_files: List[Path]) -> Dict[str, str]:
     for file in env_files:
         result_dict.update(read_env_file(file))
     return result_dict
+
+
+def all_fields_optional(cls):
+    """Decorator function used to modify a pydantic model's fields to all be optional."""
+    for field in cls.__fields__.values():
+        field.required = False
+    return cls

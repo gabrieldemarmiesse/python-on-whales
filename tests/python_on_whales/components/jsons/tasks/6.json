@@ -1,0 +1,126 @@
+{
+  "ID": "z9382z35bvw0earue1tvorel5",
+  "Version": {
+    "Index": 3370
+  },
+  "CreatedAt": "2021-07-09T17:34:59.2002062Z",
+  "UpdatedAt": "2021-07-09T17:35:00.676241Z",
+  "Labels": {},
+  "Spec": {
+    "ContainerSpec": {
+      "Image": "xxxx/xxxx:1.0.0@sha256:57d28200bd23ff51aab203498ffc6eb79a32be560f1d2ea102761eca29136abc",
+      "Labels": {
+        "com.docker.stack.namespace": "xxxx"
+      },
+      "Args": [
+        "-h",
+        "aaa",
+        "-p",
+        "6666",
+        "-d",
+        "aa",
+        "-u",
+        "aa",
+        "-pw",
+        "aa",
+        "-t",
+        "aa",
+        "-r",
+        "aa"
+      ],
+      "Privileges": {
+        "CredentialSpec": null,
+        "SELinuxContext": null
+      },
+      "Hosts": [
+        "127.0.0.1 localhost"
+      ],
+      "Secrets": [
+        {
+          "File": {
+            "Name": "aaa",
+            "UID": "0",
+            "GID": "0",
+            "Mode": 292
+          },
+          "SecretID": "aaa",
+          "SecretName": "aaa"
+        }
+      ],
+      "Isolation": "default"
+    },
+    "Resources": {
+      "Limits": {
+        "NanoCPUs": 14000000000
+      },
+      "Reservations": {
+        "NanoCPUs": 14000000000
+      }
+    },
+    "RestartPolicy": {
+      "Condition": "none",
+      "MaxAttempts": 0
+    },
+    "Placement": {
+      "Constraints": [
+        "node.role == manager"
+      ],
+      "Platforms": [
+        {
+          "Architecture": "amd64",
+          "OS": "linux"
+        }
+      ]
+    },
+    "Networks": [
+      {
+        "Target": "xgkebiqoh7rhb27irhgr7dnev"
+      }
+    ],
+    "ForceUpdate": 0
+  },
+  "ServiceID": "4kb4zu9du8b0pui4lyt820gia",
+  "Slot": 1,
+  "NodeID": "o6lvbcj08gbweofyg6hjzysgx",
+  "Status": {
+    "Timestamp": "2021-07-09T17:35:00.3918131Z",
+    "State": "failed",
+    "Message": "started",
+    "Err": "task: non-zero exit (1)",
+    "ContainerStatus": {
+      "ContainerID": "ee2cfb7ebcf80298238ff41af8871529cc494af223054cd43233640ec02e245f",
+      "PID": 0,
+      "ExitCode": 1
+    },
+    "PortStatus": {}
+  },
+  "DesiredState": "shutdown",
+  "NetworksAttachments": [
+    {
+      "Network": {
+        "ID": "xgkebiqoh7rhb27irhgr7dnev",
+        "Version": {
+          "Index": 2916
+        },
+        "CreatedAt": "2021-03-30T11:42:28.9523662Z",
+        "UpdatedAt": "2021-07-09T09:41:36.1615405Z",
+        "Spec": {
+          "Name": "host",
+          "Labels": {
+            "com.docker.swarm.predefined": "true"
+          },
+          "DriverConfiguration": {
+            "Name": "host"
+          },
+          "Scope": "swarm"
+        },
+        "DriverState": {
+          "Name": "host"
+        },
+        "IPAMOptions": {
+          "Driver": {}
+        }
+      }
+    }
+  ]
+}
