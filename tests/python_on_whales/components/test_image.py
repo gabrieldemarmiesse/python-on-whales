@@ -169,3 +169,10 @@ def test_copy_from_and_to_directory(tmp_path):
     new_image_name = docker.image.inspect(new_image_name)
     new_image_name.copy_from("/some_path", tmp_path / "some_path")
     assert "Hello world!" == (tmp_path / "some_path" / "dodo.txt").read_text()
+
+
+def test_prune():
+    docker.pull("busybox")
+    docker.image.prune(all=True)
+    with pytest.raises(DockerException):
+        docker.image.inspect("busybox")
