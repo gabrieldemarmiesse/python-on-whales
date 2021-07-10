@@ -407,3 +407,13 @@ def test_exec_env():
         result = c.execute(["bash", "-c", "echo $DODO"], envs={"DODO": "dada"})
 
     assert result == "dada"
+
+
+def test_exec_env_file(tmp_path):
+
+    env_file = tmp_path / "variables.env"
+    env_file.write_text("DODO=dada\n")
+
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        result = c.execute(["bash", "-c", "echo $DODO"], env_files=[env_file])
+    assert result == "dada"
