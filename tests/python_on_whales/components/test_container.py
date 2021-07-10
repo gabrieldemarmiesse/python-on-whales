@@ -417,3 +417,9 @@ def test_exec_env_file(tmp_path):
     with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         result = c.execute(["bash", "-c", "echo $DODO"], env_files=[env_file])
     assert result == "dada"
+
+
+def test_exec_privilged_flag():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        c.execute(["ip", "link", "add", "dummy0", "type", "dummy"], privileged=True)
+        c.execute(["ip", "link", "delete", "dummy0"], privileged=True)
