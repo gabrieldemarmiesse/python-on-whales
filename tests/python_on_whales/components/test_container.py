@@ -400,3 +400,10 @@ def test_stop_nothing():
 
 def test_kill_nothing():
     docker.container.stop([])
+
+
+def test_exec_env():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        result = c.execute(["bash", "-c", "echo $DODO"], envs={"DODO": "dada"})
+
+    assert result == "dada"
