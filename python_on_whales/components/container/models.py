@@ -102,7 +102,7 @@ class ContainerTmpfsOptions(DockerCamelModel):
 
 class ContainerMount(DockerCamelModel):
     target: Path
-    source: str
+    source: Optional[str]
     type: str
     read_only: Optional[bool]
     consistency: Optional[str]
@@ -221,7 +221,7 @@ class ContainerConfig(DockerCamelModel):
 class Mount(DockerCamelModel):
     type: Optional[str]
     name: Optional[str]
-    source: str
+    source: Optional[str]
     destination: str
     driver: Optional[str]
     mode: str

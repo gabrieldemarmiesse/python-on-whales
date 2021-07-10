@@ -321,7 +321,7 @@ class ImageCLI(DockerCLICaller):
             all: Remove all unused images, not just dangling ones
             filter: Provide filter values (e.g. `{"until": "<timestamp>"}`)
         """
-        full_cmd = self.docker_cmd + ["image", "prune"]
+        full_cmd = self.docker_cmd + ["image", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_args_list("--filter", format_dict_for_cli(filter))
         run(full_cmd)
