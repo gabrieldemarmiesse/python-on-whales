@@ -232,4 +232,5 @@ def all_fields_optional(cls):
     """Decorator function used to modify a pydantic model's fields to all be optional."""
     for field in cls.__fields__.values():
         field.required = False
+        field.allow_none = True
     return cls
