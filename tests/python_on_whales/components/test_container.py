@@ -400,3 +400,45 @@ def test_stop_nothing():
 
 def test_kill_nothing():
     docker.container.stop([])
+
+
+def test_exec_env():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        result = c.execute(["bash", "-c", "echo $DODO"], envs={"DODO": "dada"})
+
+    assert result == "dada"
+
+
+def test_exec_env_file(tmp_path):
+
+    env_file = tmp_path / "variables.env"
+    env_file.write_text("DODO=dada\n")
+
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        result = c.execute(["bash", "-c", "echo $DODO"], env_files=[env_file])
+    assert result == "dada"
+
+
+# TODO: fixme
+@pytest.mark.xfail
+def test_exec_privilged_flag():
+    with docker.run(
+        "ubuntu:18.04", ["sleep", "infinity"], detach=True, remove=True
+    ) as c:
+        c.execute(["apt-get", "update"])
+        c.execute(["apt-get", "install", "-y", "iproute2"])
+        c.execute(["ip", "link", "add", "dummy0", "type", "dummy"], privileged=True)
+        c.execute(["ip", "link", "delete", "dummy0"], privileged=True)
+
+
+def test_exec_change_user():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        c.execute(["useradd", "-ms", "/bin/bash", "newuser"])
+        assert c.execute(["whoami"], user="newuser") == "newuser"
+
+
+def test_exec_change_directory():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        assert c.execute(["pwd"], workdir="/tmp") == "/tmp"
+        assert c.execute(["pwd"], workdir="/etc") == "/etc"
+        assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"

@@ -202,13 +202,35 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).diff(self)
 
-    def execute(self, command: Union[str, List[str]], detach: bool = False):
+    def execute(
+        self,
+        command: Union[str, List[str]],
+        detach: bool = False,
+        envs: Dict[str, str] = {},
+        env_files: Union[ValidPath, List[ValidPath]] = [],
+        # interactive: bool = False,
+        privileged: bool = False,
+        # tty: bool = False,
+        user: Optional[str] = None,
+        workdir: Optional[ValidPath] = None,
+    ):
         """Execute a command in this container
 
         See the [`docker.container.execute`](../sub-commands/container.md#execute)
         command for information about the arguments.
         """
-        return ContainerCLI(self.client_config).execute(self, command, detach)
+        return ContainerCLI(self.client_config).execute(
+            self,
+            command,
+            detach,
+            envs,
+            env_files,
+            # interactive,
+            privileged,
+            # tty,
+            user,
+            workdir,
+        )
 
     def export(self, output: ValidPath) -> None:
         """Export this container filesystem.
@@ -693,6 +715,13 @@ class ContainerCLI(DockerCLICaller):
         container: ValidContainer,
         command: Union[str, List[str]],
         detach: bool = False,
+        envs: Dict[str, str] = {},
+        env_files: Union[ValidPath, List[ValidPath]] = [],
+        # interactive: bool = False,
+        privileged: bool = False,
+        # tty: bool = False,
+        user: Optional[str] = None,
+        workdir: Optional[ValidPath] = None,
     ) -> Optional[str]:
         """Execute a command inside a container
 
@@ -703,6 +732,11 @@ class ContainerCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with `None`. If `False`,
                 returns the command stdout as string.
+            envs: Set environment variables
+            env_files: Read one or more files of environment variables
+            privileged: Give extended privileges to the container.
+            user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
+            workdir: Working directory inside the container
 
         # Returns:
             Optional[str]
@@ -710,6 +744,17 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["exec"]
 
         full_cmd.add_flag("--detach", detach)
+
+        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
+        full_cmd.add_args_list("--env-file", env_files)
+
+        # TODO: activate interactive and tty
+        # full_cmd.add_flag("--interactive", interactive)
+        full_cmd.add_flag("--privileged", privileged)
+        # full_cmd.add_flag("--tty", tty)
+
+        full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(container)
         for arg in to_list(command):
