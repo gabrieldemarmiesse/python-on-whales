@@ -419,6 +419,7 @@ def test_exec_env_file(tmp_path):
     assert result == "dada"
 
 
+# TODO: fixme
 @pytest.mark.xfail
 def test_exec_privilged_flag():
     with docker.run(
