@@ -423,3 +423,16 @@ def test_exec_privilged_flag():
     with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         c.execute(["ip", "link", "add", "dummy0", "type", "dummy"], privileged=True)
         c.execute(["ip", "link", "delete", "dummy0"], privileged=True)
+
+
+def test_exec_change_user():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        c.execute(["useradd", "-ms", "/bin/bash", "newuser"])
+        assert c.execute(["whoami"], user="newuser") == "newuser"
+
+
+def test_exec_change_directory():
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        assert c.execute(["pwd"], workdir="/tmp") == "/tmp"
+        assert c.execute(["pwd"], workdir="/etc") == "/etc"
+        assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"
