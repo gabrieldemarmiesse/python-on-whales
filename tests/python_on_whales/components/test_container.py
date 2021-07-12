@@ -419,8 +419,13 @@ def test_exec_env_file(tmp_path):
     assert result == "dada"
 
 
+@pytest.mark.xfail
 def test_exec_privilged_flag():
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+    with docker.run(
+        "ubuntu:18.04", ["sleep", "infinity"], detach=True, remove=True
+    ) as c:
+        c.execute(["apt-get", "update"])
+        c.execute(["apt-get", "install", "-y", "iproute2"])
         c.execute(["ip", "link", "add", "dummy0", "type", "dummy"], privileged=True)
         c.execute(["ip", "link", "delete", "dummy0"], privileged=True)
 
