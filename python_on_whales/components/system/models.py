@@ -1,18 +1,20 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import pydantic
 
 import python_on_whales.components.node.models
-from python_on_whales.utils import DockerCamelModel
+from python_on_whales.utils import DockerCamelModel, all_fields_optional
 
 
+@all_fields_optional
 class DockerEventActor(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     attributes: Dict[str, Any]
 
 
+@all_fields_optional
 class DockerEvent(DockerCamelModel):
     type: str
     action: str
@@ -21,6 +23,7 @@ class DockerEvent(DockerCamelModel):
     time_nano: int = pydantic.Field(alias="timeNano")
 
 
+@all_fields_optional
 class DockerItemsSummary(DockerCamelModel):
     active: int
     reclaimable: pydantic.ByteSize
@@ -29,6 +32,7 @@ class DockerItemsSummary(DockerCamelModel):
     total_count: int
 
 
+@all_fields_optional
 class Plugins(DockerCamelModel):
     volume: List[str]
     network: List[str]
@@ -36,25 +40,30 @@ class Plugins(DockerCamelModel):
     log: List[str]
 
 
+@all_fields_optional
 class Runtime(DockerCamelModel):
     path: str
-    runtime_args: Optional[List[str]]
+    runtime_args: List[str]
 
 
+@all_fields_optional
 class Commit(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     expected: str
 
 
+@all_fields_optional
 class RemoteManager(DockerCamelModel):
     node_id: str = pydantic.Field(alias="NodeID")
     addr: str
 
 
+@all_fields_optional
 class Orchestration(DockerCamelModel):
     task_history_retention_limit: int
 
 
+@all_fields_optional
 class Raft(DockerCamelModel):
     snapshot_interval: int
     keep_old_snapshots: int
@@ -63,44 +72,49 @@ class Raft(DockerCamelModel):
     heartbeat_tick: int
 
 
+@all_fields_optional
 class SwarmDispatcher(DockerCamelModel):
     heartbeat_period: int
 
 
+@all_fields_optional
 class SwarmCAConfig(DockerCamelModel):
     node_cert_expiry: int
-    external_ca: Optional[List[Any]] = pydantic.Field(
-        alias="ExternalCA"
-    )  # TODO: set type
-    signing_ca_cert: Optional[str] = pydantic.Field(alias="SigningCACert")
-    signing_ca_key: Optional[str] = pydantic.Field(alias="SigningCAKey")
-    force_rotate: Optional[int]
+    external_ca: List[Any] = pydantic.Field(alias="ExternalCA")  # TODO: set type
+    signing_ca_cert: str = pydantic.Field(alias="SigningCACert")
+    signing_ca_key: str = pydantic.Field(alias="SigningCAKey")
+    force_rotate: int
 
 
+@all_fields_optional
 class SwarmEncryptionConfig(DockerCamelModel):
     auto_lock_managers: bool
 
 
+@all_fields_optional
 class Driver(DockerCamelModel):
     name: str
     options: Dict[str, Any]
 
 
+@all_fields_optional
 class SwarmTasksDefault(DockerCamelModel):
-    log_driver: Optional[Driver]
+    log_driver: Driver
 
 
+@all_fields_optional
 class SwarmSpec(DockerCamelModel):
     name: str
     labels: Dict[str, str]
-    orchestration: Optional[Orchestration]
+    orchestration: Orchestration
     raft: Raft
-    dispatcher: Optional[SwarmDispatcher]
-    ca_config: Optional[SwarmCAConfig] = pydantic.Field(alias="CAConfig")
+    dispatcher: SwarmDispatcher
+    ca_config: SwarmCAConfig = pydantic.Field(alias="CAConfig")
     encryption_config: SwarmEncryptionConfig
     task_defaults: SwarmTasksDefault
 
 
+@all_fields_optional
 class ClusterInfo(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     version: python_on_whales.components.node.models.NodeVersion
@@ -114,18 +128,20 @@ class ClusterInfo(DockerCamelModel):
     subnet_size: int
 
 
+@all_fields_optional
 class SwarmInfo(DockerCamelModel):
     node_id: str = pydantic.Field(alias="NodeID")
     node_addr: str
     local_node_state: str
     control_available: bool
     error: str
-    remote_managers: Optional[List[RemoteManager]]
-    nodes: Optional[int]
-    managers: Optional[int]
-    cluster: Optional[ClusterInfo]
+    remote_managers: List[RemoteManager]
+    nodes: int
+    managers: int
+    cluster: ClusterInfo
 
 
+@all_fields_optional
 class ClientPlugin(DockerCamelModel):
     schema_version: str
     vendor: str
@@ -133,15 +149,17 @@ class ClientPlugin(DockerCamelModel):
     short_description: str
     name: str
     path: Path
-    shadowed_paths: Optional[List[Path]]
+    shadowed_paths: List[Path]
 
 
+@all_fields_optional
 class ClientInfo(DockerCamelModel):
     debug: bool
     plugins: List[ClientPlugin]
-    warnings: Optional[List[str]]
+    warnings: List[str]
 
 
+@all_fields_optional
 class SystemInfo(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
     containers: int
@@ -152,7 +170,7 @@ class SystemInfo(DockerCamelModel):
     driver: str
     driver_status: List[List[str]]
     docker_root_dir: Path
-    system_status: Optional[List[str]]
+    system_status: List[str]
     plugins: Plugins
     memory_limit: bool
     swap_limit: bool
@@ -181,9 +199,8 @@ class SystemInfo(DockerCamelModel):
     mem_total: int
     index_server_address: str
     registry_config: Dict[str, Any]
-    generic_resources: Optional[
-        List[python_on_whales.components.node.models.NodeGenericResource]
-    ]
+    generic_resources: List[python_on_whales.components.node.models.NodeGenericResource]
+
     http_proxy: str
     https_proxy: str
     no_proxy: str
@@ -191,7 +208,7 @@ class SystemInfo(DockerCamelModel):
     labels: Dict[str, str]
     experimental_build: bool
     server_version: str
-    cluster_store: Optional[str]
+    cluster_store: str
     runtimes: Dict[str, Runtime]
     default_runtime: str
     swarm: SwarmInfo
@@ -201,7 +218,7 @@ class SystemInfo(DockerCamelModel):
     containerd_commit: Commit
     runc_commit: Commit
     init_commit: Commit
-    security_options: Optional[List[str]]
-    product_license: Optional[str]
-    warnings: Optional[List[str]]
+    security_options: List[str]
+    product_license: str
+    warnings: List[str]
     client_info: ClientInfo
