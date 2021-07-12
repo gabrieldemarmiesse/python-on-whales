@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import python_on_whales.components.container.models
-from python_on_whales.utils import DockerCamelModel
+from python_on_whales.utils import DockerCamelModel, all_fields_optional
 
 
+@all_fields_optional
 class ImageHealthcheck(DockerCamelModel):
     test: List[str]
     interval: int
@@ -13,17 +14,20 @@ class ImageHealthcheck(DockerCamelModel):
     start_period: int
 
 
+@all_fields_optional
 class ImageGraphDriver(DockerCamelModel):
     name: str
     data: Any
 
 
+@all_fields_optional
 class ImageRootFS(DockerCamelModel):
     type: str
-    layers: Optional[List[str]]
-    base_layer: Optional[str]
+    layers: List[str]
+    base_layer: str
 
 
+@all_fields_optional
 class ImageInspectResult(DockerCamelModel):
     id: str
     repo_tags: List[str]
@@ -38,9 +42,9 @@ class ImageInspectResult(DockerCamelModel):
     config: python_on_whales.components.container.models.ContainerConfig
     architecture: str
     os: str
-    os_version: Optional[str]
+    os_version: str
     size: int
     virtual_size: int
     graph_driver: ImageGraphDriver
     root_fs: ImageRootFS
-    metadata: Optional[Dict[str, str]]
+    metadata: Dict[str, str]

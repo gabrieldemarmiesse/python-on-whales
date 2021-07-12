@@ -1,16 +1,17 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-from python_on_whales.utils import DockerCamelModel
+from python_on_whales.utils import DockerCamelModel, all_fields_optional
 
 
+@all_fields_optional
 class VolumeInspectResult(DockerCamelModel):
     name: str
     driver: str
     mountpoint: Path
     created_at: datetime
-    status: Optional[Dict[str, Any]]
-    labels: Optional[Dict[str, str]]
+    status: Dict[str, Any]
+    labels: Dict[str, str]
     scope: str
-    options: Optional[Dict[str, str]]
+    options: Dict[str, str]
