@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pydantic import Field
 
@@ -22,7 +22,7 @@ class Resources(DockerCamelModel):
 class ContainerSpec(DockerCamelModel):
     image: str
     labels: Dict[str, str]
-    privileges: Dict[str, str]
+    privileges: Dict[str, Optional[str]]
     stop_grace_period: int
     isolation: str
     env: List[str]
