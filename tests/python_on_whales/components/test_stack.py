@@ -9,6 +9,7 @@ from python_on_whales.utils import PROJECT_ROOT
 
 @pytest.fixture
 def with_test_stack(swarm_mode):
+    time.sleep(1)
     some_stack = docker.stack.deploy(
         "some_stack",
         [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
