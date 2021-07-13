@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
 
-from python_on_whales.exceptions import DockerException, NoSuchImage
+from python_on_whales.exceptions import DockerException, NoSuchImage, NoSuchService
 
 PROJECT_ROOT = Path(__file__).parents[1]
 
@@ -95,8 +95,15 @@ def run(
 
     if completed_process.returncode != 0:
         if completed_process.stderr is not None:
-            if "No such image" in completed_process.stderr.decode():
+            if "no such image" in completed_process.stderr.decode().lower():
                 raise NoSuchImage(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+            if "no such service" in completed_process.stderr.decode().lower():
+                raise NoSuchService(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,

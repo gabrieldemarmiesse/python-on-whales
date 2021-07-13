@@ -313,6 +313,8 @@ class ServiceCLI(DockerCLICaller):
             detach: If True, does not wait for the services to converge and return
                 immediately.
         """
+        # verify that the services exists
+        self.inspect(list(new_scales.keys()))
 
         full_cmd = self.docker_cmd + ["service", "scale"]
         full_cmd.add_flag("--detach", detach)
