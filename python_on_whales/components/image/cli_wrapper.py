@@ -179,6 +179,13 @@ class Image(ReloadableObjectFromJson):
         )
 
     def exists(self) -> bool:
+        """Returns `True` if the docker image exists and `False` if it doesn't exists.
+
+        Note that you might have done `docker.image.remove("some_tag")` and the image
+        might still exists because python-on-whales references images by id, not by tag.
+
+         See the `docker.image.exists` command for information about the arguments.
+        """
         return ImageCLI(self.client_config).exists(self.id)
 
 
@@ -247,6 +254,14 @@ class ImageCLI(DockerCLICaller):
             return Image(self.client_config, x)
 
     def exists(self, x: str) -> bool:
+        """Verify that an image exists.
+
+         It's just calling `docker.image.inspect(...)` and verifies that it doesn't throw
+         a `python_on_whales.exceptions.NoSuchImage`.
+
+        # Returns
+            A `bool`
+        """
         try:
             self.inspect(x)
         except NoSuchImage:
