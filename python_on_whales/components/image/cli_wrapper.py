@@ -178,6 +178,9 @@ class Image(ReloadableObjectFromJson):
             self, local_path, path_in_image, new_tag
         )
 
+    def exists(self) -> bool:
+        return ImageCLI(self.client_config).exists(self.id)
+
 
 ValidImage = Union[str, Image]
 
@@ -242,6 +245,14 @@ class ImageCLI(DockerCLICaller):
             return [Image(self.client_config, identifier) for identifier in x]
         else:
             return Image(self.client_config, x)
+
+    def exists(self, x: str) -> bool:
+        try:
+            self.inspect(x)
+        except NoSuchImage:
+            return False
+        else:
+            return True
 
     def load(
         self, input: Union[ValidPath, bytes, Iterator[bytes]], quiet: bool = False
