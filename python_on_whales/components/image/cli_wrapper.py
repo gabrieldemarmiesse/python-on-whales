@@ -228,7 +228,16 @@ class ImageCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Image, List[Image]]:
-        """Creates a `python_on_whales.Image` object."""
+        """Creates a `python_on_whales.Image` object.
+
+        # Returns
+            `python_on_whales.Image`, or `List[python_on_whales.Image]` if the input
+            was a list of strings.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+
+        """
         if isinstance(x, list):
             return [Image(self.client_config, identifier) for identifier in x]
         else:
@@ -381,6 +390,9 @@ class ImageCLI(DockerCLICaller):
                 multiple threads. The progress bars might look strange as multiple
                 processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
         """
         x = to_list(x)
 
@@ -421,6 +433,10 @@ class ImageCLI(DockerCLICaller):
                 `python_on_whales.Image` objects.
             force: Force removal of the image
             prune: Delete untagged parents
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+
         """
 
         full_cmd = self.docker_cmd + ["image", "remove"]
@@ -448,6 +464,11 @@ class ImageCLI(DockerCLICaller):
 
         # Returns
             `Optional[Iterator[bytes]]`. If output is a path, nothing is returned.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+
+        # Example
 
         An example of transfer of an image from a local Docker daemon to a remote Docker
         daemon. We assume that the remote machine has an ssh access:
@@ -504,6 +525,9 @@ class ImageCLI(DockerCLICaller):
         # Arguments
             source_image: The Docker image to tag. You can use a tag to reference it.
             new_tag: The tag to add to the Docker image.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if the image does not exists.
         """
         full_cmd = self.docker_cmd + [
             "image",
