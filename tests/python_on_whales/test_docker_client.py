@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from python_on_whales import DockerException, docker
+from python_on_whales.exceptions import DockerException, docker
 
 
 def test_login_logout(docker_registry_without_login):

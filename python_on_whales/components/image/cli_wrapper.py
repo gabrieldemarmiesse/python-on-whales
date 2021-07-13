@@ -18,8 +18,8 @@ from python_on_whales.components.image.models import (
     ImageInspectResult,
     ImageRootFS,
 )
+from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.utils import (
-    DockerException,
     ValidPath,
     format_dict_for_cli,
     run,
@@ -484,7 +484,10 @@ class ImageCLI(DockerCLICaller):
             yield line
         exit_code = p.wait(0.1)
         if exit_code != 0:
-            raise DockerException(full_cmd, exit_code, stderr=p.stderr.read())
+            stderr = p.stderr.read()
+            if "No such image" in stderr.decode():
+                raise NoSuchImage(full_cmd, exit_code, stderr=stderr)
+            raise DockerException(full_cmd, exit_code, stderr=stderr)
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
         """Adds a tag to a Docker image.

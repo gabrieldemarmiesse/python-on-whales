@@ -8,12 +8,13 @@ from pathlib import Path
 import pytest
 
 import python_on_whales
-from python_on_whales import DockerException, Image, docker
+from python_on_whales import Image, docker
 from python_on_whales.components.container.cli_wrapper import ContainerStats
 from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
 )
+from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
