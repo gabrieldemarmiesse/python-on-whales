@@ -1,7 +1,8 @@
 import tempfile
 from pathlib import Path
 
-from python_on_whales import DockerException, docker
+from python_on_whales import docker
+from python_on_whales.exceptions import DockerException
 
 
 def write_code(i: int, attribute_access: str, value) -> str:

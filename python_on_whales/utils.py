@@ -8,6 +8,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
 
+from python_on_whales.exceptions import DockerException, NoSuchImage
+
 PROJECT_ROOT = Path(__file__).parents[1]
 
 
@@ -61,36 +63,6 @@ class DockerCamelModel(pydantic.BaseModel):
         allow_population_by_field_name = True
 
 
-class DockerException(Exception):
-    def __init__(
-        self,
-        command_launched: List[str],
-        return_code: int,
-        stdout: Optional[bytes] = None,
-        stderr: Optional[bytes] = None,
-    ):
-        command_launched_str = " ".join(command_launched)
-        error_msg = (
-            f"The docker command executed was `{command_launched_str}`.\n"
-            f"It returned with code {return_code}\n"
-        )
-        if stdout is not None:
-            error_msg += f"The content of stdout is '{stdout.decode()}'\n"
-        else:
-            error_msg += (
-                "The content of stdout can be found above the "
-                "stacktrace (it wasn't captured).\n"
-            )
-        if stderr is not None:
-            error_msg += f"The content of stderr is '{stderr.decode()}'\n"
-        else:
-            error_msg += (
-                "The content of stderr can be found above the "
-                "stacktrace (it wasn't captured)."
-            )
-        super().__init__(error_msg)
-
-
 def run(
     args: List[Any],
     capture_stdout: bool = True,
@@ -122,6 +94,15 @@ def run(
     )
 
     if completed_process.returncode != 0:
+        if completed_process.stderr is not None:
+            if "No such image" in completed_process.stderr.decode():
+                raise NoSuchImage(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+
         raise DockerException(
             args,
             completed_process.returncode,

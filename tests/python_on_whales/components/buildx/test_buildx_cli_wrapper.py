@@ -2,8 +2,9 @@ import os
 
 import pytest
 
-from python_on_whales import DockerException, docker
+from python_on_whales import docker
 from python_on_whales.components.buildx.models import BuilderInspectResult
+from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import set_cache_validity_period
 from python_on_whales.utils import PROJECT_ROOT
 

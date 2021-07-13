@@ -1,7 +1,8 @@
 import pytest
 
-from python_on_whales import DockerException, docker
+from python_on_whales import docker
 from python_on_whales.components.network.cli_wrapper import NetworkInspectResult
+from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 

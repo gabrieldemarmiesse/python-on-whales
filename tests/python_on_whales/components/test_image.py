@@ -1,7 +1,8 @@
 import pytest
 
-from python_on_whales import DockerException, docker
+from python_on_whales import docker
 from python_on_whales.components.image.models import ImageInspectResult
+from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
@@ -45,17 +46,6 @@ def test_filter_when_listing():
         for tag in image.repo_tags:
             tags.add(tag)
     assert tags == {"hello-world:latest"}
-
-
-def test_save_iterator_bytes_fails():
-    docker.image.pull("busybox:1", quiet=True)
-    iterator = docker.image.save("busybox:42")
-
-    with pytest.raises(DockerException) as err:
-        for _ in iterator:
-            pass
-    assert "docker image save busybox:42" in str(err.value)
-    assert "Error response from daemon: reference does not exist" in str(err.value)
 
 
 def test_save_iterator_bytes_and_load():
@@ -176,3 +166,39 @@ def test_prune():
     docker.image.prune(all=True)
     with pytest.raises(DockerException):
         docker.image.inspect("busybox")
+
+
+@pytest.mark.parametrize(
+    "docker_function", [docker.image.inspect, docker.image.remove, docker.push]
+)
+def test_no_such_image_with_multiple_functions(docker_function):
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        docker_function(image_name_that_does_not_exists)
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+def test_no_such_image_save():
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        docker.image.save(image_name_that_does_not_exists, output="/tmp/dada")
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+def test_no_such_image_save_generator():
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        for _ in docker.image.save(image_name_that_does_not_exists):
+            pass
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+def test_no_such_image_tag():
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        docker.image.tag(image_name_that_does_not_exists, "something")
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)

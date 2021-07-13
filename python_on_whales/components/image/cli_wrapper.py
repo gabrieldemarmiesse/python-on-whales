@@ -18,8 +18,8 @@ from python_on_whales.components.image.models import (
     ImageInspectResult,
     ImageRootFS,
 )
+from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.utils import (
-    DockerException,
     ValidPath,
     format_dict_for_cli,
     run,
@@ -228,7 +228,16 @@ class ImageCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Image, List[Image]]:
-        """Creates a `python_on_whales.Image` object."""
+        """Creates a `python_on_whales.Image` object.
+
+        # Returns
+            `python_on_whales.Image`, or `List[python_on_whales.Image]` if the input
+            was a list of strings.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+
+        """
         if isinstance(x, list):
             return [Image(self.client_config, identifier) for identifier in x]
         else:
@@ -381,8 +390,15 @@ class ImageCLI(DockerCLICaller):
                 multiple threads. The progress bars might look strange as multiple
                 processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
         """
         x = to_list(x)
+
+        # this is just to raise a correct exception if the images don't exist
+        self.inspect(x)
+
         if len(x) == 0:
             return
         elif len(x) == 1:
@@ -417,6 +433,10 @@ class ImageCLI(DockerCLICaller):
                 `python_on_whales.Image` objects.
             force: Force removal of the image
             prune: Delete untagged parents
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+
         """
 
         full_cmd = self.docker_cmd + ["image", "remove"]
@@ -445,6 +465,11 @@ class ImageCLI(DockerCLICaller):
         # Returns
             `Optional[Iterator[bytes]]`. If output is a path, nothing is returned.
 
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+
+        # Example
+
         An example of transfer of an image from a local Docker daemon to a remote Docker
         daemon. We assume that the remote machine has an ssh access:
 
@@ -465,12 +490,15 @@ class ImageCLI(DockerCLICaller):
         it's a cool example nonetheless.
         """
         full_cmd = self.docker_cmd + ["image", "save"]
+        images = to_list(images)
+
+        # trigger an exception early
+        self.inspect(images)
 
         if output is not None:
             full_cmd += ["--output", str(output)]
 
-        for image in to_list(images):
-            full_cmd.append(str(image))
+        full_cmd += images
         if output is None:
             # we stream the bytes
             return self._save_generator(full_cmd)
@@ -484,7 +512,10 @@ class ImageCLI(DockerCLICaller):
             yield line
         exit_code = p.wait(0.1)
         if exit_code != 0:
-            raise DockerException(full_cmd, exit_code, stderr=p.stderr.read())
+            stderr = p.stderr.read()
+            if "No such image" in stderr.decode():
+                raise NoSuchImage(full_cmd, exit_code, stderr=stderr)
+            raise DockerException(full_cmd, exit_code, stderr=stderr)
 
     def tag(self, source_image: Union[Image, str], new_tag: str):
         """Adds a tag to a Docker image.
@@ -494,6 +525,9 @@ class ImageCLI(DockerCLICaller):
         # Arguments
             source_image: The Docker image to tag. You can use a tag to reference it.
             new_tag: The tag to add to the Docker image.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchImage` if the image does not exists.
         """
         full_cmd = self.docker_cmd + [
             "image",

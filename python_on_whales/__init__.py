@@ -12,7 +12,7 @@ from .components.system.cli_wrapper import SystemInfo
 from .components.task.cli_wrapper import Task
 from .components.volume.cli_wrapper import Volume
 from .docker_client import DockerClient
-from .utils import DockerException
+from .exceptions import DockerException
 
 # alias
 docker = DockerClient()
