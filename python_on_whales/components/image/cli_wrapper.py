@@ -383,6 +383,10 @@ class ImageCLI(DockerCLICaller):
             quiet: If you don't want to see the progress bars.
         """
         x = to_list(x)
+
+        # this is just to raise a correct exception if the images don't exist
+        self.inspect(x)
+
         if len(x) == 0:
             return
         elif len(x) == 1:
@@ -465,12 +469,15 @@ class ImageCLI(DockerCLICaller):
         it's a cool example nonetheless.
         """
         full_cmd = self.docker_cmd + ["image", "save"]
+        images = to_list(images)
+
+        # trigger an exception early
+        self.inspect(images)
 
         if output is not None:
             full_cmd += ["--output", str(output)]
 
-        for image in to_list(images):
-            full_cmd.append(str(image))
+        full_cmd += images
         if output is None:
             # we stream the bytes
             return self._save_generator(full_cmd)

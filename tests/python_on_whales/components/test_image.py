@@ -179,7 +179,9 @@ def test_prune():
         docker.image.inspect("busybox")
 
 
-@pytest.mark.parametrize("docker_function", [docker.image.inspect, docker.image.remove])
+@pytest.mark.parametrize(
+    "docker_function", [docker.image.inspect, docker.image.remove, docker.push]
+)
 def test_no_such_image_with_multiple_functions(docker_function):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -199,7 +201,7 @@ def test_no_such_image_save():
 def test_no_such_image_save_generator():
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
-        for bytes_of_data in docker.image.save(image_name_that_does_not_exists):
+        for _ in docker.image.save(image_name_that_does_not_exists):
             pass
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
