@@ -48,17 +48,6 @@ def test_filter_when_listing():
     assert tags == {"hello-world:latest"}
 
 
-def test_save_iterator_bytes_fails():
-    docker.image.pull("busybox:1", quiet=True)
-    iterator = docker.image.save("busybox:42")
-
-    with pytest.raises(DockerException) as err:
-        for _ in iterator:
-            pass
-    assert "docker image save busybox:42" in str(err.value)
-    assert "Error response from daemon: reference does not exist" in str(err.value)
-
-
 def test_save_iterator_bytes_and_load():
     image_name = "busybox:1"
     docker.image.pull(image_name, quiet=True)
