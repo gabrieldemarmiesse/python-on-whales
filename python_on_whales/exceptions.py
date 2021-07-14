@@ -33,3 +33,7 @@ class DockerException(Exception):
 
 class NoSuchImage(DockerException):
     pass
+
+
+class NoSuchService(DockerException):
+    pass

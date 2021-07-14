@@ -17,6 +17,7 @@ from python_on_whales.components.service.models import (
     ServiceUpdateStatus,
     ServiceVersion,
 )
+from python_on_whales.exceptions import NoSuchService
 from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 
@@ -126,7 +127,7 @@ class Service(ReloadableObjectFromJson):
         """Returns `True` if the service is still present in the swarm, `False`
         if the service has been removed.
         """
-        return self in ServiceCLI(self.client_config).list()
+        return ServiceCLI(self.client_config).exists(self.id)
 
 
 ValidService = Union[str, Service]
@@ -233,11 +234,32 @@ class ServiceCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Service, List[Service]]:
-        """Returns one or a list of `python_on_whales.Service` object(s)."""
+        """Returns one or a list of `python_on_whales.Service` object(s).
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
+        """
         if isinstance(x, str):
             return Service(self.client_config, x)
         else:
             return [Service(self.client_config, a) for a in x]
+
+    def exists(self, x: str) -> bool:
+        """Verify that a service exists.
+
+         It's just calling `docker.service.inspect(...)` and verifies that it doesn't throw
+         a `python_on_whales.exceptions.NoSuchService`.
+
+        # Returns
+            A `bool`
+        """
+        try:
+            self.inspect(x)
+        except NoSuchService:
+            return False
+        else:
+            return True
 
     def logs(self):
         """Not yet implemented"""
@@ -275,6 +297,10 @@ class ServiceCLI(DockerCLICaller):
 
         # Returns
             `List[python_on_whales.Task]`
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
         """
         full_cmd = (
             self.docker_cmd + ["service", "ps", "--quiet", "--no-trunc"] + to_list(x)
@@ -292,6 +318,10 @@ class ServiceCLI(DockerCLICaller):
 
         # Arguments
             services: One or a list of services to remove.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
         """
         full_cmd = self.docker_cmd + ["service", "remove"]
 
@@ -312,7 +342,14 @@ class ServiceCLI(DockerCLICaller):
                 you can provide `new_scale={"service1": 4, "service2": 8}`
             detach: If True, does not wait for the services to converge and return
                 immediately.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
+
         """
+        # verify that the services exists
+        self.inspect(list(new_scales.keys()))
 
         full_cmd = self.docker_cmd + ["service", "scale"]
         full_cmd.add_flag("--detach", detach)
@@ -339,6 +376,9 @@ class ServiceCLI(DockerCLICaller):
             image: Service image tag
             with_registry_authentication: Send registry authentication details
                 to swarm agents
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if the service doesn't exists.
         """
         full_cmd = self.docker_cmd + ["service", "update"]
         full_cmd.add_flag("--force", force)

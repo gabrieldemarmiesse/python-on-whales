@@ -4,6 +4,7 @@ import pytest
 
 from python_on_whales import docker
 from python_on_whales.components.service.models import ServiceInspectResult
+from python_on_whales.exceptions import NoSuchService
 from python_on_whales.test_utils import get_all_jsons
 
 
@@ -44,3 +45,19 @@ def test_context_manager():
             raise RuntimeError
 
     assert not my_service.exists()
+
+
+@pytest.mark.parametrize(
+    "docker_function",
+    [docker.service.inspect, docker.service.remove, docker.service.ps],
+)
+@pytest.mark.usefixtures("swarm_mode")
+def test_some_functions_no_such_service(docker_function):
+    with pytest.raises(NoSuchService):
+        docker_function("DOODODGOIHURHURI")
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_scale_no_such_service():
+    with pytest.raises(NoSuchService):
+        docker.service.scale({"DOODODGOIHURHURI": 14})
