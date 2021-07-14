@@ -17,6 +17,7 @@ from python_on_whales.components.service.models import (
     ServiceUpdateStatus,
     ServiceVersion,
 )
+from python_on_whales.exceptions import NoSuchService
 from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 
@@ -126,7 +127,7 @@ class Service(ReloadableObjectFromJson):
         """Returns `True` if the service is still present in the swarm, `False`
         if the service has been removed.
         """
-        return self in ServiceCLI(self.client_config).list()
+        return ServiceCLI(self.client_config).exists(self.id)
 
 
 ValidService = Union[str, Service]
@@ -243,6 +244,22 @@ class ServiceCLI(DockerCLICaller):
             return Service(self.client_config, x)
         else:
             return [Service(self.client_config, a) for a in x]
+
+    def exists(self, x: str) -> bool:
+        """Verify that a service exists.
+
+         It's just calling `docker.service.inspect(...)` and verifies that it doesn't throw
+         a `python_on_whales.exceptions.NoSuchService`.
+
+        # Returns
+            A `bool`
+        """
+        try:
+            self.inspect(x)
+        except NoSuchService:
+            return False
+        else:
+            return True
 
     def logs(self):
         """Not yet implemented"""
