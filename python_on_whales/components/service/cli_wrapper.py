@@ -233,7 +233,12 @@ class ServiceCLI(DockerCLICaller):
         ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Service, List[Service]]:
-        """Returns one or a list of `python_on_whales.Service` object(s)."""
+        """Returns one or a list of `python_on_whales.Service` object(s).
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
+        """
         if isinstance(x, str):
             return Service(self.client_config, x)
         else:
@@ -275,6 +280,10 @@ class ServiceCLI(DockerCLICaller):
 
         # Returns
             `List[python_on_whales.Task]`
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
         """
         full_cmd = (
             self.docker_cmd + ["service", "ps", "--quiet", "--no-trunc"] + to_list(x)
@@ -292,6 +301,10 @@ class ServiceCLI(DockerCLICaller):
 
         # Arguments
             services: One or a list of services to remove.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
         """
         full_cmd = self.docker_cmd + ["service", "remove"]
 
@@ -312,6 +325,11 @@ class ServiceCLI(DockerCLICaller):
                 you can provide `new_scale={"service1": 4, "service2": 8}`
             detach: If True, does not wait for the services to converge and return
                 immediately.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if one of the services
+            doesn't exists.
+
         """
         # verify that the services exists
         self.inspect(list(new_scales.keys()))
@@ -341,6 +359,9 @@ class ServiceCLI(DockerCLICaller):
             image: Service image tag
             with_registry_authentication: Send registry authentication details
                 to swarm agents
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if the service doesn't exists.
         """
         full_cmd = self.docker_cmd + ["service", "update"]
         full_cmd.add_flag("--force", force)

@@ -52,9 +52,9 @@ def test_context_manager():
     [docker.service.inspect, docker.service.remove, docker.service.ps],
 )
 @pytest.mark.usefixtures("swarm_mode")
-def test_inspect_no_such_service(docker_function):
+def test_some_functions_no_such_service(docker_function):
     with pytest.raises(NoSuchService):
-        docker.service.inspect("DOODODGOIHURHURI")
+        docker_function("DOODODGOIHURHURI")
 
 
 @pytest.mark.usefixtures("swarm_mode")
