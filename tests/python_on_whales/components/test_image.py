@@ -202,3 +202,11 @@ def test_no_such_image_tag():
         docker.image.tag(image_name_that_does_not_exists, "something")
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+def test_exists():
+    my_image = docker.pull("busybox")
+    assert my_image.exists()
+    assert docker.image.exists("busybox")
+
+    assert not docker.image.exists("dudurghurozgiozpfezjigfoeioengizeonig")
