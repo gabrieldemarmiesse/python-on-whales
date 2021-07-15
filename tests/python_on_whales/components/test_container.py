@@ -14,7 +14,7 @@ from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
 )
-from python_on_whales.exceptions import DockerException
+from python_on_whales.exceptions import DockerException, NoSuchContainer
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
@@ -443,3 +443,21 @@ def test_exec_change_directory():
         assert c.execute(["pwd"], workdir="/tmp") == "/tmp"
         assert c.execute(["pwd"], workdir="/etc") == "/etc"
         assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"
+
+
+@pytest.mark.parametrize(
+    "docker_function",
+    [
+        docker.container.remove,
+        docker.container.stop,
+        docker.container.diff,
+        docker.container.inspect,
+        docker.container.kill,
+        docker.container.pause,
+        docker.container.restart,
+        docker.container.start,
+    ],
+)
+def test_functions_nosuchcontainer(docker_function):
+    with pytest.raises(NoSuchContainer):
+        docker_function("DOODODGOIHURHURI")
