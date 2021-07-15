@@ -456,6 +456,7 @@ def test_exec_change_directory():
         docker.container.pause,
         docker.container.restart,
         docker.container.start,
+        docker.container.commit,
     ],
 )
 def test_functions_nosuchcontainer(docker_function):
