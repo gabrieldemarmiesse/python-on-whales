@@ -462,3 +462,13 @@ def test_exec_change_directory():
 def test_functions_nosuchcontainer(docker_function):
     with pytest.raises(NoSuchContainer):
         docker_function("DOODODGOIHURHURI")
+
+
+def test_copy_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.copy(("dodueizbgueirzhgueoz", "/dududada"), "/tmp/dudufeoz")
+
+
+def test_execute_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.execute("dodueizbgueirzhgueoz", ["echo", "dudu"])
