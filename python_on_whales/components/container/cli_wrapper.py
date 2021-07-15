@@ -773,16 +773,19 @@ class ContainerCLI(DockerCLICaller):
 
         # Arguments
             container: The container to export.
-            output: The path of the output tar archive.
+            output: The path of the output tar archive. Returning a generator of bytes
+                is not yet implemented.
         """
-        full_cmd = self.docker_cmd + [
-            "container",
-            "--output",
-            output,
-            "export",
-            container,
-        ]
-        run(full_cmd)
+        full_cmd = self.docker_cmd + ["container", "export"]
+        full_cmd.add_simple_arg("--output", output)
+
+        full_cmd.append(container)
+
+        if output is None:
+            # we must return a generator of bytes
+            raise NotImplementedError
+        else:
+            run(full_cmd)
 
     @overload
     def inspect(self, x: str) -> Container:
