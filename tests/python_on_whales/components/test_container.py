@@ -420,6 +420,15 @@ def test_exec_env_file(tmp_path):
     assert result == "dada"
 
 
+def test_export_file(tmp_path):
+    dest = tmp_path / "dodo.tar"
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        c.export(dest)
+
+    assert dest.exists()
+    assert dest.stat().st_size > 10_000
+
+
 # TODO: fixme
 @pytest.mark.xfail
 def test_exec_privilged_flag():
