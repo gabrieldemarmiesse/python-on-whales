@@ -254,7 +254,7 @@ class ImageCLI(DockerCLICaller):
             return Image(self.client_config, x)
 
     def exists(self, x: str) -> bool:
-        """Verify that an image exists.
+        """Returns `True` if the image exists. `False` otherwise.
 
          It's just calling `docker.image.inspect(...)` and verifies that it doesn't throw
          a `python_on_whales.exceptions.NoSuchImage`.

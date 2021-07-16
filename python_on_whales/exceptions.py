@@ -31,6 +31,10 @@ class DockerException(Exception):
         super().__init__(error_msg)
 
 
+class NoSuchContainer(DockerException):
+    pass
+
+
 class NoSuchImage(DockerException):
     pass
 

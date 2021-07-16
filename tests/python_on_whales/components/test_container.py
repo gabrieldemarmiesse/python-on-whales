@@ -14,7 +14,7 @@ from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
 )
-from python_on_whales.exceptions import DockerException
+from python_on_whales.exceptions import DockerException, NoSuchContainer
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
@@ -452,3 +452,51 @@ def test_exec_change_directory():
         assert c.execute(["pwd"], workdir="/tmp") == "/tmp"
         assert c.execute(["pwd"], workdir="/etc") == "/etc"
         assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"
+
+
+@pytest.mark.parametrize(
+    "docker_function",
+    [
+        docker.container.remove,
+        docker.container.stop,
+        docker.container.diff,
+        docker.container.inspect,
+        docker.container.kill,
+        docker.container.pause,
+        docker.container.restart,
+        docker.container.start,
+        docker.container.commit,
+        docker.container.logs,
+        docker.container.unpause,
+        docker.container.wait,
+    ],
+)
+def test_functions_nosuchcontainer(docker_function):
+    with pytest.raises(NoSuchContainer):
+        docker_function("DOODODGOIHURHURI")
+
+
+def test_copy_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.copy(("dodueizbgueirzhgueoz", "/dududada"), "/tmp/dudufeoz")
+
+
+def test_execute_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.execute("dodueizbgueirzhgueoz", ["echo", "dudu"])
+
+
+def test_export_nosuchcontainer(tmp_path):
+    dest = tmp_path / "dodo.tar"
+    with pytest.raises(NoSuchContainer):
+        docker.container.export("some_random_container_that_does_not_exists", dest)
+
+
+def test_rename_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.rename("dodueizbgueirzhgueoz", "new_name")
+
+
+def test_update_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.update("grueighuri", cpus=4)
