@@ -173,3 +173,7 @@ def test_passing_env_files(tmp_path: Path):
     output = docker.compose.config()
 
     assert output.services["alpine"].environment["SOME_VARIABLE"] == "hello"
+
+
+def test_entrypoint_loaded_in_config():
+    assert docker.compose.config().services["dodo"].entrypoint == ["/bin/dudu"]

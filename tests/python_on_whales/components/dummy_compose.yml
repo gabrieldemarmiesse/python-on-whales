@@ -21,3 +21,6 @@ services:
     environment:
      - DD_API_KEY=__your_datadog_api_key_here__
      - POSTGRES_HOST_AUTH_METHOD=trust
+  dodo:
+    image: busybox:latest
+    entrypoint: /bin/dudu

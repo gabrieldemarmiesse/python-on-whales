@@ -36,6 +36,7 @@ class ComposeConfigService(BaseModel):
     device_cgroup_rules: List[str] = Field(default_factory=list)
     devices: Any
     environment: Dict[str, Optional[str]]
+    entrypoint: List[str]
     image: str
 
 
