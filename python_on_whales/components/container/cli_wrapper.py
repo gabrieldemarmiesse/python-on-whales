@@ -25,6 +25,7 @@ from python_on_whales.components.container.models import (
     Mount,
     NetworkSettings,
 )
+from python_on_whales.exceptions import NoSuchContainer
 from python_on_whales.utils import (
     ValidPath,
     format_dict_for_cli,
@@ -322,6 +323,15 @@ class Container(ReloadableObjectFromJson):
         information about the arguments.
         """
         return ContainerCLI(self.client_config).stop(self, time)
+
+    def exists(self) -> bool:
+        """Returns `True` if the docker container exists and `False` if it doesn't exists.
+
+        If it doesn't exists, it most likely mean that it was removed.
+
+         See the `docker.container.exists` command for information about the arguments.
+        """
+        return ContainerCLI(self.client_config).exists(self.id)
 
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
@@ -740,6 +750,9 @@ class ContainerCLI(DockerCLICaller):
 
         # Returns:
             Optional[str]
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         full_cmd = self.docker_cmd + ["exec"]
 
@@ -775,6 +788,9 @@ class ContainerCLI(DockerCLICaller):
             container: The container to export.
             output: The path of the output tar archive. Returning a generator of bytes
                 is not yet implemented.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         full_cmd = self.docker_cmd + ["container", "export"]
         full_cmd.add_simple_arg("--output", output)
@@ -805,6 +821,9 @@ class ContainerCLI(DockerCLICaller):
         # Returns:
             A `python_on_whales.Container` object or a list of those
             if a list of IDs was passed as input.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
 
         if isinstance(x, list):
@@ -824,6 +843,10 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             containers: One or more containers to kill
             signal: The signal to send the container
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
+
         """
         containers = to_list(containers)
         if not containers:
@@ -863,6 +886,9 @@ class ContainerCLI(DockerCLICaller):
 
         # Returns
             `str`
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         full_cmd = self.docker_cmd + ["container", "logs"]
         full_cmd.add_flag("--details", details)
@@ -902,6 +928,9 @@ class ContainerCLI(DockerCLICaller):
 
         # Arguments
             containers: One or more containers to pause
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
         if not containers:
@@ -932,6 +961,9 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             container: The container to rename
             new_name: The new name of the container.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
         run(full_cmd)
@@ -949,6 +981,9 @@ class ContainerCLI(DockerCLICaller):
             containers: One or more containers to restart
             time: Amount of to wait for stop before killing the container (default 10s).
                 If `int`, the unit is seconds.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
         if not containers:
@@ -980,6 +1015,9 @@ class ContainerCLI(DockerCLICaller):
             containers: One or more containers.
             force: Force the removal of a running container (uses SIGKILL)
             volumes: Remove anonymous volumes associated with the container
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
         if not containers:
@@ -1495,6 +1533,9 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             containers: One or a list of containers.
             time: Seconds to wait for stop before killing a container (default 10)
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
         if not containers:
@@ -1527,6 +1568,9 @@ class ContainerCLI(DockerCLICaller):
 
         # Arguments
             x: One or more containers (name, id or `python_on_whales.Container` object).
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         x = to_list(x)
         if not x:
@@ -1579,6 +1623,9 @@ class ContainerCLI(DockerCLICaller):
                 to enable unlimited swap.
             pids_limit: Tune container pids limit (set `-1` for unlimited)
             restart: Restart policy to apply when a container exits (default "no")
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         x = to_list(x)
         if not x:
@@ -1648,6 +1695,9 @@ class ContainerCLI(DockerCLICaller):
         # [8, 10]
         docker.container.remove([cont_1, cont_2])
         ```
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         if x == []:
             # nothing to do
@@ -1660,6 +1710,22 @@ class ContainerCLI(DockerCLICaller):
         else:
             full_cmd.append(x)
             return int(run(full_cmd))
+
+    def exists(self, x: str) -> bool:
+        """Returns `True` if the container exists. `False` otherwise.
+
+         It's just calling `docker.container.inspect(...)` and verifies that it doesn't throw
+         a `python_on_whales.exceptions.NoSuchContainer`.
+
+        # Returns
+            A `bool`
+        """
+        try:
+            self.inspect(x)
+        except NoSuchContainer:
+            return False
+        else:
+            return True
 
 
 class ContainerStats:

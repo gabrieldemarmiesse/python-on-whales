@@ -8,7 +8,12 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import pydantic
 
-from python_on_whales.exceptions import DockerException, NoSuchImage, NoSuchService
+from python_on_whales.exceptions import (
+    DockerException,
+    NoSuchContainer,
+    NoSuchImage,
+    NoSuchService,
+)
 
 PROJECT_ROOT = Path(__file__).parents[1]
 
@@ -104,6 +109,13 @@ def run(
                 )
             if "no such service" in completed_process.stderr.decode().lower():
                 raise NoSuchService(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+            if "no such container" in completed_process.stderr.decode().lower():
+                raise NoSuchContainer(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
