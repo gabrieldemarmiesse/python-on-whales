@@ -184,7 +184,7 @@ class BuildxCLI(DockerCLICaller):
         build_args: Dict[str, str] = {},
         builder: Optional[ValidBuilder] = None,
         cache: bool = True,
-        cache_from: Union[str, Dict[str, str], None] = None,
+        cache_from: Union[str, Dict[str, str], List[Dict[str, str]], None] = None,
         cache_to: Union[str, Dict[str, str], None] = None,
         file: Optional[ValidPath] = None,
         labels: Dict[str, str] = {},
@@ -221,7 +221,8 @@ class BuildxCLI(DockerCLICaller):
             cache_from: Works only with the container driver. Loads the cache
                 (if needed) from a registry `cache_from="user/app:cache"`  or
                 a directory on the client `cache_from="type=local,src=path/to/dir"`.
-                It's also possible to use a dict form for this argument. e.g.
+                It's also possible to use a dict or list of dict form for this
+                argument. e.g.
                 `cache_from=dict(type="local", src="path/to/dir")`
             cache_to: Works only with the container driver. Sends the resulting
                 docker cache either to a registry `cache_to="user/app:cache"`,
@@ -279,7 +280,10 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--load", load)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
-        if isinstance(cache_from, dict):
+        if isinstance(cache_from, list):
+            for item in cache_from:
+                full_cmd.add_simple_arg("--cache-from", format_dict_for_buildx(item))
+        elif isinstance(cache_from, dict):
             full_cmd.add_simple_arg("--cache-from", format_dict_for_buildx(cache_from))
         else:
             full_cmd.add_simple_arg("--cache-from", cache_from)
