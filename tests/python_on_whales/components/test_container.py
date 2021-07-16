@@ -466,6 +466,9 @@ def test_exec_change_directory():
         docker.container.restart,
         docker.container.start,
         docker.container.commit,
+        docker.container.logs,
+        docker.container.unpause,
+        docker.container.wait,
     ],
 )
 def test_functions_nosuchcontainer(docker_function):
@@ -481,3 +484,19 @@ def test_copy_nosuchcontainer():
 def test_execute_nosuchcontainer():
     with pytest.raises(NoSuchContainer):
         docker.container.execute("dodueizbgueirzhgueoz", ["echo", "dudu"])
+
+
+def test_export_nosuchcontainer(tmp_path):
+    dest = tmp_path / "dodo.tar"
+    with pytest.raises(NoSuchContainer):
+        docker.container.export("some_random_container_that_does_not_exists", dest)
+
+
+def test_rename_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.rename("dodueizbgueirzhgueoz", "new_name")
+
+
+def test_update_nosuchcontainer():
+    with pytest.raises(NoSuchContainer):
+        docker.container.update("grueighuri", cpus=4)
