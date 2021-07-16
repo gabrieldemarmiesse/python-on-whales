@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 
 import python_on_whales
-from python_on_whales import DockerClient, DockerException
+from python_on_whales import DockerClient
+from python_on_whales.exceptions import NoSuchImage
 from python_on_whales.utils import PROJECT_ROOT
 
 pytestmark = pytest.mark.skipif(
@@ -39,12 +40,12 @@ def test_no_containers():
 
 
 def test_docker_compose_up_detach_down():
-    docker.compose.up(detach=True)
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
     docker.compose.down()
 
 
 def test_docker_compose_pause_unpause():
-    docker.compose.up(detach=True)
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
     docker.compose.pause()
     for container in docker.compose.ps():
         assert container.state.paused
@@ -82,24 +83,24 @@ def test_docker_compose_create_extra_options_down():
 
 
 def test_docker_compose_up_detach_down_extra_options():
-    docker.compose.up(detach=True)
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
     docker.compose.down(remove_orphans=True, remove_images="all", timeout=3)
 
 
 def test_docker_compose_up_build():
-    docker.compose.up(build=True, detach=True)
+    docker.compose.up(["my_service", "busybox", "alpine"], build=True, detach=True)
     with docker.image.inspect("some_random_image"):
         docker.compose.down()
 
 
 def test_docker_compose_up_stop_rm():
-    docker.compose.up(build=True, detach=True)
+    docker.compose.up(["my_service", "busybox", "alpine"], build=True, detach=True)
     docker.compose.stop(timeout=timedelta(seconds=3))
     docker.compose.rm(volumes=True)
 
 
 def test_docker_compose_up_rm():
-    docker.compose.up(build=True, detach=True)
+    docker.compose.up(["my_service", "busybox", "alpine"], build=True, detach=True)
     docker.compose.rm(stop=True, volumes=True)
 
 
@@ -137,11 +138,11 @@ def test_docker_compose_kill():
 def test_docker_compose_pull():
     try:
         docker.image.remove("busybox")
-    except DockerException:
+    except NoSuchImage:
         pass
     try:
         docker.image.remove("alpine")
-    except DockerException:
+    except NoSuchImage:
         pass
     docker.compose.pull(["busybox", "alpine"])
     docker.image.inspect(["busybox", "alpine"])
@@ -173,3 +174,7 @@ def test_passing_env_files(tmp_path: Path):
     output = docker.compose.config()
 
     assert output.services["alpine"].environment["SOME_VARIABLE"] == "hello"
+
+
+def test_entrypoint_loaded_in_config():
+    assert docker.compose.config().services["dodo"].entrypoint == ["/bin/dudu"]
