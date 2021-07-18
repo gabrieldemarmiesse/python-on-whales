@@ -95,3 +95,24 @@ def test_ps_not_swarm_manager():
         docker.stack.ps("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_list_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.stack.list()
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_remove_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.stack.remove("dodo")
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_services_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.stack.services("dodo")
+
+    assert "not a swarm manager" in str(e.value).lower()
