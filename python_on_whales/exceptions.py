@@ -41,3 +41,7 @@ class NoSuchImage(DockerException):
 
 class NoSuchService(DockerException):
     pass
+
+
+class NotASwarmManager(DockerException):
+    pass

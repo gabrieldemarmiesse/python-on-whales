@@ -83,7 +83,7 @@ class StackCLI(DockerCLICaller):
         env = read_env_files([Path(x) for x in env_files])
         env.update(variables)
 
-        run(full_cmd, capture_stdout=False, capture_stderr=False, env=env)
+        run(full_cmd, capture_stdout=False, env=env)
         return Stack(self.client_config, name)
 
     def list(self) -> List[Stack]:

@@ -13,6 +13,7 @@ from python_on_whales.exceptions import (
     NoSuchContainer,
     NoSuchImage,
     NoSuchService,
+    NotASwarmManager,
 )
 
 PROJECT_ROOT = Path(__file__).parents[1]
@@ -116,6 +117,16 @@ def run(
                 )
             if "no such container" in completed_process.stderr.decode().lower():
                 raise NoSuchContainer(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+            if (
+                "this node is not a swarm manager"
+                in completed_process.stderr.decode().lower()
+            ):
+                raise NotASwarmManager(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
