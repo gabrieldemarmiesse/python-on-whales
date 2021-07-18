@@ -80,11 +80,18 @@ def test_stack_env_files(tmp_path: Path):
     time.sleep(1)
 
 
-def test_not_swarm_manager():
+def test_deploy_not_swarm_manager():
     with pytest.raises(NotASwarmManager) as e:
         docker.stack.deploy(
             "some_stack",
             [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
         )
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_ps_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.stack.ps("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
