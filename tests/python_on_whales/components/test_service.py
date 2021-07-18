@@ -4,7 +4,7 @@ import pytest
 
 from python_on_whales import docker
 from python_on_whales.components.service.models import ServiceInspectResult
-from python_on_whales.exceptions import NoSuchService
+from python_on_whales.exceptions import NoSuchService, NotASwarmManager
 from python_on_whales.test_utils import get_all_jsons
 
 
@@ -61,3 +61,59 @@ def test_some_functions_no_such_service(docker_function):
 def test_scale_no_such_service():
     with pytest.raises(NoSuchService):
         docker.service.scale({"DOODODGOIHURHURI": 14})
+
+
+def test_create_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.create("busybox", ["sleep", "infinity"])
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_inspect_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.inspect("dodo")
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_exists_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.exists("dodo")
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_list_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.list()
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_ps_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.ps("dodo")
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_remove_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.remove("dodo")
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_scale_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.scale({"dodo": 8})
+
+    assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_update_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.service.update("dodo", image="busybox")
+
+    assert "not a swarm manager" in str(e.value).lower()
