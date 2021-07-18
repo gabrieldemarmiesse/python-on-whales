@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from python_on_whales import docker
+from python_on_whales.exceptions import NotASwarmManager
 from python_on_whales.utils import PROJECT_ROOT
 
 
@@ -77,3 +78,13 @@ def test_stack_env_files(tmp_path: Path):
     time.sleep(1)
     docker.stack.remove(third_stack)
     time.sleep(1)
+
+
+def test_not_swarm_manager():
+    with pytest.raises(NotASwarmManager) as e:
+        docker.stack.deploy(
+            "some_stack",
+            [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        )
+
+    assert "not a swarm manager" in str(e.value).lower()
