@@ -15,6 +15,7 @@ from python_on_whales.client_config import (
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.volume.models import VolumeInspectResult
+from python_on_whales.exceptions import NoSuchVolume
 from python_on_whales.test_utils import random_name
 from python_on_whales.utils import ValidPath, run, to_list
 
@@ -93,6 +94,15 @@ class Volume(ReloadableObjectFromJson):
             self, new_volume_name, driver, labels, options
         )
 
+    def exists(self) -> bool:
+        """Returns `True` if the docker volume exists and `False` if it doesn't exists.
+
+        If it doesn't exists, it most likely mean that it was removed.
+
+         See the `docker.volume.exists` command for information about the arguments.
+        """
+        return VolumeCLI(self.client_config).exists(self.name)
+
 
 ValidVolume = Union[Volume, str]
 VolumePath = Tuple[Union[Volume, str], ValidPath]
@@ -141,6 +151,22 @@ class VolumeCLI(DockerCLICaller):
             return Volume(self.client_config, x)
         else:
             return [Volume(self.client_config, reference) for reference in x]
+
+    def exists(self, x: str) -> bool:
+        """Returns `True` if the volume exists. `False` otherwise.
+
+         It's just calling `docker.volume.inspect(...)` and verifies that it doesn't throw
+         a `python_on_whales.exceptions.NoSuchVolume`.
+
+        # Returns
+            A `bool`
+        """
+        try:
+            self.inspect(x)
+        except NoSuchVolume:
+            return False
+        else:
+            return True
 
     def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
         """List volumes

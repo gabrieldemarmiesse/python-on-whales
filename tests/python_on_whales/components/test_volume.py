@@ -5,6 +5,7 @@ import pytest
 
 from python_on_whales import docker
 from python_on_whales.components.volume.models import VolumeInspectResult
+from python_on_whales.exceptions import NoSuchVolume
 from python_on_whales.test_utils import get_all_jsons
 
 
@@ -169,3 +170,22 @@ def test_clone():
         volumes=[(new_volume, "/volume")],
     )
     assert files == "dodo.txt"
+
+
+@pytest.mark.parametrize(
+    "docker_function", [docker.volume.inspect, docker.volume.remove]
+)
+def test_functions_no_such_volume(docker_function):
+    with pytest.raises(NoSuchVolume) as e:
+        docker_function("dodo")
+    assert "no such volume" in str(e.value).lower()
+
+
+def test_volume_does_not_exists():
+    assert not docker.volume.exists("dodo")
+
+
+def test_volume_exists():
+    with docker.volume.create() as v:
+        assert v.exists()
+        assert docker.volume.exists(v.name)
