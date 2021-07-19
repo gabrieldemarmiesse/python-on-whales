@@ -500,6 +500,17 @@ class BuildxCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "version"]
         return run(full_cmd)
 
+    def is_installed(self) -> bool:
+        """Returns `True` if docker buildx is installed and working.
+
+        If it's not installed, head
+        to [the installation page](https://github.com/docker/buildx#installing)
+        and follow the instructions.
+        """
+        full_cmd = self.docker_cmd + ["buildx", "--help"]
+        help_output = run(full_cmd)
+        return "buildx" in help_output
+
 
 def format_dict_for_buildx(options: Dict[str, str]) -> str:
     return ",".join(format_dict_for_cli(options, separator="="))
