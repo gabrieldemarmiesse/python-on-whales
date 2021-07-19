@@ -867,7 +867,9 @@ class ContainerCLI(DockerCLICaller):
         tail: Optional[int] = None,
         timestamps: bool = False,
         until: Union[None, datetime, timedelta] = None,
-    ) -> str:
+        follow: bool = False,
+        stream: bool = False,
+    ) -> Union[str, Iterable[Tuple[str, bytes]]]:
         """Returns the logs of a container as a string.
 
         Alias: `docker.logs(...)`
@@ -883,20 +885,53 @@ class ContainerCLI(DockerCLICaller):
             timestamps: Put timestamps next to lines.
             until: Use a datetime or a timedelta to specify the upper date
                 limit for the logs.
+            follow: If `False` (the default), the logs returned are the logs up to the time
+                of the function call. If `True`, the logs of the container up to the time the
+                container stopped are displayed. Which means that if the container isn't stopped
+                yet, the function will continue until the container is stopped.
+                Which is why it is advised to use the `stream` option if you use the `follow` option.
+                Without `stream`, only a `str` will be returned, possibly much later in the
+                future. With `stream`, you'll be able to read the logs in real time.
+            stream: Similar to the `stream` argument of `docker.run`.
+                This function will then returns and iterator that will yield a
+                tuple `(source, content)` with `source` being `"stderr"` or
+                `"stdout"`. `content` is the content of the line as bytes.
+                Take a look at [the user guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
+                to have an example of the output.
 
         # Returns
-            `str`
+            `str` if `stream=False` (the default), `Iterable[Tuple[str, bytes]]`
+            if `stream=True`.
 
         # Raises
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
+
+        If you are a bit confused about `follow` and `stream`, here are some use cases.
+
+        * If you want to have the logs up to this point as a `str`, don't use those args.
+        * If you want to stream the output in real time, use `follow=True, stream=True`
+        * If you want the logs up to this point but you don't want to fit all the logs
+        in memory because they are too big, use `stream=True`.
         """
+
+        # first we verify that the container exists and raise an exception if not.
+        self.inspect(container)
+
         full_cmd = self.docker_cmd + ["container", "logs"]
         full_cmd.add_flag("--details", details)
         full_cmd.add_simple_arg("--since", format_time_arg(since))
         full_cmd.add_simple_arg("--tail", tail)
         full_cmd.add_flag("--timestamps", timestamps)
         full_cmd.add_simple_arg("--until", format_time_arg(until))
-        return run(full_cmd + [container])
+        full_cmd.add_flag("--follow", follow)
+        full_cmd.append(container)
+
+        iterator = stream_stdout_and_stderr(full_cmd)
+
+        if stream:
+            return iterator
+        else:
+            return "".join(x[1].decode() for x in iterator)
 
     def list(self, all: bool = False, filters: Dict[str, str] = {}) -> List[Container]:
         """List the containers on the host.
