@@ -155,10 +155,33 @@ def test_container_remove():
 
 
 def test_simple_logs():
-    container = docker.run("busybox:1", ["echo", "dodo"], detach=True)
-    time.sleep(0.3)
-    output = docker.container.logs(container)
-    assert output == "dodo"
+    with docker.run("busybox:1", ["echo", "dodo"], detach=True) as c:
+        time.sleep(0.3)
+        output = docker.container.logs(c)
+        assert output == "dodo\n"
+
+
+def test_simple_logs_do_not_follow():
+    with docker.run(
+        "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
+    ) as c:
+        output = docker.container.logs(c, follow=False)
+        assert output == ""
+
+
+def test_simple_logs_follow():
+    with docker.run(
+        "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
+    ) as c:
+        output = docker.container.logs(c, follow=True)
+        assert output == "dodo\n"
+
+
+def test_simple_logs_stream():
+    with docker.run("busybox:1", ["echo", "dodo"], detach=True) as c:
+        time.sleep(0.3)
+        output = list(docker.container.logs(c, stream=True))
+        assert output == [("stdout", b"dodo\n")]
 
 
 def test_rename():
