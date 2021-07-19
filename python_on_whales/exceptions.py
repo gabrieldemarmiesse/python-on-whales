@@ -45,3 +45,7 @@ class NoSuchService(DockerException):
 
 class NotASwarmManager(DockerException):
     pass
+
+
+class NoSuchVolume(DockerException):
+    pass
