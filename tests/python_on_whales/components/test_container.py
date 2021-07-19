@@ -161,6 +161,13 @@ def test_simple_logs():
         assert output == "dodo\n"
 
 
+def test_simple_logs_stderr():
+    with docker.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
+        time.sleep(0.3)
+        output = docker.container.logs(c)
+        assert output == "dodo\n"
+
+
 def test_simple_logs_do_not_follow():
     with docker.run(
         "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
@@ -181,6 +188,33 @@ def test_simple_logs_stream():
     with docker.run("busybox:1", ["echo", "dodo"], detach=True) as c:
         time.sleep(0.3)
         output = list(docker.container.logs(c, stream=True))
+        assert output == [("stdout", b"dodo\n")]
+
+
+def test_simple_logs_stream_stderr():
+    with docker.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
+        time.sleep(0.3)
+        output = list(docker.container.logs(c, stream=True))
+        assert output == [("stderr", b"dodo\n")]
+
+
+def test_simple_logs_stream_stdout_and_stderr():
+    with docker.run(
+        "busybox:1", ["sh", "-c", ">&2 echo dodo && echo dudu"], detach=True
+    ) as c:
+        time.sleep(0.3)
+        output = list(docker.container.logs(c, stream=True))
+
+        # the order of stderr and stdout is not guaranteed.
+        assert set(output) == {("stderr", b"dodo\n"), ("stdout", b"dudu\n")}
+
+
+def test_simple_logs_stream_wait():
+    with docker.run(
+        "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
+    ) as c:
+        time.sleep(0.3)
+        output = list(docker.container.logs(c, follow=True, stream=True))
         assert output == [("stdout", b"dodo\n")]
 
 
