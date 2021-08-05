@@ -29,6 +29,7 @@ from python_on_whales.exceptions import NoSuchContainer
 from python_on_whales.utils import (
     ValidPath,
     format_dict_for_cli,
+    format_time_arg,
     removeprefix,
     run,
     stream_stdout_and_stderr,
@@ -870,11 +871,9 @@ class ContainerCLI(DockerCLICaller):
         follow: bool = False,
         stream: bool = False,
     ) -> Union[str, Iterable[Tuple[str, bytes]]]:
-        """Returns the logs of a container as a string.
+        """Returns the logs of a container as a string or an iterator.
 
         Alias: `docker.logs(...)`
-
-        The follow option is not yet implemented.
 
         # Arguments
             container: The container to get the logs of
@@ -1795,20 +1794,6 @@ class ContainerStats:
     def __repr__(self):
         attr = ", ".join(f"{key}={value}" for key, value in self.__dict__.items())
         return f"<{self.__class__} object, attributes are {attr}>"
-
-
-def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
-    if isinstance(time_object, datetime):
-        return time_object.strftime("%Y-%m-%dT%H:%M:%S")
-    elif isinstance(time_object, timedelta):
-        return f"{time_object.total_seconds()}s"
-
-
-def format_time_arg(time_object):
-    if time_object is None:
-        return None
-    else:
-        return format_time_for_docker(time_object)
 
 
 def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
