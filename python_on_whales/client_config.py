@@ -8,7 +8,10 @@ from typing import Any, Dict, List, Optional
 
 import pydantic
 
-from python_on_whales.download_binaries import DOCKER_BINARY_PATH, download_docker_cli
+from python_on_whales.download_binaries import (
+    download_docker_cli,
+    get_docker_binary_path,
+)
 from python_on_whales.utils import to_list
 
 from .utils import ValidPath, run
@@ -58,8 +61,8 @@ class ClientConfig:
             docker_sys = shutil.which("docker")
             if docker_sys is not None:
                 self.client_binary_path = docker_sys
-            elif DOCKER_BINARY_PATH.exists():
-                self.client_binary_path = DOCKER_BINARY_PATH
+            elif get_docker_binary_path().exists():
+                self.client_binary_path = get_docker_binary_path()
             else:
                 warnings.warn(
                     "The docker client binary file was not found on your system. \n"
@@ -76,7 +79,7 @@ class ClientConfig:
                     "$ python-on-whales download-cli \n"
                 )
                 download_docker_cli()
-                self.client_binary_path = DOCKER_BINARY_PATH
+                self.client_binary_path = get_docker_binary_path()
         return self.client_binary_path
 
     @property
