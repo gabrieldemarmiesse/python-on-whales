@@ -18,7 +18,8 @@ TEMPLATE_CLI = (
 WINDOWS_CLI_URL = "https://github.com/StefanScherer/docker-cli-builder/releases/download/{version}/docker.exe"
 
 
-DOCKER_BINARY_PATH = CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
+def get_docker_binary_path():
+    return CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 
 
 def get_docker_cli_url():
@@ -31,19 +32,28 @@ def get_docker_cli_url():
 
 def download_docker_cli():
     file_to_download = get_docker_cli_url()
+
+    extension = file_to_download.split(".")[-1]
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir = Path(tmp_dir)
-        tar_file = tmp_dir / "docker.tgz"
-        download_from_url(file_to_download, tar_file)
-        extract_dir = tmp_dir / "extracted"
-        shutil.unpack_archive(str(tar_file), str(extract_dir))
+        downloaded_file_path = tmp_dir / f"docker.{extension}"
+        download_from_url(file_to_download, downloaded_file_path)
 
-        DOCKER_BINARY_PATH.parent.mkdir(exist_ok=True, parents=True)
-        shutil.move(extract_dir / "docker" / "docker", DOCKER_BINARY_PATH)
+        docker_binary_path = get_docker_binary_path()
+
+        if extension == "tgz":
+            extract_dir = tmp_dir / "extracted"
+            shutil.unpack_archive(str(downloaded_file_path), str(extract_dir))
+
+            docker_binary_path.parent.mkdir(exist_ok=True, parents=True)
+            shutil.move(extract_dir / "docker" / "docker", docker_binary_path)
+        elif extension == "exe":
+            docker_binary_path.parent.mkdir(exist_ok=True, parents=True)
+            shutil.move(downloaded_file_path, docker_binary_path)
 
     warnings.warn(
         f"The docker client binary file {DOCKER_VERSION} was downloaded and put "
-        f"in `{DOCKER_BINARY_PATH.absolute()}`. \n"
+        f"in `{docker_binary_path.absolute()}`. \n"
         f"You can feel free to remove it if you wish, Python on whales will download "
         f"it again if needed."
     )
