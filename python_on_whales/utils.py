@@ -1,5 +1,6 @@
 import os
 import subprocess
+from datetime import datetime, timedelta
 from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
@@ -253,3 +254,17 @@ def all_fields_optional(cls):
         field.required = False
         field.allow_none = True
     return cls
+
+
+def format_time_arg(time_object):
+    if time_object is None:
+        return None
+    else:
+        return format_time_for_docker(time_object)
+
+
+def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
+    if isinstance(time_object, datetime):
+        return time_object.strftime("%Y-%m-%dT%H:%M:%S")
+    elif isinstance(time_object, timedelta):
+        return f"{time_object.total_seconds()}s"

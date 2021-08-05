@@ -18,7 +18,14 @@ from python_on_whales.components.service.models import (
     ServiceVersion,
 )
 from python_on_whales.exceptions import NoSuchService
-from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
+from python_on_whales.utils import (
+    ValidPath,
+    format_dict_for_cli,
+    format_time_arg,
+    run,
+    stream_stdout_and_stderr,
+    to_list,
+)
 
 
 class Service(ReloadableObjectFromJson):
@@ -261,9 +268,72 @@ class ServiceCLI(DockerCLICaller):
         else:
             return True
 
-    def logs(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def logs(
+        self,
+        service: ValidService,
+        details: bool = False,
+        since: Union[None, datetime, timedelta] = None,
+        tail: Optional[int] = None,
+        timestamps: bool = False,
+        follow: bool = False,
+        raw: bool = False,
+        task_ids: bool = True,
+        resolve: bool = True,
+        truncate: bool = True,
+        stream: bool = False,
+    ):
+        """Returns the logs of a service as a string or an iterator.
+
+        # Arguments
+            service: The service to get the logs of
+            details: Show extra details provided to logs
+            since: Use a datetime or timedelta to specify the lower
+                date limit for the logs.
+            tail: Number of lines to show from the end of the logs (default all)
+            timestamps: Put timestamps next to lines.
+            follow: If `False` (the default), the logs returned are the logs up to the time
+                of the function call. If `True`, the logs of the container up to the time the
+                service is stopped (removed) are displayed.
+                Which is why you must use the `stream` option if you use the `follow` option.
+                Without `stream`, only a `str` will be returned, possibly much later in the
+                future (maybe never if the service is never removed). So this option is not
+                possible (You'll get an error if you use follow and not stream).
+                With `stream`, you'll be able to read the logs in real time and stop
+                whenever you need.
+            stream: Similar to the `stream` argument of `docker.run()`.
+                This function will then returns and iterator that will yield a
+                tuple `(source, content)` with `source` being `"stderr"` or
+                `"stdout"`. `content` is the content of the line as bytes.
+                Take a look at [the user guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
+                to have an example of the output.
+
+        # Returns
+            `str` if `stream=False` (the default), `Iterable[Tuple[str, bytes]]`
+            if `stream=True`.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchService` if the service does not exists.
+        """
+        # first we verify that the service exists and raise an exception if not.
+        self.inspect(str(service))
+
+        full_cmd = self.docker_cmd + ["service", "logs"]
+        full_cmd.add_flag("--details", details)
+        full_cmd.add_simple_arg("--since", format_time_arg(since))
+        full_cmd.add_simple_arg("--tail", tail)
+        full_cmd.add_flag("--timestamps", timestamps)
+        full_cmd.add_flag("--follow", follow)
+        full_cmd.add_flag("--raw", raw)
+        full_cmd.add_flag("--no-task-ids", not task_ids)
+        full_cmd.add_flag("--no-resolve", not resolve)
+        full_cmd.add_flag("--no-trunc", not truncate)
+        full_cmd.append(service)
+
+        iterator = stream_stdout_and_stderr(full_cmd)
+        if stream:
+            return iterator
+        else:
+            return "".join(x[1].decode() for x in iterator)
 
     def list(self) -> List[Service]:
         """Returns the list of services
