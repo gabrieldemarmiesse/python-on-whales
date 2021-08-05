@@ -40,15 +40,13 @@ def download_docker_cli():
         download_from_url(file_to_download, downloaded_file_path)
 
         docker_binary_path = get_docker_binary_path()
+        docker_binary_path.parent.mkdir(exist_ok=True, parents=True)
 
         if extension == "tgz":
             extract_dir = tmp_dir / "extracted"
             shutil.unpack_archive(str(downloaded_file_path), str(extract_dir))
-
-            docker_binary_path.parent.mkdir(exist_ok=True, parents=True)
             shutil.move(extract_dir / "docker" / "docker", docker_binary_path)
         elif extension == "exe":
-            docker_binary_path.parent.mkdir(exist_ok=True, parents=True)
             shutil.move(downloaded_file_path, docker_binary_path)
 
     warnings.warn(
