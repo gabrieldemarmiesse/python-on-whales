@@ -236,7 +236,7 @@ def read_env_file(env_file: Path) -> Dict[str, str]:
         if not line:
             continue
         line = line.strip()
-        key, value = line.split("=")
+        key, value = line.split("=", 1)
         result_dict[key] = value
     return result_dict
 
