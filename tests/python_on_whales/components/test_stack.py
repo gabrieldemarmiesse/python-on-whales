@@ -63,7 +63,7 @@ def test_stack_variables():
 @pytest.mark.usefixtures("swarm_mode")
 def test_stack_env_files(tmp_path: Path):
     env_file = tmp_path / "some.env"
-    env_file.write_text("SOME_VARIABLE=hello-world # some var \n # some comment")
+    env_file.write_text('SOME_VARIABLE="--tls=true" # some var \n # some comment')
     third_stack = docker.stack.deploy(
         "third_stack",
         [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
@@ -71,7 +71,7 @@ def test_stack_env_files(tmp_path: Path):
     )
 
     agent_service = docker.service.inspect("third_stack_agent")
-    expected = "SOME_OTHER_VARIABLE=hello-world"
+    expected = 'SOME_OTHER_VARIABLE="--tls=true"'
     assert expected in agent_service.spec.task_template.container_spec.env
 
     assert docker.stack.list() == [third_stack]
