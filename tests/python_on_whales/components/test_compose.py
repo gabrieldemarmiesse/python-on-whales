@@ -182,16 +182,15 @@ def test_entrypoint_loaded_in_config():
 
 def test_config_complexe_compose():
     """Checking that the pydantic model does its job"""
-    docker = DockerClient(
-        compose_files=[
-            PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
-        ],
+    compose_file = (
+        PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
     )
+    docker = DockerClient(compose_files=[compose_file])
     config = docker.compose.config()
 
     assert (
         config.services["my_service"].build.context
-        == Path("my_service_build").absolute()
+        == (compose_file.parent / "my_service_build").absolute()
     )
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
