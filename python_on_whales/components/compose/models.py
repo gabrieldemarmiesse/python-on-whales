@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -19,7 +19,7 @@ class ResourcesLimits(BaseModel):
 
 @all_fields_optional
 class ResourcesReservation(BaseModel):
-    cpus: float
+    cpus: Union[float, str]
     memory: int
 
 

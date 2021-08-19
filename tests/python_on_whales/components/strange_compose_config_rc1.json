@@ -1,0 +1,25 @@
+{
+  "services": {
+    "myservice": {
+      "deploy": {
+        "resources": {
+          "reservations": {
+            "cpus": "'0.25'"
+          }
+        },
+        "placement": {}
+      },
+      "image": "alpine",
+      "networks": {
+        "default": null
+      }
+    }
+  },
+  "networks": {
+    "default": {
+      "name": "tmp_default",
+      "ipam": {},
+      "external": false
+    }
+  }
+}

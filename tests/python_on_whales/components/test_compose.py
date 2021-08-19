@@ -5,6 +5,7 @@ import pytest
 
 import python_on_whales
 from python_on_whales import DockerClient
+from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.exceptions import NoSuchImage
 from python_on_whales.utils import PROJECT_ROOT
 
@@ -223,3 +224,11 @@ def test_config_complexe_compose():
     assert config.services["my_service"].deploy.replicas == 4
 
     assert not config.volumes["dodo"].external
+
+
+def test_compose_config_from_rc1():
+    config = ComposeConfig.parse_file(
+        Path(__file__).parent / "strange_compose_config_rc1.json"
+    )
+
+    assert config.services["myservice"].deploy.resources.reservations.cpus == "'0.25'"
