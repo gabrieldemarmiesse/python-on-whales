@@ -511,6 +511,7 @@ class ContainerCLI(DockerCLICaller):
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
+        quiet: bool = False,
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
@@ -551,7 +552,7 @@ class ContainerCLI(DockerCLICaller):
         """
         python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
-        )._pull_if_necessary(image)
+        )._pull_if_necessary(image, quiet=quiet)
         full_cmd = self.docker_cmd + ["create"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
@@ -605,7 +606,8 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
-        full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
+        full_cmd.add_simple_arg("--health-interval",
+                                to_seconds(health_interval))
         full_cmd.add_simple_arg("--health-retries", health_retries)
         full_cmd.add_simple_arg(
             "--health-start-period", to_seconds(health_start_period)
@@ -999,7 +1001,8 @@ class ContainerCLI(DockerCLICaller):
         # Raises
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
-        full_cmd = self.docker_cmd + ["container", "rename", str(container), new_name]
+        full_cmd = self.docker_cmd + \
+            ["container", "rename", str(container), new_name]
         run(full_cmd)
 
     def restart(
@@ -1142,6 +1145,7 @@ class ContainerCLI(DockerCLICaller):
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
+        quiet: bool = False,
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
@@ -1292,6 +1296,7 @@ class ContainerCLI(DockerCLICaller):
                 example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
                 `[("127.0.0.1:3000", 2000, "udp")]`.
             publish_all: Publish all exposed ports to random ports.
+            quite: If you don't want to see any output. 
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
             remove: Automatically remove the container when it exits.
@@ -1316,7 +1321,7 @@ class ContainerCLI(DockerCLICaller):
 
         python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
-        )._pull_if_necessary(image)
+        )._pull_if_necessary(image, quiet=quiet)
 
         full_cmd = self.docker_cmd + ["container", "run"]
 
@@ -1371,7 +1376,8 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
-        full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
+        full_cmd.add_simple_arg("--health-interval",
+                                to_seconds(health_interval))
         full_cmd.add_simple_arg("--health-retries", health_retries)
         full_cmd.add_simple_arg(
             "--health-start-period", to_seconds(health_start_period)
@@ -1496,7 +1502,8 @@ class ContainerCLI(DockerCLICaller):
             # nothing to do
             return
         if attach and len(containers) > 1:
-            raise ValueError("Attaching multiple containers on start is not supported.")
+            raise ValueError(
+                "Attaching multiple containers on start is not supported.")
         if not attach and stream:
             raise ValueError(
                 "It's not possible to stream stderr and stdout if the client isn't "
@@ -1792,7 +1799,8 @@ class ContainerStats:
         )
 
     def __repr__(self):
-        attr = ", ".join(f"{key}={value}" for key, value in self.__dict__.items())
+        attr = ", ".join(f"{key}={value}" for key,
+                         value in self.__dict__.items())
         return f"<{self.__class__} object, attributes are {attr}>"
 
 

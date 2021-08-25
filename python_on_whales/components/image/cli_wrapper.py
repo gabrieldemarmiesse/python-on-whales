@@ -563,15 +563,16 @@ class ImageCLI(DockerCLICaller):
         ]
         run(full_cmd)
 
-    def _pull_if_necessary(self, image: ValidImage) -> Image:
+    def _pull_if_necessary(self, image: ValidImage, quiet: bool = False) -> Image:
         if isinstance(image, Image):
             # A docker image object must exist in the daemon to be defined.
             return image
         try:
             return self.inspect(image)
         except DockerException:
-            print(f"Unable to find image '{image}' locally")
-            return self.pull(image)
+            if not quiet:
+                print(f"Unable to find image '{image}' locally")
+            return self.pull(image, quiet=quiet)
 
     def copy_from(
         self, image: ValidImage, path_in_image: ValidPath, destination: ValidPath
