@@ -1,6 +1,6 @@
 FROM busybox as get_buildx
 
-RUN wget -O /docker-buildx https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-amd64
+RUN wget -O /docker-buildx https://github.com/docker/buildx/releases/download/v0.6.0/buildx-v0.6.0.linux-amd64
 RUN chmod a+x /docker-buildx
 
 #-----------------------------------------------------------------------------
