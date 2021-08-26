@@ -84,6 +84,7 @@ class ComposeConfigService(BaseModel):
     environment: Dict[str, Optional[str]]
     entrypoint: List[str]
     image: str
+    labels: Dict[str, str] = Field(default_factory=dict)
     ports: List[ComposeServicePort]
     volumes: List[ComposeServiceVolume]
 

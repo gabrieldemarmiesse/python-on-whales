@@ -1,0 +1,106 @@
+{
+  "services": {
+    "appli-back": {
+      "deploy": {
+        "labels": {
+          "traefik.enable": "true",
+          "traefik.http.services.appli-back.loadbalancer.server.port": "8080"
+        },
+        "resources": {
+          "limits": {
+            "cpus": "1"
+          }
+        },
+        "placement": {}
+      },
+      "environment": {
+        "REDIS_URL": "redis://redis:6379/4"
+      },
+      "env_file": [
+        "/root/.secret_envs/mapbox.env"
+      ]
+    },
+    "traefik": {
+      "command": [
+        "--providers.docker=true",
+        "--accesslog=true"
+      ],
+      "deploy": {
+        "labels": {
+          "traefik.enable": "true",
+          "traefik.http.routers.traefik.priority": "200"
+        },
+        "resources": {
+          "limits": {
+            "cpus": "1"
+          }
+        },
+        "placement": {
+          "constraints": [
+            "node.role == manager"
+          ]
+        }
+      },
+      "image": "traefik:v2.3",
+      "labels": {
+        "traefik.enable": "true",
+        "traefik.http.routers.traefik.priority": "200"
+      },
+      "networks": {
+        "default": {
+          "aliases": [
+            "something"
+          ]
+        }
+      },
+      "ports": [
+        {
+          "mode": "ingress",
+          "target": 80,
+          "published": 80,
+          "protocol": "tcp"
+        },
+        {
+          "mode": "ingress",
+          "target": 443,
+          "published": 443,
+          "protocol": "tcp"
+        },
+        {
+          "mode": "ingress",
+          "target": 8080,
+          "published": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/var/run/docker.sock",
+          "target": "/var/run/docker.sock",
+          "read_only": true,
+          "bind": {
+            "create_host_path": true
+          }
+        }
+      ]
+    }
+  },
+  "networks": {
+    "default": {
+      "name": "my_default",
+      "ipam": {},
+      "external": true
+    }
+  },
+  "volumes": {
+    "rabbitmq-data": {
+      "name": "rabbitmq-data",
+      "external": false
+    },
+    "redis-data": {
+      "name": "redis-data",
+      "external": false
+    }
+  }
+}
