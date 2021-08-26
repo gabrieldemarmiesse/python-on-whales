@@ -352,13 +352,13 @@ def test_bake(only_print):
     assert config == {
         "target": {
             "my_out1": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image1:1.0.0"],
                 "target": "out1",
             },
             "my_out2": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image2:1.0.0"],
                 "target": "out2",
@@ -375,14 +375,14 @@ def test_bake_with_load(only_print):
     assert config == {
         "target": {
             "my_out1": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image1:1.0.0"],
                 "target": "out1",
                 "output": ["type=docker"],
             },
             "my_out2": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image2:1.0.0"],
                 "target": "out2",
@@ -402,13 +402,13 @@ def test_bake_with_variables(only_print):
     assert config == {
         "target": {
             "my_out1": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image1:3.0.4"],
                 "target": "out1",
             },
             "my_out2": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image2:3.0.4"],
                 "target": "out2",
@@ -428,13 +428,13 @@ def test_bake_with_variables_2(only_print, monkeypatch):
     assert config == {
         "target": {
             "my_out1": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["dodo:3.0.4"],
                 "target": "out1",
             },
             "my_out2": {
-                "context": "./",
+                "context": ".",
                 "dockerfile": "Dockerfile",
                 "tags": ["pretty_image2:3.0.4"],
                 "target": "out2",
