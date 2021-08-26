@@ -7,6 +7,7 @@ import python_on_whales
 from python_on_whales import DockerClient
 from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.exceptions import NoSuchImage
+from python_on_whales.test_utils import get_all_jsons
 from python_on_whales.utils import PROJECT_ROOT
 
 pytestmark = pytest.mark.skipif(
@@ -232,3 +233,11 @@ def test_compose_config_from_rc1():
     )
 
     assert config.services["myservice"].deploy.resources.reservations.cpus == "'0.25'"
+
+
+@pytest.mark.parametrize("json_file", get_all_jsons("compose"))
+def test_load_json(json_file):
+    json_as_txt = json_file.read_text()
+    config: ComposeConfig = ComposeConfig.parse_raw(json_as_txt)
+    if json_file.name == "0.json":
+        assert config.services["traefik"].labels["traefik.enable"] == "true"
