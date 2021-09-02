@@ -4,7 +4,7 @@ import json
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
@@ -14,7 +14,13 @@ from python_on_whales.client_config import (
 )
 from python_on_whales.components.buildx.imagetools.cli_wrapper import ImagetoolsCLI
 from python_on_whales.components.buildx.models import BuilderInspectResult
-from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
+from python_on_whales.utils import (
+    ValidPath,
+    format_dict_for_cli,
+    run,
+    stream_stdout_and_stderr,
+    to_list,
+)
 
 
 class GetImageMethod(Enum):
@@ -97,7 +103,8 @@ class BuildxCLI(DockerCLICaller):
         push: bool = False,
         set: Dict[str, str] = {},
         variables: Dict[str, str] = {},
-    ) -> Dict[str, Dict[str, Dict[str, Any]]]:
+        stream_logs: bool = False,
+    ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
         """Bake is similar to make, it allows you to build things declared in a file.
 
         For example it allows you to build multiple docker image in parallel.
@@ -171,7 +178,14 @@ class BuildxCLI(DockerCLICaller):
         targets = to_list(targets)
         env = dict(variables)
         if print:
+            if stream_logs:
+                ValueError(
+                    "Getting the config of the bake and streaming "
+                    "logs at the same time is not possible."
+                )
             return json.loads(run(full_cmd + targets, env=env))
+        elif stream_logs:
+            return stream_buildx_logs(full_cmd + targets, env=env)
         else:
             run(full_cmd + targets, capture_stderr=progress is False, env=env)
             return json.loads(run(full_cmd + ["--print"] + targets, env=env))
@@ -199,7 +213,10 @@ class BuildxCLI(DockerCLICaller):
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
-    ) -> Optional[python_on_whales.components.image.cli_wrapper.Image]:
+        stream_logs: bool = False,
+    ) -> Union[
+        None, python_on_whales.components.image.cli_wrapper.Image, Iterator[str]
+    ]:
         """Build a Docker image with builkit as backend.
 
         Alias: `docker.build(...)`
@@ -253,6 +270,8 @@ class BuildxCLI(DockerCLICaller):
                 (format is `default|<id>[=<socket>|<key>[,<key>]]` as a string)
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
+            stream_logs: If `True` this function will return an iterator of strings.
+                You can then read the logs as they arrive.
 
         # Returns
             A `python_on_whales.Image` if a Docker image is loaded
@@ -299,6 +318,18 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
         full_cmd.add_args_list("--tag", tags)
+
+        if stream_logs:
+            if progress in (False, "tty"):
+                raise ValueError(
+                    "You want to stream logs, but it's not possible if a tty is used "
+                    "as 'progress'. It's also not possible if 'progress' is False. "
+                    "Make sure the function arguments of 'docker.build' are "
+                    "coherent."
+                )
+
+            full_cmd.append(context_path)
+            return stream_buildx_logs(full_cmd)
 
         will_load_image = self._build_will_load_image(builder, push, load, output)
         # very special_case, must be fixed https://github.com/docker/buildx/issues/420
@@ -514,3 +545,8 @@ class BuildxCLI(DockerCLICaller):
 
 def format_dict_for_buildx(options: Dict[str, str]) -> str:
     return ",".join(format_dict_for_cli(options, separator="="))
+
+
+def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:
+    for origin, value in stream_stdout_and_stderr(full_cmd, env=env):
+        yield value.decode()

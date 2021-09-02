@@ -38,6 +38,14 @@ def test_buildx_build(tmp_path):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_streaming_logs(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    output = list(docker.buildx.build(tmp_path, stream_logs=True))
+    assert output[0] == "#1 [internal] load build definition from Dockerfile\n"
+    assert output[-1] == "#6 DONE 0.0s\n"
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_load_docker_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     my_image = docker.buildx.build(tmp_path, load=True)
@@ -433,6 +441,18 @@ def test_bake_with_variables_2(only_print, monkeypatch):
             },
         }
     }
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+def test_bake_stream_logs(monkeypatch):
+    monkeypatch.setenv("IMAGE_NAME_1", "dodo")
+    output = docker.buildx.bake(
+        files=[bake_file], variables={"TAG": "3.0.4"}, stream_logs=True
+    )
+    output = list(output)
+    assert output[0].startswith("#")
+    assert output[-1].startswith("#")
 
 
 def test_prune():

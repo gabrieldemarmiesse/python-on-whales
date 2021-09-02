@@ -201,9 +201,17 @@ def reader(pipe, pipe_name, queue):
         queue.put(None)
 
 
-def stream_stdout_and_stderr(full_cmd: list) -> Iterable[Tuple[str, bytes]]:
+def stream_stdout_and_stderr(
+    full_cmd: list, env: Dict[str, str] = None
+) -> Iterable[Tuple[str, bytes]]:
+    if env is None:
+        subprocess_env = None
+    else:
+        subprocess_env = dict(os.environ)
+        subprocess_env.update(env)
+
     full_cmd = list(map(str, full_cmd))
-    process = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
+    process = Popen(full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env)
     q = Queue()
     full_stderr = b""  # for the error message
     Thread(target=reader, args=[process.stdout, "stdout", q]).start()
