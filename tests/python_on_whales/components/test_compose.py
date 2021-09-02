@@ -46,6 +46,24 @@ def test_docker_compose_up_detach_down():
     docker.compose.down()
 
 
+def test_docker_compose_up_detach_down_with_scales():
+    docker.compose.up(
+        ["my_service", "busybox", "alpine"],
+        detach=True,
+        scales={"busybox": 2, "alpine": 3},
+    )
+    assert len(docker.compose.ps()) == 6
+
+    docker.compose.up(
+        ["my_service", "busybox", "alpine"],
+        detach=True,
+        scales={"busybox": 2, "alpine": 5},
+    )
+    assert len(docker.compose.ps()) == 8
+
+    docker.compose.down(timeout=1)
+
+
 def test_docker_compose_pause_unpause():
     docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
     docker.compose.pause()
