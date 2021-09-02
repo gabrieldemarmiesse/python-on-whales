@@ -451,8 +451,8 @@ def test_bake_stream_logs(monkeypatch):
         files=[bake_file], variables={"TAG": "3.0.4"}, stream_logs=True
     )
     output = list(output)
-    assert output[0].startswith("#1")
-    assert output[-1] == "#8 DONE 0.0s\n"
+    assert output[0].startswith("#")
+    assert output[-1].startswith("#")
 
 
 def test_prune():
