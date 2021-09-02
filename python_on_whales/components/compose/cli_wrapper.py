@@ -213,10 +213,6 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def scale(self):
-        """Not yet implemented"""
-        raise NotImplementedError
-
     def start(self):
         """Not yet implemented"""
         raise NotImplementedError
@@ -257,6 +253,7 @@ class ComposeCLI(DockerCLICaller):
         build: bool = False,
         detach: bool = False,
         abort_on_container_exit: bool = False,
+        scales: Dict[str, int] = {},
     ):
         """Start the containers.
 
@@ -274,6 +271,9 @@ class ComposeCLI(DockerCLICaller):
                 Incompatible with `abort_on_container_exit=True`.
             abort_on_container_exit: If `True` stops all containers if any container was
                 stopped. Incompatible with `detach=True`.
+            scales: Scale SERVICE to NUM instances. Overrides
+                the scale setting in the Compose file if present. For example:
+                `scales={"my_service": 2, "my_other_service": 5}`.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -284,6 +284,8 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
+        for service, scale in scales.items():
+            full_cmd.add_simple_arg("--scale", f"{service}={scale}")
 
         full_cmd += services
         run(full_cmd, capture_stdout=False)
