@@ -254,6 +254,12 @@ class ComposeCLI(DockerCLICaller):
         detach: bool = False,
         abort_on_container_exit: bool = False,
         scales: Dict[str, int] = {},
+        attach_dependencies: bool = False,
+        force_recreate: bool = False,
+        no_build: bool = False,
+        color: bool = True,
+        log_prefix: bool = True,
+        start: bool = True,
     ):
         """Start the containers.
 
@@ -274,6 +280,13 @@ class ComposeCLI(DockerCLICaller):
             scales: Scale SERVICE to NUM instances. Overrides
                 the scale setting in the Compose file if present. For example:
                 `scales={"my_service": 2, "my_other_service": 5}`.
+            attach_dependencies: Attach to dependent containers.
+            force_recreate: Recreate containers even if their configuration and image
+                haven't changed.
+            no_build: Don't build an image, even if it's missing.
+            color: If `False`, it will produce monochrome output.
+            log_prefix: If `False`, will not display the prefix in the logs.
+            start: Start the service after creating them.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -281,11 +294,17 @@ class ComposeCLI(DockerCLICaller):
 
         """
         full_cmd = self.docker_compose_cmd + ["up"]
-        full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--build", build)
+        full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
         for service, scale in scales.items():
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")
+        full_cmd.add_flag("--attach-dependencies", attach_dependencies)
+        full_cmd.add_flag("--force-recreate", force_recreate)
+        full_cmd.add_flag("--no-build", no_build)
+        full_cmd.add_flag("--no-color", not color)
+        full_cmd.add_flag("--no-log-prefix", not log_prefix)
+        full_cmd.add_flag("--no-start", not start)
 
         full_cmd += services
         run(full_cmd, capture_stdout=False)
