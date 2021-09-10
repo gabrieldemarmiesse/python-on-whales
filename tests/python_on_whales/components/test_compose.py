@@ -20,6 +20,20 @@ docker = DockerClient(
 )
 
 
+def test_compose_project_name():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_project_name="dudu",
+    )
+    docker.compose.up(["busybox", "alpine"], detach=True)
+    containers = docker.compose.ps()
+    container_names = set(x.name for x in containers)
+    assert container_names == {"dudu_busybox_1", "dudu_alpine_1"}
+    docker.compose.down()
+
+
 def test_docker_compose_build():
     docker.compose.build()
     docker.compose.build(["my_service"])

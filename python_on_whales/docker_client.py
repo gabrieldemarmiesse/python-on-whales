@@ -53,6 +53,8 @@ class DockerClient(DockerCLICaller):
         compose_files: Docker compose yaml file
         compose_env_file: .env file containing the environments variables to inject
             into the compose project. By default, it uses `./.env`.
+        compose_project_name: The name of the compose project. It will be prefixed to
+            networks, volumes and containers created by compose.
     """
 
     def __init__(
@@ -70,6 +72,7 @@ class DockerClient(DockerCLICaller):
         client_config: Optional[ClientConfig] = None,
         compose_files: List[ValidPath] = [],
         compose_env_file: Optional[ValidPath] = None,
+        compose_project_name: Optional[str] = None,
     ):
 
         if client_config is None:
@@ -86,6 +89,7 @@ class DockerClient(DockerCLICaller):
                 tlsverify=tlsverify,
                 compose_files=compose_files,
                 compose_env_file=compose_env_file,
+                compose_project_name=compose_project_name,
             )
         super().__init__(client_config)
 
