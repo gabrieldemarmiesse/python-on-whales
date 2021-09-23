@@ -230,7 +230,8 @@ def test_config_complexe_compose():
     assert config.services["my_service"].command == [
         "ping",
         "-c",
-        "",
+        "2",
+
         "www.google.com",
     ]
 
