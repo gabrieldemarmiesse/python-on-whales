@@ -5,7 +5,7 @@ services:
     build:
       context: my_service_build
     image: some_random_image
-    command: ping -c 7 www.google.com
+    command: ping -c 2 www.google.com
     ports:
      - "5000:5000"
     volumes:
