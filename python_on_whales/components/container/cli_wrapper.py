@@ -785,7 +785,7 @@ class ContainerCLI(DockerCLICaller):
         for arg in to_list(command):
             full_cmd.append(arg)
 
-        result = run(full_cmd, tty=True)
+        result = run(full_cmd, tty=tty)
         if detach:
             return None
         else:
