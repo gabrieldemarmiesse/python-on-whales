@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from queue import Queue
@@ -78,17 +79,22 @@ def run(
     input: bytes = None,
     return_stderr: bool = False,
     env: Dict[str, str] = {},
+    tty: bool = False,
 ) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
     subprocess_env = dict(os.environ)
     subprocess_env.update(env)
     if args[1] == "buildx":
         subprocess_env["DOCKER_CLI_EXPERIMENTAL"] = "enabled"
-    if capture_stdout:
+    if tty:
+        stdout_dest = sys.stdout
+    elif capture_stdout:
         stdout_dest = subprocess.PIPE
     else:
         stdout_dest = None
-    if capture_stderr:
+    if tty:
+        stderr_dest = sys.stderr
+    elif capture_stderr:
         stderr_dest = subprocess.PIPE
     else:
         stderr_dest = None
