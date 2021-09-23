@@ -230,7 +230,7 @@ def test_config_complexe_compose():
     assert config.services["my_service"].command == [
         "ping",
         "-c",
-        "7",
+        "",
         "www.google.com",
     ]
 
@@ -260,7 +260,6 @@ def test_config_complexe_compose():
 
 
 def test_compose_down_volumes():
-    """Checking that the pydantic model does its job"""
     compose_file = (
         PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
     )
