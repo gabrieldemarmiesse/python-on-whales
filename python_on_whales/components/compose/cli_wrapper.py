@@ -82,6 +82,7 @@ class ComposeCLI(DockerCLICaller):
         remove_orphans: bool = False,
         remove_images: Optional[str] = None,
         timeout: Optional[int] = None,
+        volumes: bool = False,
     ):
         """Stops and removes the containers
 
@@ -92,11 +93,16 @@ class ComposeCLI(DockerCLICaller):
                 `"local"` remove only images that don't have a custom
                 tag. Possible values are `"local"` and `"all"`.
             timeout: Specify a shutdown timeout in seconds (default 10).
+            volumes: Remove named volumes declared in the
+                volumes section of the Compose file and anonymous
+                volumes attached to containers.
         """
         full_cmd = self.docker_compose_cmd + ["down"]
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_simple_arg("--rmi", remove_images)
         full_cmd.add_simple_arg("--timeout", timeout)
+        full_cmd.add_flag("--volumes", volumes)
+
         run(full_cmd)
 
     def events(self):

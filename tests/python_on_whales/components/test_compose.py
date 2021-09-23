@@ -259,6 +259,22 @@ def test_config_complexe_compose():
     assert not config.volumes["dodo"].external
 
 
+def test_compose_down_volumes():
+    """Checking that the pydantic model does its job"""
+    compose_file = (
+        PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
+    )
+    docker = DockerClient(compose_files=[compose_file])
+    docker.compose.up(
+        ["my_service"], detach=True, scales=dict(my_service=1), build=True
+    )
+    assert docker.volume.exists("components_dodo")
+    docker.compose.down()
+    assert docker.volume.exists("components_dodo")
+    docker.compose.down(volumes=True)
+    assert not docker.volume.exists("components_dodo")
+
+
 def test_compose_config_from_rc1():
     config = ComposeConfig.parse_file(
         Path(__file__).parent / "strange_compose_config_rc1.json"
