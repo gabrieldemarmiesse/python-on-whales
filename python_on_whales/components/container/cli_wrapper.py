@@ -210,9 +210,9 @@ class Container(ReloadableObjectFromJson):
         detach: bool = False,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
-        # interactive: bool = False,
+        interactive: bool = False,
         privileged: bool = False,
-        # tty: bool = False,
+        tty: bool = False,
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
     ):
@@ -227,9 +227,9 @@ class Container(ReloadableObjectFromJson):
             detach,
             envs,
             env_files,
-            # interactive,
+            interactive,
             privileged,
-            # tty,
+            tty,
             user,
             workdir,
         )
@@ -728,9 +728,9 @@ class ContainerCLI(DockerCLICaller):
         detach: bool = False,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
-        # interactive: bool = False,
+        interactive: bool = False,
         privileged: bool = False,
-        # tty: bool = False,
+        tty: bool = False,
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
     ) -> Optional[str]:
@@ -745,7 +745,13 @@ class ContainerCLI(DockerCLICaller):
                 returns the command stdout as string.
             envs: Set environment variables
             env_files: Read one or more files of environment variables
+            interactive: Leave stdin open during the duration of the process
+                to allow communication with the parent process.
+                Currently only works with `tty=True` for interactive use
+                on the terminal.
             privileged: Give extended privileges to the container.
+            tty: Allocate a pseudo-TTY. Allow the process to access your terminal
+                to write on it.
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
 
@@ -763,9 +769,14 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--env-file", env_files)
 
         # TODO: activate interactive and tty
-        # full_cmd.add_flag("--interactive", interactive)
+        if interactive and not tty:
+            raise NotImplementedError(
+                "Currently, docker.container.execute(interactive=True) must have"
+                "tty=True. interactive=True and tty=False is not yet implemented."
+            )
+        full_cmd.add_flag("--interactive", interactive)
         full_cmd.add_flag("--privileged", privileged)
-        # full_cmd.add_flag("--tty", tty)
+        full_cmd.add_flag("--tty", tty)
 
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
@@ -774,7 +785,7 @@ class ContainerCLI(DockerCLICaller):
         for arg in to_list(command):
             full_cmd.append(arg)
 
-        result = run(full_cmd)
+        result = run(full_cmd, tty=tty)
         if detach:
             return None
         else:
