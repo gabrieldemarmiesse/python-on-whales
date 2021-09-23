@@ -745,7 +745,13 @@ class ContainerCLI(DockerCLICaller):
                 returns the command stdout as string.
             envs: Set environment variables
             env_files: Read one or more files of environment variables
+            interactive: Leave stdin open during the duration of the process
+                to allow communication with the parent process.
+                Currently only works with `tty=True` for interactive use
+                on the terminal.
             privileged: Give extended privileges to the container.
+            tty: Allocate a pseudo-TTY. Allow the process to access your terminal
+                to write on it.
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
 
