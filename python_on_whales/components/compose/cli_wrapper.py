@@ -218,6 +218,7 @@ class ComposeCLI(DockerCLICaller):
 
     def run(
         self,
+        service: str,
         command: List[str] = [],
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
@@ -256,6 +257,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd.append(service)
         full_cmd += command
 
         result = run(full_cmd)
