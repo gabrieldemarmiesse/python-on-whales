@@ -1,3 +1,4 @@
+import time
 from datetime import timedelta
 from pathlib import Path
 
@@ -290,5 +291,14 @@ def test_load_json(json_file):
         assert config.services["traefik"].labels["traefik.enable"] == "true"
 
 
-def test_compose_run():
-    docker.compose.run()
+def test_compose_run_simple():
+    result = docker.compose.run("alpine", ["echo", "dodo"])
+    assert result == "dodo"
+
+
+def test_compose_run_detach():
+    container = docker.compose.run("alpine", ["echo", "dodo"], detach=True)
+
+    time.sleep(0.1)
+    assert not container.state.running
+    assert container.logs() == "dodo\n"
