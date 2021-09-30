@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import timedelta
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.container.cli_wrapper
@@ -215,9 +216,56 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += to_list(services)
         run(full_cmd)
 
-    def run(self):
+    def run(
+        self,
+        service: str,
+        command: List[str] = [],
+        detach: bool = False,
+        # entrypoint: Optional[List[str]] = None,
+        # envs: Dict[str, str] = {},
+        # labels: Dict[str, str] = {},
+        name: Optional[str] = None,
+        tty: bool = True,
+        dependencies: bool = True,
+        publish: List[
+            python_on_whales.components.container.cli_wrapper.ValidPortMapping
+        ] = [],
+        remove: bool = False,
+        service_ports: bool = False,
+        use_aliases: bool = False,
+        user: Optional[str] = None,
+        # volumes: bool = "todo",
+        workdir: Union[None, str, Path] = None,
+    ) -> Union[str, python_on_whales.components.container.cli_wrapper.Container]:
         """Not yet implemented"""
-        raise NotImplementedError
+        full_cmd = self.docker_compose_cmd + ["run"]
+        full_cmd.add_flag("--detach", detach)
+        full_cmd.add_simple_arg("--name", name)
+        full_cmd.add_flag("--no-TTY", not tty)
+        full_cmd.add_flag("--no-deps", not dependencies)
+        for port_mapping in publish:
+            if len(port_mapping) == 2:
+                full_cmd += ["--publish", f"{port_mapping[0]}:{port_mapping[1]}"]
+            else:
+                full_cmd += [
+                    "--publish",
+                    f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
+                ]
+
+        full_cmd.add_flag("--remove", remove)
+        full_cmd.add_flag("--service-ports", service_ports)
+        full_cmd.add_flag("--use-aliases", use_aliases)
+        full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd.append(service)
+        full_cmd += command
+
+        result = run(full_cmd)
+        if detach:
+            Container = python_on_whales.components.container.cli_wrapper.Container
+            return Container(self.client_config, result, is_immutable_id=True)
+        else:
+            return result
 
     def start(self):
         """Not yet implemented"""
