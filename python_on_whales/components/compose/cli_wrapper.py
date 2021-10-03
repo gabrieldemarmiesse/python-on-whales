@@ -252,7 +252,7 @@ class ComposeCLI(DockerCLICaller):
                     f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
                 ]
 
-        full_cmd.add_flag("--remove", remove)
+        full_cmd.add_flag("--rm", remove)
         full_cmd.add_flag("--service-ports", service_ports)
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
