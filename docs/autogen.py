@@ -77,6 +77,7 @@ pages = {
     "docker_objects/nodes.md": get_methods("python_on_whales.Node"),
     "docker_objects/plugins.md": get_methods("python_on_whales.Plugin"),
     "docker_objects/services.md": get_methods("python_on_whales.Service"),
+    "docker_objects/secrets.md": get_methods("python_on_whales.Secret"),
     "docker_objects/stacks.md": get_methods("python_on_whales.Stack"),
     "docker_objects/volumes.md": get_methods("python_on_whales.Volume"),
 }
@@ -119,6 +120,7 @@ doc_generator = MyDocumentationGenerator(
         "python_on_whales.Node",
         "python_on_whales.Plugin",
         "python_on_whales.Service",
+        "python_on_whales.Secret",
         "python_on_whales.Stack",
         "python_on_whales.Task",
         "python_on_whales.Volume",
