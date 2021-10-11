@@ -1123,6 +1123,7 @@ class ContainerCLI(DockerCLICaller):
         health_timeout: Union[None, int, timedelta] = None,
         hostname: Optional[str] = None,
         init: bool = False,
+        interactive: bool = False,
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
         ipc: Optional[str] = None,
@@ -1166,6 +1167,7 @@ class ContainerCLI(DockerCLICaller):
         stream: bool = False,
         sysctl: Dict[str, str] = {},
         tmpfs: List[ValidPath] = [],
+        tty: bool = False,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -1274,6 +1276,10 @@ class ContainerCLI(DockerCLICaller):
                 are `"all"` or `"device=GPU-3a23c669-1f69-c64e-cf85-44e9b07e7a2a"` or
                 `"device=0,2"`. If you want 3 gpus, just write `gpus=3`.
             hostname: Container host name
+            interactive: Leave stdin open during the duration of the process
+                to allow communication with the parent process.
+                Currently only works with `tty=True` for interactive use
+                on the terminal.
             ip: IPv4 address (e.g., 172.30.100.104)
             ip6: IPv6 address (e.g., 2001:db8::33)
             ipc: IPC mode to use
@@ -1312,6 +1318,8 @@ class ContainerCLI(DockerCLICaller):
                 `"4g"` for example.
             stop_timeout: Signal to stop a container (default "SIGTERM")
             storage_options: Storage driver options for the container
+            tty: Allocate a pseudo-TTY. Allow the process to access your terminal
+                to write on it.
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
@@ -1392,6 +1400,15 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--hostname", hostname)
 
         full_cmd.add_flag("--init", init)
+
+        # TODO: activate interactive and tty
+        if interactive and not tty:
+            raise NotImplementedError(
+                "Currently, docker.container.run(interactive=True) must have"
+                "tty=True. interactive=True and tty=False is not yet implemented."
+            )
+        full_cmd.add_flag("--interactive", interactive)
+        full_cmd.add_flag("--tty", tty)
 
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
@@ -1476,17 +1493,29 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.append(image)
         full_cmd += command
 
-        if detach and stream:
-            raise ValueError(
-                "It's not possible to stream and detach a container at "
-                "the same time."
-            )
+        if detach:
+            if stream:
+                raise ValueError(
+                    "It's not possible to stream and detach a container at "
+                    "the same time."
+                )
+            if interactive:
+                raise ValueError(
+                    "It's not possible to interact and detach a container at "
+                    "the same time."
+                )
+        if stream and interactive:
+            if interactive:
+                raise ValueError(
+                    "It's not possible to interact and stream a container at "
+                    "the same time."
+                )
         if detach:
             return Container(self.client_config, run(full_cmd))
         elif stream:
             return stream_stdout_and_stderr(full_cmd)
         else:
-            return run(full_cmd, capture_stderr=False)
+            return run(full_cmd, tty=tty, capture_stderr=False)
 
     def start(
         self,
