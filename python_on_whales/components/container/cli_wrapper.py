@@ -644,7 +644,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--name", name)
 
         full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-aliases", network_aliases)
+        full_cmd.add_args_list("--network-alias", network_aliases)
 
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
         full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
@@ -1438,7 +1438,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--name", name)
 
         full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-aliases", network_aliases)
+        full_cmd.add_args_list("--network-alias", network_aliases)
 
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
         full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
