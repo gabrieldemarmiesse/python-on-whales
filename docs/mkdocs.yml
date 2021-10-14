@@ -33,6 +33,7 @@ nav:
     - Networks: docker_objects/networks.md
     - Nodes: docker_objects/nodes.md
     - Plugins: docker_objects/plugins.md
+    - Secrets: docker_objects/secrets.md
     - Services: docker_objects/services.md
     - Stacks: docker_objects/stacks.md
     - Tasks: docker_objects/tasks.md
