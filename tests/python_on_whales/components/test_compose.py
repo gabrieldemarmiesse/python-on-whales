@@ -292,7 +292,7 @@ def test_load_json(json_file):
 
 
 def test_compose_run_simple():
-    result = docker.compose.run("alpine", ["echo", "dodo"])
+    result = docker.compose.run("alpine", ["echo", "dodo"], remove=True)
     assert result == "dodo"
 
 
