@@ -284,6 +284,17 @@ def test_execute():
     docker.kill(my_container)
 
 
+def test_execute_stream():
+    my_container = docker.run(
+        "busybox:1", ["sleep", "infinity"], detach=True, remove=True
+    )
+    exec_result = list(
+        docker.execute(my_container, ["sh", "-c", ">&2 echo dodo"], stream=True)
+    )
+    assert exec_result == [("stderr", b"dodo\n")]
+    docker.kill(my_container)
+
+
 def test_diff():
     my_container = docker.run(
         "busybox:1", ["sleep", "infinity"], detach=True, remove=True

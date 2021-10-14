@@ -215,7 +215,8 @@ class Container(ReloadableObjectFromJson):
         tty: bool = False,
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
-    ):
+        stream: bool = False,
+    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command in this container
 
         See the [`docker.container.execute`](../sub-commands/container.md#execute)
@@ -232,6 +233,7 @@ class Container(ReloadableObjectFromJson):
             tty,
             user,
             workdir,
+            stream,
         )
 
     def export(self, output: ValidPath) -> None:
@@ -733,7 +735,8 @@ class ContainerCLI(DockerCLICaller):
         tty: bool = False,
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
-    ) -> Optional[str]:
+        stream: bool = False,
+    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command inside a container
 
         Alias: `docker.execute(...)`
@@ -754,6 +757,7 @@ class ContainerCLI(DockerCLICaller):
                 to write on it.
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
+            stream: Similar to `docker.run(..., stream=True)`.
 
         # Returns:
             Optional[str]
@@ -774,6 +778,24 @@ class ContainerCLI(DockerCLICaller):
                 "Currently, docker.container.execute(interactive=True) must have"
                 "tty=True. interactive=True and tty=False is not yet implemented."
             )
+
+        if interactive and stream:
+            raise ValueError(
+                "You can't set interactive=True and stream=True at the same"
+                "time. Their purpose are not compatible."
+            )
+
+        if tty and stream:
+            raise ValueError(
+                "You can't set interactive=True and stream=True at the same"
+                "time. Their purpose are not compatible."
+            )
+
+        if detach and stream:
+            raise ValueError(
+                "You can't detach and stream at the same time. It's not compatible."
+            )
+
         full_cmd.add_flag("--interactive", interactive)
         full_cmd.add_flag("--privileged", privileged)
         full_cmd.add_flag("--tty", tty)
@@ -784,12 +806,14 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.append(container)
         for arg in to_list(command):
             full_cmd.append(arg)
-
-        result = run(full_cmd, tty=tty)
-        if detach:
-            return None
+        if stream:
+            return stream_stdout_and_stderr(full_cmd)
         else:
-            return result
+            result = run(full_cmd, tty=tty)
+            if detach:
+                return None
+            else:
+                return result
 
     def export(self, container: ValidContainer, output: ValidPath) -> None:
         """Export a container's filesystem as a tar archive
