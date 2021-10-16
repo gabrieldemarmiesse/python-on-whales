@@ -41,7 +41,6 @@ def to_docker_camel(string):
             "secondary_ipv6_addresses": "SecondaryIPv6Addresses",
             "endpoint_id": "EndpointID",
             "global_ipv6_prefix_lenght": "GlobalIPv6PrefixLen",
-            "ip_adress": "IPAddress",
             "ip_prefix_lenght": "IPPrefixLen",
             "ipv6_gateway": "IPv6Gateway",
             "network_id": "NetworkID",

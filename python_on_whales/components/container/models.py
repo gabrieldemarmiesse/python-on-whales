@@ -294,7 +294,7 @@ class NetworkSettings(DockerCamelModel):
     gateway: str
     global_ipv6_address: str
     global_ipv6_prefix_lenght: int
-    ip_adress: str
+    ip_address: str
     ip_prefix_lenght: int
     ipv6_gateway: str
     mac_address: str
