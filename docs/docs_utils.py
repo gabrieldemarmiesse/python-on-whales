@@ -425,7 +425,7 @@ def generate_code_demo_containers():
             "container.network_settings.gateway",
             "container.network_settings.global_ipv6_address",
             "container.network_settings.global_ipv6_prefix_lenght",
-            "container.network_settings.ip_adress",
+            "container.network_settings.ip_address",
             "container.network_settings.ip_prefix_lenght",
             "container.network_settings.ipv6_gateway",
             "container.network_settings.mac_address",

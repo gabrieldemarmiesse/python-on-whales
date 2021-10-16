@@ -1314,7 +1314,7 @@ class ContainerCLI(DockerCLICaller):
                 containers with `docker.ps(filters='...')`. The labels can also be found on
                 each container with the attribute `my_container.config.labels`.
             log_driver: Logging driver for the container
-            mac_adress: Container MAC address (e.g., `"92:d0:c6:0a:29:33"`)
+            mac_address: Container MAC address (e.g., `"92:d0:c6:0a:29:33"`)
             memory:  Memory limit, valid values are `1024` (ints are bytes) or
                 `"43m"` or `"6g"`.
             memory_reservation: Memory soft limit
