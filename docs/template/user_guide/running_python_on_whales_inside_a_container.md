@@ -1,0 +1,81 @@
+# Running python-on-whales inside a container
+
+*To follow this example, you just need Docker installed, and nothing else!*
+
+### The use case
+
+Sometimes you don't want to install Python on your system, but you still
+would like to use python-on-whales to handle most of the Docker logic.
+
+You can then run python-on-whales inside a Docker container. For simplicity,
+we let the container access the Docker daemon of the host.
+
+Let's give you the code example, and we'll explain afterwards where is the magic.
+
+
+### Example
+
+We want to run this small Python script. It uses python-on-whales. We'll call it `main.py`
+
+```python
+# main.py
+from python_on_whales import docker
+
+print("We are going to run the hello world docker container")
+
+output = docker.run("hello-world")
+
+print("Here is the output:")
+print(output)
+```
+
+Next to this `main.py`, make a `Dockerfile`.
+
+```Dockerfile
+# Dockerfile
+FROM python:3.9
+
+RUN pip install python-on-whales
+RUN python-on-whales download-cli
+
+COPY ./main.py /main.py
+
+CMD python /main.py
+```
+
+We're all set! Let's run this Python script, without having Python installed on the system!
+
+```bash
+docker build -t image-with-python-on-whales .
+docker run -v /var/run/docker.sock:/var/run/docker.sock image-with-python-on-whales
+```
+
+You should see this output:
+
+```
+We are going to run the hello world docker container
+Here is the output:
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+### How does it work?
