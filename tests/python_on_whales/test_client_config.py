@@ -11,10 +11,10 @@ fake_json_message = """
         "CreatedAt": "2020-10-08T18:32:55Z",
         "Driver": ["dummy", "fake", ["driver"]],
         "Labels": {
-            "com.docker.stack.namespace": "scube"
+            "com.docker.stack.namespace": "dodo"
         },
-        "Mountpoint": "/var/lib/docker/volumes/scube_traefik-data/_data",
-        "Name": "scube_traefik-data",
+        "Mountpoint": "/var/lib/docker/volumes/dodo_traefik-data/_data",
+        "Name": "dodo_traefik-data",
         "Options": null,
         "Scope": "local"
     }

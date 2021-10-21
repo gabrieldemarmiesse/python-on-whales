@@ -4,7 +4,7 @@
     "Path": "/bin/sh",
     "Args": [
         "-c",
-        "celery -A scube_workers.entrypoint worker --concurrency=1 --prefetch-multiplier=1 -Ofair -l info -Q gpu_queue"
+        "celery -A dodo_workers.entrypoint worker --concurrency=1 --prefetch-multiplier=1 -Ofair -l info -Q gpu_queue"
     ],
     "State": {
         "Status": "running",
@@ -24,7 +24,7 @@
     "HostnamePath": "/var/lib/docker/containers/b0778d74153ce07c9f20ce1cdff173e85ca55bf872ada44a3ed3e7afb46c1881/hostname",
     "HostsPath": "/var/lib/docker/containers/b0778d74153ce07c9f20ce1cdff173e85ca55bf872ada44a3ed3e7afb46c1881/hosts",
     "LogPath": "/var/lib/docker/containers/b0778d74153ce07c9f20ce1cdff173e85ca55bf872ada44a3ed3e7afb46c1881/b0778d74153ce07c9f20ce1cdff173e85ca55bf872ada44a3ed3e7afb46c1881-json.log",
-    "Name": "/scube_scube-gpu-workers.1.5ipf9kn4kofbu9xgv6088iene",
+    "Name": "/dodo_dodo-gpu-workers.1.5ipf9kn4kofbu9xgv6088iene",
     "RestartCount": 0,
     "Driver": "overlay2",
     "Platform": "linux",
@@ -174,21 +174,21 @@
         "Cmd": [
             "/bin/sh",
             "-c",
-            "celery -A scube_workers.entrypoint worker --concurrency=1 --prefetch-multiplier=1 -Ofair -l info -Q gpu_queue"
+            "celery -A dodo_workers.entrypoint worker --concurrency=1 --prefetch-multiplier=1 -Ofair -l info -Q gpu_queue"
         ],
-        "Image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/scube-gpu-workers:1@sha256:ccde46a8ee38b91ea4ccb53fc54fa64c98d625cbe9ecc928cc8ca5574a7d3fae",
+        "Image": "766281746212.dkr.ecr.eu-west-1.amazonaws.com/dodo-gpu-workers:1@sha256:ccde46a8ee38b91ea4ccb53fc54fa64c98d625cbe9ecc928cc8ca5574a7d3fae",
         "Volumes": null,
-        "WorkingDir": "/scube-workers",
+        "WorkingDir": "/dodo-workers",
         "Entrypoint": null,
         "OnBuild": null,
         "Labels": {
-            "com.docker.stack.namespace": "scube",
+            "com.docker.stack.namespace": "dodo",
             "com.docker.swarm.node.id": "t81qp2z24qs08t9u9oo2fh16j",
             "com.docker.swarm.service.id": "r73z7p4uua0aq7wokchd1r3pc",
-            "com.docker.swarm.service.name": "scube_scube-gpu-workers",
+            "com.docker.swarm.service.name": "dodo_dodo-gpu-workers",
             "com.docker.swarm.task": "",
             "com.docker.swarm.task.id": "5ipf9kn4kofbu9xgv6088iene",
-            "com.docker.swarm.task.name": "scube_scube-gpu-workers.1.5ipf9kn4kofbu9xgv6088iene"
+            "com.docker.swarm.task.name": "dodo_dodo-gpu-workers.1.5ipf9kn4kofbu9xgv6088iene"
         }
     },
     "NetworkSettings": {
@@ -210,7 +210,7 @@
         "IPv6Gateway": "",
         "MacAddress": "",
         "Networks": {
-            "scube_default": {
+            "dodo_default": {
                 "IPAMConfig": {
                     "IPv4Address": "10.0.1.103"
                 },

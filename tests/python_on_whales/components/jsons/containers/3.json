@@ -233,7 +233,7 @@
                 "MacAddress": "02:42:0a:00:00:32",
                 "DriverOpts": null
             },
-            "scube_default": {
+            "dodo_default": {
                 "IPAMConfig": {
                     "IPv4Address": "10.0.1.120"
                 },

@@ -2,10 +2,10 @@
     "CreatedAt": "2020-09-30T15:05:23Z",
     "Driver": "local",
     "Labels": {
-        "com.docker.stack.namespace": "scube"
+        "com.docker.stack.namespace": "dodo"
     },
-    "Mountpoint": "/var/lib/docker/volumes/scube_asset-server-data/_data",
-    "Name": "scube_asset-server-data",
+    "Mountpoint": "/var/lib/docker/volumes/dodo_asset-server-data/_data",
+    "Name": "dodo_asset-server-data",
     "Options": null,
     "Scope": "local"
 }
