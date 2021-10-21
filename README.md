@@ -2,11 +2,11 @@
 
 A Docker client for Python, designed to be fun and intuitive!
 
-Works on Linux, MacOS and Windows, for Python 3.7 and above. 
+Works on Linux, macOS and Windows, for Python 3.7 and above. 
 
 The docs can be found at this address: <https://gabrieldemarmiesse.github.io/python-on-whales/>
 
-The Github repo can be found at this adress: <https://github.com/gabrieldemarmiesse/python-on-whales>
+The GitHub repo can be found at this address: <https://github.com/gabrieldemarmiesse/python-on-whales>
 
 
 ## How to install?
