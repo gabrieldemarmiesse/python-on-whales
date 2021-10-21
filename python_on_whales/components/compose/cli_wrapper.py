@@ -363,9 +363,9 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += services
         run(full_cmd, capture_stdout=False)
 
-    def version(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def version(self) -> str:
+        """Returns the version of docker compose as a `str`."""
+        return run(self.docker_compose_cmd + ["version"])
 
     def is_installed(self) -> bool:
         """Returns `True` if docker compose (the one written in Go)

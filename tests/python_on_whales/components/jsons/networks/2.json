@@ -24,21 +24,21 @@
     "ConfigOnly": false,
     "Containers": {
         "43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a": {
-            "Name": "scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+            "Name": "dodo_traefik.1.oso75s3hbdlzjruy04zug808l",
             "EndpointID": "2a26ed12e3dc35035ee8fb61bf7709d048cc42b7eefb72bb4e9621b0a61e3161",
             "MacAddress": "02:42:0a:00:00:e4",
             "IPv4Address": "10.0.0.228/24",
             "IPv6Address": ""
         },
         "5d7bac8f63f38e66df4c967e4d6b3611bc55b148740752141b11ec49c6d4482b": {
-            "Name": "scube_postgis.1.dnxxoigt20bi0j0cj4kjttxiw",
+            "Name": "dodo_postgis.1.dnxxoigt20bi0j0cj4kjttxiw",
             "EndpointID": "fe7ba15133c65f2a31fe8d50d9579cf15e4fa53af0dbe0ae3637faa4972743b3",
             "MacAddress": "02:42:0a:00:00:2e",
             "IPv4Address": "10.0.0.46/24",
             "IPv6Address": ""
         },
         "78288b3914fc80f303ecaebac1de16283a6917679a82601f35794c4669088374": {
-            "Name": "scube_redis.1.5hvdl4hr3pp70iyq2w49qr09r",
+            "Name": "dodo_redis.1.5hvdl4hr3pp70iyq2w49qr09r",
             "EndpointID": "1eaf137aac74a9a26101928b9d70a9159ff0c45d3e59caed5dd4206d80c17e28",
             "MacAddress": "02:42:0a:00:00:e5",
             "IPv4Address": "10.0.0.229/24",

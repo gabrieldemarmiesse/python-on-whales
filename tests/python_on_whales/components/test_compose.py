@@ -302,3 +302,7 @@ def test_compose_run_detach():
     time.sleep(0.1)
     assert not container.state.running
     assert container.logs() == "dodo\n"
+
+
+def test_compose_version():
+    assert "Docker Compose version v2" in docker.compose.version()
