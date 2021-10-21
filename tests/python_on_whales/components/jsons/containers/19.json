@@ -26,7 +26,7 @@
     "HostnamePath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/hostname",
     "HostsPath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/hosts",
     "LogPath": "/var/lib/docker/containers/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b/349556945f4e56295fb2df1fddc6d09b88ee8430e666977305d2d16478f1773b-json.log",
-    "Name": "/scube_postgis_1",
+    "Name": "/dodo_postgis_1",
     "RestartCount": 0,
     "Driver": "overlay2",
     "Platform": "linux",
@@ -41,7 +41,7 @@
             "Type": "json-file",
             "Config": {}
         },
-        "NetworkMode": "scube_default",
+        "NetworkMode": "dodo_default",
         "PortBindings": {
             "5432/tcp": [
                 {
@@ -158,7 +158,7 @@
     "Mounts": [
         {
             "Type": "volume",
-            "Name": "scube_postgis-data",
+            "Name": "dodo_postgis-data",
             "Destination": "/var/lib/postgresql/data",
             "Driver": "local",
             "Mode": "z",
@@ -167,7 +167,7 @@
         },
         {
             "Type": "volume",
-            "Name": "scube_postgis-data-dumps",
+            "Name": "dodo_postgis-data-dumps",
             "Destination": "/db-dumps",
             "Driver": "local",
             "Mode": "z",
@@ -211,7 +211,7 @@
             "com.docker.compose.config-hash": "f9c82edff1bea51788b6e2bb9e1f2d95a1af728ae5cc807bd9c0dc43c29b869f",
             "com.docker.compose.container-number": "1",
             "com.docker.compose.oneoff": "False",
-            "com.docker.compose.project": "scube",
+            "com.docker.compose.project": "dodo",
             "com.docker.compose.service": "postgis",
             "com.docker.compose.version": "1.0-alpha",
             "maintainer": "PostGIS Project - https://postgis.net"
@@ -248,7 +248,7 @@
         "IPv6Gateway": "",
         "MacAddress": "",
         "Networks": {
-            "scube_default": {
+            "dodo_default": {
                 "IPAMConfig": null,
                 "Links": null,
                 "Aliases": [

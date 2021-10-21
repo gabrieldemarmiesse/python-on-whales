@@ -24,7 +24,7 @@ def test_load_json(json_file):
             tzinfo=timezone(timedelta(hours=2)),
         )
         assert a.mountpoint == Path(
-            "/var/lib/docker/volumes/scube_letsencrypt_config/_data"
+            "/var/lib/docker/volumes/dodo_letsencrypt_config/_data"
         )
         assert a.options is None
 

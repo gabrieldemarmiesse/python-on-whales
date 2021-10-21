@@ -10,7 +10,7 @@
             "has-celery-workers": "1",
             "has-flower-data": "1",
             "has-rabbitmq-data": "1",
-            "has-scube-workers-rabbitmq-data": "1"
+            "has-dodo-workers-rabbitmq-data": "1"
         },
         "Role": "worker",
         "Availability": "active"
