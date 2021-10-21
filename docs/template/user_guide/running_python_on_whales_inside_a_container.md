@@ -27,6 +27,9 @@ output = docker.run("hello-world")
 
 print("Here is the output:")
 print(output)
+
+print(f"buildx version: {docker.buildx.version()}")
+print(f"compose version: {docker.compose.version()}")
 ```
 
 Next to this `main.py`, make a `Dockerfile`.
@@ -38,8 +41,17 @@ FROM python:3.9
 RUN pip install python-on-whales
 RUN python-on-whales download-cli
 
-COPY ./main.py /main.py
+# install docker buildx, this step is optional
+RUN mkdir -p ~/.docker/cli-plugins/
+RUN wget https://github.com/docker/buildx/releases/download/v0.6.3/buildx-v0.6.3.linux-amd64 -O ~/.docker/cli-plugins/docker-buildx
+RUN chmod a+x  ~/.docker/cli-plugins/docker-buildx
 
+# install docker compose, this step is optional
+RUN mkdir -p ~/.docker/cli-plugins/
+RUN wget https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -O ~/.docker/cli-plugins/docker-compose
+RUN chmod a+x  ~/.docker/cli-plugins/docker-compose
+
+COPY ./main.py /main.py
 CMD python /main.py
 ```
 
@@ -79,3 +91,11 @@ For more examples and ideas, visit:
 ```
 
 ### How does it work?
+
+The main magic here is the sharing of the docker socket between the host and the container.
+This is done with the `-v /var/run/docker.sock:/var/run/docker.sock`.
+
+With this option, the container can have access to the docker API. But it still needs the binary client in Go.
+Download it in the dockerfile with `python-no-whales download-cli`. You can then optionally install buildx and compose.
+
+Then you're good to go! Simple as that.
