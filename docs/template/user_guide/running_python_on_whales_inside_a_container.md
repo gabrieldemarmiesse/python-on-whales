@@ -88,6 +88,9 @@ Share images, automate workflows, and more with a free Docker ID:
 
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
+ 
+buildx version: github.com/docker/buildx v0.6.3 266c0eac611d64fcc0c72d80206aa364e826758d
+compose version: Docker Compose version v2.0.0-rc.2
 ```
 
 ### How does it work?
