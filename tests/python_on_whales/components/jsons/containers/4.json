@@ -12,7 +12,7 @@
         "--providers.docker=true",
         "--providers.docker.exposedbydefault=false",
         "--providers.docker.swarmMode=true",
-        "--providers.docker.network=scube_default",
+        "--providers.docker.network=dodo_default",
         "--certificatesresolvers.myresolver.acme.email=admin@earthcube.eu",
         "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json",
         "--certificatesresolvers.myresolver.acme.tlschallenge=true",
@@ -37,7 +37,7 @@
     "HostnamePath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/hostname",
     "HostsPath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/hosts",
     "LogPath": "/var/lib/docker/containers/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a/43c8723ce0a940a2674d84f49934bb2207421248cd22bf71b6b8df6c5feb709a-json.log",
-    "Name": "/scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+    "Name": "/dodo_traefik.1.oso75s3hbdlzjruy04zug808l",
     "RestartCount": 0,
     "Driver": "overlay2",
     "Platform": "linux",
@@ -127,11 +127,11 @@
             },
             {
                 "Type": "volume",
-                "Source": "scube_traefik-data",
+                "Source": "dodo_traefik-data",
                 "Target": "/letsencrypt",
                 "VolumeOptions": {
                     "Labels": {
-                        "com.docker.stack.namespace": "scube"
+                        "com.docker.stack.namespace": "dodo"
                     }
                 }
             }
@@ -176,8 +176,8 @@
         },
         {
             "Type": "volume",
-            "Name": "scube_traefik-data",
-            "Source": "/var/lib/docker/volumes/scube_traefik-data/_data",
+            "Name": "dodo_traefik-data",
+            "Source": "/var/lib/docker/volumes/dodo_traefik-data/_data",
             "Destination": "/letsencrypt",
             "Driver": "local",
             "Mode": "z",
@@ -211,7 +211,7 @@
             "--providers.docker=true",
             "--providers.docker.exposedbydefault=false",
             "--providers.docker.swarmMode=true",
-            "--providers.docker.network=scube_default",
+            "--providers.docker.network=dodo_default",
             "--certificatesresolvers.myresolver.acme.email=admin@earthcube.eu",
             "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json",
             "--certificatesresolvers.myresolver.acme.tlschallenge=true",
@@ -226,13 +226,13 @@
         ],
         "OnBuild": null,
         "Labels": {
-            "com.docker.stack.namespace": "scube",
+            "com.docker.stack.namespace": "dodo",
             "com.docker.swarm.node.id": "a3i9k93drhmg9u6gw43q7net4",
             "com.docker.swarm.service.id": "xlkka3nmf3vp7whxa1ytk4ft8",
-            "com.docker.swarm.service.name": "scube_traefik",
+            "com.docker.swarm.service.name": "dodo_traefik",
             "com.docker.swarm.task": "",
             "com.docker.swarm.task.id": "oso75s3hbdlzjruy04zug808l",
-            "com.docker.swarm.task.name": "scube_traefik.1.oso75s3hbdlzjruy04zug808l",
+            "com.docker.swarm.task.name": "dodo_traefik.1.oso75s3hbdlzjruy04zug808l",
             "org.opencontainers.image.description": "A modern reverse-proxy",
             "org.opencontainers.image.documentation": "https://docs.traefik.io",
             "org.opencontainers.image.title": "Traefik",
@@ -285,7 +285,7 @@
                 "MacAddress": "02:42:0a:00:00:e4",
                 "DriverOpts": null
             },
-            "scube_default": {
+            "dodo_default": {
                 "IPAMConfig": {
                     "IPv4Address": "10.0.1.91"
                 },
