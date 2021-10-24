@@ -114,10 +114,6 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def images(self):
-        """Not yet implemented"""
-        raise NotImplementedError
-
     def kill(self, services: Union[str, List[str]] = [], signal: Optional[str] = None):
         """Kills the container(s) of a service
 
