@@ -33,7 +33,7 @@ def test_compose_project_name():
     containers = docker.compose.ps()
     container_names = set(x.name for x in containers)
     assert container_names == {"dudu_busybox_1", "dudu_alpine_1"}
-    docker.compose.down()
+    docker.compose.down(timeout=1)
 
 
 def test_docker_compose_build():
@@ -50,7 +50,7 @@ def test_docker_compose_up_down():
         ]
     )
     docker.compose.up(["busybox", "alpine"])
-    docker.compose.down()
+    docker.compose.down(timeout=1)
 
 
 def test_no_containers():
@@ -59,7 +59,7 @@ def test_no_containers():
 
 def test_docker_compose_up_detach_down():
     docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
-    docker.compose.down()
+    docker.compose.down(timeout=1)
 
 
 def test_docker_compose_up_detach_down_with_scales():
@@ -95,7 +95,7 @@ def test_docker_compose_pause_unpause():
     assert docker.container.inspect("components_my_service_1").state.paused
     assert docker.container.inspect("components_busybox_1").state.paused
 
-    docker.compose.down()
+    docker.compose.down(timeout=1)
 
 
 def test_docker_compose_create_down():
@@ -142,7 +142,7 @@ def test_docker_compose_up_rm():
 
 def test_docker_compose_up_down_some_services():
     docker.compose.up(["my_service", "busybox"], detach=True)
-    docker.compose.down()
+    docker.compose.down(timeout=1)
 
 
 def test_docker_compose_ps():
@@ -151,6 +151,14 @@ def test_docker_compose_ps():
     names = set(x.name for x in containers)
     assert names == {"components_my_service_1", "components_busybox_1"}
     docker.compose.down()
+
+
+def test_docker_compose_start():
+    docker.compose.create(["busybox"])
+    assert not docker.compose.ps()[0].state.running
+    docker.compose.start(["busybox"])
+    assert docker.compose.ps()[0].state.running
+    docker.compose.down(timeout=1)
 
 
 def test_docker_compose_restart():

@@ -276,9 +276,15 @@ class ComposeCLI(DockerCLICaller):
         else:
             return result
 
-    def start(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def start(self, services: Union[str, List[str]] = []):
+        """Start the specified services.
+
+        # Arguments
+            services: The names of one or more services to start
+        """
+        full_cmd = self.docker_compose_cmd + ["start"]
+        full_cmd += to_list(services)
+        run(full_cmd)
 
     def stop(
         self,
