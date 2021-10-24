@@ -1,8 +1,9 @@
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
+import pytz
 
 import python_on_whales
 from python_on_whales import DockerClient
@@ -149,6 +150,25 @@ def test_docker_compose_ps():
     containers = docker.compose.ps()
     names = set(x.name for x in containers)
     assert names == {"components_my_service_1", "components_busybox_1"}
+    docker.compose.down()
+
+
+def test_docker_compose_restart():
+    docker.compose.up(["my_service"], detach=True)
+    time.sleep(2)
+
+    for container in docker.compose.ps():
+        assert (datetime.now(pytz.utc) - container.state.started_at) > timedelta(
+            seconds=2
+        )
+
+    docker.compose.restart(timeout=1)
+
+    for container in docker.compose.ps():
+        assert (datetime.now(pytz.utc) - container.state.started_at) < timedelta(
+            seconds=2
+        )
+
     docker.compose.down()
 
 

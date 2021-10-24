@@ -187,9 +187,22 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += services
         run(full_cmd)
 
-    def restart(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def restart(self, timeout: Union[int, timedelta, None]):
+        """Restart all containers
+
+        # Arguments
+            timeout: The shutdown timeout (`int` are interpreted as seconds).
+                `None` means the CLI default value (10s).
+                See [the docker stop docs](https://docs.docker.com/engine/reference/commandline/stop/)
+                for more details about this argument.
+        """
+        full_cmd = self.docker_compose_cmd + ["restart"]
+
+        if isinstance(timeout, timedelta):
+            timeout = int(timeout.total_seconds())
+
+        full_cmd.add_simple_arg("--timeout", timeout)
+        run(full_cmd)
 
     def rm(
         self,
