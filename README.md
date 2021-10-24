@@ -182,7 +182,7 @@ Use the right tool for the right job 🙂
 | sub-command  | Functions implemented  | Progress |
 |---|---|---|
 | buildx  | 10/11 | ![50%](https://progress-bar.dev/92) |
-| compose  | 13/24 | ![54%](https://progress-bar.dev/54) |
+| compose  | 16/24 | ![66%](https://progress-bar.dev/66) |
 | config  | 4/4 | ![50%](https://progress-bar.dev/100) |
 | container | 22/24 | ![50%](https://progress-bar.dev/91) |
 | context  | 4/6 | ![50%](https://progress-bar.dev/67) |
