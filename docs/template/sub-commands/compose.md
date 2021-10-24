@@ -40,9 +40,9 @@ docker.compose.down()
 ```
 
 
-#### About `docker.compose.image()`.
+#### About `docker.compose.images()`.
 
-The Docker command line has a `docker compose image` command. Python-on-whales doesn't have
+The Docker command line has a `docker compose images` command. Python-on-whales doesn't have
 an equivalent because it's trivial to do so with existing functions.
 
 ```
