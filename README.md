@@ -23,12 +23,12 @@ from python_on_whales import docker
 ```
 and then:
 
-* `docker run hello-world` -> [`docker.run("hello-world")`](./sub-commands/container.md#run)
-* `docker pull ubuntu` -> [`docker.pull("ubuntu")`](./sub-commands/image.md#pull)
-* `docker build ./` -> [`docker.build("./")`](./sub-commands/buildx.md#build)
-* `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](./sub-commands/compose.md#up)
-* `docker image ls` -> [`docker.image.list()`](./sub-commands/image.md#list)
-* `docker ps` -> [`docker.ps()`](./sub-commands/container.md#list)
+* `docker run hello-world` -> [`docker.run("hello-world")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#run)
+* `docker pull ubuntu` -> [`docker.pull("ubuntu")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#pull)
+* `docker build ./` -> [`docker.build("./")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/buildx/#build)
+* `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/compose/#up)
+* `docker image ls` -> [`docker.image.list()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#list)
+* `docker ps` -> [`docker.ps()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#list)
 
 You get the idea 🙂 it's the same as the CLI we all know and love.
 
