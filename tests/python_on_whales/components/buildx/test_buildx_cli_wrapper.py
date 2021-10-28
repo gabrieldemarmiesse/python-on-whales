@@ -42,7 +42,7 @@ def test_buildx_build_streaming_logs(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     output = list(docker.buildx.build(tmp_path, stream_logs=True))
     assert output[0] == "#1 [internal] load build definition from Dockerfile\n"
-    assert output[-1] == "#6 DONE 0.0s\n"
+    assert "#6 DONE" in output[-1]
 
 
 @pytest.mark.usefixtures("with_docker_driver")
