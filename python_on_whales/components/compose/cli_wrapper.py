@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig
-from python_on_whales.utils import run, to_list
+from python_on_whales.utils import run, stream_stdout_and_stderr, to_list
 
 
 class ComposeCLI(DockerCLICaller):
@@ -128,9 +128,54 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += services
         run(full_cmd)
 
-    def logs(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def logs(
+        self,
+        services: Union[str, List[str]] = [],
+        tail: Optional[str] = None,
+        follow: bool = False,
+        no_log_prefix: bool = False,
+        timestamps: bool = False,
+        since: Optional[str] = None,
+        until: Optional[str] = None,
+        stream: bool = False,
+    ):
+        """View output from containers
+
+        # Arguments
+            services: One or more service(s) to view
+            tail: Number of lines to show from the end of the logs for each container. (default "all")
+            follow: Follow log output ***WARNING***: With this
+                option, `docker.compose.logs()` will not return at all. Use it exclusively with
+                `stream=True`. You can loop on the logs but the loop will never end.
+
+            no_log_prefix: Don't print prefix in logs
+            timestamps: Show timestamps
+            since: Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+            until: Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+            stream: Similar to the `stream` argument of `docker.run()`.
+                This function will then returns and iterator that will yield a
+                tuple `(source, content)` with `source` being `"stderr"` or
+                `"stdout"`. `content` is the content of the line as bytes.
+                Take a look at [the user guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
+                to have an example of the output.
+        # Returns
+            `str` if `stream=False` (the default), `Iterable[Tuple[str, bytes]]`
+            if `stream=True`.
+        """
+        full_cmd = self.docker_compose_cmd + ["logs", "--no-color"]
+        full_cmd.add_simple_arg("--tail", tail)
+        full_cmd.add_flag("--follow", follow)
+        full_cmd.add_flag("--no-log-prefix", no_log_prefix)
+        full_cmd.add_flag("--timestamps", timestamps)
+        full_cmd.add_simple_arg("--since", since)
+        full_cmd.add_simple_arg("--until", until)
+        full_cmd += to_list(services)
+
+        iterator = stream_stdout_and_stderr(full_cmd)
+        if stream:
+            return iterator
+        else:
+            return "".join(x[1].decode() for x in iterator)
 
     def pause(self, services: Union[str, List[str]] = []):
         """Pause one or more services"""

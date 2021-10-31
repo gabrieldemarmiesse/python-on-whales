@@ -334,3 +334,29 @@ def test_compose_run_detach():
 
 def test_compose_version():
     assert "Docker Compose version v2" in docker.compose.version()
+
+
+def test_compose_logs_simple_use_case():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
+        ]
+    )
+    docker.compose.up(detach=True)
+    full_output = docker.compose.logs()
+    assert "--- www.google.com ping statistics ---" in full_output
+    assert "error with my_other_service" in full_output
+    docker.compose.down(timeout=1)
+
+
+def test_compose_logs_stream():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
+        ]
+    )
+    docker.compose.up(detach=True)
+    logs = docker.compose.logs()
+    logs = list(logs)
+
+    docker.compose.down(timeout=1)

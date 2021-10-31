@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  my_service:
+    image: busybox
+    command: ping -c 5 www.google.com
+    deploy:
+      replicas: 4
+  my_other_service:
+    image: busybox
+    command: sh -c '>&2 echo error with my_other_service'
+    deploy:
+      replicas: 2
