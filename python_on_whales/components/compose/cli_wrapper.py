@@ -183,10 +183,11 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += services
         run(full_cmd)
 
-    def restart(self, timeout: Union[int, timedelta, None]):
-        """Restart all containers
+    def restart(self, services: Union[str, List[str]] = [], timeout: Union[int, timedelta, None] = None):
+        """Restart containers
 
         # Arguments
+            services: The names of one or more services to restart (str or list of str)
             timeout: The shutdown timeout (`int` are interpreted as seconds).
                 `None` means the CLI default value (10s).
                 See [the docker stop docs](https://docs.docker.com/engine/reference/commandline/stop/)
@@ -198,6 +199,7 @@ class ComposeCLI(DockerCLICaller):
             timeout = int(timeout.total_seconds())
 
         full_cmd.add_simple_arg("--timeout", timeout)
+        full_cmd += to_list(services)
         run(full_cmd)
 
     def rm(
