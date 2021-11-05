@@ -183,7 +183,11 @@ class ComposeCLI(DockerCLICaller):
         full_cmd += services
         run(full_cmd)
 
-    def restart(self, services: Union[str, List[str]] = [], timeout: Union[int, timedelta, None] = None):
+    def restart(
+        self,
+        services: Union[str, List[str]] = [],
+        timeout: Union[int, timedelta, None] = None,
+    ):
         """Restart containers
 
         # Arguments
