@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig
-from python_on_whales.utils import run, to_list, stream_stdout_and_stderr
+from python_on_whales.utils import run, stream_stdout_and_stderr, to_list
 
 
 class ComposeCLI(DockerCLICaller):
