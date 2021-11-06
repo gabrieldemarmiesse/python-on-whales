@@ -320,12 +320,12 @@ def test_load_json(json_file):
 
 
 def test_compose_run_simple():
-    result = docker.compose.run("alpine", ["echo", "dodo"], remove=True)
+    result = docker.compose.run("alpine", ["echo", "dodo"], remove=True, tty=False)
     assert result == "dodo"
 
 
 def test_compose_run_detach():
-    container = docker.compose.run("alpine", ["echo", "dodo"], detach=True)
+    container = docker.compose.run("alpine", ["echo", "dodo"], detach=True, tty=False)
 
     time.sleep(0.1)
     assert not container.state.running
