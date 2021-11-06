@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig
-from python_on_whales.utils import run, to_list
+from python_on_whales.utils import run, to_list, stream_stdout_and_stderr
 
 
 class ComposeCLI(DockerCLICaller):
@@ -241,6 +241,7 @@ class ComposeCLI(DockerCLICaller):
         # labels: Dict[str, str] = {},
         name: Optional[str] = None,
         tty: bool = True,
+        stream: bool = False,
         dependencies: bool = True,
         publish: List[
             python_on_whales.components.container.cli_wrapper.ValidPortMapping
@@ -252,7 +253,41 @@ class ComposeCLI(DockerCLICaller):
         # volumes: bool = "todo",
         workdir: Union[None, str, Path] = None,
     ) -> Union[str, python_on_whales.components.container.cli_wrapper.Container]:
-        """Not yet implemented"""
+        """Run a one-off command on a service.
+
+        # Arguments
+            service: The name of the service.
+            command: The command to execute.
+            detach: if `True`, returns immediately with the Container.
+                    If `False`, returns the command stdout as string.
+            name: Assign a name to the container.
+            dependencies: Also start linked services.
+            publish: Publish a container's port(s) to the host.
+            service_ports: Enable service's ports and map them to the host.
+            remove: Automatically remove the container when it exits.
+            use_aliases: Use the service's network aliases in the connected network(s).
+            tty: Allocate a pseudo-TTY. Allow the process to access your terminal
+                to write on it.
+            stream: Similar to `docker.run(..., stream=True)`.
+            user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
+            workdir: Working directory inside the container
+
+        # Returns:
+            Optional[str]
+
+        """
+
+        if tty and stream:
+            raise ValueError(
+                "You can't set tty=True and stream=True at the same"
+                "time. Their purpose are not compatible."
+            )
+
+        if detach and stream:
+            raise ValueError(
+                "You can't detach and stream at the same time. It's not compatible."
+            )
+
         full_cmd = self.docker_compose_cmd + ["run"]
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
@@ -275,12 +310,15 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.append(service)
         full_cmd += command
 
-        result = run(full_cmd)
-        if detach:
-            Container = python_on_whales.components.container.cli_wrapper.Container
-            return Container(self.client_config, result, is_immutable_id=True)
+        if stream:
+            return stream_stdout_and_stderr(full_cmd)
         else:
-            return result
+            result = run(full_cmd, tty=tty)
+            if detach:
+                Container = python_on_whales.components.container.cli_wrapper.Container
+                return Container(self.client_config, result, is_immutable_id=True)
+            else:
+                return result
 
     def start(self, services: Union[str, List[str]] = []):
         """Start the specified services.
