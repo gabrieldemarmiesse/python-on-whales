@@ -320,7 +320,7 @@ def test_load_json(json_file):
 
 
 def test_compose_run_simple():
-    result = docker.compose.run("alpine", ["echo", "dodo"], remove=True)
+    result = docker.compose.run("alpine", ["echo", "dodo"], remove=True, tty=False)
     assert result == "dodo"
 
 
