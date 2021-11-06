@@ -288,6 +288,11 @@ class ComposeCLI(DockerCLICaller):
                 "You can't detach and stream at the same time. It's not compatible."
             )
 
+    if detach and tty:
+            raise ValueError(
+                "You can't detach and set tty=True at the same time. It's not compatible. "
+                "Try setting tty=False in docker.compose.run(...)."
+            )
         full_cmd = self.docker_compose_cmd + ["run"]
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
