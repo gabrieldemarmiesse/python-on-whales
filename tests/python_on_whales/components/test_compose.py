@@ -325,7 +325,7 @@ def test_compose_run_simple():
 
 
 def test_compose_run_detach():
-    container = docker.compose.run("alpine", ["echo", "dodo"], detach=True)
+    container = docker.compose.run("alpine", ["echo", "dodo"], detach=True, tty=False)
 
     time.sleep(0.1)
     assert not container.state.running
