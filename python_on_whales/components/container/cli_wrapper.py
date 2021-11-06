@@ -787,7 +787,7 @@ class ContainerCLI(DockerCLICaller):
 
         if tty and stream:
             raise ValueError(
-                "You can't set interactive=True and stream=True at the same"
+                "You can't set tty=True and stream=True at the same"
                 "time. Their purpose are not compatible."
             )
 
