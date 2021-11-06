@@ -280,7 +280,7 @@ class ComposeCLI(DockerCLICaller):
         if tty and stream:
             raise ValueError(
                 "You can't set tty=True and stream=True at the same"
-                "time. Their purpose are not compatible."
+                "time. Their purpose are not compatible. Try setting tty=False in docker.compose.run"
             )
 
         if detach and stream:
