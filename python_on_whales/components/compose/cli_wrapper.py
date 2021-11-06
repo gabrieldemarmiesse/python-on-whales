@@ -288,7 +288,7 @@ class ComposeCLI(DockerCLICaller):
                 "You can't detach and stream at the same time. It's not compatible."
             )
 
-    if detach and tty:
+        if detach and tty:
             raise ValueError(
                 "You can't detach and set tty=True at the same time. It's not compatible. "
                 "Try setting tty=False in docker.compose.run(...)."
