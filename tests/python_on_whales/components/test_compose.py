@@ -367,8 +367,10 @@ def test_compose_logs_stream():
     time.sleep(15)
     logs = docker.compose.logs(stream=True)
     logs = list(logs)
-    any(["error with my_other_service" in log[1].decode() for log in logs])
-    any(["--- www.google.com ping statistics ---" in log[1].decode() for log in logs])
+    assert any(["error with my_other_service" in log[1].decode() for log in logs])
+    assert any(
+        ["--- www.google.com ping statistics ---" in log[1].decode() for log in logs]
+    )
 
     docker.compose.down(timeout=1)
 
