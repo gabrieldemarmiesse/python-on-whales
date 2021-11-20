@@ -1,3 +1,4 @@
+import signal
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -20,6 +21,10 @@ pytestmark = pytest.mark.skipif(
 docker = DockerClient(
     compose_files=[PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"]
 )
+
+
+def mock_KeyboardInterrupt(signum, frame):
+    raise KeyboardInterrupt("Time is up")
 
 
 def test_compose_project_name():
@@ -334,3 +339,69 @@ def test_compose_run_detach():
 
 def test_compose_version():
     assert "Docker Compose version v2" in docker.compose.version()
+
+
+def test_compose_logs_simple_use_case():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
+        ]
+    )
+    docker.compose.up(detach=True)
+    # Wait some seconds to let the container to complete the execution of ping
+    # and print the statistics
+    time.sleep(15)
+    full_output = docker.compose.logs()
+    assert "error with my_other_service" in full_output
+    assert "--- www.google.com ping statistics ---" in full_output
+    docker.compose.down(timeout=1)
+
+
+def test_compose_logs_stream():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
+        ]
+    )
+    docker.compose.up(detach=True)
+    time.sleep(15)
+    logs = docker.compose.logs(stream=True)
+    logs = list(logs)
+    any(["error with my_other_service" in log for log in logs])
+    any(["--- www.google.com ping statistics ---" in log for log in logs])
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_logs_follow():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
+        ]
+    )
+    docker.compose.up(detach=True)
+
+    signal.signal(signal.SIGALRM, mock_KeyboardInterrupt)
+    signal.alarm(15)
+
+    start = datetime.now()
+
+    try:
+        full_output = docker.compose.logs(follow=True)
+        # interrupt the alarm in case the command ends before the timeout
+        signal.alarm(0)
+    # catch and ignore the exception when the command is interruped by the timeout
+    except KeyboardInterrupt:
+        pass
+
+    end = datetime.now()
+
+    # 5 seconds because the command can end before the timeout (set to 15 seconds)...
+    # but it is enough to verify that the follow flag was working
+    # otherwise the logs command should completed in much less than 5 seconds
+    assert (end - start).seconds >= 5
+
+    assert "error with my_other_service" in full_output
+    assert "--- www.google.com ping statistics ---" in full_output
+
+    docker.compose.down(timeout=1)
