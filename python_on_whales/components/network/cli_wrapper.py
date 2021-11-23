@@ -155,6 +155,7 @@ class NetworkCLI(DockerCLICaller):
         driver: Optional[str] = None,
         gateway: Optional[str] = None,
         subnet: Optional[str] = None,
+        labels: Dict[str, str] = {},
         options: List[str] = [],
     ) -> Network:
         """Creates a Docker network.
@@ -170,6 +171,7 @@ class NetworkCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--driver", driver)
         full_cmd.add_simple_arg("--gateway", gateway)
         full_cmd.add_simple_arg("--subnet", subnet)
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.add_args_list("--opt", options)
         full_cmd.append(name)
         return Network(self.client_config, run(full_cmd), is_immutable_id=True)
