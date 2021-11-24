@@ -22,7 +22,7 @@ def test_network_create_remove():
 
 def test_network_create_with_labels():
     my_name = random_name()
-    labels = {'hello': 'world', 'meme': 'meme-label'}
+    labels = {"hello": "world", "meme": "meme-label"}
     my_network = docker.network.create(my_name, labels=labels)
     assert my_network.name == my_name
     for key, value in labels.items():
