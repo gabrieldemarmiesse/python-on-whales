@@ -20,6 +20,16 @@ def test_network_create_remove():
     docker.network.remove(my_name)
 
 
+def test_network_create_with_labels():
+    my_name = random_name()
+    labels = {'hello': 'world', 'meme': 'meme-label'}
+    my_network = docker.network.create(my_name, labels=labels)
+    assert my_network.name == my_name
+    for key, value in labels.items():
+        assert my_network.labels[key] == value
+    docker.network.remove(my_name)
+
+
 def test_context_manager():
     from python_on_whales import docker
 
