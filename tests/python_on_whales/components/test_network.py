@@ -15,24 +15,20 @@ def test_load_json(json_file):
 
 def test_network_create_remove():
     my_name = random_name()
-    my_network = docker.network.create(my_name)
-    assert my_network.name == my_name
-    docker.network.remove(my_name)
+    with docker.network.create(my_name) as my_network:
+        assert my_network.name == my_name
 
 
 def test_network_create_with_labels():
     my_name = random_name()
     labels = {"hello": "world", "meme": "meme-label"}
-    my_network = docker.network.create(my_name, labels=labels)
-    assert my_network.name == my_name
-    for key, value in labels.items():
-        assert my_network.labels[key] == value
-    docker.network.remove(my_name)
+    with docker.network.create(my_name, labels=labels) as my_network:
+        assert my_network.name == my_name
+        for key, value in labels.items():
+            assert my_network.labels[key] == value
 
 
 def test_context_manager():
-    from python_on_whales import docker
-
     with pytest.raises(DockerException):
         with docker.network.create(random_name()) as my_net:
             docker.run(
