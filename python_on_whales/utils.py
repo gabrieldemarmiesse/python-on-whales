@@ -219,6 +219,7 @@ def stream_stdout_and_stderr(
     process = Popen(full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env)
     q = Queue()
     full_stderr = b""  # for the error message
+    # we use deamon threads to avoid hanging if the user uses ctrl+c
     th = Thread(target=reader, args=[process.stdout, "stdout", q])
     th.daemon = True
     th.start()
