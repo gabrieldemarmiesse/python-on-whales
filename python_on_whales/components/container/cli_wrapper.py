@@ -1340,7 +1340,9 @@ class ContainerCLI(DockerCLICaller):
             privileged: Give extended privileges to this container.
             publish: Ports to publish, same as the `-p` argument in the Docker CLI.
                 example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
-                `[("127.0.0.1:3000", 2000, "udp")]`.
+                `[("127.0.0.1:3000", 2000, "udp")]`. You can also use a single entry in
+                the tuple to signify that you want a random free port on the host. For example:
+                `publish=[(80,)]`.
             publish_all: Publish all exposed ports to random ports.
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
