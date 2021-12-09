@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
@@ -297,7 +297,11 @@ class ComposeCLI(DockerCLICaller):
         user: Optional[str] = None,
         # volumes: bool = "todo",
         workdir: Union[None, str, Path] = None,
-    ) -> Union[str, python_on_whales.components.container.cli_wrapper.Container]:
+    ) -> Union[
+        str,
+        python_on_whales.components.container.cli_wrapper.Container,
+        Iterable[Tuple[str, bytes]],
+    ]:
         """Run a one-off command on a service.
 
         # Arguments
