@@ -657,14 +657,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_flag("--privileged", privileged)
 
-        for port_mapping in publish:
-            if len(port_mapping) == 2:
-                full_cmd += ["-p", f"{port_mapping[0]}:{port_mapping[1]}"]
-            else:
-                full_cmd += [
-                    "-p",
-                    f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
-                ]
+        self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
         full_cmd.add_flag("--read-only", read_only)
@@ -701,6 +694,22 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.append(image)
         full_cmd += command
         return Container(self.client_config, run(full_cmd), is_immutable_id=True)
+
+    def _add_publish_to_command(self, full_cmd, publish):
+        for port_mapping in publish:
+            if len(port_mapping) == 1:
+                full_cmd += ["-p", port_mapping[0]]
+            elif len(port_mapping) == 2:
+                full_cmd += ["-p", f"{port_mapping[0]}:{port_mapping[1]}"]
+            elif len(port_mapping) == 3:
+                full_cmd += [
+                    "-p",
+                    f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
+                ]
+            else:
+                raise ValueError(
+                    "The size of the tuples in the publish list must be 1, 2, or 3"
+                )
 
     def diff(self, container: ValidContainer) -> Dict[str, str]:
         """List all the files modified, added or deleted since the container started.
@@ -1331,7 +1340,9 @@ class ContainerCLI(DockerCLICaller):
             privileged: Give extended privileges to this container.
             publish: Ports to publish, same as the `-p` argument in the Docker CLI.
                 example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
-                `[("127.0.0.1:3000", 2000, "udp")]`.
+                `[("127.0.0.1:3000", 2000, "udp")]`. You can also use a single entry in
+                the tuple to signify that you want a random free port on the host. For example:
+                `publish=[(80,)]`.
             publish_all: Publish all exposed ports to random ports.
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
@@ -1473,14 +1484,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_flag("--privileged", privileged)
 
-        for port_mapping in publish:
-            if len(port_mapping) == 2:
-                full_cmd += ["-p", f"{port_mapping[0]}:{port_mapping[1]}"]
-            else:
-                full_cmd += [
-                    "-p",
-                    f"{port_mapping[0]}:{port_mapping[1]}/{port_mapping[2]}",
-                ]
+        self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
         full_cmd.add_flag("--read-only", read_only)
