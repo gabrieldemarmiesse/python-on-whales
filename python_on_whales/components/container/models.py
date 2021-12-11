@@ -265,10 +265,10 @@ class NetworkInspectResult(DockerCamelModel):
     endpoint_id: str
     gateway: str
     ip_address: str
-    ip_prefix_lenght: int
+    ip_prefix_length: int
     ipv6_gateway: str
     global_ipv6_address: str
-    global_ipv6_prefix_lenght: int
+    global_ipv6_prefix_length: int
     mac_address: str
     driver_options: dict
 
@@ -285,7 +285,7 @@ class NetworkSettings(DockerCamelModel):
     sandbox_id: str
     hairpin_mode: bool
     link_local_ipv6_address: str
-    link_local_ipv6_prefix_lenght: int
+    link_local_ipv6_prefix_length: int
     ports: dict  # to rework
     sandbox_key: Path
     secondary_ip_addresses: List[ContainerNetworkAddress]
@@ -293,9 +293,9 @@ class NetworkSettings(DockerCamelModel):
     endpoint_id: str
     gateway: str
     global_ipv6_address: str
-    global_ipv6_prefix_lenght: int
+    global_ipv6_prefix_length: int
     ip_address: str
-    ip_prefix_lenght: int
+    ip_prefix_length: int
     ipv6_gateway: str
     mac_address: str
     networks: Dict[str, NetworkInspectResult]
