@@ -41,6 +41,8 @@ docker.compose.up()
 docker.compose.down()
 ```
 
+You have multiple compose options available (like profiles, env_files, project name) when creating the Docker client. You can check them out 
+in the `DockerClient` [documentation](https://gabrieldemarmiesse.github.io/python-on-whales/docker_client/#dockerclient).
 
 #### About `docker.compose.images()`.
 
