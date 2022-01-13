@@ -4,13 +4,14 @@ import tempfile
 import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pydantic
 
 from python_on_whales.download_binaries import (
     download_docker_cli,
-    get_docker_binary_path,
+    get_docker_binary_path_in_cache,
 )
 from python_on_whales.utils import to_list
 
@@ -59,12 +60,8 @@ class ClientConfig:
 
     def get_docker_path(self) -> ValidPath:
         if self.client_binary_path is None:
-            docker_sys = shutil.which("docker")
-            if docker_sys is not None:
-                self.client_binary_path = docker_sys
-            elif get_docker_binary_path().exists():
-                self.client_binary_path = get_docker_binary_path()
-            else:
+            self.client_binary_path = get_docker_client_binary_path()
+            if self.client_binary_path is None:
                 warnings.warn(
                     "The docker client binary file was not found on your system. \n"
                     "Docker on whales will try to download it for you. \n"
@@ -80,7 +77,7 @@ class ClientConfig:
                     "$ python-on-whales download-cli \n"
                 )
                 download_docker_cli()
-                self.client_binary_path = get_docker_binary_path()
+                self.client_binary_path = get_docker_binary_path_in_cache()
         return self.client_binary_path
 
     @property
@@ -243,3 +240,23 @@ def bulk_reload(docker_objects: List[ReloadableObjectFromJson]):
     json_str = run(full_cmd)
     for json_obj, docker_object in zip(json.loads(json_str), docker_objects):
         docker_object._set_inspect_result(docker_object._parse_json_object(json_obj))
+
+
+def get_docker_client_binary_path() -> Optional[Path]:
+    """Return the path of the docker client binary file.
+    If `None` is returned, the docker client binary is not available and must be downloaded.
+
+    # Returns
+        `Optional[Path]`, The path of the docker client binary file.
+
+    Note that if you use python-on-whales normally, the docker client binary is
+    downloaded automatically if needed. So you only need this function if you
+    want to bypass the automatic download process.
+    """
+    docker_sys = shutil.which("docker")
+    if docker_sys is not None:
+        return Path(docker_sys)
+    elif get_docker_binary_path_in_cache().exists():
+        return get_docker_binary_path_in_cache()
+    else:
+        return None

@@ -15,7 +15,7 @@ def test_download_cli(mocker, tmp_path):
 
     download_binaries.download_docker_cli()
     simple_command = [
-        download_binaries.get_docker_binary_path(),
+        download_binaries.get_docker_binary_path_in_cache(),
         "run",
         "--rm",
         "hello-world",
@@ -26,12 +26,12 @@ def test_download_cli(mocker, tmp_path):
 
 def test_download_cli_from_cli():
     try:
-        download_binaries.get_docker_binary_path().unlink()
+        download_binaries.get_docker_binary_path_in_cache().unlink()
     except FileNotFoundError:
         pass
     run(["python-on-whales", "download-cli"])
     simple_command = [
-        download_binaries.get_docker_binary_path(),
+        download_binaries.get_docker_binary_path_in_cache(),
         "run",
         "--rm",
         "hello-world",
@@ -44,9 +44,9 @@ def test_download_windows_binaries(mocker, tmp_path):
     mocker.patch.object(platform, "system", lambda: "Windows")
     mocker.patch.object(download_binaries, "CACHE_DIR", tmp_path)
 
-    assert not download_binaries.get_docker_binary_path().exists()
+    assert not download_binaries.get_docker_binary_path_in_cache().exists()
     assert download_binaries.get_user_os() == "windows"
 
     download_binaries.download_docker_cli()
 
-    assert download_binaries.get_docker_binary_path().exists()
+    assert download_binaries.get_docker_binary_path_in_cache().exists()
