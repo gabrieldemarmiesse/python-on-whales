@@ -51,6 +51,8 @@ class DockerClient(DockerCLICaller):
         tls:  Use TLS; implied by `tlsverify`
         tlscacert: Trust certs signed only by this CA (default "~/.docker/ca.pem")
         compose_files: Docker compose yaml file
+        compose_profiles: List of compose profiles to use. Take a look at
+            the [documentation for profiles](https://docs.docker.com/compose/profiles/).
         compose_env_file: .env file containing the environments variables to inject
             into the compose project. By default, it uses `./.env`.
         compose_project_name: The name of the compose project. It will be prefixed to
@@ -71,6 +73,7 @@ class DockerClient(DockerCLICaller):
         tlsverify: Optional[bool] = None,
         client_config: Optional[ClientConfig] = None,
         compose_files: List[ValidPath] = [],
+        compose_profiles: List[str] = [],
         compose_env_file: Optional[ValidPath] = None,
         compose_project_name: Optional[str] = None,
     ):
@@ -88,6 +91,7 @@ class DockerClient(DockerCLICaller):
                 tlskey=tlskey,
                 tlsverify=tlsverify,
                 compose_files=compose_files,
+                compose_profiles=compose_profiles,
                 compose_env_file=compose_env_file,
                 compose_project_name=compose_project_name,
             )

@@ -55,6 +55,7 @@ class ClientConfig:
     tlsverify: Optional[bool] = None
     client_binary_path: Optional[ValidPath] = None
     compose_files: List[ValidPath] = field(default_factory=list)
+    compose_profiles: List[str] = field(default_factory=list)
     compose_env_file: Optional[ValidPath] = None
     compose_project_name: Optional[str] = None
 
@@ -121,6 +122,7 @@ class ClientConfig:
     def docker_compose_cmd(self) -> Command:
         base_cmd = self.docker_cmd + ["compose"]
         base_cmd.add_args_list("--file", self.compose_files)
+        base_cmd.add_args_list("--profile", self.compose_profiles)
         base_cmd.add_simple_arg("--env-file", self.compose_env_file)
         base_cmd.add_simple_arg("--project-name", self.compose_project_name)
         return base_cmd

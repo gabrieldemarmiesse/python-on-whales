@@ -23,4 +23,14 @@ services:
      - POSTGRES_HOST_AUTH_METHOD=trust
   dodo:
     image: busybox:latest
-    entrypoint: /bin/dudu
+    entrypoint: /bin/sh
+  profile_test_service:
+    image: busybox:latest
+    command: sleep infinity
+    profiles:
+      - my_test_profile
+  second_profile_test_service:
+    image: busybox:latest
+    command: sleep infinity
+    profiles:
+      - my_test_profile2

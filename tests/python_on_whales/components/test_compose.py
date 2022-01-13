@@ -245,7 +245,7 @@ def test_passing_env_files(tmp_path: Path):
 
 
 def test_entrypoint_loaded_in_config():
-    assert docker.compose.config().services["dodo"].entrypoint == ["/bin/dudu"]
+    assert docker.compose.config().services["dodo"].entrypoint == ["/bin/sh"]
 
 
 def test_config_complexe_compose():
@@ -405,5 +405,36 @@ def test_compose_logs_follow():
 
     assert "error with my_other_service" in full_output
     assert "--- www.google.com ping statistics ---" in full_output
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_single_profile():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_profiles=["my_test_profile"],
+    )
+    docker.compose.up(detach=True)
+
+    container_names = [x.name for x in docker.compose.ps()]
+    assert "components_profile_test_service_1" in container_names
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_multiple_profiles():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_profiles=["my_test_profile", "my_test_profile2"],
+    )
+    docker.compose.up(detach=True)
+
+    container_names = [x.name for x in docker.compose.ps()]
+    assert "components_profile_test_service_1" in container_names
+    assert "components_second_profile_test_service_1" in container_names
 
     docker.compose.down(timeout=1)
