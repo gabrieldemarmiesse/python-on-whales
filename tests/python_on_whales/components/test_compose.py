@@ -245,7 +245,7 @@ def test_passing_env_files(tmp_path: Path):
 
 
 def test_entrypoint_loaded_in_config():
-    assert docker.compose.config().services["dodo"].entrypoint == ["/bin/bash"]
+    assert docker.compose.config().services["dodo"].entrypoint == ["/bin/sh"]
 
 
 def test_config_complexe_compose():
