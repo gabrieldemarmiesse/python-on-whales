@@ -5,11 +5,13 @@ the [Go implementation of Docker compose](https://github.com/docker/compose-cli)
 is called a.k.a. Compose v2, not the [Python implementation](https://github.com/docker/compose).
 
 You can verify that `docker compose` is installed by running
-```
+```bash
 docker compose --help
 ```
-If that doesn't work, then install the cli plugin.
-The instructions are here: https://github.com/docker/compose-cli#compose-v2-aka-local-docker-compose
+Be careful! it's different from `docker-compose --help`! Notice the `-` between 'docker' and 'compose'.
+Compose v2 has no `-` in the command.
+
+If that doesn't work, then [install the cli plugin](https://github.com/docker/compose-cli#compose-v2-aka-local-docker-compose).
 it's just a single binary to download.
 
 The Go implementation of compose is still experimental, so take the appropriate precautions.
