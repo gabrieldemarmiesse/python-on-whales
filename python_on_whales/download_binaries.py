@@ -18,7 +18,7 @@ TEMPLATE_CLI = (
 WINDOWS_CLI_URL = "https://github.com/StefanScherer/docker-cli-builder/releases/download/{version}/docker.exe"
 
 
-def get_docker_binary_path():
+def get_docker_binary_path_in_cache():
     return CACHE_DIR / "docker-cli" / DOCKER_VERSION / "docker"
 
 
@@ -39,7 +39,7 @@ def download_docker_cli():
         downloaded_file_path = tmp_dir / f"docker.{extension}"
         download_from_url(file_to_download, downloaded_file_path)
 
-        docker_binary_path = get_docker_binary_path()
+        docker_binary_path = get_docker_binary_path_in_cache()
         docker_binary_path.parent.mkdir(exist_ok=True, parents=True)
 
         if extension == "tgz":
