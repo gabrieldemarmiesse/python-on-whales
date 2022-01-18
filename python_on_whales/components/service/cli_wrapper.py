@@ -343,9 +343,23 @@ class ServiceCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["service", "list", "--quiet"]
 
-        ids = run(full_cmd).splitlines()
+        ids_truncated = run(full_cmd).splitlines()
 
-        return [Service(self.client_config, x) for x in ids]
+        # the ids are truncated because there is no single docker command that allows us to get them
+        # untruncated. We must run an inspect command to get all untruncated ids.
+
+        full_cmd = (
+            self.docker_cmd
+            + ["service", "inspect"]
+            + ids_truncated
+            + ["--format", "{{.ID}}"]
+        )
+        ids_not_truncated = run(full_cmd).splitlines()
+
+        return [
+            Service(self.client_config, x, is_immutable_id=True)
+            for x in ids_not_truncated
+        ]
 
     def ps(
         self, x: Union[ValidService, List[ValidService]]
