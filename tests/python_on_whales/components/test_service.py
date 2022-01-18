@@ -35,6 +35,15 @@ def test_get_logs():
 
 
 @pytest.mark.usefixtures("swarm_mode")
+def test_get_list_of_services():
+    with docker.service.create(
+        "busybox", ["sh", "-c", "echo dodo && sleep infinity"]
+    ) as my_service:
+        list_of_services = docker.service.list()
+        assert [my_service] == list_of_services
+
+
+@pytest.mark.usefixtures("swarm_mode")
 def test_service_scale():
     service = docker.service.create("busybox", ["sleep", "infinity"])
     service.scale(3)
