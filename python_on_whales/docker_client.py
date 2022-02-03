@@ -39,6 +39,12 @@ class DockerClient(DockerCLICaller):
     print(docker.run("hello-world")
     ```
 
+    To use an alternate docker client implementation (e.g. podman or nerdctl)
+    use the `client_binary` argument:
+    ```python
+    docker = DockerClient(client_binary="podman")
+    ```
+
     # Arguments
         config: Location of client config files (default "~/.docker")
         context: Name of the context to use to connect to the
@@ -58,6 +64,7 @@ class DockerClient(DockerCLICaller):
         compose_project_name: The name of the compose project. It will be prefixed to
             networks, volumes and containers created by compose.
         compose_compatibility: Use docker compose in compatibility mode.
+        client_binary: The name/path of the docker client binary to use
     """
 
     def __init__(
@@ -78,6 +85,7 @@ class DockerClient(DockerCLICaller):
         compose_env_file: Optional[ValidPath] = None,
         compose_project_name: Optional[str] = None,
         compose_compatibility: Optional[bool] = None,
+        client_binary: Optional[str] = None,
     ):
 
         if client_config is None:
@@ -97,6 +105,7 @@ class DockerClient(DockerCLICaller):
                 compose_env_file=compose_env_file,
                 compose_project_name=compose_project_name,
                 compose_compatibility=compose_compatibility,
+                client_binary_path=client_binary,
             )
         super().__init__(client_config)
 

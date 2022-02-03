@@ -46,6 +46,10 @@ class Builder(ReloadableObject):
     def _fetch_and_parse_inspect_result(
         self, reference: Optional[str]
     ) -> BuilderInspectResult:
+        if self.client_config.client_implementation == "podman":
+            # podman doesn't implement the `buildx inspect` command
+            return BuilderInspectResult(name="default", driver="podman")
+
         full_cmd = self.docker_cmd + ["buildx", "inspect"]
         if reference is not None:
             full_cmd.append(reference)

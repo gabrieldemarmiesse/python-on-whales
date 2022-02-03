@@ -5,7 +5,7 @@ import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 import pydantic
 
@@ -128,6 +128,15 @@ class ClientConfig:
         base_cmd.add_simple_arg("--project-name", self.compose_project_name)
         base_cmd.add_flag("--compatibility", self.compose_compatibility)
         return base_cmd
+
+    @property
+    def client_implementation(self) -> str:
+        """Get docker command implementation (docker, podman, nerdctl, unknown)."""
+
+        version = cast(str, run(self.docker_cmd + ["--version"]))
+        name, *_ = version.split(" ", 1)
+
+        return name.lower()
 
 
 class DockerCLICaller:
