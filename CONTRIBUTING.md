@@ -18,13 +18,13 @@ with the help of [keras-autodoc](https://gabrieldemarmiesse.github.io/keras-auto
 #### First install the dependencies:
 
 ```
-pip install keras-autodoc mkdocs
+pip install keras-autodoc mkdocs Sphinx==3.5.4
 ```
 
 #### Generate the documentation files and serve them
 ```
 cd ./docs/
-python autogen.py && mkdocs generate
+python autogen.py && mkdocs serve
 ```
 
 #### Open your browser

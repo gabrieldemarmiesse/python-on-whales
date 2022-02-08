@@ -201,6 +201,10 @@ Use the right tool for the right job 🙂
 
 Take those numbers with a grain of salt. The functions don't all need the same amount of work to be implemented.
 
+## Contributing
+
+Any and all PRs are welcome. Please see [this documentation](./CONTRIBUTING.md).
+
 ## What about the license?
 
 It's a MIT license, so quite permissive.
