@@ -92,7 +92,7 @@ class SystemCLI(DockerCLICaller):
             all: Remove all unused images not just dangling ones
             volumes: Prune volumes
         """
-        full_cmd = self.docker_cmd + ["system", "prune"]
+        full_cmd = self.docker_cmd + ["system", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_flag("--volumes", volumes)
         run(full_cmd)
