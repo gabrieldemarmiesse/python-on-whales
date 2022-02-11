@@ -86,7 +86,9 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
         return SystemInfo.parse_raw(run(full_cmd))
 
-    def prune(self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}) -> None:
+    def prune(
+        self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}
+    ) -> None:
         """Remove unused docker data
 
         # Arguments
