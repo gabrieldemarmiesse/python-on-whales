@@ -75,13 +75,18 @@ def test_prune_prunes_container():
 
 
 def test_prune_prunes_network():
+    network_name = random_name()
     try:
-        with docker.network.create(random_name()) as my_net:
+        with docker.network.create(network_name) as my_net:
             assert my_net in docker.network.list()
             docker.system.prune()
             assert my_net not in docker.network.list()
-    except DockerException:
-        pass  # context manager tries to remove network and raises DockerException
+    except DockerException as e:
+        expected_message = "The docker command executed was `/usr/local/bin/docker "
+        f"network remove {network_name}`"
+        (actual_message,) = e.args
+        if not actual_message.startswith(expected_message):
+            raise e
 
 
 def test_prune_prunes_volumes():
