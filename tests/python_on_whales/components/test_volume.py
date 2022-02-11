@@ -37,6 +37,9 @@ def test_simple_volume():
 def test_multiple_volumes():
     volumes = [docker.volume.create() for _ in range(3)]
 
+    for v in volumes:
+        assert v in docker.volume.list()
+
     docker.volume.remove(volumes)
 
     for v in volumes:
