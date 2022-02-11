@@ -40,6 +40,7 @@ def test_parsing_events():
 
 def test_prune_prunes_image():
     # TODO: Test dangling image
+    docker.image.remove("busybox", force=True)
     image = docker.pull("busybox")
     assert image in docker.image.list()
 

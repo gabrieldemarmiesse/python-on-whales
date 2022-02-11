@@ -145,16 +145,9 @@ sys.exit(1)
         assert "Something is wrong!" in str(err.value)
 
 
-def test_remove_does_not_remove_when_false():
-    container = docker.run("hello-world", remove=False, detach=True)
-    time.sleep(0.3)
-    assert container in docker.container.list(all=True)
-    docker.container.remove(container)  # docker.container.remove tested elsewhere
-
-
-def test_remove_removes_when_true():
-    with pytest.raises(NoSuchContainer):
-        docker.run("hello-world", remove=True, detach=True)
+def test_remove():
+    output = docker.run("hello-world", remove=True)
+    assert "Hello from Docker!" in output
 
 
 def test_cpus():
