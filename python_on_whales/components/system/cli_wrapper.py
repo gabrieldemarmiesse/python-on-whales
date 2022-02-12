@@ -1,8 +1,9 @@
 import json
+from typing import Dict
 
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.system.models import DockerItemsSummary, SystemInfo
-from python_on_whales.utils import run
+from python_on_whales.utils import format_dict_for_cli, run
 
 
 class DiskFreeResult:
@@ -85,14 +86,20 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
         return SystemInfo.parse_raw(run(full_cmd))
 
-    def prune(self, all: bool = False, volumes: bool = False) -> None:
+    def prune(
+        self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}
+    ) -> None:
         """Remove unused docker data
 
         # Arguments
             all: Remove all unused images not just dangling ones
             volumes: Prune volumes
+            filters: See the [Docker documentation page about filtering
+                ](https://docs.docker.com/engine/reference/commandline/system_prune/#filtering).
+                For example, `filters=dict(until="24h")`.
         """
         full_cmd = self.docker_cmd + ["system", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_flag("--volumes", volumes)
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
