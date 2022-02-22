@@ -1027,8 +1027,7 @@ class ContainerCLI(DockerCLICaller):
             filters: Filters as strings or list of strings
         """
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
-        for filter_ in to_list(filters):
-            full_cmd += ["--filter", filter_]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
