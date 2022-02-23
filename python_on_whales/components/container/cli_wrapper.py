@@ -1020,7 +1020,7 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def prune(self, filters: Union[str, List[str]] = []) -> None:
+    def prune(self, filters: Dict[str, str] = {}) -> None:
         """Remove containers that are not running.
 
         # Arguments
