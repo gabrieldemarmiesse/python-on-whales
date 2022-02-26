@@ -25,4 +25,9 @@ setup(
             "python-on-whales=python_on_whales.command_line_entrypoint:main"
         ],
     },
+    project_urls={
+        "Documentation": "https://gabrieldemarmiesse.github.io/python-on-whales/",
+        "Source Code": "https://github.com/gabrieldemarmiesse/python-on-whales",
+        "Bug Tracker": "https://github.com/gabrieldemarmiesse/python-on-whales/issues",
+    },
 )
