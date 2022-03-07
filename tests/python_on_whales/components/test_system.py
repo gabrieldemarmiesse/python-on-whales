@@ -50,6 +50,14 @@ def test_prune_prunes_image():
     assert image in docker.image.list()
 
     # image not pruned because it does not have dne label
+    docker.system.prune(all=True, filters={"label": "dne"})
+    assert image in docker.image.list()
+
+    # image not pruned because it is not 1000000 hours old
+    docker.system.prune(all=True, filters={"until": "1000000h"})
+    assert image in docker.image.list()
+
+    # image not pruned because it does not have dne label and is not 1000000 hours old
     docker.system.prune(all=True, filters={"label": "dne", "until": "1000000h"})
     assert image in docker.image.list()
 

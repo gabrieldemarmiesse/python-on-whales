@@ -1026,6 +1026,12 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             filters: Filters as strings or list of strings
         """
+        if isinstance(filter, list):
+            raise TypeError(
+                "since python-on-whales 0.38.0, the filter argument is expected to be "
+                "a dict, not a list, please replace your function call by "
+                "docker.container.prune(filters={...})"
+            )
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
