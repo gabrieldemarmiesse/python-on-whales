@@ -200,17 +200,11 @@ def test_prune():
     volume = docker.volume.create("test-volume")
     assert volume in docker.volume.list()
 
-    # volume not pruned because it does not have matching name
-    docker.volume.prune(filters={"name": "dne"})
+    # volume not pruned because it is does not have label "dne"
+    docker.volume.prune(filters={"label": "dne"})
     assert volume in docker.volume.list()
 
-    # volume not pruned because it does not have matching name
-    docker.volume.prune(filters={"label": "some-label"})
-    assert volume in docker.volume.list()
-
-    # volume not pruned because it does not have matching name
-    docker.volume.prune(filters={"name": "dne", "label": "some-label"})
-    assert volume in docker.volume.list()
+    # could only find "label" filter for `docker volume prune`
 
     # volume pruned
     docker.volume.prune()
