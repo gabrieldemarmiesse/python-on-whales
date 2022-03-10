@@ -17,7 +17,7 @@ from python_on_whales.client_config import (
 from python_on_whales.components.volume.models import VolumeInspectResult
 from python_on_whales.exceptions import NoSuchVolume
 from python_on_whales.test_utils import random_name
-from python_on_whales.utils import ValidPath, run, to_list
+from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
 
 
 class Volume(ReloadableObjectFromJson):
@@ -181,9 +181,7 @@ class VolumeCLI(DockerCLICaller):
         """
 
         full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
-
-        for key, value in filters.items():
-            full_cmd += ["--filter", f"{key}={value}"]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         volumes_names = run(full_cmd).splitlines()
 

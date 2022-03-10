@@ -588,3 +588,26 @@ def test_rename_nosuchcontainer():
 def test_update_nosuchcontainer():
     with pytest.raises(NoSuchContainer):
         docker.container.update("grueighuri", cpus=4)
+
+
+def test_prune():
+    for container in docker.container.list(filters={"name": "test-container"}):
+        docker.container.remove(container, force=True)
+    container = docker.container.create("busybox")
+    assert container in docker.container.list(all=True)
+
+    # container not pruned because it is not old enough
+    docker.container.prune(filters={"until": "100h"})
+    assert container in docker.container.list(all=True)
+
+    # container not pruned because it is does not have label "dne"
+    docker.container.prune(filters={"label": "dne"})
+    assert container in docker.container.list(all=True)
+
+    # container not pruned because it is not old enough and does not have label "dne"
+    docker.container.prune(filters={"until": "100h", "label": "dne"})
+    assert container in docker.container.list(all=True)
+
+    # container pruned
+    docker.container.prune()
+    assert container not in docker.container.list(all=True)

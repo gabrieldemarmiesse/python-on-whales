@@ -192,3 +192,20 @@ def test_volume_exists():
     with docker.volume.create() as v:
         assert v.exists()
         assert docker.volume.exists(v.name)
+
+
+def test_prune():
+    for container in docker.container.list(filters={"name": "test-volume"}):
+        docker.container.remove(container, force=True)
+    volume = docker.volume.create("test-volume")
+    assert volume in docker.volume.list()
+
+    # volume not pruned because it is does not have label "dne"
+    docker.volume.prune(filters={"label": "dne"})
+    assert volume in docker.volume.list()
+
+    # could only find "label" filter for `docker volume prune`
+
+    # volume pruned
+    docker.volume.prune()
+    assert volume not in docker.volume.list()

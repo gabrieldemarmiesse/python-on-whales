@@ -1020,15 +1020,20 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def prune(self, filters: Union[str, List[str]] = []) -> None:
+    def prune(self, filters: Dict[str, str] = {}) -> None:
         """Remove containers that are not running.
 
         # Arguments
             filters: Filters as strings or list of strings
         """
+        if isinstance(filter, list):
+            raise TypeError(
+                "since python-on-whales 0.38.0, the filter argument is expected to be "
+                "a dict, not a list, please replace your function call by "
+                "docker.container.prune(filters={...})"
+            )
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
-        for filter_ in to_list(filters):
-            full_cmd += ["--filter", filter_]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
