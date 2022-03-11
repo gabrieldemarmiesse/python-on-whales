@@ -202,7 +202,7 @@ class VolumeCLI(DockerCLICaller):
         for key, value in filters.items():
             full_cmd += ["--filter", f"{key}={value}"]
 
-        run(full_cmd, capture_stderr=False, capture_stdout=False)
+        run(full_cmd)
 
     def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
         """Removes one or more volumes
