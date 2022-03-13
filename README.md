@@ -133,6 +133,20 @@ context, the Docker object is removed automatically, even if an exception occurs
 * All Docker objects and the Docker client are safe to use with multithreading and multiprocessing.
 * Display the commands called and the environment variables used by setting the environment variable `PYTHON_ON_WHALES_DEBUG=1`.
 
+### STDOUT and STDERR handling
+
+_While this is by no means an exhaustive explanation it conveys the overall philosophy of python-on-whales_
+
+Most python-on-whales methods capture `STDOUT` and `STDERR`.
+
+`STDERR` is only used to raise appropriate exceptions when the underlying docker process fails.
+
+Many of these methods, like `docker.volume.prune`, return `STDOUT` in its raw form. You can ignore the `STDOUT` or perhaps log it.
+
+Certain of these methods, e.g. `docker.container.list`, use the captured `STDOUT` to return objects more specific to docker, e.g. `List[Container]`.
+
+Other python-on-whales methods by default do not capture `STDOUT` and `STDERR`. Instead these methods output them directly to the terminal to better handle more complicated output. One such method is `docker.buildx.build`.
+
 ## Why another project? Why not build on Docker-py?
 
 In a sense this project is built on top of [Docker-py](https://docker-py.readthedocs.io/en/stable/) 
