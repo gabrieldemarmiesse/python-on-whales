@@ -110,9 +110,50 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def exec(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def execute(
+        self,
+        service: str,
+        command: List[str],
+        detach: bool = False,
+        envs: Dict[str, str] = {},
+        index: int = 1,
+        tty: bool = True,
+        privileged: bool = False,
+        user: Optional[str] = None,
+        workdir: Union[str, Path, None] = None,
+    ) -> Optional[str]:
+        """Execute a command in a running container.
+
+        # Arguments
+            service: The name of the service.
+            command: The command to execute.
+            detach: If `True`, detach from the container after the command exits. In this case,
+                 nothing is returned by the function. By default, the execute command returns only when the
+                 command has finished running, and the function will raise an exception `DockerException` if the command
+                 exits with a non-zero exit code. If `False`, the command is executed and the stdout is returned.
+            envs: A dictionary of environment variables to set in the container.
+            index: The index of the container to execute the command in (default 1) if there are multiple containers for this service.
+            tty: If `True`, allocate a pseudo-TTY. Use `False` to get the output of the command.
+            privileged: If `True`, run the command in privileged mode.
+            user: The user name to use inside the container.
+            workdir: The working directory inside the container.
+        """
+        full_cmd = self.docker_compose_cmd + ["exec"]
+        full_cmd.add_flag("--detach", detach)
+        for key, value in envs.items():
+            full_cmd.add_simple_arg("--env", f"{key}={value}")
+        full_cmd.add_simple_arg("--index", index)
+        full_cmd.add_flag("--no-TTY", not tty)
+        full_cmd.add_flag("--privileged", privileged)
+        full_cmd.add_simple_arg("--user", user)
+        full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd += [service] + command
+        if detach:
+            run(full_cmd)
+        elif tty:
+            run(full_cmd, capture_stdout=False, capture_stderr=False)
+        else:
+            return run(full_cmd)
 
     def kill(self, services: Union[str, List[str]] = [], signal: Optional[str] = None):
         """Kills the container(s) of a service
