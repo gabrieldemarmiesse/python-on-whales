@@ -409,6 +409,96 @@ def test_compose_logs_follow():
     docker.compose.down(timeout=1)
 
 
+@pytest.mark.parametrize("privileged", [True, False])
+def test_compose_execute_no_tty(privileged):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ]
+    )
+    docker.compose.up(["busybox"], detach=True)
+    time.sleep(2)
+    full_output = docker.compose.execute(
+        "busybox", ["echo", "dodo"], tty=False, privileged=privileged
+    )
+    assert full_output == "dodo"
+    docker.compose.down(timeout=1)
+
+
+def test_compose_execute_with_tty():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ]
+    )
+    docker.compose.up(["busybox"], detach=True)
+    time.sleep(2)
+    output = docker.compose.execute("busybox", ["echo", "dodo"], tty=True)
+    assert output is None
+    docker.compose.down(timeout=1)
+
+
+def test_compose_execute_detach():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ]
+    )
+    docker.compose.up(["busybox"], detach=True)
+    t1 = datetime.now()
+    output = docker.compose.execute("busybox", ["sleep", "20"], detach=True)
+    execution_time = datetime.now() - t1
+    assert execution_time.seconds < 20
+    assert output is None
+    docker.compose.down(timeout=1)
+
+
+def test_compose_execute_envs():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ]
+    )
+    docker.compose.up(["busybox"], detach=True)
+    output = docker.compose.execute(
+        "busybox",
+        ["sh", "-c", "echo $VAR1,$VAR2"],
+        envs={"VAR1": "hello", "VAR2": "world"},
+        tty=False,
+    )
+    assert output == "hello,world"
+    docker.compose.down(timeout=1)
+
+
+def test_compose_execute_user():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ]
+    )
+    docker.compose.up(["busybox"], detach=True)
+    output = docker.compose.execute("busybox", ["whoami"], tty=False, user="sync")
+    assert output == "sync"
+    docker.compose.down(timeout=1)
+
+
+def test_compose_execute_workdir():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ]
+    )
+    docker.compose.up(["busybox"], detach=True)
+    assert (
+        docker.compose.execute("busybox", ["pwd"], tty=False, workdir="/tmp") == "/tmp"
+    )
+    assert (
+        docker.compose.execute("busybox", ["pwd"], tty=False, workdir="/proc")
+        == "/proc"
+    )
+    docker.compose.down(timeout=1)
+
+
 def test_compose_single_profile():
     docker = DockerClient(
         compose_files=[
