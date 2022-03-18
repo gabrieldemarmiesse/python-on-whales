@@ -17,11 +17,9 @@ services:
     command: sleep infinity
   busybox-2-electric-boogaloo:
     image: busybox:latest
-    depends:
+    depends_on:
       - alpine
     command: sleep infinity
-  ghost:
-    image: i_do_not_exist:v0.0.1
   alpine:
     image: alpine:latest
     command: sleep infinity

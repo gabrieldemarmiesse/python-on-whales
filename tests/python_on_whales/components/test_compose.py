@@ -222,12 +222,17 @@ def test_docker_compose_pull():
     "the CI. We get a .dockercfg: $HOME is not defined.",
 )
 def test_docker_compose_pull_ignore_pull_failures():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_non_existent_image.yml"
+        ]
+    )
     try:
-        docker.image.remove("busybox")
+        docker.image.remove("ghost")
     except NoSuchImage:
         pass
-    docker.compose.pull(["busybox", "ghost"], ignore_pull_failures=True)
-    docker.image.inspect(["busybox"])
+    docker.compose.pull(["ghost"], ignore_pull_failures=True)
 
 
 @pytest.mark.skipif(
