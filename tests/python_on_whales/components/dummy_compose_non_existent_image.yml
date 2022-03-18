@@ -5,4 +5,6 @@ services:
     image: busybox:latest
     command: sleep infinity
   ghost:
-      image: busybox:i-do-not-exist
+    build:
+      context: ghost_context
+    image: i-definitely-do-not-exist
