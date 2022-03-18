@@ -58,6 +58,7 @@ class ClientConfig:
     compose_profiles: List[str] = field(default_factory=list)
     compose_env_file: Optional[ValidPath] = None
     compose_project_name: Optional[str] = None
+    compose_compatibility: Optional[bool] = None
 
     def get_docker_path(self) -> ValidPath:
         if self.client_binary_path is None:
@@ -125,6 +126,7 @@ class ClientConfig:
         base_cmd.add_args_list("--profile", self.compose_profiles)
         base_cmd.add_simple_arg("--env-file", self.compose_env_file)
         base_cmd.add_simple_arg("--project-name", self.compose_project_name)
+        base_cmd.add_flag("--compatibility", self.compose_compatibility)
         return base_cmd
 
 
