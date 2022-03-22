@@ -198,11 +198,6 @@ def test_docker_compose_kill():
     docker.compose.down()
 
 
-@pytest.mark.skipif(
-    True,
-    reason="TODO: Fixme. For some reason it works locally but not in "
-    "the CI. We get a .dockercfg: $HOME is not defined.",
-)
 def test_docker_compose_pull():
     try:
         docker.image.remove("busybox")
@@ -216,11 +211,6 @@ def test_docker_compose_pull():
     docker.image.inspect(["busybox", "alpine"])
 
 
-@pytest.mark.skipif(
-    True,
-    reason="TODO: Fixme. For some reason it works locally but not in "
-    "the CI. We get a .dockercfg: $HOME is not defined.",
-)
 def test_docker_compose_pull_ignore_pull_failures():
     docker = DockerClient(
         compose_files=[
@@ -235,18 +225,13 @@ def test_docker_compose_pull_ignore_pull_failures():
     docker.compose.pull(["ghost"], ignore_pull_failures=True)
 
 
-@pytest.mark.skipif(
-    True,
-    reason="TODO: Fixme. For some reason it works locally but not in "
-    "the CI. We get a .dockercfg: $HOME is not defined.",
-)
 def test_docker_compose_pull_include_deps():
     try:
         docker.image.remove("alpine")
     except NoSuchImage:
         pass
     docker.compose.pull(["busybox-2-electric-boogaloo"], include_deps=True)
-    docker.image.inspect(["alpine", "busybox-2-electric-boogaloo"])
+    docker.image.inspect(["alpine"])
 
 
 def test_docker_compose_up_abort_on_container_exit():
