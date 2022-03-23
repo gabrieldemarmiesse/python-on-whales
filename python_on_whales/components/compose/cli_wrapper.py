@@ -245,15 +245,25 @@ class ComposeCLI(DockerCLICaller):
         Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def pull(self, services: List[str] = []):
+    def pull(
+        self,
+        services: List[str] = [],
+        ignore_pull_failures: bool = False,
+        include_deps: bool = False,
+    ):
         """Pull service images
 
         # Arguments
             services: The list of services to select. Only the images of those
                 services will be pulled. If no services are specified (the default
                 behavior) all images of all services are pulled.
+            ignore_pull_failures: Pull what it can and ignores images with pull failures
+            include_deps: Also pull services declared as dependencies
+
         """
         full_cmd = self.docker_compose_cmd + ["pull"]
+        full_cmd.add_flag("--ignore-pull-failures", ignore_pull_failures)
+        full_cmd.add_flag("--include-deps", include_deps)
         full_cmd += services
         run(full_cmd)
 
