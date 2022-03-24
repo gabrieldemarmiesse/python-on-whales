@@ -6,9 +6,10 @@ from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 import pydantic
+from typing_extensions import Literal
 
 from python_on_whales.exceptions import (
     DockerException,
@@ -69,6 +70,32 @@ class DockerCamelModel(pydantic.BaseModel):
     class Config:
         alias_generator = to_docker_camel
         allow_population_by_field_name = True
+
+
+@overload
+def run(
+    args: List[Any],
+    capture_stdout: bool = True,
+    capture_stderr: bool = True,
+    input: bytes = None,
+    return_stderr: Literal[True] = False,
+    env: Dict[str, str] = {},
+    tty: bool = False,
+) -> Tuple[str, str]:
+    ...
+
+
+@overload
+def run(
+    args: List[Any],
+    capture_stdout: bool = True,
+    capture_stderr: bool = True,
+    input: bytes = None,
+    return_stderr: Literal[False] = False,
+    env: Dict[str, str] = {},
+    tty: bool = False,
+) -> str:
+    ...
 
 
 def run(

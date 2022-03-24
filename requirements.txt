@@ -2,3 +2,4 @@ pydantic
 requests
 tqdm
 typer
+typing_extensions
