@@ -263,10 +263,7 @@ def test_config_complexe_compose():
     docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     config = docker.compose.config()
 
-    assert (
-        config.services["my_service"].build.context
-        == (compose_file.parent / "my_service_build").absolute()
-    )
+    assert config.services["my_service"].build.context == Path("my_service_build")
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
         "ping",
@@ -397,9 +394,12 @@ def test_compose_logs_follow():
     signal.alarm(15)
 
     start = datetime.now()
-
+    full_output = ""
     try:
-        full_output = docker.compose.logs(follow=True)
+        for output_type, current_output in docker.compose.logs(
+            follow=True, stream=True
+        ):
+            full_output += current_output.decode()
         # interrupt the alarm in case the command ends before the timeout
         signal.alarm(0)
     # catch and ignore the exception when the command is interruped by the timeout
@@ -436,18 +436,8 @@ def test_compose_execute_no_tty(privileged):
     docker.compose.down(timeout=1)
 
 
-def test_compose_execute_with_tty():
-    docker = DockerClient(
-        compose_files=[
-            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ],
-        compose_compatibility=True,
-    )
-    docker.compose.up(["busybox"], detach=True)
-    time.sleep(2)
-    output = docker.compose.execute("busybox", ["echo", "dodo"], tty=True)
-    assert output is None
-    docker.compose.down(timeout=1)
+# We can't test the TTY flag on execute because we can't have a true tty in pytest
+# of course tty still works if python-on-whales is executed outside pytest.
 
 
 def test_compose_execute_detach():
@@ -459,7 +449,7 @@ def test_compose_execute_detach():
     )
     docker.compose.up(["busybox"], detach=True)
     t1 = datetime.now()
-    output = docker.compose.execute("busybox", ["sleep", "20"], detach=True)
+    output = docker.compose.execute("busybox", ["sleep", "20"], detach=True, tty=False)
     execution_time = datetime.now() - t1
     assert execution_time.seconds < 20
     assert output is None
