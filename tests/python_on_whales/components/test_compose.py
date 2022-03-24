@@ -19,7 +19,10 @@ pytestmark = pytest.mark.skipif(
 )
 
 docker = DockerClient(
-    compose_files=[PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"]
+    compose_files=[
+        PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+    ],
+    compose_compatibility=True,
 )
 
 
@@ -33,6 +36,7 @@ def test_compose_project_name():
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
         ],
         compose_project_name="dudu",
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox", "alpine"], detach=True)
     containers = docker.compose.ps()
@@ -52,7 +56,8 @@ def test_docker_compose_up_down():
         compose_files=[
             PROJECT_ROOT
             / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox", "alpine"])
     docker.compose.down(timeout=1)
@@ -239,7 +244,8 @@ def test_docker_compose_up_abort_on_container_exit():
         compose_files=[
             PROJECT_ROOT
             / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["alpine"], abort_on_container_exit=True)
     for container in docker.compose.ps():
@@ -256,6 +262,7 @@ def test_passing_env_files(tmp_path: Path):
             / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
         ],
         compose_env_file=compose_env_file,
+        compose_compatibility=True,
     )
     output = docker.compose.config()
 
@@ -271,13 +278,10 @@ def test_config_complexe_compose():
     compose_file = (
         PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
     )
-    docker = DockerClient(compose_files=[compose_file])
+    docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     config = docker.compose.config()
 
-    assert (
-        config.services["my_service"].build.context
-        == (compose_file.parent / "my_service_build").absolute()
-    )
+    assert config.services["my_service"].build.context == Path("my_service_build")
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
         "ping",
@@ -315,7 +319,7 @@ def test_compose_down_volumes():
     compose_file = (
         PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
     )
-    docker = DockerClient(compose_files=[compose_file])
+    docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     docker.compose.up(
         ["my_service"], detach=True, scales=dict(my_service=1), build=True
     )
@@ -363,7 +367,8 @@ def test_compose_logs_simple_use_case():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(detach=True)
     # Wait some seconds to let the container to complete the execution of ping
@@ -379,7 +384,8 @@ def test_compose_logs_stream():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(detach=True)
     time.sleep(15)
@@ -397,7 +403,8 @@ def test_compose_logs_follow():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(detach=True)
 
@@ -405,9 +412,12 @@ def test_compose_logs_follow():
     signal.alarm(15)
 
     start = datetime.now()
-
+    full_output = ""
     try:
-        full_output = docker.compose.logs(follow=True)
+        for output_type, current_output in docker.compose.logs(
+            follow=True, stream=True
+        ):
+            full_output += current_output.decode()
         # interrupt the alarm in case the command ends before the timeout
         signal.alarm(0)
     # catch and ignore the exception when the command is interruped by the timeout
@@ -432,7 +442,8 @@ def test_compose_execute_no_tty(privileged):
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox"], detach=True)
     time.sleep(2)
@@ -443,28 +454,20 @@ def test_compose_execute_no_tty(privileged):
     docker.compose.down(timeout=1)
 
 
-def test_compose_execute_with_tty():
-    docker = DockerClient(
-        compose_files=[
-            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ]
-    )
-    docker.compose.up(["busybox"], detach=True)
-    time.sleep(2)
-    output = docker.compose.execute("busybox", ["echo", "dodo"], tty=True)
-    assert output is None
-    docker.compose.down(timeout=1)
+# We can't test the TTY flag on execute because we can't have a true tty in pytest
+# of course tty still works if python-on-whales is executed outside pytest.
 
 
 def test_compose_execute_detach():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox"], detach=True)
     t1 = datetime.now()
-    output = docker.compose.execute("busybox", ["sleep", "20"], detach=True)
+    output = docker.compose.execute("busybox", ["sleep", "20"], detach=True, tty=False)
     execution_time = datetime.now() - t1
     assert execution_time.seconds < 20
     assert output is None
@@ -475,7 +478,8 @@ def test_compose_execute_envs():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox"], detach=True)
     output = docker.compose.execute(
@@ -492,7 +496,8 @@ def test_compose_execute_user():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox"], detach=True)
     output = docker.compose.execute("busybox", ["whoami"], tty=False, user="sync")
@@ -504,7 +509,8 @@ def test_compose_execute_workdir():
     docker = DockerClient(
         compose_files=[
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
-        ]
+        ],
+        compose_compatibility=True,
     )
     docker.compose.up(["busybox"], detach=True)
     assert (
@@ -523,6 +529,7 @@ def test_compose_single_profile():
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
         ],
         compose_profiles=["my_test_profile"],
+        compose_compatibility=True,
     )
     docker.compose.up(detach=True)
 
@@ -538,6 +545,7 @@ def test_compose_multiple_profiles():
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
         ],
         compose_profiles=["my_test_profile", "my_test_profile2"],
+        compose_compatibility=True,
     )
     docker.compose.up(detach=True)
 
