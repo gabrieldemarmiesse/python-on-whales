@@ -15,6 +15,11 @@ services:
   busybox:
     image: busybox:latest
     command: sleep infinity
+  busybox-2-electric-boogaloo:
+    image: busybox:latest
+    depends_on:
+      - alpine
+    command: sleep infinity
   alpine:
     image: alpine:latest
     command: sleep infinity
