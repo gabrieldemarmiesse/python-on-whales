@@ -3,3 +3,4 @@ requests
 tqdm
 typer
 typing_extensions
+click<=8.0.4
