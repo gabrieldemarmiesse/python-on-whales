@@ -8,13 +8,25 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig
-from python_on_whales.utils import run, stream_stdout_and_stderr, to_list, format_dict_for_cli
+from python_on_whales.utils import (
+    format_dict_for_cli,
+    run,
+    stream_stdout_and_stderr,
+    to_list,
+)
 
 
 class ComposeCLI(DockerCLICaller):
-    def build(self, services: List[str] = [], build_args: Dict[str, str] = {},
-              cache: bool = True, progress: Optional[str] = None, pull: bool = False,
-              quiet: bool = False, ssh: Optional[str] = None):
+    def build(
+        self,
+        services: List[str] = [],
+        build_args: Dict[str, str] = {},
+        cache: bool = True,
+        progress: Optional[str] = None,
+        pull: bool = False,
+        quiet: bool = False,
+        ssh: Optional[str] = None,
+    ):
         """Build services declared in a yaml compose file.
 
         # Arguments
