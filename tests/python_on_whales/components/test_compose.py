@@ -51,6 +51,17 @@ def test_docker_compose_build():
     docker.image.remove("some_random_image")
 
 
+def test_docker_compose_build_with_arguments():
+    docker.compose.build(
+        build_args={"PYTHON_VERSION": "3.7"},
+        cache=False,
+        progress="plain",
+        pull=True,
+        quiet=True,
+    )
+    docker.image.remove("some_random_image")
+
+
 def test_docker_compose_up_down():
     docker = DockerClient(
         compose_files=[
