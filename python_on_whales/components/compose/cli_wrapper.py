@@ -8,18 +8,47 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig
-from python_on_whales.utils import run, stream_stdout_and_stderr, to_list
+from python_on_whales.utils import (
+    format_dict_for_cli,
+    run,
+    stream_stdout_and_stderr,
+    to_list,
+)
 
 
 class ComposeCLI(DockerCLICaller):
-    def build(self, services: List[str] = []):
+    def build(
+        self,
+        services: List[str] = [],
+        build_args: Dict[str, str] = {},
+        cache: bool = True,
+        progress: Optional[str] = None,
+        pull: bool = False,
+        quiet: bool = False,
+        ssh: Optional[str] = None,
+    ):
         """Build services declared in a yaml compose file.
 
         # Arguments
             services: The services to build (as strings).
                 If empty (default), all services are built.
+            build_arguments: Set build-time variables for services. For example
+                 `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
+            cache: Set to `False` if you don't want to use the cache to build your images
+            progress: Set type of progress output (auto, tty, plain, quiet) (default "auto")
+            pull: Set to `True` to always attempt to pull a newer version of the
+                image (in the `FROM` statements for example).
+            quiet: Don't print anything
+            ssh: Set SSH authentications used when building service images.
+                (use `'default'` for using your default SSH Agent)
         """
         full_cmd = self.docker_compose_cmd + ["build"]
+        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
+        full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_simple_arg("--progress", progress)
+        full_cmd.add_flag("--pull", pull)
+        full_cmd.add_flag("--quiet", quiet)
+        full_cmd.add_simple_arg("--ssh", ssh)
         full_cmd += services
         run(full_cmd, capture_stdout=False)
 
