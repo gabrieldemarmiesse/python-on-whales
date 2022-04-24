@@ -81,6 +81,9 @@ e6ca3592b144: Downloading [=============>                                     ] 
 >>> print(my_docker_image.repo_tags)
 ['ubuntu:20.04']
 
+>>> docker.image.list()
+[python_on_whales.Image(id='sha256:1a437e363abfa', tags=['ubuntu:20.04'])]
+
 >>> my_docker_image.remove()
 ```
 
@@ -128,6 +131,8 @@ docker.run(
     envs={"POSTGRES_PASSWORD": "mysecretpassword"},
     detach=True,
 )
+print(docker.ps())
+# [python_on_whales.Container(id='f5fb939c409d', name='some-postgres')]
 ```
 
 -----
