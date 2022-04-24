@@ -18,6 +18,7 @@ def test_list_tasks():
 
     # Todo: use a context manager
     tasks = docker.task.list()
+    repr(tasks)
     assert len(tasks) >= 1
     assert tasks[0].desired_state == "running"
     assert tasks[0].service_id == service.id

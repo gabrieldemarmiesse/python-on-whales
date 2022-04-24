@@ -60,6 +60,9 @@ class Builder(ReloadableObject):
     def driver(self) -> str:
         return self._get_inspect_result().driver
 
+    def __repr__(self):
+        return f"python_on_whales.Builder(name='{self.name}', driver='{self.driver}')"
+
     def remove(self):
         """Removes this builder. After this operation the builder cannot be used anymore.
 

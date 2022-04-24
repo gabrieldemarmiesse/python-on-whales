@@ -74,6 +74,9 @@ class Volume(ReloadableObjectFromJson):
     def options(self) -> Optional[Dict[str, str]]:
         return self._get_inspect_result().options
 
+    def __repr__(self):
+        return f"python_on_whales.Volume(name='{self.name}', driver={self.driver})"
+
     def remove(self) -> None:
         """Removes this volume"""
         VolumeCLI(self.client_config).remove(self)
