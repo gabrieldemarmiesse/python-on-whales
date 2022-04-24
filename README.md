@@ -29,6 +29,7 @@ and then:
 * `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/compose/#up)
 * `docker image ls` -> [`docker.image.list()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#list)
 * `docker ps` -> [`docker.ps()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#list)
+* `docker cp` -> [`docker.copy()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#copy)
 
 You get the idea 🙂 it's the same as the CLI we all know and love.
 
@@ -110,6 +111,63 @@ e6ca3592b144: Downloading [=============>                                     ] 
  => => exporting layers                                                                                         0.0s
  => => writing image sha256:e1c2382d515b097ebdac4ed189012ca3b34ab6be65ba0c650421ebcac8b70a4d                    0.0s
  => => naming to docker.io/library/some_image_name
+```
+
+## Some more `docker.run()` advanced examples with postgres
+
+```bash
+docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+```
+becomes
+```python
+from python_on_whales import docker
+
+docker.run(
+    "postgres:9.6",
+    name="some-postgres",
+    envs={"POSTGRES_PASSWORD": "mysecretpassword"},
+    detach=True,
+)
+```
+
+-----
+
+```bash
+docker run -it --rm --network some-network postgres psql -h some-postgres -U postgres
+```
+becomes
+```python
+from python_on_whales import docker
+
+# since it's interactive, you'll be dropped into the psql shell. The python code
+# will continue only after you exit the shell.
+docker.run(
+    "postgres:9.6",
+    ["psql", "-h", "some-postgres", "-U", "postgres"],
+    networks=["some-network"],
+    interactive=True,
+    tty=True,
+    remove=True,
+)
+```
+----------
+
+
+```bash
+docker run -d --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -e PGDATA=/var/lib/postgresql/data/pgdata -v /custom/mount:/var/lib/postgresql/data -v myvolume:/tmp/myvolume postgres -c shared_buffers=256MB -c max_connections=200
+```
+becomes
+```python
+from python_on_whales import docker
+
+docker.run(
+    "postgres:9.6",
+    ["-c", "shared_buffers=256MB", "-c", "max_connections=200"],
+    name="some-postgres",
+    envs={"POSTGRES_PASSWORD": "mysecretpassword", "PGDATA": "/var/lib/postgresql/data/pgdata"},
+    volumes=[("/custom/mount", "/var/lib/postgresql/data"), ("myvolume", "/tmp/myvolume")],
+    detach=True,
+)
 ```
 
 
