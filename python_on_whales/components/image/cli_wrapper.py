@@ -130,6 +130,9 @@ class Image(ReloadableObjectFromJson):
     def metadata(self) -> Optional[Dict[str, str]]:
         return self._get_inspect_result().metadata
 
+    def __repr__(self):
+        return f"python_on_whales.Image(id='{self.id[:20]}', tags={self.repo_tags})"
+
     def remove(self, force: bool = False, prune: bool = True):
         """Remove this Docker image.
 

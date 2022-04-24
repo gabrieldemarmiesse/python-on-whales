@@ -68,6 +68,9 @@ class Node(ReloadableObjectFromJson):
     def manager_status(self) -> Optional[NodeManagerStatus]:
         return self._get_inspect_result().manager_status
 
+    def __repr__(self):
+        return f"python_on_whales.Node(id='{self.id[:12]}', hostname='{self.description.hostname}', role='{self.spec.role}')"
+
     def update(
         self,
         availability: Optional[str] = None,

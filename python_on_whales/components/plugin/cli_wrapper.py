@@ -65,6 +65,9 @@ class Plugin(ReloadableObjectFromJson):
     def _docker_plugin(self) -> PluginCLI:
         return PluginCLI(self.client_config)
 
+    def __repr__(self):
+        return f"python_on_whales.Plugin(id='{self.id[:12]}', name='{self.name}')"
+
     def disable(self, force: bool = False) -> None:
         """Disable this plugin"""
         self._docker_plugin.disable(self, force=force)
@@ -203,7 +206,6 @@ class PluginCLI(DockerCLICaller):
     def list(self) -> List[Plugin]:
         """Returns a `List[python_on_whales.Plugin` that are installed on the daemon."""
         full_cmd = self.docker_cmd + [
-            "docker",
             "plugin",
             "list",
             "--no-trunc",

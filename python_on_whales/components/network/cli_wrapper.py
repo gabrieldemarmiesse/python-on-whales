@@ -99,6 +99,9 @@ class Network(ReloadableObjectFromJson):
     def config_only(self) -> bool:
         return self._get_inspect_result().config_only
 
+    def __repr__(self):
+        return f"python_on_whales.Network(id='{self.id[:12]}', name={self.name})"
+
     def remove(self) -> None:
         """Removes this Docker network.
 

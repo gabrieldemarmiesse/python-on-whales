@@ -24,6 +24,7 @@ def test_load_json(json_file):
 @pytest.mark.usefixtures("swarm_mode")
 def test_list_nodes():
     nodes = docker.node.list()
+    assert nodes[0].id[:12] in repr(nodes)
     assert len(nodes) == 1
 
 

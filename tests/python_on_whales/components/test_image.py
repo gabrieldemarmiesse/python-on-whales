@@ -13,6 +13,14 @@ def test_load_json(json_file):
     # we could do more checks here if needed
 
 
+def test_image_repr():
+    docker.image.pull("busybox:1", quiet=True)
+    docker.image.pull("busybox:1.32", quiet=True)
+    assert "busybox:1" in repr(docker.image.list())
+    assert "busybox:1.32" in repr(docker.image.list())
+    docker.image.remove(["busybox:1", "busybox:1.32"])
+
+
 def test_image_remove():
     docker.image.pull("busybox:1", quiet=True)
     docker.image.pull("busybox:1.32", quiet=True)

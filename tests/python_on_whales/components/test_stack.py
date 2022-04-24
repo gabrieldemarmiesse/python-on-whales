@@ -26,6 +26,7 @@ def test_services_inspect():
     all_services = docker.service.list()
     assert len(all_services) == 4
     assert set(all_services) == set(docker.stack.services("some_stack"))
+    assert "name='some_stack'" in repr(docker.stack.list())
 
 
 def test_stack_ps_and_services(with_test_stack):

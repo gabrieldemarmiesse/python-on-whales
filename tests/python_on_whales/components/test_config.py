@@ -17,6 +17,7 @@ def test_create_delete_config(tmp_path):
         assert my_conf.spec.name == "my_conf"
         assert docker.config.list() == [my_conf]
         assert docker.config.inspect("my_conf") == my_conf
+        repr(docker.config.list())
 
 
 @pytest.mark.usefixtures("swarm_mode")

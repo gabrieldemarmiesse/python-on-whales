@@ -169,6 +169,9 @@ class Container(ReloadableObjectFromJson):
     def network_settings(self) -> NetworkSettings:
         return self._get_inspect_result().network_settings
 
+    def __repr__(self):
+        return f"python_on_whales.Container(id='{self.id[:12]}', name='{self.name}')"
+
     # --------------------------------------------------------------------
     # public methods
 

@@ -31,6 +31,9 @@ def test_load_json(json_file):
 
 def test_simple_volume():
     some_volume = docker.volume.create()
+    assert some_volume.exists()
+    assert some_volume.name in repr(docker.volume.list())
+    assert some_volume.driver in repr(docker.volume.list())
     docker.volume.remove(some_volume)
 
 

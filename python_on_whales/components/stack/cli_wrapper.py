@@ -20,6 +20,9 @@ class Stack:
     def __eq__(self, other: Stack):
         return self.client_config == other.client_config and self.name == other.name
 
+    def __repr__(self):
+        return f"python_on_whales.Stack(name='{self.name}')"
+
     def remove(self) -> None:
         StackCLI(self.client_config).remove(self)
 

@@ -109,6 +109,17 @@ sys.exit(1)
         assert "Something is wrong!" in str(err.value)
 
 
+def test_container_repr():
+    with docker.run(
+        "ubuntu",
+        ["sleep", "infinity"],
+        remove=True,
+        detach=True,
+        stop_timeout=1,
+    ) as container:
+        assert container.id[:12] in repr(docker.container.list())
+
+
 def test_container_run_with_random_port():
     with docker.run(
         "ubuntu",
@@ -119,6 +130,7 @@ def test_container_run_with_random_port():
         stop_timeout=1,
     ) as container:
         assert container.network_settings.ports["90/tcp"][0]["HostPort"] is not None
+        assert container.id[:12] in repr(docker.container.list())
 
 
 def test_container_create_with_random_ports():

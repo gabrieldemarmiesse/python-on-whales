@@ -26,6 +26,8 @@ def test_install_plugin_disable_enable():
     with docker.plugin.install(test_plugin_name) as my_plugin:
         my_plugin.disable()
         my_plugin.enable()
+        assert my_plugin in docker.plugin.list()
+        assert "name='vieux/sshfs:latest'" in repr(my_plugin)
 
 
 def test_plugin_upgrade():
