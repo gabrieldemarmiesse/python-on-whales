@@ -1,4 +1,4 @@
-from .client_config import get_docker_client_binary_path
+from .client_config import ClientNotFoundError
 from .components.buildx.cli_wrapper import Builder
 from .components.config.cli_wrapper import Config
 from .components.container.cli_wrapper import Container, ContainerStats
