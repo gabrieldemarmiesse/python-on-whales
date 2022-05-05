@@ -24,6 +24,10 @@ class ParsingError(Exception):
     pass
 
 
+class ClientNotFoundError(Exception):
+    pass
+
+
 class Command(list):
     def add_simple_arg(self, name: str, value: Any):
         if value is not None:
@@ -59,11 +63,20 @@ class ClientConfig:
     compose_env_file: Optional[ValidPath] = None
     compose_project_name: Optional[str] = None
     compose_compatibility: Optional[bool] = None
+    client_binary: str = "docker"
 
     def get_docker_path(self) -> ValidPath:
         if self.client_binary_path is None:
-            self.client_binary_path = get_docker_client_binary_path()
-            if self.client_binary_path is None:
+            self.client_binary_path = Path(self._get_docker_path())
+
+        return self.client_binary_path
+
+    def _get_docker_path(self) -> str:
+        which_result = shutil.which(self.client_binary)
+        if which_result is not None:
+            return which_result
+        if self.client_binary == "docker":
+            if not get_docker_binary_path_in_cache().exists():
                 warnings.warn(
                     "The docker client binary file was not found on your system. \n"
                     "Docker on whales will try to download it for you. \n"
@@ -79,8 +92,13 @@ class ClientConfig:
                     "$ python-on-whales download-cli \n"
                 )
                 download_docker_cli()
-                self.client_binary_path = get_docker_binary_path_in_cache()
-        return self.client_binary_path
+            return get_docker_binary_path_in_cache()
+
+        raise ClientNotFoundError(
+            f"The binary '{self.client_binary}' could not be found on your PATH. "
+            f"Please ensure that your PATH is has the directory of the binary you're looking for. "
+            f"You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
+        )
 
     @property
     def docker_cmd(self) -> Command:
@@ -244,23 +262,3 @@ def bulk_reload(docker_objects: List[ReloadableObjectFromJson]):
     json_str = run(full_cmd)
     for json_obj, docker_object in zip(json.loads(json_str), docker_objects):
         docker_object._set_inspect_result(docker_object._parse_json_object(json_obj))
-
-
-def get_docker_client_binary_path() -> Optional[Path]:
-    """Return the path of the docker client binary file.
-    If `None` is returned, the docker client binary is not available and must be downloaded.
-
-    # Returns
-        `Optional[Path]`, The path of the docker client binary file.
-
-    Note that if you use python-on-whales normally, the docker client binary is
-    downloaded automatically if needed. So you only need this function if you
-    want to bypass the automatic download process.
-    """
-    docker_sys = shutil.which("docker")
-    if docker_sys is not None:
-        return Path(docker_sys)
-    elif get_docker_binary_path_in_cache().exists():
-        return get_docker_binary_path_in_cache()
-    else:
-        return None

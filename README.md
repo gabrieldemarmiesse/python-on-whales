@@ -264,6 +264,37 @@ Use the right tool for the right job 🙂
 
 Take those numbers with a grain of salt. The functions don't all need the same amount of work to be implemented.
 
+## Alternatives to Docker: Podman, nerdctl...
+
+Support for Docker-compatible clients like [Podman](https://podman.io/) and [Nerdctl](https://github.com/containerd/nerdctl) was introduced in Python-on-whales version 0.44.0.
+
+You can use an arbitrary binary to execute Docker commands by using the argument `client_binary` of `python_on_whales.DockerCLient`.
+Here is an example:
+```python
+>>> from python_on_whales import DockerClient
+
+>>> nerdctl = DockerClient(client_binary="nerdctl")
+
+>>> nerdctl.pull("python:3.9")
+docker.io/library/python:3.9:                                                     resolved       |++++++++++++++++++++++++++++++++++++++|
+index-sha256:a83c0aa6471527636d7331c30704d0f88e0ab3331bbc460d4ae2e53bbae64dca:    done           |++++++++++++++++++++++++++++++++++++++|
+manifest-sha256:8ccef93ff3c9e1bb9562d394526cdc6834033a0498073d41baa8b309f4fac20e: done           |++++++++++++++++++++++++++++++++++++++|
+config-sha256:f033692e2c5abe1e0ee34bcca759a3e4432b10b0031174b08d48bcc90d14d68b:   done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:9952b1051adaff513c99f86765361450af108b12b0073d0ba40255c4e419b481:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:c766e27afb21eddf9ab3e4349700ebe697c32a4c6ada6af4f08282277a291a28:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:1535e3c1181a81ea66d5bacb16564e4da2ba96304506598be39afe9c82b21c5c:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:6de7cb7bdc8f9b4c4d6539233fe87304aa1a6427c3238183265c9f02d831eddb:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:967757d5652770cfa81b6cc7577d65e06d336173da116d1fb5b2d349d5d44127:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:c357e2c68cb3bf1e98dcb3eb6ceb16837253db71535921d6993c594588bffe04:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:26787c68cf0c92a778db814d327e283fe1da4434a7fea1f0232dae8002e38f33:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:6aefca2dc61dcbcd268b8a9861e552f9cdb69e57242faec64ac120d2355a9c1a:    done           |++++++++++++++++++++++++++++++++++++++|
+layer-sha256:32a180f5cf85702e7680719c40c39c07972b1176355df5a621de9eb87ad07ce2:    done           |++++++++++++++++++++++++++++++++++++++|
+elapsed: 35.9s                                                                    total:  333.5  (9.3 MiB/s)
+
+python_on_whales.Image(id='sha256:f033692e2c5ab', tags=['python:3.9'])
+```
+
+
 ## Contributing
 
 Any and all PRs are welcome. Please see [this documentation](./CONTRIBUTING.md).

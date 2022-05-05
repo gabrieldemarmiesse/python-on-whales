@@ -78,6 +78,7 @@ class DockerClient(DockerCLICaller):
         compose_env_file: Optional[ValidPath] = None,
         compose_project_name: Optional[str] = None,
         compose_compatibility: Optional[bool] = None,
+        client_binary: str = "docker",
     ):
 
         if client_config is None:
@@ -97,6 +98,7 @@ class DockerClient(DockerCLICaller):
                 compose_env_file=compose_env_file,
                 compose_project_name=compose_project_name,
                 compose_compatibility=compose_compatibility,
+                client_binary=client_binary,
             )
         super().__init__(client_config)
 
