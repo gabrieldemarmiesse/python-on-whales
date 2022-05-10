@@ -1,0 +1,10 @@
+
+services:
+  alpine_one:
+    image: alpine:latest
+    command: sh -c "sleep 2"
+    env_file: some/path/one.env
+  alpine_two:
+    image: alpine:latest
+    command: sh -c "sleep 2"
+    env_file: some/other/path/two.env
