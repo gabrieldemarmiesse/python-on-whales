@@ -1,6 +1,7 @@
 import signal
 import time
 from datetime import datetime, timedelta
+from os import makedirs
 from pathlib import Path
 
 import pytest
@@ -278,6 +279,27 @@ def test_passing_env_files(tmp_path: Path):
     output = docker.compose.config()
 
     assert output.services["alpine"].environment["SOME_VARIABLE"] == "hello"
+
+
+def test_project_directory_env_files(tmp_path: Path):
+    makedirs(tmp_path / "some/path")
+    makedirs(tmp_path / "some/other/path")
+    project_env_file_one = tmp_path / "some/path/one.env"
+    project_env_file_two = tmp_path / "some/other/path/two.env"
+    project_env_file_one.write_text("TEST=one\n")
+    project_env_file_two.write_text("TEST=two\n")
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_project_directory.yml"
+        ],
+        compose_project_directory=tmp_path,
+        compose_compatibility=True,
+    )
+    output = docker.compose.config()
+
+    assert output.services["alpine_one"].environment["TEST"] == "one"
+    assert output.services["alpine_two"].environment["TEST"] == "two"
 
 
 def test_entrypoint_loaded_in_config():

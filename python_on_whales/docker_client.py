@@ -57,6 +57,8 @@ class DockerClient(DockerCLICaller):
             into the compose project. By default, it uses `./.env`.
         compose_project_name: The name of the compose project. It will be prefixed to
             networks, volumes and containers created by compose.
+        compose_project_directory: Use an alternate working directory. By default, it
+            uses the path of the compose file.
         compose_compatibility: Use docker compose in compatibility mode.
     """
 
@@ -77,6 +79,7 @@ class DockerClient(DockerCLICaller):
         compose_profiles: List[str] = [],
         compose_env_file: Optional[ValidPath] = None,
         compose_project_name: Optional[str] = None,
+        compose_project_directory: Optional[ValidPath] = None,
         compose_compatibility: Optional[bool] = None,
         client_binary: str = "docker",
     ):
@@ -97,6 +100,7 @@ class DockerClient(DockerCLICaller):
                 compose_profiles=compose_profiles,
                 compose_env_file=compose_env_file,
                 compose_project_name=compose_project_name,
+                compose_project_directory=compose_project_directory,
                 compose_compatibility=compose_compatibility,
                 client_binary=client_binary,
             )
