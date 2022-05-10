@@ -1,8 +1,8 @@
 import signal
 import time
 from datetime import datetime, timedelta
-from pathlib import Path
 from os import makedirs
+from pathlib import Path
 
 import pytest
 import pytz
@@ -279,6 +279,7 @@ def test_passing_env_files(tmp_path: Path):
     output = docker.compose.config()
 
     assert output.services["alpine"].environment["SOME_VARIABLE"] == "hello"
+
 
 def test_project_directory_env_files(tmp_path: Path):
     makedirs(tmp_path / "some/path")
