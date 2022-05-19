@@ -142,6 +142,17 @@ class NetworkCLI(DockerCLICaller):
             python_on_whales.components.container.cli_wrapper.ValidContainer
         ] = [],
     ) -> None:
+        """Connect a container to a network
+
+        # Arguments
+            network: The network to connect to
+            container: The container to connect
+            alias: Add network-scoped alias for the container
+            driver_options: Driver options for the network
+            ip: IPv4 address (e.g., `"172.30.100.104"`)
+            ip6: IPv6 address (e.g., `"2001:db8::33"`)
+            links: Add links to other containers
+        """
         full_cmd = self.docker_cmd + ["network", "connect"]
         full_cmd.add_simple_arg("--alias", alias)
         full_cmd.add_args_list("--driver-opt", driver_options)
@@ -185,7 +196,13 @@ class NetworkCLI(DockerCLICaller):
         container: python_on_whales.components.container.cli_wrapper.ValidContainer,
         force: bool = False,
     ):
-        full_cmd = self.docker_cmd + ["network", "disconnet"]
+        """Disconnect a container from a network
+
+        # Arguments
+            network: The name of the network.
+            container: The container to disconnect.
+        """
+        full_cmd = self.docker_cmd + ["network", "disconnect"]
         full_cmd.add_flag("--force", force)
         full_cmd += [network, container]
         run(full_cmd)
