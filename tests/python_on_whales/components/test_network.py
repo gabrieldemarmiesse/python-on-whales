@@ -43,5 +43,14 @@ def test_context_manager():
     assert my_net not in docker.network.list()
 
 
+def test_network_connect_disconnect():
+    with docker.network.create(random_name()) as my_net:
+        with docker.container.run(
+            "busybox:1", ["sleep", "infinity"], detach=True
+        ) as my_container:
+            docker.network.connect(my_net, my_container)
+            docker.network.disconnect(my_net, my_container)
+
+
 def test_remove_nothing():
     docker.network.remove([])
