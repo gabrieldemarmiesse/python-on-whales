@@ -5,7 +5,7 @@ import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 
@@ -64,19 +64,22 @@ class ClientConfig:
     compose_project_name: Optional[str] = None
     compose_project_directory: Optional[ValidPath] = None
     compose_compatibility: Optional[bool] = None
-    client_binary: str = "docker"
+    client_call: List[str] = field(default_factory=lambda: ["docker"])
+    _client_call_with_path: Optional[List[Union[Path, str]]] = None
 
-    def get_docker_path(self) -> ValidPath:
-        if self.client_binary_path is None:
-            self.client_binary_path = Path(self._get_docker_path())
+    def get_client_call_with_path(self) -> List[Union[Path, str]]:
+        if self._client_call_with_path is None:
+            self._client_call_with_path = [
+                Path(self._get_docker_path())
+            ] + self.client_call[1:]
 
-        return self.client_binary_path
+        return self._client_call_with_path
 
     def _get_docker_path(self) -> str:
-        which_result = shutil.which(self.client_binary)
+        which_result = shutil.which(self.client_call[0])
         if which_result is not None:
             return which_result
-        if self.client_binary == "docker":
+        if self.client_call[0] == "docker":
             if not get_docker_binary_path_in_cache().exists():
                 warnings.warn(
                     "The docker client binary file was not found on your system. \n"
@@ -96,7 +99,7 @@ class ClientConfig:
             return get_docker_binary_path_in_cache()
 
         raise ClientNotFoundError(
-            f"The binary '{self.client_binary}' could not be found on your PATH. "
+            f"The binary '{self.client_call[0]}' could not be found on your PATH. "
             f"Please ensure that your PATH is has the directory of the binary you're looking for. "
             f"You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
         )
@@ -104,7 +107,7 @@ class ClientConfig:
     @property
     def docker_cmd(self) -> Command:
 
-        result = Command([self.get_docker_path()])
+        result = Command(self.get_client_call_with_path())
 
         if self.config is not None:
             result += ["--config", self.config]

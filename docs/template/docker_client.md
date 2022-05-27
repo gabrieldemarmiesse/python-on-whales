@@ -114,3 +114,8 @@ you can run from your shell:
 python-on-whales download-cli
 ```
 
+# Handling an unavailable client
+
+Trying to use Python-on-whales when it cannot find or download a Docker client binary
+will trigger a `python_on_whales.ClientNotFoundError`. You can use a try-except around 
+a first `docker.ps()` call to handle the case when Python-on-whales won't work.
