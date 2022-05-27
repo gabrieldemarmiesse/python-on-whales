@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import pydantic
 
@@ -227,7 +227,7 @@ class ContainerConfig(DockerCamelModel):
     image: str
     volumes: dict
     working_dir: Path
-    entrypoint: List[str]
+    entrypoint: Union[List[str], str]
     network_disabled: bool
     mac_address: str
     on_build: List[str]
