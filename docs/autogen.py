@@ -11,8 +11,7 @@ a = get_methods(
 print(a)
 pages = {
     "docker_client.md": ["python_on_whales.DockerClient"]
-    + get_methods("python_on_whales.docker_client.DockerClient")
-    + ["python_on_whales.get_docker_client_binary_path"],
+    + get_methods("python_on_whales.docker_client.DockerClient"),
     "sub-commands/buildx.md": get_methods(
         "python_on_whales.components.buildx.cli_wrapper.BuildxCLI"
     )

@@ -73,7 +73,7 @@ class DockerClient(DockerCLICaller):
             Let's say you want to use estargz to run a container immediately, without waiting for the "pull"
             to finish (yes it's possible!), you can
             do `nerdctl = DockerClient(client_call=["nerdctl", "--snapshotter=stargz"])`
-            and then `nerdctl.run("ghcr.io/stargz-containers/python:3.7-org", ["-c", "print('hi')"]`.
+            and then `nerdctl.run("ghcr.io/stargz-containers/python:3.7-org", ["-c", "print('hi')"])`.
             You can also use this system to call Docker with sudo with `client_call=["sudo", "docker"]`
             (note that it won't ask for your password, so sudo should be passwordless during the python
             program execution).
