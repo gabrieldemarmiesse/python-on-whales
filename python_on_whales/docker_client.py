@@ -1,4 +1,5 @@
 import base64
+import warnings
 from typing import List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
@@ -60,6 +61,24 @@ class DockerClient(DockerCLICaller):
         compose_project_directory: Use an alternate working directory. By default, it
             uses the path of the compose file.
         compose_compatibility: Use docker compose in compatibility mode.
+        client_call: Client binary to use and how to call it. Default is `["docker"]`. You can try with
+            for example `["podman"]` or `["nerdctl"]`. The client must have the same commands and
+            outputs as Docker to work. Some best effort support is done in case of divergences,
+            meaning you can report issues occuring on some other binary than Docker, but
+            we don't guarantee that it will be fixed.
+            This option is a list because you can provide a list of command line arguments to be placed after `"docker"`.
+            For exemple `host="ssh://my_user@host.com"` is equivalent
+            to `client_call=["docker", "--host=ssh://my_user@host.com"]`.
+            This will allow you to use some exotic options that are not explicitly supported by Python-on-whales.
+            Let's say you want to use estargz to run a container immediately, without waiting for the "pull"
+            to finish (yes it's possible!), you can
+            do `nerdctl = DockerClient(client_call=["nerdctl", "--snapshotter=stargz"])`
+            and then `nerdctl.run("ghcr.io/stargz-containers/python:3.7-org", ["-c", "print('hi')"]`.
+            You can also use this system to call Docker with sudo with `client_call=["sudo", "docker"]`
+            (note that it won't ask for your password, so sudo should be passwordless during the python
+            program execution).
+        client_binary: Deprecated, use `client_call`. If you used before `client_binary="podman"`, now use
+            `client_call=["podman"]`.
     """
 
     def __init__(
@@ -82,7 +101,14 @@ class DockerClient(DockerCLICaller):
         compose_project_directory: Optional[ValidPath] = None,
         compose_compatibility: Optional[bool] = None,
         client_binary: str = "docker",
+        client_call: List[str] = ["docker"],
     ):
+        if client_binary != "docker":
+            warnings.warn(
+                "The usage of client_binary is deprecated, use `client_call` instead. For "
+                "example if you used `client_binary='podman'`, now you should use `client_call=['podman']`."
+            )
+            client_call = [client_binary]
 
         if client_config is None:
             client_config = ClientConfig(
@@ -102,7 +128,7 @@ class DockerClient(DockerCLICaller):
                 compose_project_name=compose_project_name,
                 compose_project_directory=compose_project_directory,
                 compose_compatibility=compose_compatibility,
-                client_binary=client_binary,
+                client_call=client_call,
             )
         super().__init__(client_config)
 
