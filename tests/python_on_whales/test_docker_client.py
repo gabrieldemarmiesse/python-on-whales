@@ -42,7 +42,7 @@ def test_docker_client_options():
         detach=True,
         name="test_dind_container",
     ):
-        time.sleep(4)
+        time.sleep(10)
         dind_client = DockerClient(host="tcp://localhost:2380")
         assert dind_client.image.list() == []
         assert "Hello from Docker!" in dind_client.run("hello-world")
