@@ -252,8 +252,9 @@ class DockerClient(DockerCLICaller):
 
         You need botocore to run this function. Use `pip install botocore` to install it.
 
-        The registry parameter can be used to override the registry that is guessed from authorization token
-        request's response. It is especially useful if the aws account you use can access several repositories and you
+        The `registry` parameter can be used to override the registry that is guessed from the authorization token
+        request's response.
+        It is especially useful if the aws account you use can access several repositories and you
         need to explicitly define the one you want to use
         """
         import botocore.session
