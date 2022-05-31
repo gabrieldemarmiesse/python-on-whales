@@ -236,6 +236,7 @@ class DockerClient(DockerCLICaller):
         aws_access_key_id: Optional[str] = None,
         aws_secret_access_key: Optional[str] = None,
         region_name: Optional[str] = None,
+        registry: Optional[str] = None
     ):
         """Login to the aws ECR registry. Credentials are taken from the
         environment variables as defined in
@@ -263,5 +264,6 @@ class DockerClient(DockerCLICaller):
         response = client.get_authorization_token()["authorizationData"][0]
         credentials = base64.b64decode(response["authorizationToken"]).decode()
         username, password = credentials.split(":")
-        registry = response["proxyEndpoint"]
+        if registry is None:
+            registry = response["proxyEndpoint"]
         self.login(registry, username, password)
