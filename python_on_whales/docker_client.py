@@ -254,6 +254,7 @@ class DockerClient(DockerCLICaller):
 
         The `registry` parameter can be used to override the registry that is guessed from the authorization token
         request's response.
+        In other words: If the registry is `None` (the default) then it will be assumed that it's the ECR registry linked to the credentials provided.
         It is especially useful if the aws account you use can access several repositories and you
         need to explicitly define the one you want to use
         """
