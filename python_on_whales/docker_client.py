@@ -236,7 +236,7 @@ class DockerClient(DockerCLICaller):
         aws_access_key_id: Optional[str] = None,
         aws_secret_access_key: Optional[str] = None,
         region_name: Optional[str] = None,
-        registry: Optional[str] = None
+        registry: Optional[str] = None,
     ):
         """Login to the aws ECR registry. Credentials are taken from the
         environment variables as defined in
@@ -251,6 +251,10 @@ class DockerClient(DockerCLICaller):
         ```
 
         You need botocore to run this function. Use `pip install botocore` to install it.
+
+        The registry parameter can be used to override the registry that is guessed from authorization token
+        request's response. It is especially useful if the aws account you use can access several repositories and you
+        need to explicitly define the one you want to use
         """
         import botocore.session
 
