@@ -2,7 +2,11 @@ import json
 from typing import Dict, List
 
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.system.models import DockerEvent, DockerItemsSummary, SystemInfo
+from python_on_whales.components.system.models import (
+    DockerEvent,
+    DockerItemsSummary,
+    SystemInfo,
+)
 from python_on_whales.utils import format_dict_for_cli, run
 
 
