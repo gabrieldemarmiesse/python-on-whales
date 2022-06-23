@@ -1,8 +1,8 @@
 import json
-from typing import Dict
+from typing import Dict, List
 
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.system.models import DockerItemsSummary, SystemInfo
+from python_on_whales.components.system.models import DockerEvent, DockerItemsSummary, SystemInfo
 from python_on_whales.utils import format_dict_for_cli, run
 
 
@@ -57,9 +57,32 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "df", "--format", "{{json .}}"]
         return DiskFreeResult(run(full_cmd))
 
-    def events(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def events(self, filters:List[str]) -> list[DockerEvent]:
+        """Returns docker events information up to the current point in time.
+        
+        # Arguments
+            filters: See the [Docker documentation page about filtering
+                ](https://docs.docker.com/engine/reference/commandline/events/#filtering).
+        
+        # Returns
+            A list of `python_on_whales.DockerEvent` objects
+        
+        Currently only supports filters and adds a default option of `--until "0s"`. The
+        until option forces the events command to return with all the events upto the 
+        current point in time. Without this option, a call to events would listen for
+        events indefinitely.
+        [reference page for
+        system events](https://docs.docker.com/engine/api/v1.40/#operation/SystemEvents)
+        """
+        full_cmd = self.docker_cmd + ["system", "events", "--format", "{{json .}}", "--until", "0s"]
+        for filter in filters:
+            full_cmd.extend(["--filter", filter])
+        event_strings = run(full_cmd).split()
+        events = []
+        for event in event_strings:
+            parsed = DockerEvent.parse_raw(event)
+            events.append(parsed)
+        return events
 
     def info(self) -> SystemInfo:
         """Returns diverse information about the Docker client and daemon.

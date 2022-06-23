@@ -1,7 +1,8 @@
+from asyncio import events
 import json
 from datetime import date
 from pathlib import Path
-
+from time import sleep
 import pytest
 
 from python_on_whales import docker
@@ -21,6 +22,19 @@ def test_disk_free():
 def test_info():
     info = docker.system.info()
     assert "local" in info.plugins.volume
+
+def test_events():
+    name = random_name()
+    docker.run("hello-world", remove=True, name=name)
+    # Takes some time for events to register
+    sleep(1)
+    events = docker.system.events(filters=[f"container={name}"])
+    # Check that we capture all the events from container create to destroy
+    assert len(events) >= 5
+    actions = []
+    for event in events:
+        actions.append(event.action)
+    assert set(actions) == set(["create", "attach", "start", "die", "destroy"])
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("system_info"))

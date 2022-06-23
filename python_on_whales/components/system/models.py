@@ -11,14 +11,14 @@ from python_on_whales.utils import DockerCamelModel, all_fields_optional
 @all_fields_optional
 class DockerEventActor(DockerCamelModel):
     id: str = pydantic.Field(alias="ID")
-    attributes: Dict[str, Any]
+    attributes: Dict[str, Any] = pydantic.Field(alias="Attributes")
 
 
 @all_fields_optional
 class DockerEvent(DockerCamelModel):
-    type: str
-    action: str
-    actor: DockerEventActor
+    type: str = pydantic.Field(alias="Type")
+    action: str = pydantic.Field(alias="Action")
+    actor: DockerEventActor = pydantic.Field(alias="Actor")
     time: datetime
     time_nano: int = pydantic.Field(alias="timeNano")
 
