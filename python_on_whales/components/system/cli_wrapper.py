@@ -61,7 +61,7 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "df", "--format", "{{json .}}"]
         return DiskFreeResult(run(full_cmd))
 
-    def events(self, filters:List[str]) -> List[DockerEvent]:
+    def events(self, filters: List[str]) -> List[DockerEvent]:
         """Returns docker events information up to the current point in time.
 
         # Arguments
@@ -78,7 +78,14 @@ class SystemCLI(DockerCLICaller):
         [reference page for
         system events](https://docs.docker.com/engine/api/v1.40/#operation/SystemEvents)
         """
-        full_cmd = self.docker_cmd + ["system", "events", "--format", "{{json .}}", "--until", "0s"]
+        full_cmd = self.docker_cmd + [
+            "system",
+            "events",
+            "--format",
+            "{{json .}}",
+            "--until",
+            "0s",
+        ]
         for filter in filters:
             full_cmd.extend(["--filter", filter])
         event_strings = run(full_cmd).split()
