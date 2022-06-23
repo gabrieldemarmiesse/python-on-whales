@@ -57,18 +57,18 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "df", "--format", "{{json .}}"]
         return DiskFreeResult(run(full_cmd))
 
-    def events(self, filters:List[str]) -> list[DockerEvent]:
+    def events(self, filters:List[str]) -> List[DockerEvent]:
         """Returns docker events information up to the current point in time.
-        
+
         # Arguments
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/events/#filtering).
-        
+
         # Returns
             A list of `python_on_whales.DockerEvent` objects
-        
+
         Currently only supports filters and adds a default option of `--until "0s"`. The
-        until option forces the events command to return with all the events upto the 
+        until option forces the events command to return with all the events upto the
         current point in time. Without this option, a call to events would listen for
         events indefinitely.
         [reference page for

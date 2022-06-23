@@ -22,6 +22,7 @@ def test_info():
     info = docker.system.info()
     assert "local" in info.plugins.volume
 
+
 def test_events():
     name = random_name()
     docker.run("hello-world", remove=True, name=name)
