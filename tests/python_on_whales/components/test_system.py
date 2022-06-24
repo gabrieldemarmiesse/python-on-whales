@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from time import sleep
 
@@ -29,13 +29,28 @@ def test_events():
     docker.run("hello-world", remove=True, name=name)
     # Takes some time for events to register
     sleep(1)
-    events = docker.system.events(filters=[f"container={name}"])
+    timestamp_1 = datetime.now()
+    # Second run to generate more events
+    docker.run("hello-world", remove=True, name=name)
+    # Takes some time for events to register
+    sleep(1)
+    timestamp_2 = datetime.now()
+    event_iterator = docker.system.events(
+        until=timestamp_2, filters={"container": name}
+    )
+    events = list(event_iterator)
     # Check that we capture all the events from container create to destroy
-    assert len(events) >= 5
-    actions = []
+    assert len(events) == 10
+    actions = set()
     for event in events:
-        actions.append(event.action)
-    assert set(actions) == set(["create", "attach", "start", "die", "destroy"])
+        actions.add(event.action)
+    assert actions == {"create", "attach", "start", "die", "destroy"}
+    event_iterator = docker.system.events(
+        since=timestamp_1, until=timestamp_2, filters={"container": name}
+    )
+    events = list(event_iterator)
+    # Check that we only capture the events from the second docker run command
+    assert len(events) == 5
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("system_info"))

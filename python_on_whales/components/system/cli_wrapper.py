@@ -1,5 +1,6 @@
+import datetime
 import json
-from typing import Dict, List
+from typing import Dict, Iterator, Union
 
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.system.models import (
@@ -7,7 +8,12 @@ from python_on_whales.components.system.models import (
     DockerItemsSummary,
     SystemInfo,
 )
-from python_on_whales.utils import format_dict_for_cli, run
+from python_on_whales.utils import (
+    format_dict_for_cli,
+    format_time_arg,
+    run,
+    stream_stdout_and_stderr,
+)
 
 
 class DiskFreeResult:
@@ -61,20 +67,22 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "df", "--format", "{{json .}}"]
         return DiskFreeResult(run(full_cmd))
 
-    def events(self, filters: List[str]) -> List[DockerEvent]:
-        """Returns docker events information up to the current point in time.
+    def events(
+        self,
+        since: Union[None, datetime.datetime, datetime.timedelta] = None,
+        until: Union[None, datetime.datetime, datetime.timedelta] = None,
+        filters: Union[None, Dict[str, str]] = None,
+    ) -> Iterator[DockerEvent]:
+        """Return docker events information up to the current point in time.
 
         # Arguments
+            since:  Show all events created since timestamp
+            until: 	Stream events until this timestamp
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/events/#filtering).
-
         # Returns
-            A list of `python_on_whales.DockerEvent` objects
+            A iterator which will yield DockerEvent objects from stdout/stderr
 
-        Currently only supports filters and adds a default option of `--until "0s"`. The
-        until option forces the events command to return with all the events upto the
-        current point in time. Without this option, a call to events would listen for
-        events indefinitely.
         [reference page for
         system events](https://docs.docker.com/engine/api/v1.40/#operation/SystemEvents)
         """
@@ -83,17 +91,18 @@ class SystemCLI(DockerCLICaller):
             "events",
             "--format",
             "{{json .}}",
-            "--until",
-            "0s",
         ]
-        for filter in filters:
-            full_cmd.extend(["--filter", filter])
-        event_strings = run(full_cmd).split()
-        events = []
-        for event in event_strings:
-            parsed = DockerEvent.parse_raw(event)
-            events.append(parsed)
-        return events
+        full_cmd.add_simple_arg("--since", format_time_arg(since))
+        full_cmd.add_simple_arg("--until", format_time_arg(until))
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        iterator = stream_stdout_and_stderr(full_cmd)
+        event_function = (
+            lambda stream_tuple: DockerEvent.parse_raw(stream_tuple[1])
+            if stream_tuple[0] == "stdout"
+            else None
+        )
+        event_iterator = map(event_function, iterator)
+        return event_iterator
 
     def info(self) -> SystemInfo:
         """Returns diverse information about the Docker client and daemon.
