@@ -96,13 +96,9 @@ class SystemCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--until", format_time_arg(until))
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         iterator = stream_stdout_and_stderr(full_cmd)
-        event_function = (
-            lambda stream_tuple: DockerEvent.parse_raw(stream_tuple[1])
-            if stream_tuple[0] == "stdout"
-            else None
-        )
-        event_iterator = map(event_function, iterator)
-        return event_iterator
+        for stream_origin, stream_content in iterator:
+            if stream_origin == "stdout":
+                yield DockerEvent.parse_raw(stream_content)
 
     def info(self) -> SystemInfo:
         """Returns diverse information about the Docker client and daemon.
