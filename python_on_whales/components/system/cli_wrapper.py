@@ -71,9 +71,37 @@ class SystemCLI(DockerCLICaller):
         self,
         since: Union[None, datetime.datetime, datetime.timedelta] = None,
         until: Union[None, datetime.datetime, datetime.timedelta] = None,
-        filters: Union[None, Dict[str, str]] = None,
+        filters: Dict[str, str] = {},
     ) -> Iterator[DockerEvent]:
         """Return docker events information up to the current point in time.
+
+        If `until` is not specified, then the iterator returned is infinite.
+        For example
+
+        ```python
+        from python_on_whales import docker
+        from datetime import datetime, timedelta
+
+
+        for event in docker.system.events():
+            print("new event!")
+            print(event)
+            # this will never end, that's ok if you want to monitor something
+            # for a long time. You can also use 'break' in the for loop if needed.
+
+        for event in docker.system.events(until=datetime.now() - timedelta(seconds=30)):
+            print("some past event")
+            print(event)
+            # this loop will end, unlike the previous one
+
+        for event in docker.system.events(until=datetime.now() + timedelta(seconds=30)):
+            print("some past event")
+            print(event)
+            # this loop will end in 30 seconds, even if there are no events at all
+
+        events = list(docker.system.events(filters={"container": "mycontainer"}, until=datetime.now()))
+        # the list of all events concerning the container "mycontainer"
+        ```
 
         # Arguments
             since:  Show all events created since timestamp

@@ -1,4 +1,5 @@
 import json
+import time
 from datetime import date, datetime
 from pathlib import Path
 from time import sleep
@@ -35,22 +36,37 @@ def test_events():
     # Takes some time for events to register
     sleep(1)
     timestamp_2 = datetime.now()
-    event_iterator = docker.system.events(
-        until=timestamp_2, filters={"container": name}
-    )
-    events = list(event_iterator)
+    events = list(docker.system.events(until=timestamp_2, filters={"container": name}))
     # Check that we capture all the events from container create to destroy
     assert len(events) == 10
     actions = set()
     for event in events:
         actions.add(event.action)
     assert actions == {"create", "attach", "start", "die", "destroy"}
-    event_iterator = docker.system.events(
-        since=timestamp_1, until=timestamp_2, filters={"container": name}
+    events = list(
+        docker.system.events(
+            since=timestamp_1, until=timestamp_2, filters={"container": name}
+        )
     )
-    events = list(event_iterator)
     # Check that we only capture the events from the second docker run command
     assert len(events) == 5
+
+
+def test_events_no_arguments():
+    # The removal of the container will happen while we are waiting for an event
+    container_name = random_name()
+    docker.run(
+        "busybox",
+        ["sh", "-c", "sleep 3 && exit 1"],
+        name=container_name,
+        remove=True,
+        detach=True,
+    )
+    for event in docker.system.events():
+        assert isinstance(event, DockerEvent)
+        break
+    time.sleep(3)
+    assert not docker.container.exists(container_name)
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("system_info"))
