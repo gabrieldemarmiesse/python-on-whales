@@ -35,18 +35,18 @@ def test_events():
     # Takes some time for events to register
     sleep(1)
     timestamp_2 = datetime.now()
-    events = list(docker.system.events(
-        until=timestamp_2, filters={"container": name}
-    ))
+    events = list(docker.system.events(until=timestamp_2, filters={"container": name}))
     # Check that we capture all the events from container create to destroy
     assert len(events) == 10
     actions = set()
     for event in events:
         actions.add(event.action)
     assert actions == {"create", "attach", "start", "die", "destroy"}
-    events = list(docker.system.events(
-        since=timestamp_1, until=timestamp_2, filters={"container": name}
-    ))
+    events = list(
+        docker.system.events(
+            since=timestamp_1, until=timestamp_2, filters={"container": name}
+        )
+    )
     # Check that we only capture the events from the second docker run command
     assert len(events) == 5
 
