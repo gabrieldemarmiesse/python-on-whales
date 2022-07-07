@@ -42,3 +42,4 @@ nav:
       - docker.run() guide: user_guide/docker_run.md
       - Swarm generic resources: user_guide/generic_resources.md
       - Running python-on-whales inside a container: user_guide/running_python_on_whales_inside_a_container.md
+      - dealing with exceptions: user_guide/exceptions.md
