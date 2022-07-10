@@ -153,7 +153,7 @@ class DockerClient(DockerCLICaller):
 
         # aliases
         self.attach = None
-        self.build = self.buildx.build
+        self.build = self.image.build
         self.commit = self.container.commit
         self.copy = self.container.copy
         self.create = self.container.create
