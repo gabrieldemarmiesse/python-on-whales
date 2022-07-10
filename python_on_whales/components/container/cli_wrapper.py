@@ -1535,11 +1535,6 @@ class ContainerCLI(DockerCLICaller):
                     "It's not possible to stream and detach a container at "
                     "the same time."
                 )
-            if interactive:
-                raise ValueError(
-                    "It's not possible to interact and detach a container at "
-                    "the same time."
-                )
         if stream and interactive:
             if interactive:
                 raise ValueError(
