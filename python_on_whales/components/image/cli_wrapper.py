@@ -224,7 +224,7 @@ class ImageCLI(DockerCLICaller):
         `DOCKER_BUILDKIT` is set to `1` or if you had run previously `docker buildx install` from bash
         or `docker.buildx.install()` from Python.
 
-        Some ressources on why moving to buildx/buildkit is necessary:
+        Some resources on why moving to buildx/buildkit is necessary:
         * [Proposal: make BuildKit the default builder on Linux](https://github.com/moby/moby/issues/40379)
         * [Deprecated Engine Features: Legacy builder for Linux images](https://github.com/docker/cli/blob/master/docs/deprecated.md#legacy-builder-for-linux-images)
 
