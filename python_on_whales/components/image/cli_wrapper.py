@@ -202,6 +202,80 @@ class ImageCLI(DockerCLICaller):
             client_config
         ).build
 
+    def legacy_build(
+        self,
+        context_path: ValidPath,
+        add_hosts: Dict[str, str] = {},
+        build_args: Dict[str, str] = {},
+        cache: bool = True,
+        file: Optional[ValidPath] = None,
+        labels: Dict[str, str] = {},
+        network: Optional[str] = None,
+        pull: bool = False,
+        tags: Union[str, List[str]] = [],
+        target: Optional[str] = None,
+    ) -> python_on_whales.components.image.cli_wrapper.Image:
+        """Build a Docker image with the old Docker builder (meaning not using buildx/buildkit)
+
+        As the name implies this is a legacy building method. Users are strongly encouraged to use
+        `docker.build()` instead. The legacy builder will not be available in docker v22.06 and above.
+
+        This function also won't run the legacy builder if the environment variable
+        `DOCKER_BUILDKIT` is set to `1` or if you had run previously `docker buildx install` from bash
+        or `docker.buildx.install()` from Python.
+
+        Some resources on why moving to buildx/buildkit is necessary:
+
+        * [Proposal: make BuildKit the default builder on Linux](https://github.com/moby/moby/issues/40379)
+        * [Deprecated Engine Features: Legacy builder for Linux images](https://github.com/docker/cli/blob/master/docs/deprecated.md#legacy-builder-for-linux-images)
+
+        A `python_on_whales.Image` is returned, even when using multiple tags.
+        That is because it will produce a single image with multiple tags.
+
+        # Arguments
+            context_path: The path of the build context. Defaults to the current working directory
+            add_hosts: Hosts to add. `add_hosts={"my_host1": "192.168.32.35"}`
+            build_args: The build arguments.
+                ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
+            cache: Whether or not to use the cache, defaults to True
+            file: The path of the Dockerfile, defaults to `context_path/Dockerfile`
+            labels: Dict of labels to add to the image.
+                `labels={"very-secure": "1", "needs-gpu": "0"}` for example.
+            network: which network to use when building the Docker image
+            pull: Always attempt to pull a newer version of the image
+            tags: Tag or tags to put on the resulting image.
+            target: Set the target build stage to build.
+
+        # Returns
+            A `python_on_whales.Image`
+        """
+        # to make it easier to write and read tests, the tests of this function
+        # are also grouped with the tests of "docker.build()".
+        tags = to_list(tags)
+        full_cmd = self.docker_cmd + ["build"]
+
+        full_cmd.add_args_list(
+            "--add-host", format_dict_for_cli(add_hosts, separator=":")
+        )
+        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_flag("--pull", pull)
+        full_cmd.add_simple_arg("--file", file)
+        full_cmd.add_simple_arg("--target", target)
+        full_cmd.add_simple_arg("--network", network)
+        full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_args_list("--tag", tags)
+
+        docker_image = python_on_whales.components.image.cli_wrapper.ImageCLI(
+            self.client_config
+        )
+        full_cmd.append(context_path)
+        stdout_lines = run(full_cmd).splitlines()
+        for line in stdout_lines:
+            if "Successfully built" in line:
+                image_id = line.split(" ")[-1]
+        return docker_image.inspect(image_id)
+
     def history(self):
         """Not yet implemented"""
         raise NotImplementedError

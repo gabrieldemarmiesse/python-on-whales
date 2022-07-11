@@ -52,6 +52,12 @@ def test_buildx_build_load_docker_driver(tmp_path):
     assert my_image.size > 1000
 
 
+def test_legacy_build_simple_case(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    my_image = docker.legacy_build(tmp_path)
+    assert my_image.size > 1000
+
+
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_push_registry(tmp_path, docker_registry):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
@@ -161,6 +167,12 @@ def test_buildx_build_load_container_driver_tag(tmp_path):
         assert my_image.repo_tags == ["my_tag:1"]
 
 
+def test_legacy_build_tag(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    with docker.legacy_build(tmp_path, tags="my_tag:1") as my_image:
+        assert my_image.repo_tags == ["my_tag:1"]
+
+
 @pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_load_container_driver_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
@@ -258,10 +270,23 @@ def test_buildx_build_single_tag(tmp_path):
     assert "hello1:latest" in image.repo_tags
 
 
+def test_legacy_build_single_tag(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    image = docker.legacy_build(tmp_path, tags="hello1")
+    assert "hello1:latest" in image.repo_tags
+
+
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_multiple_tags(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
+    assert "hello1:latest" in image.repo_tags
+    assert "hello2:latest" in image.repo_tags
+
+
+def test_legacy_build_multiple_tags(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    image = docker.legacy_build(tmp_path, tags=["hello1", "hello2"])
     assert "hello1:latest" in image.repo_tags
     assert "hello2:latest" in image.repo_tags
 
@@ -302,10 +327,20 @@ def test_buildx_build_network(tmp_path):
     docker.buildx.build(tmp_path, network="host")
 
 
+def test_legacy_build_network(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.legacy_build(tmp_path, network="host")
+
+
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_file(tmp_path):
     (tmp_path / "Dockerfile111").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, file=(tmp_path / "Dockerfile111"))
+
+
+def test_legacy_build_file(tmp_path):
+    (tmp_path / "Dockerfile111").write_text(dockerfile_content1)
+    docker.legacy_build(tmp_path, file=(tmp_path / "Dockerfile111"))
 
 
 def test_buildx_create_remove():
