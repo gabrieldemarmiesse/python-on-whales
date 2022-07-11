@@ -623,3 +623,8 @@ def test_prune():
     # container pruned
     docker.container.prune()
     assert container not in docker.container.list(all=True)
+
+
+def test_run_detached_interactive():
+    with docker.run("ubuntu", interactive=True, detach=True, tty=False) as c:
+        c.execute(["true"])
