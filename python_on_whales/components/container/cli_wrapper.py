@@ -1444,12 +1444,6 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--init", init)
 
-        # TODO: activate interactive and tty
-        if interactive and not tty:
-            raise NotImplementedError(
-                "Currently, docker.container.run(interactive=True) must have"
-                "tty=True. interactive=True and tty=False is not yet implemented."
-            )
         full_cmd.add_flag("--interactive", interactive)
         full_cmd.add_flag("--tty", tty)
 
@@ -1533,12 +1527,6 @@ class ContainerCLI(DockerCLICaller):
             if stream:
                 raise ValueError(
                     "It's not possible to stream and detach a container at "
-                    "the same time."
-                )
-        if stream and interactive:
-            if interactive:
-                raise ValueError(
-                    "It's not possible to interact and stream a container at "
                     "the same time."
                 )
         if detach:
