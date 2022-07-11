@@ -224,21 +224,21 @@ class ImageCLI(DockerCLICaller):
         `DOCKER_BUILDKIT` is set to `1` or if you had run previously `docker buildx install` from bash
         or `docker.buildx.install()` from Python.
 
-        Some ressources on why moving to buildx/buildkit is necessary:
+        Some resources on why moving to buildx/buildkit is necessary:
+
         * [Proposal: make BuildKit the default builder on Linux](https://github.com/moby/moby/issues/40379)
         * [Deprecated Engine Features: Legacy builder for Linux images](https://github.com/docker/cli/blob/master/docs/deprecated.md#legacy-builder-for-linux-images)
-
 
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
 
         # Arguments
-            context_path: The path of the build context.
+            context_path: The path of the build context. Defaults to the current working directory
             add_hosts: Hosts to add. `add_hosts={"my_host1": "192.168.32.35"}`
             build_args: The build arguments.
                 ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
             cache: Whether or not to use the cache, defaults to True
-            file: The path of the Dockerfile
+            file: The path of the Dockerfile, defaults to `context_path/Dockerfile`
             labels: Dict of labels to add to the image.
                 `labels={"very-secure": "1", "needs-gpu": "0"}` for example.
             network: which network to use when building the Docker image
