@@ -252,7 +252,7 @@ class ImageCLI(DockerCLICaller):
         # to make it easier to write and read tests, the tests of this function
         # are also grouped with the tests of "docker.build()".
         tags = to_list(tags)
-        full_cmd = self.docker_cmd + ["build"]
+        full_cmd = self.docker_cmd + ["build", "--quiet"]
 
         full_cmd.add_args_list(
             "--add-host", format_dict_for_cli(add_hosts, separator=":")
@@ -270,10 +270,7 @@ class ImageCLI(DockerCLICaller):
             self.client_config
         )
         full_cmd.append(context_path)
-        stdout_lines = run(full_cmd).splitlines()
-        for line in stdout_lines:
-            if "Successfully built" in line:
-                image_id = line.split(" ")[-1]
+        image_id = run(full_cmd).strip()
         return docker_image.inspect(image_id)
 
     def history(self):
