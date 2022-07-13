@@ -542,7 +542,7 @@ class ImageCLI(DockerCLICaller):
 
         """
 
-        full_cmd = self.docker_cmd + ["image", "remove"]
+        full_cmd = self.docker_cmd + ["image", "rm"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--no-prune", not prune)
         for image in to_list(x):
