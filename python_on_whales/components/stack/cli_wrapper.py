@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.service.cli_wrapper
 import python_on_whales.components.task.cli_wrapper
@@ -17,8 +17,11 @@ class Stack:
     def __str__(self):
         return self.name
 
-    def __eq__(self, other: Stack):
-        return self.client_config == other.client_config and self.name == other.name
+    def __eq__(self, other: Any):
+        if isinstance(other, Stack):
+            return self.client_config == other.client_config and self.name == other.name
+        else:
+            return False
 
     def __repr__(self):
         return f"python_on_whales.Stack(name='{self.name}')"
