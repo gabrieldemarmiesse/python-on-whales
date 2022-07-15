@@ -132,9 +132,11 @@ class StackCLI(DockerCLICaller):
         """Removes one or more stacks.
 
         # Arguments
-            x: One or more stacks
+            x: One or more stacks, empty list means nothing will be done.
 
         """
+        if x == []:
+            return
         full_cmd = self.docker_cmd + ["stack", "remove"] + to_list(x)
         run(full_cmd)
 
