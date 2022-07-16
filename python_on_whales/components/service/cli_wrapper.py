@@ -389,9 +389,6 @@ class ServiceCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchService` if one of the services
             doesn't exist.
         """
-        if x == []:
-            return []
-
         full_cmd = (
             self.docker_cmd + ["service", "ps", "--quiet", "--no-trunc"] + to_list(x)
         )
@@ -411,9 +408,12 @@ class ServiceCLI(DockerCLICaller):
 
         # Raises
             `python_on_whales.exceptions.NoSuchService` if one of the services
-            doesn't exists.
+            doesn't exist.
         """
         full_cmd = self.docker_cmd + ["service", "remove"]
+
+        if services == []:
+            return
 
         for service in to_list(services):
             full_cmd.append(service)

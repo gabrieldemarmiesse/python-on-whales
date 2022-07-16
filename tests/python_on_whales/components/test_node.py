@@ -37,3 +37,10 @@ def test_tasks():
     assert len(tasks) > 0
     assert tasks[0].desired_state == "running"
     docker.service.remove(service)
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_list_tasks_node():
+    with docker.service.create("busybox", ["sleep", "infinity"]) as my_service:
+        assert docker.node.ps([]) == []
+        assert set(docker.node.ps()) == set(docker.service.ps(my_service))

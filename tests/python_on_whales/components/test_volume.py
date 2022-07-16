@@ -203,7 +203,7 @@ def test_prune():
     volume = docker.volume.create("test-volume")
     assert volume in docker.volume.list()
 
-    # volume not pruned because it is does not have label "dne"
+    # volume not pruned because it does not have label "dne"
     docker.volume.prune(filters={"label": "dne"})
     assert volume in docker.volume.list()
 
@@ -212,3 +212,11 @@ def test_prune():
     # volume pruned
     docker.volume.prune()
     assert volume not in docker.volume.list()
+
+
+def test_volume_remove_empty_list():
+    with docker.volume.create() as my_volume:
+        assert my_volume in docker.volume.list()
+        all_volumes = set(docker.volume.list())
+        docker.volume.remove([])
+        assert all_volumes == set(docker.volume.list())
