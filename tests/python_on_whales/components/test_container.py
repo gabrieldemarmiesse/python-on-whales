@@ -500,7 +500,10 @@ def test_stop_nothing():
 
 
 def test_kill_nothing():
-    docker.container.stop([])
+    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True):
+        set_of_containers = set(docker.ps())
+        docker.container.kill([])
+        assert set_of_containers == set(docker.ps())
 
 
 def test_exec_env():

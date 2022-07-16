@@ -176,6 +176,13 @@ def test_prune():
         docker.image.inspect("busybox")
 
 
+def test_remove_nothing():
+    with docker.pull("hello-world"):
+        all_images = set(docker.image.list())
+        docker.image.remove([])
+        assert all_images == set(docker.image.list())
+
+
 @pytest.mark.parametrize(
     "docker_function", [docker.image.inspect, docker.image.remove, docker.push]
 )
