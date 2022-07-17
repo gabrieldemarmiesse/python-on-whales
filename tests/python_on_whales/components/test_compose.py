@@ -31,6 +31,47 @@ def mock_KeyboardInterrupt(signum, frame):
     raise KeyboardInterrupt("Time is up")
 
 
+def test_build_empty_list_of_services():
+    previous_images = set(docker.image.list())
+    docker.compose.build([])
+    assert previous_images == set(docker.image.list())
+
+
+def test_create_empty_list_of_services():
+    previous_containers = set(docker.ps(all=True))
+    docker.compose.create([])
+    assert previous_containers == set(docker.ps(all=True))
+
+
+def test_kill_empty_list_of_services():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    time.sleep(1)
+    all_running_containers = set(docker.ps())
+    docker.compose.kill([])
+    assert all_running_containers == set(docker.ps())
+    docker.compose.down(timeout=1)
+
+
+def test_pause_empty_list_of_services():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    time.sleep(1)
+    number_of_paused_containers = len([x for x in docker.ps() if x.state.paused])
+    docker.compose.pause([])
+    assert number_of_paused_containers == len(
+        [x for x in docker.ps() if x.state.paused]
+    )
+    docker.compose.down(timeout=1)
+
+
+def test_remove_empty_list_of_services():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    time.sleep(1)
+    number_of_containers = len(docker.ps())
+    docker.compose.rm([], stop=True)
+    assert number_of_containers == len(docker.ps())
+    docker.compose.down(timeout=1)
+
+
 def test_compose_project_name():
     docker = DockerClient(
         compose_files=[
