@@ -367,8 +367,8 @@ Driver: docker-container
 Nodes:
 Name:      blissful_swartz0
 Endpoint:  unix:///var/run/docker.sock
-Status:    inactive
-Platforms:  linux/amd64, linux/arm64
+Status:    running
+Platforms: linux/amd64, linux/arm64
 """
 
 
@@ -376,13 +376,15 @@ def test_builder_inspect_result_from_string():
     a = BuilderInspectResult.from_str(some_builder_info)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
+    assert a.status == "inactive"
     assert a.platforms == []
 
 
-def test_builder_inspect_result__platforms_from_string():
+def test_builder_inspect_result_platforms_from_string():
     a = BuilderInspectResult.from_str(some_builder_info_with_platforms)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
+    assert a.status == "running"
     assert a.platforms == ["linux/amd64", "linux/arm64"]
 
 

@@ -61,6 +61,10 @@ class Builder(ReloadableObject):
         return self._get_inspect_result().driver
 
     @property
+    def status(self) -> str:
+        return self._get_inspect_result().status
+
+    @property
     def platforms(self) -> List[str]:
         return self._get_inspect_result().platforms
 

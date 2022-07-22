@@ -7,6 +7,7 @@ from typing import List
 class BuilderInspectResult:
     name: str
     driver: str
+    status: str
     platforms: List[str] = field(default_factory=lambda: [])
 
     @classmethod
@@ -19,6 +20,8 @@ class BuilderInspectResult:
                 result_dict["name"] = line.split(":")[1].strip()
             if line.startswith("Driver:"):
                 result_dict["driver"] = line.split(":")[1].strip()
+            if line.startswith("Status:"):
+                result_dict["status"] = line.split(":")[1].strip()
             if line.startswith("Platforms:"):
                 platforms = line.split(":")[1].strip()
                 if platforms:
