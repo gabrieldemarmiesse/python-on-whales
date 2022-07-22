@@ -60,6 +60,10 @@ class Builder(ReloadableObject):
     def driver(self) -> str:
         return self._get_inspect_result().driver
 
+    @property
+    def platforms(self) -> List[str]:
+        return self._get_inspect_result().platforms
+
     def __repr__(self):
         return f"python_on_whales.Builder(name='{self.name}', driver='{self.driver}')"
 
@@ -444,11 +448,9 @@ class BuildxCLI(DockerCLICaller):
 
     def inspect(self, x: Optional[str] = None) -> Builder:
         """Returns a builder instance from the name.
-
         # Arguments
             x: If `None` (the default), returns the current builder. If a string is provided,
                 the builder that has this name is returned.
-
         # Returns
             A `python_on_whales.Builder` object.
         """

@@ -360,11 +360,30 @@ Status:    inactive
 Platforms:
 """
 
+some_builder_info_with_platforms = """
+Name:   blissful_swartz
+Driver: docker-container
+
+Nodes:
+Name:      blissful_swartz0
+Endpoint:  unix:///var/run/docker.sock
+Status:    inactive
+Platforms:  linux/amd64, linux/arm64
+"""
+
 
 def test_builder_inspect_result_from_string():
     a = BuilderInspectResult.from_str(some_builder_info)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
+    assert a.platforms == []
+
+
+def test_builder_inspect_result__platforms_from_string():
+    a = BuilderInspectResult.from_str(some_builder_info_with_platforms)
+    assert a.name == "blissful_swartz"
+    assert a.driver == "docker-container"
+    assert a.platforms == ["linux/amd64", "linux/arm64"]
 
 
 bake_test_dir = PROJECT_ROOT / "tests/python_on_whales/components/bake_tests"
