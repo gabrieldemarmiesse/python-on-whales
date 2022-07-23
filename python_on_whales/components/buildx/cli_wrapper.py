@@ -452,9 +452,11 @@ class BuildxCLI(DockerCLICaller):
 
     def inspect(self, x: Optional[str] = None) -> Builder:
         """Returns a builder instance from the name.
+
         # Arguments
             x: If `None` (the default), returns the current builder. If a string is provided,
                 the builder that has this name is returned.
+
         # Returns
             A `python_on_whales.Builder` object.
         """
