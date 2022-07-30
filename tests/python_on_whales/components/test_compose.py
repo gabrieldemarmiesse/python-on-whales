@@ -72,6 +72,16 @@ def test_remove_empty_list_of_services():
     docker.compose.down(timeout=1)
 
 
+def test_pull_empty_list_of_services():
+    len_list_of_images = len(docker.image.list())
+    docker.compose.pull([])
+    assert len_list_of_images == len(docker.image.list())
+
+
+def test_push_empty_list_of_services():
+    docker.compose.push([])
+
+
 def test_compose_project_name():
     docker = DockerClient(
         compose_files=[
@@ -237,6 +247,25 @@ def test_docker_compose_restart():
 
     for container in docker.compose.ps():
         assert (datetime.now(pytz.utc) - container.state.started_at) < timedelta(
+            seconds=2
+        )
+
+    docker.compose.down()
+
+
+def test_docker_compose_restart_empty_list_of_services():
+    docker.compose.up(["my_service"], detach=True)
+    time.sleep(2)
+
+    for container in docker.compose.ps():
+        assert (datetime.now(pytz.utc) - container.state.started_at) > timedelta(
+            seconds=2
+        )
+
+    docker.compose.restart([], timeout=1)
+
+    for container in docker.compose.ps():
+        assert (datetime.now(pytz.utc) - container.state.started_at) > timedelta(
             seconds=2
         )
 
