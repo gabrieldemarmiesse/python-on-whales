@@ -53,4 +53,6 @@ def test_network_connect_disconnect():
 
 
 def test_remove_nothing():
+    all_neworks = set(docker.network.list())
     docker.network.remove([])
+    assert all_neworks == set(docker.network.list())

@@ -211,11 +211,13 @@ class VolumeCLI(DockerCLICaller):
         """Removes one or more volumes
 
         # Arguments
-            x: A volume or a list of volumes.
+            x: A volume or a list of volumes. An empty list as argument means
+                nothing is done.
         """
 
         full_cmd = self.docker_cmd + ["volume", "remove"]
-
+        if x == []:
+            return
         for v in to_list(x):
             full_cmd.append(str(v))
 

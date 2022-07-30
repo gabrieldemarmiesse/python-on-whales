@@ -93,5 +93,7 @@ class SecretCLI(DockerCLICaller):
             x: One or more secrets.
                 Name, ids or `python_on_whales.Secret` objects are valid inputs.
         """
+        if x == []:
+            return
         full_cmd = self.docker_cmd + ["secret", "remove"] + to_list(x)
         run(full_cmd)

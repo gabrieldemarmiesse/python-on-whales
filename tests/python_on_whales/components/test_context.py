@@ -26,3 +26,9 @@ def test_list_contexts():
 
 def test_use_context():
     docker.context.use("default")
+
+
+def test_remove_empty_context_list():
+    all_contexts = set(docker.context.list())
+    docker.context.remove([])
+    assert all_contexts == set(docker.context.list())

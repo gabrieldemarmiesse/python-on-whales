@@ -239,6 +239,8 @@ class PluginCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["plugin", "remove"]
         full_cmd.add_flag("--force", force)
+        if x == []:
+            return
         full_cmd += to_list(x)
         run(full_cmd)
 
