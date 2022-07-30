@@ -268,12 +268,12 @@ Take those numbers with a grain of salt. The functions don't all need the same a
 
 Support for Docker-compatible clients like [Podman](https://podman.io/) and [Nerdctl](https://github.com/containerd/nerdctl) was introduced in Python-on-whales version 0.44.0.
 
-You can use an arbitrary binary to execute Docker commands by using the argument `client_binary` of `python_on_whales.DockerCLient`.
+You can use an arbitrary binary to execute Docker commands by using the argument `client_call` of `python_on_whales.DockerCLient`.
 Here is an example:
 ```python
 >>> from python_on_whales import DockerClient
 
->>> nerdctl = DockerClient(client_binary="nerdctl")
+>>> nerdctl = DockerClient(client_call=["nerdctl"])
 
 >>> nerdctl.pull("python:3.9")
 docker.io/library/python:3.9:                                                     resolved       |++++++++++++++++++++++++++++++++++++++|
@@ -292,6 +292,19 @@ layer-sha256:32a180f5cf85702e7680719c40c39c07972b1176355df5a621de9eb87ad07ce2:  
 elapsed: 35.9s                                                                    total:  333.5  (9.3 MiB/s)
 
 python_on_whales.Image(id='sha256:f033692e2c5ab', tags=['python:3.9'])
+```
+
+You can do something similar with podman:
+
+```python
+from python_on_whales import DockerClient
+
+podman = DockerClient(client_call=["podman"])
+
+podman.pull("hello-world")
+podman.run("hello-world")
+print(podman.ps())
+...
 ```
 
 
