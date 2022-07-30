@@ -29,6 +29,12 @@ def test_services_inspect():
     assert "name='some_stack'" in repr(docker.stack.list())
 
 
+@pytest.mark.usefixtures("with_test_stack")
+def test_remove_empty_stack_list():
+    docker.stack.remove([])
+    assert docker.stack.list() != []
+
+
 def test_stack_ps_and_services(with_test_stack):
 
     all_services = docker.service.list()

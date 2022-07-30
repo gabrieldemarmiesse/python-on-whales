@@ -119,11 +119,13 @@ class ContextCLI(DockerCLICaller):
         """Removes one or more contexts
 
         # Arguments
-            x: One or more contexts
+            x: One or more contexts, empty list means no-op.
             force: Force the removal of this context
         """
         full_cmd = self.docker_cmd + ["context", "remove"]
         full_cmd.add_flag("--force", force)
+        if x == []:
+            return
         full_cmd += to_list(x)
         run(full_cmd)
 

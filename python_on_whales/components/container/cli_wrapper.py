@@ -897,7 +897,7 @@ class ContainerCLI(DockerCLICaller):
 
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "kill"]
@@ -1014,7 +1014,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["pause"]
@@ -1551,7 +1551,7 @@ class ContainerCLI(DockerCLICaller):
             containers: One or a list of containers.
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         if attach and len(containers) > 1:
@@ -1631,7 +1631,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "stop"]
@@ -1666,7 +1666,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         x = to_list(x)
-        if not x:
+        if x == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "unpause"]
@@ -1721,7 +1721,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         x = to_list(x)
-        if not x:
+        if x == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "update"]

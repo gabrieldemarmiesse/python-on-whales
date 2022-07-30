@@ -502,7 +502,7 @@ class ImageCLI(DockerCLICaller):
         # this is just to raise a correct exception if the images don't exist
         self.inspect(x)
 
-        if len(x) == 0:
+        if x == []:
             return
         elif len(x) == 1:
             self._push_single_tag(x[0], quiet=quiet)
@@ -545,6 +545,8 @@ class ImageCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["image", "rm"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--no-prune", not prune)
+        if x == []:
+            return
         for image in to_list(x):
             full_cmd.append(image)
 
