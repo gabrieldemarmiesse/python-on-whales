@@ -60,6 +60,14 @@ class Builder(ReloadableObject):
     def driver(self) -> str:
         return self._get_inspect_result().driver
 
+    @property
+    def status(self) -> str:
+        return self._get_inspect_result().status
+
+    @property
+    def platforms(self) -> List[str]:
+        return self._get_inspect_result().platforms
+
     def __repr__(self):
         return f"python_on_whales.Builder(name='{self.name}', driver='{self.driver}')"
 
