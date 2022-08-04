@@ -419,7 +419,14 @@ class ImageCLI(DockerCLICaller):
         # def list(self,filters: Dict[str, str] = {}) -> List[Image]:
         # so to avoid breakages when people used positional arguments, we can check the types and send a warning
         if isinstance(repository_or_tag, dict):
-            warnings.warn("stuufff", DeprecationWarning)
+            # after a while, we can convert that to an error. No hurry though.
+            warnings.warn(
+                f"You are calling docker.image.list({repository_or_tag}) with the filter as the first argument."
+                f"Since Python-on-whales v0.51.0, the first argument has be changed to `repository_or_tag`."
+                f"To fix this warning, please add the filters keyword argument, "
+                f"like so: docker.image.list(filters={repository_or_tag}) ",
+                DeprecationWarning,
+            )
             filters = repository_or_tag
             repository_or_tag = None
 
