@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
@@ -399,7 +400,12 @@ class ImageCLI(DockerCLICaller):
             raise DockerException(full_cmd, exit_code)
         return stdout.decode().splitlines()
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Image]:
+    def list(
+        self,
+        repository_or_tag: Optional[str] = None,
+        filters: Dict[str, str] = {},
+        all: bool = False,
+    ) -> List[Image]:
         """Returns the list of Docker images present on the machine.
 
         Alias: `docker.images()`
@@ -409,6 +415,14 @@ class ImageCLI(DockerCLICaller):
         # Returns
             A `List[python_on_whales.Image]` object.
         """
+        # previously the signature was
+        # def list(self,filters: Dict[str, str] = {}) -> List[Image]:
+        # so to avoid breakages when people used positional arguments, we can check the types and send a warning
+        if isinstance(repository_or_tag, dict):
+            warnings.warn("stuufff", DeprecationWarning)
+            filters = repository_or_tag
+            repository_or_tag = None
+
         full_cmd = self.docker_cmd + [
             "image",
             "list",
@@ -416,6 +430,10 @@ class ImageCLI(DockerCLICaller):
             "--no-trunc",
         ]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_flag("--all", all)
+
+        if repository_or_tag is not None:
+            full_cmd.append(repository_or_tag)
 
         ids = run(full_cmd).splitlines()
         # the list of tags is bigger than the number of images. We uniquify
