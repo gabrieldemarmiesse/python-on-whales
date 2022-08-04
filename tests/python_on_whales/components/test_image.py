@@ -47,8 +47,35 @@ def test_save_iterator_bytes():
 
 
 def test_filter_when_listing():
-    docker.pull("hello-world")
+    docker.pull(["hello-world", "busybox"])
     images_listed = docker.image.list(filters=dict(reference="hello-world"))
+    tags = set()
+    for image in images_listed:
+        for tag in image.repo_tags:
+            tags.add(tag)
+    assert tags == {"hello-world:latest"}
+
+
+def test_filter_when_listing_old_signature():
+    """Check backward compatibility"""
+    docker.pull(["hello-world", "busybox"])
+    with pytest.warns(DeprecationWarning) as warnings_emmitted:
+        images_listed = docker.image.list({"reference": "hello-world"})
+
+    warning_message = str(warnings_emmitted.list[0].message)
+    assert "docker.image.list({'reference': 'hello-world'}" in warning_message
+    assert "docker.image.list(filters={'reference': 'hello-world'}" in warning_message
+    tags = set()
+    for image in images_listed:
+        for tag in image.repo_tags:
+            tags.add(tag)
+    assert tags == {"hello-world:latest"}
+
+
+def test_use_first_argument_to_filter():
+    """Check backward compatibility"""
+    docker.pull(["hello-world", "busybox"])
+    images_listed = docker.image.list("hello-world")
     tags = set()
     for image in images_listed:
         for tag in image.repo_tags:
