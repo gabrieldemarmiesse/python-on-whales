@@ -294,6 +294,7 @@ def test_docker_compose_pull():
         docker.image.remove("alpine")
     except NoSuchImage:
         pass
+    docker.compose.pull("busybox")
     docker.compose.pull(["busybox", "alpine"])
     docker.image.inspect(["busybox", "alpine"])
 
@@ -329,7 +330,7 @@ def test_docker_compose_up_abort_on_container_exit():
         ],
         compose_compatibility=True,
     )
-    docker.compose.up(["alpine"], abort_on_container_exit=True)
+    docker.compose.up("alpine", abort_on_container_exit=True)
     for container in docker.compose.ps():
         assert not container.state.running
     docker.compose.down()

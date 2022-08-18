@@ -308,7 +308,7 @@ class ComposeCLI(DockerCLICaller):
 
     def pull(
         self,
-        services: Optional[List[str]] = None,
+        services: Union[List[str], str, None] = None,
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
     ):
@@ -329,6 +329,7 @@ class ComposeCLI(DockerCLICaller):
         if services == []:
             return
         elif services is not None:
+            services = to_list(services)
             full_cmd += services
         run(full_cmd)
 
@@ -566,7 +567,7 @@ class ComposeCLI(DockerCLICaller):
 
     def up(
         self,
-        services: Optional[List[str]] = None,
+        services: Union[List[str], str, None] = None,
         build: bool = False,
         detach: bool = False,
         abort_on_container_exit: bool = False,
@@ -577,6 +578,7 @@ class ComposeCLI(DockerCLICaller):
         color: bool = True,
         log_prefix: bool = True,
         start: bool = True,
+        quiet: bool = False,
     ):
         """Start the containers.
 
@@ -605,6 +607,8 @@ class ComposeCLI(DockerCLICaller):
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
             start: Start the service after creating them.
+            quiet: By default, some progress bars and logs are sent to stderr and stdout.
+                Set `quiet=True` to avoid having any output.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -627,8 +631,10 @@ class ComposeCLI(DockerCLICaller):
         if services == []:
             return
         elif services is not None:
+            services = to_list(services)
             full_cmd += services
-        run(full_cmd, capture_stdout=False)
+        # important information is written to both stdout AND stderr.
+        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     def version(self) -> str:
         """Returns the version of docker compose as a `str`."""
