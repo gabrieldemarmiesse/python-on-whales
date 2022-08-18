@@ -298,6 +298,9 @@ def test_docker_compose_pull():
     docker.compose.pull(["busybox", "alpine"])
     docker.image.inspect(["busybox", "alpine"])
 
+    # pull with quiet should work too
+    docker.compose.pull(["busybox", "alpine"], quiet=True)
+
 
 def test_docker_compose_pull_ignore_pull_failures():
     docker = DockerClient(

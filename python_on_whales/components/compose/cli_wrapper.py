@@ -311,6 +311,7 @@ class ComposeCLI(DockerCLICaller):
         services: Union[List[str], str, None] = None,
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
+        quiet: bool = False,
     ):
         """Pull service images
 
@@ -321,17 +322,20 @@ class ComposeCLI(DockerCLICaller):
                 If an empty list is provided, then the function call is a no-op.
             ignore_pull_failures: Pull what it can and ignores images with pull failures
             include_deps: Also pull services declared as dependencies
+            quiet: By default, the progress bars are printed in stdout and stderr (both).
+                To disable all output, use `quiet=True`
 
         """
         full_cmd = self.docker_compose_cmd + ["pull"]
         full_cmd.add_flag("--ignore-pull-failures", ignore_pull_failures)
         full_cmd.add_flag("--include-deps", include_deps)
+        full_cmd.add_flag("--quiet", quiet)
         if services == []:
             return
         elif services is not None:
             services = to_list(services)
             full_cmd += services
-        run(full_cmd)
+        run(full_cmd, capture_stdout=False, capture_stderr=False)
 
     def push(self, services: Optional[List[str]] = None):
         """Push service images
