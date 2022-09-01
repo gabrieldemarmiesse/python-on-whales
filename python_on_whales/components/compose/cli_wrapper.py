@@ -127,6 +127,7 @@ class ComposeCLI(DockerCLICaller):
         remove_images: Optional[str] = None,
         timeout: Optional[int] = None,
         volumes: bool = False,
+        quiet: bool = False,
     ):
         """Stops and removes the containers
 
@@ -140,6 +141,8 @@ class ComposeCLI(DockerCLICaller):
             volumes: Remove named volumes declared in the
                 volumes section of the Compose file and anonymous
                 volumes attached to containers.
+            quiet: If `False`, send to stderr and stdout the progress spinners with
+                the messages. If `True`, do not display anything.
         """
         full_cmd = self.docker_compose_cmd + ["down"]
         full_cmd.add_flag("--remove-orphans", remove_orphans)
@@ -147,7 +150,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
 
-        run(full_cmd)
+        run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
 
     def events(self):
         """Not yet implemented"""
