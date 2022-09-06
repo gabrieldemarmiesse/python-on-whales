@@ -661,3 +661,64 @@ def test_compose_multiple_profiles():
     assert "components_second_profile_test_service_1" in container_names
 
     docker.compose.down(timeout=1)
+
+
+def test_compose_port():
+    d = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_non_existent_image.yml"
+        ]
+    )
+    service = "busybox"
+    d.compose.up(services=[service], detach=True)
+
+    expected_tcp_host, expected_tcp_port, expected_udp_host, expected_udp_port = (
+        None,
+        None,
+        None,
+        None,
+    )
+    for container in d.compose.ps():
+        if service in container.name:
+            tcp_cfg = container.network_settings.ports["3000/tcp"][0]
+            expected_tcp_host, expected_tcp_port = tcp_cfg["HostIp"], int(
+                tcp_cfg["HostPort"]
+            )
+            udp_cfg = container.network_settings.ports["4000/udp"][0]
+            expected_udp_host, expected_udp_port = udp_cfg["HostIp"], int(
+                udp_cfg["HostPort"]
+            )
+            break
+
+    tcp_host, tcp_port = d.compose.port(service, "3000")
+    assert expected_tcp_host == tcp_host
+    assert expected_tcp_port == tcp_port
+
+    udp_host, udp_port = d.compose.port(service, "4000", protocol="udp")
+    assert expected_udp_host == udp_host
+    assert expected_udp_port == udp_port
+
+    invalid_protocol_host, invalid_protocol_type = d.compose.port(
+        service, "4000", protocol="tcp"
+    )
+    assert invalid_protocol_host is None
+    assert invalid_protocol_type is None
+
+    unknown_host, unknown_port = d.compose.port(service, "1111")
+    assert unknown_host is None
+    assert unknown_port is None
+
+    try:
+        _ = d.compose.port("", "123")
+        assert False, "error should be raised for empty service"
+    except ValueError as e:
+        assert e.args == ValueError("Service cannot be empty").args
+
+    try:
+        _ = d.compose.port(service, "")
+        assert False, "error should be raised for empty port"
+    except ValueError as e:
+        assert e.args == ValueError("Private port cannot be empty").args
+
+    d.compose.down(timeout=1)
