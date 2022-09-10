@@ -288,9 +288,38 @@ class ComposeCLI(DockerCLICaller):
             full_cmd += to_list(services)
         run(full_cmd)
 
-    def port(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def port(
+        self, service: str, private_port: str, index: int = 1, protocol: str = "tcp"
+    ) -> Tuple[Optional[str], Optional[int]]:
+        """Returns the public port for a port binding.
+
+        # Arguments
+            service: The name of the service.
+            private_port: The private port.
+            index: Index of the container if service has multiple replicas (default 1)
+            protocol: tcp or udp (default "tcp").
+
+        # Returns
+            tuple with (host, port). If port is unknown, then host and port are None.
+        """
+        full_cmd = self.docker_compose_cmd + ["port"]
+        if service == "":
+            raise ValueError("Service cannot be empty")
+        if private_port == "":
+            raise ValueError("Private port cannot be empty")
+
+        full_cmd.add_simple_arg("--index", index)
+        full_cmd.add_simple_arg("--protocol", protocol)
+        full_cmd += [service, private_port]
+
+        result = run(full_cmd)
+        if result == ":0":
+            # docker compose cli joins host:str with port:int in the result. If port is unknown
+            # then result has default value for the both variables (str->empty string, int -> 0)
+            return None, None
+
+        host, port = str(result).split(":")
+        return host, int(port)
 
     def ps(self) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
