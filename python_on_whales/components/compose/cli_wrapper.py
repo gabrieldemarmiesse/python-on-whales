@@ -291,14 +291,16 @@ class ComposeCLI(DockerCLICaller):
     def port(
         self, service: str, private_port: str, index: int = 1, protocol: str = "tcp"
     ) -> Tuple[Optional[str], Optional[int]]:
-        """Print the public port for a port binding.
+        """Returns the public port for a port binding.
+
         # Arguments
             service: The name of the service.
             private_port: The private port.
             index: Index of the container if service has multiple replicas (default 1)
             protocol: tcp or udp (default "tcp").
+
         # Returns
-            tuple with [host, port]. If port is unknown, then host and port are None.
+            tuple with (host, port). If port is unknown, then host and port are None.
         """
         full_cmd = self.docker_compose_cmd + ["port"]
         if service == "":
