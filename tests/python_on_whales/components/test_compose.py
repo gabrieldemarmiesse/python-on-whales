@@ -722,3 +722,33 @@ def test_compose_port():
         assert e.args == ValueError("Private port cannot be empty").args
 
     d.compose.down(timeout=1)
+
+
+def test_compose_ls_project_running():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_compatibility=True,
+        compose_project_name="test_compose_ls",
+    )
+    docker.compose.up(["busybox"], detach=True)
+    time.sleep(2)
+
+    projects = docker.compose.ls()
+    project = [
+        proj
+        for proj in projects
+        if proj["Name"] == docker.compose.client_config.compose_project_name
+    ][0]
+
+    assert project["Status"] == "running(1)"
+
+    config_files = (
+        sorted(project["ConfigFiles"])
+        if type(project["ConfigFiles"]) == list
+        else [project["ConfigFiles"]]
+    )
+    assert config_files == sorted([str(f) for f in docker.client_config.compose_files])
+
+    docker.compose.down(timeout=1)

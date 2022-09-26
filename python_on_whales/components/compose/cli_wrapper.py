@@ -338,6 +338,21 @@ class ComposeCLI(DockerCLICaller):
         Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
+    def ls(
+        self, all_stopped=False, project_filters={}
+    ) -> List[python_on_whales.components.compose.cli_wrapper.Projects]:
+        """Returns a list of docker compose projects
+
+        # Returns
+            A `List[python_on_whales.Projects]`
+        """
+        full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
+        full_cmd.add_flag("--all", all_stopped)
+        for name, value in project_filters.items():
+            full_cmd.add_flag("--filter", f"{name}={value}")
+
+        return json.loads(run(full_cmd))
+
     def pull(
         self,
         services: Union[List[str], str, None] = None,
