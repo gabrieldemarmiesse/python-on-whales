@@ -343,8 +343,12 @@ class ComposeCLI(DockerCLICaller):
     ) -> List[Dict[str, Union[str, List[str]]]]:
         """Returns a list of docker compose projects
 
+        # Arguments
+            all_stopped: Results include all stopped compose projects.
+            project_filters: Filter results based on conditions provided.
+
         # Returns
-            A `List[python_on_whales.Projects]`
+            List[Dict[str, Union[str, List[str]]]]
         """
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all_stopped)
