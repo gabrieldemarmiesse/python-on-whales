@@ -725,30 +725,25 @@ def test_compose_port():
 
 
 def test_compose_ls_project_running():
-    docker = DockerClient(
+    d = DockerClient(
         compose_files=[
-            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml",
         ],
         compose_compatibility=True,
         compose_project_name="test_compose_ls",
     )
-    docker.compose.up(["busybox"], detach=True)
+    d.compose.up(["busybox"], detach=True)
     time.sleep(2)
 
-    projects = docker.compose.ls()
+    projects = d.compose.ls()
     project = [
         proj
         for proj in projects
-        if proj["Name"] == docker.compose.client_config.compose_project_name
+        if proj.name == d.compose.client_config.compose_project_name
     ][0]
 
-    assert project["Status"] == "running(1)"
+    assert project.status == "running"
+    assert project.count == 1
+    assert sorted(project.config_files) == sorted(d.client_config.compose_files)
 
-    config_files = (
-        sorted(project["ConfigFiles"])
-        if type(project["ConfigFiles"]) == list
-        else [project["ConfigFiles"]]
-    )
-    assert config_files == sorted([str(f) for f in docker.client_config.compose_files])
-
-    docker.compose.down(timeout=1)
+    d.compose.down(timeout=1)

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.compose.models import ComposeConfig
+from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
     format_dict_for_cli,
     run,
@@ -338,9 +339,7 @@ class ComposeCLI(DockerCLICaller):
         Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def ls(
-        self, all_stopped=False, project_filters={}
-    ) -> List[Dict[str, Union[str, List[str]]]]:
+    def ls(self, all_stopped=False, project_filters={}) -> List[ComposeProject]:
         """Returns a list of docker compose projects
 
         # Arguments
@@ -348,14 +347,22 @@ class ComposeCLI(DockerCLICaller):
             project_filters: Filter results based on conditions provided.
 
         # Returns
-            List[Dict[str, Union[str, List[str]]]]
+            A `List[python_on_whales.ComposeProject]`
         """
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all_stopped)
         for name, value in project_filters.items():
             full_cmd.add_flag("--filter", f"{name}={value}")
 
-        return json.loads(run(full_cmd))
+        return [
+            ComposeProject(
+                name=proj["Name"],
+                status=re.search(r"^[\w]+(?=\()", proj["Status"]).group(),
+                count=int(re.search(r"(?<=\()[0-9]+(?=\)$)", proj["Status"]).group()),
+                config_files=[Path(path) for path in proj["ConfigFiles"].split(",")],
+            )
+            for proj in json.loads(run(full_cmd))
+        ]
 
     def pull(
         self,
