@@ -340,7 +340,7 @@ class ComposeCLI(DockerCLICaller):
 
     def ls(
         self, all_stopped=False, project_filters={}
-    ) -> List[python_on_whales.components.compose.cli_wrapper.Projects]:
+    ) -> List[Dict[str, Union[str, List[str]]]]:
         """Returns a list of docker compose projects
 
         # Returns
