@@ -733,7 +733,7 @@ def test_compose_ls_project_running():
         compose_project_name="test_compose_ls",
     )
     d.compose.up(["busybox"], detach=True)
-    # TODO: revert back to 2 secs if ConfigFiles KeyError problem is not 
+    # TODO: revert back to 2 secs if ConfigFiles KeyError problem is not
     # related to compose race cond
     time.sleep(10)
 
