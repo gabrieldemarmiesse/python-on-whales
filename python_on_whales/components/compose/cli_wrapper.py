@@ -364,7 +364,7 @@ class ComposeCLI(DockerCLICaller):
                     if "ConfigFiles" in proj
                 ],
             )
-            for proj in [{"Name": "test_compose_ls", "Status": "running(1)"}]
+            for proj in json.loads(run(full_cmd))
         ]
 
     def pull(
