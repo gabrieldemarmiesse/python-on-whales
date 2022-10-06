@@ -124,4 +124,4 @@ class ComposeProject(BaseModel):
     name: str
     status: str
     count: int
-    config_files: List[Path]
+    config_files: Optional[List[Path]]
