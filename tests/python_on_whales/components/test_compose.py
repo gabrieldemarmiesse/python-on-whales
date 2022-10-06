@@ -744,6 +744,7 @@ def test_compose_ls_project_running():
 
     assert project.status == "running"
     assert project.count == 1
-    assert sorted(project.config_files) == sorted(d.client_config.compose_files)
+    if project.config_files:
+        assert sorted(project.config_files) == sorted(d.client_config.compose_files)
 
     d.compose.down(timeout=1)
