@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
 from datetime import timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
@@ -356,8 +355,8 @@ class ComposeCLI(DockerCLICaller):
         return [
             ComposeProject(
                 name=proj["Name"],
-                status=re.search(r"^[\w]+(?=\()", proj["Status"]).group(),
-                count=int(re.search(r"(?<=\()[0-9]+(?=\)$)", proj["Status"]).group()),
+                status=proj["Status"].split("(")[0],
+                count=int(proj["Status"].split("(")[1].strip(")")),
                 config_files=[
                     Path(path)
                     for path in proj.get("ConfigFiles", "").split(",")
