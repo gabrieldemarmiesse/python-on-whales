@@ -4,6 +4,7 @@ import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -16,7 +17,6 @@ from python_on_whales.components.container.models import (
 )
 from python_on_whales.exceptions import DockerException, NoSuchContainer
 from python_on_whales.test_utils import get_all_jsons, random_name
-from unittest.mock import Mock, patch
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("containers"))
