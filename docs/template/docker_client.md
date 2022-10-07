@@ -26,6 +26,7 @@
 
 They're actually aliases
 
+* [`docker.attach`](sub-commands/container.md#attach)
 * [`docker.build`](sub-commands/buildx.md#build)
 * [`docker.commit`](sub-commands/container.md#commit)
 * [`docker.copy`](sub-commands/container.md#copy)
