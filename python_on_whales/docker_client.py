@@ -152,7 +152,7 @@ class DockerClient(DockerCLICaller):
         self.volume = VolumeCLI(self.client_config)
 
         # aliases
-        self.attach = None
+        self.attach = self.container.attach
         self.build = self.buildx.build
         self.legacy_build = self.image.legacy_build
         self.commit = self.container.commit

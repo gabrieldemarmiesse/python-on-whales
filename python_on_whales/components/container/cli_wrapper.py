@@ -175,6 +175,23 @@ class Container(ReloadableObjectFromJson):
     # --------------------------------------------------------------------
     # public methods
 
+    def attach(
+        self,
+        detach_keys: Optional[str] = None,
+        no_stdin: bool = False,
+        sig_proxy: bool = True
+    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+        """Attach local standard input, output, and error streams to a running container.
+
+        Alias: `docker.attach(...)`
+
+        See the [`docker.container.attach`](../sub-commands/container.md#attach) command for
+        information about the arguments.
+        """
+        return ContainerCLI(self.client_config).attach(
+            self, detach_keys, no_stdin, sig_proxy
+        )
+
     def commit(
         self,
         tag: Optional[str] = None,
@@ -353,9 +370,38 @@ class ContainerCLI(DockerCLICaller):
         super().__init__(*args, **kwargs)
         self.remove = self.remove
 
-    def attach(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def attach(
+        self,
+        container: ValidContainer,
+        detach_keys: Optional[str] = None,
+        no_stdin: bool = False,
+        sig_proxy: bool = True
+    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+        """Attach local standard input, output, and error streams to a running container
+
+        Alias: `docker.attach(...)`
+
+        # Arguments
+            container: The running container to attach to
+            detach_keys: Override the key sequence for detaching a container
+            no_stdin: Do not attach STDIN
+            sig_proxy: Proxy all received signals to the process (default true)
+
+        # Returns:
+            Optional[str]
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
+        """
+        self.inspect(container)
+
+        full_cmd = self.docker_cmd + ["attach"]
+        full_cmd.add_simple_arg('--detach_keys', detach_keys)
+        full_cmd.add_flag("--no-stdin", no_stdin)
+        full_cmd.add_flag("--sig-proxy", sig_proxy)
+        full_cmd.append(container)
+
+        return run(full_cmd, tty=True)
 
     def commit(
         self,
