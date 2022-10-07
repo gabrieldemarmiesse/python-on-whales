@@ -16,6 +16,7 @@ from python_on_whales.components.container.models import (
 )
 from python_on_whales.exceptions import DockerException, NoSuchContainer
 from python_on_whales.test_utils import get_all_jsons, random_name
+from unittest.mock import Mock, patch
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("containers"))
@@ -560,16 +561,17 @@ def test_exec_change_directory():
 @pytest.mark.parametrize(
     "docker_function",
     [
-        docker.container.remove,
-        docker.container.stop,
+        docker.container.attach,
+        docker.container.commit,
         docker.container.diff,
         docker.container.inspect,
         docker.container.kill,
+        docker.container.logs,
         docker.container.pause,
+        docker.container.remove,
         docker.container.restart,
         docker.container.start,
-        docker.container.commit,
-        docker.container.logs,
+        docker.container.stop,
         docker.container.unpause,
         docker.container.wait,
     ],
@@ -631,3 +633,64 @@ def test_prune():
 def test_run_detached_interactive():
     with docker.run("ubuntu", interactive=True, detach=True, tty=False) as c:
         c.execute(["true"])
+
+
+@patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_attach_default(run_mock: Mock, inspect_mock: Mock) -> None:
+
+    test_container_name = 'test_dummy_container'
+
+    docker.attach(test_container_name)
+
+    inspect_mock.assert_called_once_with(test_container_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ['attach', '--sig-proxy', test_container_name],
+        tty=True
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_attach_detach_keys_argument(run_mock: Mock, inspect_mock: Mock) -> None:
+
+    test_container_name = 'test_dummy_container'
+    test_detach_key = 'dummy'
+
+    docker.attach(test_container_name, detach_keys=test_detach_key)
+
+    inspect_mock.assert_called_once_with(test_container_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ['attach', '--detach-keys', test_detach_key, '--sig-proxy', test_container_name],
+        tty=True
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock) -> None:
+
+    test_container_name = 'test_dummy_container'
+
+    docker.attach(test_container_name, no_stdin=True)
+
+    inspect_mock.assert_called_once_with(test_container_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ['attach', '--no-stdin', '--sig-proxy', test_container_name],
+        tty=True
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
+
+    test_container_name = 'test_dummy_container'
+
+    docker.attach(test_container_name, sig_proxy=False)
+
+    inspect_mock.assert_called_once_with(test_container_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ['attach', test_container_name],
+        tty=True
+    )
