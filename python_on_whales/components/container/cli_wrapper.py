@@ -179,7 +179,7 @@ class Container(ReloadableObjectFromJson):
         self,
         detach_keys: Optional[str] = None,
         no_stdin: bool = False,
-        sig_proxy: bool = True
+        sig_proxy: bool = True,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Attach local standard input, output, and error streams to a running container.
 
@@ -375,7 +375,7 @@ class ContainerCLI(DockerCLICaller):
         container: ValidContainer,
         detach_keys: Optional[str] = None,
         no_stdin: bool = False,
-        sig_proxy: bool = True
+        sig_proxy: bool = True,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Attach local standard input, output, and error streams to a running container
 
@@ -396,7 +396,7 @@ class ContainerCLI(DockerCLICaller):
         self.inspect(container)
 
         full_cmd = self.docker_cmd + ["attach"]
-        full_cmd.add_simple_arg('--detach-keys', detach_keys)
+        full_cmd.add_simple_arg("--detach-keys", detach_keys)
         full_cmd.add_flag("--no-stdin", no_stdin)
         full_cmd.add_flag("--sig-proxy", sig_proxy)
         full_cmd.append(container)
