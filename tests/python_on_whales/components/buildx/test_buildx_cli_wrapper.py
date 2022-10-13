@@ -46,6 +46,22 @@ def test_buildx_build_streaming_logs(tmp_path):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_streaming_logs_with_decode_error_handling(tmp_path):
+    # This will simulate buildx clipping log output in the middle of a UTF-8 character
+    bad_encoding_dockerfile = (
+        dockerfile_content1
+        + """
+    RUN printf '\\xE2\\x9E'
+    """
+    )
+    (tmp_path / "Dockerfile").write_text(bad_encoding_dockerfile)
+    output = list(docker.buildx.build(tmp_path, cache=False, stream_logs=True))
+    assert output[0] == "#1 [internal] load build definition from Dockerfile\n"
+    assert len([x for x in output if "�" in x]) == 1
+    assert "#7 DONE" in output[-1]
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_load_docker_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     my_image = docker.buildx.build(tmp_path, load=True)

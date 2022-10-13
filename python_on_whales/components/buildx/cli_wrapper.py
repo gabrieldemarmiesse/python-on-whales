@@ -560,4 +560,4 @@ def format_dict_for_buildx(options: Dict[str, str]) -> str:
 
 def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:
     for origin, value in stream_stdout_and_stderr(full_cmd, env=env):
-        yield value.decode()
+        yield value.decode(errors="replace")
