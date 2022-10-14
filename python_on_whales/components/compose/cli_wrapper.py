@@ -338,7 +338,9 @@ class ComposeCLI(DockerCLICaller):
         Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def ls(self, all: bool = False, filters: Dict[str, str] = {}) -> List[ComposeProject]:
+    def ls(
+        self, all: bool = False, filters: Dict[str, str] = {}
+    ) -> List[ComposeProject]:
         """Returns a list of docker compose projects
 
         # Arguments
@@ -360,7 +362,8 @@ class ComposeCLI(DockerCLICaller):
                     Path(path)
                     for path in proj.get("ConfigFiles", "").split(",")
                     if "ConfigFiles" in proj
-                ] or None,
+                ]
+                or None,
             )
             for proj in json.loads(run(full_cmd))
         ]
