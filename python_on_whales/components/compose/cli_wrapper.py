@@ -349,7 +349,7 @@ class ComposeCLI(DockerCLICaller):
             A `List[python_on_whales.ComposeProject]`
         """
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
-        full_cmd.add_flag("--all", all_stopped)
+        full_cmd.add_flag("--all", all)
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         return [
             ComposeProject(
