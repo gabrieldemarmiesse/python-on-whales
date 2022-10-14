@@ -222,7 +222,7 @@ class NetworkCLI(DockerCLICaller):
             return [Network(self.client_config, reference) for reference in x]
 
     def list(self, filters: Dict[str, str] = {}) -> List[Network]:
-        full_cmd = self.docker_cmd + ["network", "list", "--no-trunc", "--quiet"]
+        full_cmd = self.docker_cmd + ["network", "ls", "--no-trunc", "--quiet"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         ids = run(full_cmd).splitlines()
