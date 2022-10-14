@@ -360,7 +360,7 @@ class ComposeCLI(DockerCLICaller):
                     Path(path)
                     for path in proj.get("ConfigFiles", "").split(",")
                     if "ConfigFiles" in proj
-                ],
+                ] or None,
             )
             for proj in json.loads(run(full_cmd))
         ]
