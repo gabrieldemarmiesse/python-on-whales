@@ -350,8 +350,7 @@ class ComposeCLI(DockerCLICaller):
         """
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all_stopped)
-        for name, value in project_filters.items():
-            full_cmd.add_flag("--filter", f"{name}={value}")
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         return [
             ComposeProject(
                 name=proj["Name"],
