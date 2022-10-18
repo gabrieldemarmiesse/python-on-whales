@@ -118,3 +118,10 @@ class ComposeConfig(BaseModel):
     volumes: Dict[str, ComposeConfigVolume] = Field(default_factory=dict)
     configs: Any
     secrets: Any
+
+
+class ComposeProject(BaseModel):
+    name: str
+    status: str
+    count: int
+    config_files: Optional[List[Path]]

@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.compose.models import ComposeConfig
+from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
     format_dict_for_cli,
     run,
@@ -337,6 +337,36 @@ class ComposeCLI(DockerCLICaller):
 
         Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
+
+    def ls(
+        self, all: bool = False, filters: Dict[str, str] = {}
+    ) -> List[ComposeProject]:
+        """Returns a list of docker compose projects
+
+        # Arguments
+            all_stopped: Results include all stopped compose projects.
+            project_filters: Filter results based on conditions provided.
+
+        # Returns
+            A `List[python_on_whales.ComposeProject]`
+        """
+        full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
+        full_cmd.add_flag("--all", all)
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        return [
+            ComposeProject(
+                name=proj["Name"],
+                status=proj["Status"].split("(")[0],
+                count=int(proj["Status"].split("(")[1].strip(")")),
+                config_files=[
+                    Path(path)
+                    for path in proj.get("ConfigFiles", "").split(",")
+                    if "ConfigFiles" in proj
+                ]
+                or None,
+            )
+            for proj in json.loads(run(full_cmd))
+        ]
 
     def pull(
         self,
