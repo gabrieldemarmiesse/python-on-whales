@@ -180,7 +180,7 @@ class Container(ReloadableObjectFromJson):
         detach_keys: Optional[str] = None,
         no_stdin: bool = False,
         sig_proxy: bool = True,
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+    ) -> None:
         """Attach local standard input, output, and error streams to a running container.
 
         Alias: `docker.attach(...)`
@@ -188,9 +188,7 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.attach`](../sub-commands/container.md#attach) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).attach(
-            self, detach_keys, no_stdin, sig_proxy
-        )
+        ContainerCLI(self.client_config).attach(self, detach_keys, no_stdin, sig_proxy)
 
     def commit(
         self,
@@ -376,7 +374,7 @@ class ContainerCLI(DockerCLICaller):
         detach_keys: Optional[str] = None,
         no_stdin: bool = False,
         sig_proxy: bool = True,
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+    ) -> None:
         """Attach local standard input, output, and error streams to a running container
 
         Alias: `docker.attach(...)`
@@ -386,9 +384,6 @@ class ContainerCLI(DockerCLICaller):
             detach_keys: Override the key sequence for detaching a container
             no_stdin: Do not attach STDIN
             sig_proxy: Proxy all received signals to the process (default true)
-
-        # Returns:
-            Optional[str]
 
         # Raises
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
@@ -401,7 +396,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--sig-proxy", sig_proxy)
         full_cmd.append(container)
 
-        return run(full_cmd, tty=True)
+        run(full_cmd, tty=True)
 
     def commit(
         self,
