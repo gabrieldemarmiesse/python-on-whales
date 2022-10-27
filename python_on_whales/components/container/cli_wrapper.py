@@ -382,7 +382,7 @@ class ContainerCLI(DockerCLICaller):
         # Arguments
             container: The running container to attach to
             detach_keys: Override the key sequence for detaching a container
-            no_stdin: Do not attach STDIN
+            stdin: Attach STDIN
             sig_proxy: Proxy all received signals to the process (default true)
 
         # Raises
