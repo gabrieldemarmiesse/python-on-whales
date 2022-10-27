@@ -372,7 +372,7 @@ class ContainerCLI(DockerCLICaller):
         self,
         container: ValidContainer,
         detach_keys: Optional[str] = None,
-        not stdin: bool = True,
+        stdin: bool = True,
         sig_proxy: bool = True,
     ) -> None:
         """Attach local standard input, output, and error streams to a running container
