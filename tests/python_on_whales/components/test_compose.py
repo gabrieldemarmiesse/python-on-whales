@@ -724,26 +724,28 @@ def test_compose_port():
     d.compose.down(timeout=1)
 
 
-def test_compose_ls_project_running():
+def test_compose_ls_project_multiple_statuses():
     d = DockerClient(
         compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml",
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml",
         ],
         compose_compatibility=True,
         compose_project_name="test_compose_ls",
     )
-    d.compose.up(["busybox"], detach=True)
+    d.compose.up(["alpine", "dodo"], detach=True)
     time.sleep(2)
 
-    projects = d.compose.ls()
+    projects = d.compose.ls(all=True)
     project = [
         proj
         for proj in projects
         if proj.name == d.compose.client_config.compose_project_name
     ][0]
 
-    assert project.status == "running"
-    assert project.count == 1
+    assert project.running == 1
+    assert project.exited == 1
     if project.config_files:
         assert sorted(project.config_files) == sorted(d.client_config.compose_files)
 
