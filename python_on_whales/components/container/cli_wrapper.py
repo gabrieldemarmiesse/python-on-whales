@@ -392,7 +392,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd = self.docker_cmd + ["attach"]
         full_cmd.add_simple_arg("--detach-keys", detach_keys)
-        full_cmd.add_flag("--no-stdin", no_stdin)
+        full_cmd.add_flag("--no-stdin", not stdin)
         full_cmd.add_flag("--sig-proxy", sig_proxy)
         full_cmd.append(container)
 
