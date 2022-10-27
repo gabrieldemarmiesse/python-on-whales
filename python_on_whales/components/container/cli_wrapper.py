@@ -188,7 +188,7 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.attach`](../sub-commands/container.md#attach) command for
         information about the arguments.
         """
-        ContainerCLI(self.client_config).attach(self, detach_keys, no_stdin, sig_proxy)
+        ContainerCLI(self.client_config).attach(self, detach_keys, not stdin, sig_proxy)
 
     def commit(
         self,
