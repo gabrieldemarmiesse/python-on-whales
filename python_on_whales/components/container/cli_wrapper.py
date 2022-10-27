@@ -178,7 +178,7 @@ class Container(ReloadableObjectFromJson):
     def attach(
         self,
         detach_keys: Optional[str] = None,
-        no_stdin: bool = False,
+        stdin: bool = True,
         sig_proxy: bool = True,
     ) -> None:
         """Attach local standard input, output, and error streams to a running container.
