@@ -680,7 +680,7 @@ def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock) -> None:
 
     test_container_name = "test_dummy_container"
 
-    docker.attach(test_container_name, no_stdin=True)
+    docker.attach(test_container_name, stdin=False)
 
     inspect_mock.assert_called_once_with(test_container_name)
     run_mock.assert_called_once_with(
