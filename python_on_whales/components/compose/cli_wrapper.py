@@ -10,6 +10,7 @@ from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
     format_dict_for_cli,
+    parse_ls_status_count,
     run,
     stream_stdout_and_stderr,
     to_list,
@@ -353,11 +354,17 @@ class ComposeCLI(DockerCLICaller):
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        print("zozo")
+        print(json.loads(run(full_cmd)))
         return [
             ComposeProject(
                 name=proj["Name"],
-                status=proj["Status"].split("(")[0],
-                count=int(proj["Status"].split("(")[1].strip(")")),
+                created=parse_ls_status_count(proj["Status"], "created"),
+                running=parse_ls_status_count(proj["Status"], "running"),
+                restarting=parse_ls_status_count(proj["Status"], "restarting"),
+                exited=parse_ls_status_count(proj["Status"], "exited"),
+                paused=parse_ls_status_count(proj["Status"], "paused"),
+                dead=parse_ls_status_count(proj["Status"], "dead"),
                 config_files=[
                     Path(path)
                     for path in proj.get("ConfigFiles", "").split(",")

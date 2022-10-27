@@ -313,3 +313,10 @@ def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
         return time_object.strftime("%Y-%m-%dT%H:%M:%S")
     elif isinstance(time_object, timedelta):
         return f"{time_object.total_seconds()}s"
+
+
+def parse_ls_status_count(status_output, status) -> Union[None, str]:
+    try:
+        return status_output.split(status + "(")[1].split(")")[0]
+    except IndexError:
+        return
