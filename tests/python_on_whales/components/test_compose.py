@@ -746,6 +746,7 @@ def test_compose_ls_project_multiple_statuses():
 
     assert project.running == 1
     assert project.exited == 1
+    assert project.paused == 0
     if project.config_files:
         assert sorted(project.config_files) == sorted(d.client_config.compose_files)
 
