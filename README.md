@@ -247,7 +247,7 @@ Use the right tool for the right job 🙂
 | buildx  | 10/11 | ![92%](https://progress-bar.dev/92) |
 | compose  | 18/23 | ![73%](https://progress-bar.dev/78) |
 | config  | 4/4 | ![50%](https://progress-bar.dev/100) |
-| container | 22/24 | ![50%](https://progress-bar.dev/91) |
+| container | 23/24 | ![50%](https://progress-bar.dev/91) |
 | context  | 4/6 | ![50%](https://progress-bar.dev/67) |
 | image  | 12/13 | ![50%](https://progress-bar.dev/92) |
 | manifest  | 0/4 | ![50%](https://progress-bar.dev/0) |
