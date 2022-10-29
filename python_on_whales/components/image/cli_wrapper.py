@@ -158,12 +158,16 @@ class Image(ReloadableObjectFromJson):
         """
         return ImageCLI(self.client_config).tag(self, new_tag)
 
-    def copy_from(self, path_in_image: ValidPath, destination: ValidPath):
+    def copy_from(
+        self, path_in_image: ValidPath, destination: ValidPath, pull: str = "missing"
+    ):
         """Copy a file from a docker image in the local filesystem.
 
         See the `docker.image.copy_from` command for information about the arguments.
         """
-        return ImageCLI(self.client_config).copy_from(self, path_in_image, destination)
+        return ImageCLI(self.client_config).copy_from(
+            self, path_in_image, destination, pull
+        )
 
     def copy_to(
         self,
@@ -679,11 +683,15 @@ class ImageCLI(DockerCLICaller):
             return self.pull(image)
 
     def copy_from(
-        self, image: ValidImage, path_in_image: ValidPath, destination: ValidPath
+        self,
+        image: ValidImage,
+        path_in_image: ValidPath,
+        destination: ValidPath,
+        pull: str = "missing",
     ):
         with python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
-        ).create(image) as tmp_container:
+        ).create(image, pull=pull) as tmp_container:
             tmp_container.copy_from(path_in_image, destination)
 
     def copy_to(

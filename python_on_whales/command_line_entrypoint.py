@@ -27,9 +27,8 @@ image_app = typer.Typer()
 
 
 @image_app.command()
-def copy_from(docker_image: str, source: str, destination: str):
-    image = docker.image._pull_if_necessary(docker_image)
-    docker.image.copy_from(image, source, destination)
+def copy_from(docker_image: str, source: str, destination: str, pull: str = "missing"):
+    docker.image.copy_from(docker_image, source, destination, pull)
 
 
 @image_app.command()
