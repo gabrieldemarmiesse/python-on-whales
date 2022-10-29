@@ -175,6 +175,21 @@ class Container(ReloadableObjectFromJson):
     # --------------------------------------------------------------------
     # public methods
 
+    def attach(
+        self,
+        detach_keys: Optional[str] = None,
+        stdin: bool = True,
+        sig_proxy: bool = True,
+    ) -> None:
+        """Attach local standard input, output, and error streams to a running container.
+
+        Alias: `docker.attach(...)`
+
+        See the [`docker.container.attach`](../sub-commands/container.md#attach) command for
+        information about the arguments.
+        """
+        ContainerCLI(self.client_config).attach(self, detach_keys, not stdin, sig_proxy)
+
     def commit(
         self,
         tag: Optional[str] = None,
@@ -353,9 +368,35 @@ class ContainerCLI(DockerCLICaller):
         super().__init__(*args, **kwargs)
         self.remove = self.remove
 
-    def attach(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def attach(
+        self,
+        container: ValidContainer,
+        detach_keys: Optional[str] = None,
+        stdin: bool = True,
+        sig_proxy: bool = True,
+    ) -> None:
+        """Attach local standard input, output, and error streams to a running container
+
+        Alias: `docker.attach(...)`
+
+        # Arguments
+            container: The running container to attach to
+            detach_keys: Override the key sequence for detaching a container
+            stdin: Attach STDIN
+            sig_proxy: Proxy all received signals to the process (default true)
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
+        """
+        self.inspect(container)
+
+        full_cmd = self.docker_cmd + ["attach"]
+        full_cmd.add_simple_arg("--detach-keys", detach_keys)
+        full_cmd.add_flag("--no-stdin", not stdin)
+        full_cmd.add_flag("--sig-proxy", sig_proxy)
+        full_cmd.append(container)
+
+        run(full_cmd, tty=True)
 
     def commit(
         self,
