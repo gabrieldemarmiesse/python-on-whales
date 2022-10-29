@@ -39,9 +39,9 @@ def copy_to(
     destination: str,
     new_tag: Optional[str] = None,
     push: bool = False,
+    pull: str = "missing",
 ):
-    image = docker.image._pull_if_necessary(docker_image)
-    docker.image.copy_to(image, source, destination, new_tag)
+    docker.image.copy_to(docker_image, source, destination, new_tag, pull)
     if push:
         docker.image.push(new_tag)
 

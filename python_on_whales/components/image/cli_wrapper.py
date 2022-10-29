@@ -170,6 +170,7 @@ class Image(ReloadableObjectFromJson):
         local_path: ValidPath,
         path_in_image: ValidPath,
         new_tag: Optional[str] = None,
+        pull: str = "missing",
     ) -> Image:
         """Copy a file from the local filesystem in a docker image to create a new
         docker image.
@@ -179,7 +180,7 @@ class Image(ReloadableObjectFromJson):
         See the `docker.image.copy_to` command for information about the arguments.
         """
         return ImageCLI(self.client_config).copy_to(
-            self, local_path, path_in_image, new_tag
+            self, local_path, path_in_image, new_tag, pull
         )
 
     def exists(self) -> bool:
@@ -691,9 +692,10 @@ class ImageCLI(DockerCLICaller):
         local_path: ValidPath,
         path_in_image: ValidPath,
         new_tag: Optional[str] = None,
+        pull: str = "missing",
     ) -> Image:
         with python_on_whales.components.container.cli_wrapper.ContainerCLI(
             self.client_config
-        ).create(base_image) as tmp_container:
+        ).create(base_image, pull=pull) as tmp_container:
             tmp_container.copy_to(local_path, path_in_image)
             return tmp_container.commit(tag=new_tag)
