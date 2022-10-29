@@ -1,7 +1,10 @@
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.manifest.cli_wrapper import ManifestListInspectResult, ManifestList
+from python_on_whales.components.manifest.cli_wrapper import (
+    ManifestList,
+    ManifestListInspectResult,
+)
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 

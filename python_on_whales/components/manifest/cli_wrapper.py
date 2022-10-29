@@ -3,10 +3,10 @@ from typing import Any, Dict, List, Union
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
-    ReloadableObjectFromJson
+    ReloadableObjectFromJson,
 )
-from python_on_whales.components.manifest.models import ManifestListInspectResult
 from python_on_whales.components.buildx.imagetools.models import ImageVariantManifest
+from python_on_whales.components.manifest.models import ManifestListInspectResult
 from python_on_whales.utils import run, to_list
 
 
