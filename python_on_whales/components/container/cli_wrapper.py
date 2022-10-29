@@ -1236,6 +1236,7 @@ class ContainerCLI(DockerCLICaller):
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
+        pull: str = "missing",
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
@@ -1393,6 +1394,7 @@ class ContainerCLI(DockerCLICaller):
                 the tuple to signify that you want a random free port on the host. For example:
                 `publish=[(80,)]`.
             publish_all: Publish all exposed ports to random ports.
+            pull: Pull image before running ("always"|"missing"|"never") (default "missing").
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
             remove: Automatically remove the container when it exits.
@@ -1416,10 +1418,6 @@ class ContainerCLI(DockerCLICaller):
             The container output as a string if detach is `False` (the default),
             and a `python_on_whales.Container` if detach is `True`.
         """
-
-        python_on_whales.components.image.cli_wrapper.ImageCLI(
-            self.client_config
-        )._pull_if_necessary(image)
 
         full_cmd = self.docker_cmd + ["container", "run"]
 
@@ -1529,6 +1527,8 @@ class ContainerCLI(DockerCLICaller):
 
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
+
+        full_cmd.add_simple_arg("--pull", pull)
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
