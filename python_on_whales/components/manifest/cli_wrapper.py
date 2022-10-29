@@ -9,12 +9,14 @@ from python_on_whales.components.manifest.models import ManifestListInspectResul
 from python_on_whales.components.buildx.imagetools.models import ImageVariantManifest
 from python_on_whales.utils import run, to_list
 
+
 class ManifestList(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
-        super().__init__(client_config, "id", reference, is_immutable_id)
-    
+        self.reference = reference
+        super().__init__(client_config, "name", reference, is_immutable_id)
+
     def __enter__(self):
         return self
 
@@ -22,9 +24,10 @@ class ManifestList(ReloadableObjectFromJson):
         self.remove()
 
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["manifest", "inspect", reference])
+        return f'[{run(self.docker_cmd + ["manifest", "inspect", reference])}]'
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> ManifestListInspectResult:
+        json_object["name"] = self.reference
         return ManifestListInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> ManifestListInspectResult:
@@ -32,12 +35,8 @@ class ManifestList(ReloadableObjectFromJson):
         return super()._get_inspect_result()
 
     @property
-    def id(self) -> str:
-        return self._get_immutable_id()
-
-    @property
-    def name(reference) -> str:
-        return reference
+    def name(self) -> str:
+        return self._get_inspect_result().name
 
     @property
     def schema_version(self) -> str:
@@ -62,7 +61,9 @@ class ManifestList(ReloadableObjectFromJson):
         """
         ManifestCLI(self.client_config).remove(self)
 
+
 ValidManifestList = Union[ManifestList, str]
+
 
 class ManifestCLI(DockerCLICaller):
     def annotate(
@@ -108,7 +109,7 @@ class ManifestCLI(DockerCLICaller):
         # Arguments
             name: The name of the manifest list
             manifests: The list of manifests to add to the manifest list
-        
+
         # Returns
             A `python_on_whales.ManifestList`.
         """
@@ -117,20 +118,29 @@ class ManifestCLI(DockerCLICaller):
         full_cmd.add_flag("--insecure", insecure)
         full_cmd.append(name)
         full_cmd += to_list(manifests)
-        return ManifestList(self.client_config, run(full_cmd), is_immutable_id=True)
+        return ManifestList(self.client_config, run(full_cmd)[22:], is_immutable_id=True)
 
     def inspect(self, x: str) -> ManifestList:
         """Returns a Docker manifest list object.
         """
         return ManifestList(self.client_config, x)
 
+    def push(self, x: str, purge: bool = False, quiet: bool = False):
+        """Push a manifest list to a repository.
 
-    def push(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+        # Options
+            purge: Remove the local manifest list after push
+        """
+        # this is just to raise a correct exception if the manifest list doesn't exist
+        self.inspect(x)
+
+        full_cmd = self.docker_cmd + ["manifest", "push"]
+        full_cmd.add_flag("--purge", purge)
+        full_cmd.append(x)
+        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     def remove(self, manifest_lists: Union[ValidManifestList, List[ValidManifestList]]):
-        """Removes a Docker manifest list.
+        """Removes a Docker manifest list or lists.
 
         # Arguments
             manifest_lists: One or more manifest lists.
