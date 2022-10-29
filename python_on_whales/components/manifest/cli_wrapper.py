@@ -26,7 +26,9 @@ class ManifestList(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return f'[{run(self.docker_cmd + ["manifest", "inspect", reference])}]'
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> ManifestListInspectResult:
+    def _parse_json_object(
+        self, json_object: Dict[str, Any]
+    ) -> ManifestListInspectResult:
         json_object["name"] = self.reference
         return ManifestListInspectResult.parse_obj(json_object)
 
@@ -118,11 +120,12 @@ class ManifestCLI(DockerCLICaller):
         full_cmd.add_flag("--insecure", insecure)
         full_cmd.append(name)
         full_cmd += to_list(manifests)
-        return ManifestList(self.client_config, run(full_cmd)[22:], is_immutable_id=True)
+        return ManifestList(
+            self.client_config, run(full_cmd)[22:], is_immutable_id=True
+        )
 
     def inspect(self, x: str) -> ManifestList:
-        """Returns a Docker manifest list object.
-        """
+        """Returns a Docker manifest list object."""
         return ManifestList(self.client_config, x)
 
     def push(self, x: str, purge: bool = False, quiet: bool = False):

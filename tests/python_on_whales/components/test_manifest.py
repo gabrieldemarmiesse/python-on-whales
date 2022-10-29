@@ -31,6 +31,8 @@ def test_manifest_create_remove(with_manifest):
 
 
 def test_manifest_annotate(with_manifest):
-    docker.manifest.annotate(with_manifest.name, "busybox:1.26", os="linux", arch="arm64")
+    docker.manifest.annotate(
+        with_manifest.name, "busybox:1.26", os="linux", arch="arm64"
+    )
     assert with_manifest.manifests[0].platform.os == "linux"
     assert with_manifest.manifests[0].platform.architecture == "arm64"
