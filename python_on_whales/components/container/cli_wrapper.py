@@ -557,6 +557,7 @@ class ContainerCLI(DockerCLICaller):
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
+        pull: str = "missing",
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
@@ -595,9 +596,6 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
-        python_on_whales.components.image.cli_wrapper.ImageCLI(
-            self.client_config
-        )._pull_if_necessary(image)
         full_cmd = self.docker_cmd + ["create"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
@@ -703,6 +701,8 @@ class ContainerCLI(DockerCLICaller):
 
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
+
+        full_cmd.add_simple_arg("--pull", pull)
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
