@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
 
 from python_on_whales import docker
@@ -252,3 +254,37 @@ def test_exists():
     assert docker.image.exists("busybox")
 
     assert not docker.image.exists("dudurghurozgiozpfezjigfoeioengizeonig")
+
+
+@patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
+def test_copy_from_default_pull(container_mock: Mock) -> None:
+
+    container_cli_mock = MagicMock()
+    container_mock.return_value = container_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.image.copy_from(
+        test_image_name, "test_path_in_image", "test_local_destination"
+    )
+
+    container_cli_mock.create.assert_called_with(test_image_name, pull="missing")
+
+
+@patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
+def test_copy_from_pull(container_mock: Mock) -> None:
+
+    container_cli_mock = MagicMock()
+    container_mock.return_value = container_cli_mock
+
+    test_image_name = "test_dummy_image"
+    test_pull_flag = "test_pull_flag_value"
+
+    docker.image.copy_from(
+        test_image_name,
+        "test_path_in_image",
+        "test_local_destination",
+        pull=test_pull_flag,
+    )
+
+    container_cli_mock.create.assert_called_with(test_image_name, pull=test_pull_flag)
