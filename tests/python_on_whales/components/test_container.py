@@ -702,3 +702,32 @@ def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd + ["attach", test_container_name], tty=True
     )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+def test_container_create_default_pull(_: Mock, run_mock: Mock) -> None:
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name)
+
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["create", "--pull", "missing", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+def test_container_create_pull(_: Mock, run_mock: Mock) -> None:
+
+    test_image_name = "test_dummy_image"
+    test_pull_value = "test_dummy_pull_value"
+
+    docker.create(test_image_name, pull=test_pull_value)
+
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["create", "--pull", test_pull_value, test_image_name]
+    )

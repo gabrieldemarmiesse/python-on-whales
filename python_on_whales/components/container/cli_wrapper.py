@@ -737,6 +737,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.append(image)
         full_cmd += command
+
         return Container(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def _add_publish_to_command(self, full_cmd, publish):
