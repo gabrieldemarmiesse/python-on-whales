@@ -731,3 +731,34 @@ def test_container_create_pull(_: Mock, run_mock: Mock) -> None:
         docker.client_config.docker_cmd
         + ["create", "--pull", test_pull_value, test_image_name]
     )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_container_run_default_pull(run_mock: Mock) -> None:
+
+    test_image_name = "test_dummy_image"
+
+    docker.run(test_image_name)
+
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["container", "run", "--pull", "missing", test_image_name],
+        tty=False,
+        capture_stderr=False,
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_container_run_pull(run_mock: Mock) -> None:
+
+    test_image_name = "test_dummy_image"
+    test_pull_value = "test_dummy_pull_value"
+
+    docker.run(test_image_name, pull=test_pull_value)
+
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["container", "run", "--pull", test_pull_value, test_image_name],
+        tty=False,
+        capture_stderr=False,
+    )
