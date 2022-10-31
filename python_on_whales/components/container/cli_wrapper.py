@@ -596,6 +596,15 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
+
+        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
+            self.client_config
+        )
+        if pull == "missing":
+            image_cli._pull_if_necessary(image)
+        elif pull == "always":
+            image_cli.pull(image)
+
         full_cmd = self.docker_cmd + ["create"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
@@ -702,7 +711,7 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
-        full_cmd.add_simple_arg("--pull", pull)
+        full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
@@ -1420,6 +1429,14 @@ class ContainerCLI(DockerCLICaller):
             and a `python_on_whales.Container` if detach is `True`.
         """
 
+        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
+            self.client_config
+        )
+        if pull == "missing":
+            image_cli._pull_if_necessary(image)
+        elif pull == "always":
+            image_cli.pull(image)
+
         full_cmd = self.docker_cmd + ["container", "run"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
@@ -1529,7 +1546,7 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
-        full_cmd.add_simple_arg("--pull", pull)
+        full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
