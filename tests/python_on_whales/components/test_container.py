@@ -706,30 +706,83 @@ def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
 
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
-def test_container_create_default_pull(_: Mock, run_mock: Mock) -> None:
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_default_pull(
+    image_mock: Mock, _: Mock, run_mock: Mock
+) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
 
     test_image_name = "test_dummy_image"
 
     docker.create(test_image_name)
 
+    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
+    image_cli_mock.pull.assert_not_called()
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd
-        + ["create", "--pull", "missing", test_image_name]
+        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
     )
 
 
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
-def test_container_create_pull(_: Mock, run_mock: Mock) -> None:
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_missing_pull(
+    image_mock: Mock, _: Mock, run_mock: Mock
+) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
 
     test_image_name = "test_dummy_image"
-    test_pull_value = "test_dummy_pull_value"
 
-    docker.create(test_image_name, pull=test_pull_value)
+    docker.create(test_image_name, pull="missing")
 
+    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
+    image_cli_mock.pull.assert_not_called()
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd
-        + ["create", "--pull", test_pull_value, test_image_name]
+        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_always_pull(
+    image_mock: Mock, _: Mock, run_mock: Mock
+) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name, pull="always")
+
+    image_cli_mock._pull_if_necessary.assert_not_called()
+    image_cli_mock.pull.assert_called_once_with(test_image_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name, pull="never")
+
+    image_cli_mock._pull_if_necessary.assert_not_called()
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
     )
 
 
