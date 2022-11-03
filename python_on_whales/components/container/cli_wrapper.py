@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 import pydantic
+from packaging import version
 
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.network.cli_wrapper
@@ -35,6 +36,8 @@ from python_on_whales.utils import (
     stream_stdout_and_stderr,
     to_list,
 )
+
+DOCKER_RELEASE_PULL_SUPPORT = "20.10.0"
 
 
 class Container(ReloadableObjectFromJson):
@@ -600,7 +603,7 @@ class ContainerCLI(DockerCLICaller):
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )
-        if pull == "missing":
+        if pull == "missing" or not self._client_supports_pull():
             image_cli._pull_if_necessary(image)
         elif pull == "always":
             image_cli.pull(image)
@@ -711,7 +714,8 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
-        full_cmd.add_simple_arg("--pull", "never")
+        if self._client_supports_pull():
+            full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
@@ -748,6 +752,16 @@ class ContainerCLI(DockerCLICaller):
         full_cmd += command
 
         return Container(self.client_config, run(full_cmd), is_immutable_id=True)
+
+    def _client_supports_pull(self) -> bool:
+        """Tell if the Docker client in use supported the argument --pull.
+
+        # Returns
+            `True` if the Docker client supports the argument --pull. `False` otherwise.
+        """
+        return version.parse(self.client_version) >= version.parse(
+            DOCKER_RELEASE_PULL_SUPPORT
+        )
 
     def _add_publish_to_command(self, full_cmd, publish):
         for port_mapping in publish:
@@ -1405,6 +1419,7 @@ class ContainerCLI(DockerCLICaller):
                 `publish=[(80,)]`.
             publish_all: Publish all exposed ports to random ports.
             pull: Pull image before running ("always"|"missing"|"never") (default "missing").
+                Ignored for Docker clients older than `20.10.0`.
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
             remove: Automatically remove the container when it exits.
@@ -1432,7 +1447,7 @@ class ContainerCLI(DockerCLICaller):
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )
-        if pull == "missing":
+        if pull == "missing" or not self._client_supports_pull():
             image_cli._pull_if_necessary(image)
         elif pull == "always":
             image_cli.pull(image)
@@ -1546,7 +1561,8 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
-        full_cmd.add_simple_arg("--pull", "never")
+        if self._client_supports_pull():
+            full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
