@@ -165,6 +165,16 @@ class DockerCLICaller:
     def docker_compose_cmd(self) -> Command:
         return self.client_config.docker_compose_cmd
 
+    @property
+    def client_version(self) -> str:
+
+        # TODO: retrieve not only the client version but all of the provided
+        # client and server information and store it in a more convenient data structure.
+
+        full_cmd = self.client_config.docker_cmd + ["version"]
+        full_cmd.add_simple_arg("--format", "{{.Client.Version}}")
+        return run(full_cmd)
+
 
 class ReloadableObject(DockerCLICaller):
     def __init__(
