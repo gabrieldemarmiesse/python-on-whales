@@ -4,13 +4,17 @@ import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
+from packaging import version
 
 import python_on_whales
 from python_on_whales import Image, docker
-from python_on_whales.components.container.cli_wrapper import ContainerStats
+from python_on_whales.components.container.cli_wrapper import (
+    DOCKER_RELEASE_PULL_SUPPORT,
+    ContainerStats,
+)
 from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
@@ -976,3 +980,45 @@ def test_container_run_never_pull(
         tty=False,
         capture_stderr=False,
     )
+
+
+def test_pull_support_release() -> None:
+    assert DOCKER_RELEASE_PULL_SUPPORT == "20.10.0"
+
+
+def test_support_pull_recent_version() -> None:
+    def get_release() -> str:
+        threshold_version = version.parse(DOCKER_RELEASE_PULL_SUPPORT)
+        return f"{threshold_version.major + 1}.0.0"
+
+    with patch(
+        "python_on_whales.client_config.DockerCLICaller.client_version",
+        new_callable=PropertyMock,
+        wraps=get_release,
+    ):
+        assert docker.container._client_supports_pull()
+
+
+def test_support_pull_exact_version() -> None:
+    def get_release() -> str:
+        return DOCKER_RELEASE_PULL_SUPPORT
+
+    with patch(
+        "python_on_whales.client_config.DockerCLICaller.client_version",
+        new_callable=PropertyMock,
+        wraps=get_release,
+    ):
+        assert docker.container._client_supports_pull()
+
+
+def test_support_pull_older_version() -> None:
+    def get_release() -> str:
+        threshold_version = version.parse(DOCKER_RELEASE_PULL_SUPPORT)
+        return f"{threshold_version.major - 1}.0.0"
+
+    with patch(
+        "python_on_whales.client_config.DockerCLICaller.client_version",
+        new_callable=PropertyMock,
+        wraps=get_release,
+    ):
+        assert not docker.container._client_supports_pull()
