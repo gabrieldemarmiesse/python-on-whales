@@ -721,7 +721,7 @@ def test_container_create_default_pull(
     image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
     image_cli_mock.pull.assert_not_called()
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
+        docker.client_config.docker_cmd + ["create", test_image_name]
     )
 
 
@@ -742,7 +742,7 @@ def test_container_create_missing_pull(
     image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
     image_cli_mock.pull.assert_not_called()
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
+        docker.client_config.docker_cmd + ["create", test_image_name]
     )
 
 
@@ -763,7 +763,7 @@ def test_container_create_always_pull(
     image_cli_mock._pull_if_necessary.assert_not_called()
     image_cli_mock.pull.assert_called_once_with(test_image_name)
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
+        docker.client_config.docker_cmd + ["create", test_image_name]
     )
 
 
@@ -801,8 +801,7 @@ def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -
     image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
     image_cli_mock.pull.assert_not_called()
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd
-        + ["container", "run", "--pull", "never", test_image_name],
+        docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
     )
@@ -823,8 +822,7 @@ def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -
     image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
     image_cli_mock.pull.assert_not_called()
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd
-        + ["container", "run", "--pull", "never", test_image_name],
+        docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
     )
@@ -845,8 +843,7 @@ def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) ->
     image_cli_mock._pull_if_necessary.assert_not_called()
     image_cli_mock.pull.assert_called_once_with(test_image_name)
     run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd
-        + ["container", "run", "--pull", "never", test_image_name],
+        docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
     )
