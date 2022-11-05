@@ -122,10 +122,6 @@ class ComposeConfig(BaseModel):
 
 class ComposeProject(BaseModel):
     name: str
-    created: int = 0
-    running: int = 0
-    restarting: int = 0
-    exited: int = 0
-    paused: int = 0
-    dead: int = 0
+    status: str
+    count: int
     config_files: Optional[List[Path]]
