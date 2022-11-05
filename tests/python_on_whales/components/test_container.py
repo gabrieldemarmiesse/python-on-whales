@@ -4,17 +4,13 @@ import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import Mock, patch
 
 import pytest
-from packaging import version
 
 import python_on_whales
 from python_on_whales import Image, docker
-from python_on_whales.components.container.cli_wrapper import (
-    DOCKER_RELEASE_PULL_SUPPORT,
-    ContainerStats,
-)
+from python_on_whales.components.container.cli_wrapper import ContainerStats
 from python_on_whales.components.container.models import (
     ContainerInspectResult,
     ContainerState,
@@ -708,43 +704,12 @@ def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
-@patch("python_on_whales.components.container.cli_wrapper.run")
-@patch("python_on_whales.components.container.cli_wrapper.Container")
-@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_create_unsupported_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = False
-
-    image_cli_mock = Mock()
-    image_mock.return_value = image_cli_mock
-
-    test_image_name = "test_dummy_image"
-
-    docker.create(test_image_name, pull="always")
-
-    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
-    image_cli_mock.pull.assert_not_called()
-    run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd + ["create", test_image_name]
-    )
-
-
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_create_default_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
+    image_mock: Mock, _: Mock, run_mock: Mock
 ) -> None:
-
-    pull_mock.return_value = True
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -760,17 +725,12 @@ def test_container_create_default_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_create_missing_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
+    image_mock: Mock, _: Mock, run_mock: Mock
 ) -> None:
-
-    pull_mock.return_value = True
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -786,17 +746,12 @@ def test_container_create_missing_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_create_always_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
+    image_mock: Mock, _: Mock, run_mock: Mock
 ) -> None:
-
-    pull_mock.return_value = True
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -812,17 +767,10 @@ def test_container_create_always_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_create_never_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = True
+def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -838,45 +786,10 @@ def test_container_create_never_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_unsupported_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = False
-
-    image_cli_mock = Mock()
-    image_mock.return_value = image_cli_mock
-
-    test_image_name = "test_dummy_image"
-
-    docker.run(test_image_name, pull="always")
-
-    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
-    image_cli_mock.pull.assert_not_called()
-    run_mock.assert_called_once_with(
-        docker.client_config.docker_cmd + ["container", "run", test_image_name],
-        tty=False,
-        capture_stderr=False,
-    )
-
-
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
-@patch("python_on_whales.components.container.cli_wrapper.run")
-@patch("python_on_whales.components.container.cli_wrapper.Container")
-@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_default_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = True
+def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -895,17 +808,10 @@ def test_container_run_default_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_missing_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = True
+def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -924,17 +830,10 @@ def test_container_run_missing_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_always_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = True
+def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -953,17 +852,10 @@ def test_container_run_always_pull(
     )
 
 
-@patch(
-    "python_on_whales.components.container.cli_wrapper.ContainerCLI._client_supports_pull"
-)
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_never_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock, pull_mock: Mock
-) -> None:
-
-    pull_mock.return_value = True
+def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
 
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
@@ -980,45 +872,3 @@ def test_container_run_never_pull(
         tty=False,
         capture_stderr=False,
     )
-
-
-def test_pull_support_release() -> None:
-    assert DOCKER_RELEASE_PULL_SUPPORT == "20.10.0"
-
-
-def test_support_pull_recent_version() -> None:
-    def get_release() -> str:
-        threshold_version = version.parse(DOCKER_RELEASE_PULL_SUPPORT)
-        return f"{threshold_version.major + 1}.0.0"
-
-    with patch(
-        "python_on_whales.client_config.DockerCLICaller.client_version",
-        new_callable=PropertyMock,
-        wraps=get_release,
-    ):
-        assert docker.container._client_supports_pull()
-
-
-def test_support_pull_exact_version() -> None:
-    def get_release() -> str:
-        return DOCKER_RELEASE_PULL_SUPPORT
-
-    with patch(
-        "python_on_whales.client_config.DockerCLICaller.client_version",
-        new_callable=PropertyMock,
-        wraps=get_release,
-    ):
-        assert docker.container._client_supports_pull()
-
-
-def test_support_pull_older_version() -> None:
-    def get_release() -> str:
-        threshold_version = version.parse(DOCKER_RELEASE_PULL_SUPPORT)
-        return f"{threshold_version.major - 1}.0.0"
-
-    with patch(
-        "python_on_whales.client_config.DockerCLICaller.client_version",
-        new_callable=PropertyMock,
-        wraps=get_release,
-    ):
-        assert not docker.container._client_supports_pull()
