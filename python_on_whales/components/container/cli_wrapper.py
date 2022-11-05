@@ -711,7 +711,8 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
-        full_cmd.add_simple_arg("--pull", "never")
+        if pull == "never":
+            full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
@@ -1546,7 +1547,8 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
-        full_cmd.add_simple_arg("--pull", "never")
+        if pull == "never":
+            full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
