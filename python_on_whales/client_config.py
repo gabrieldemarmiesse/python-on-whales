@@ -64,6 +64,7 @@ class ClientConfig:
     compose_project_name: Optional[str] = None
     compose_project_directory: Optional[ValidPath] = None
     compose_compatibility: Optional[bool] = None
+    compose_envs: Optional[Dict[str, str]] = None
     client_call: List[str] = field(default_factory=lambda: ["docker"])
     _client_call_with_path: Optional[List[Union[Path, str]]] = None
 
@@ -164,6 +165,10 @@ class DockerCLICaller:
     @property
     def docker_compose_cmd(self) -> Command:
         return self.client_config.docker_compose_cmd
+
+    @property
+    def docker_compose_envs(self) -> Dict[str, str]:
+        return self.client_config.compose_envs or {}
 
 
 class ReloadableObject(DockerCLICaller):

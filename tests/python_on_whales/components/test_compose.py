@@ -218,6 +218,123 @@ def test_docker_compose_up_down_some_services():
     docker.compose.down(timeout=1)
 
 
+def test_docker_compose_config_process_envs(tmp_path: Path):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+    )
+    envs = {"SOME_VARIABLE_TO_INSERT": "test-value"}
+
+    output = docker.compose.config(envs=envs)
+
+    assert output.services["alpine"].environment["SOME_VARIABLE"] == "test-value"
+
+
+def test_docker_compose_config_process_envs_override(tmp_path: Path):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+        compose_envs={"SOME_VARIABLE_TO_INSERT": "test-client"},
+    )
+
+    output = docker.compose.config(envs={"SOME_VARIABLE_TO_INSERT": "test-call"})
+    assert output.services["alpine"].environment["SOME_VARIABLE"] == "test-call"
+
+
+def test_docker_compose_up_process_envs(tmp_path: Path):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+    )
+
+    docker.compose.up(envs={"SOME_VARIABLE_TO_INSERT": "test-value"})
+
+    assert not docker.container.inspect("alpine").state.running
+
+    result = docker.compose.execute(
+        "alpine", ["bash", "-c", "echo $SOME_VARIABLE"], tty=False
+    )
+
+    assert result == "test-value"
+
+
+def test_docker_compose_up_process_envs_override(tmp_path: Path):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+        compose_envs={"SOME_VARIABLE_TO_INSERT": "test-client"},
+    )
+
+    docker.compose.up(envs={"SOME_VARIABLE_TO_INSERT": "test-call"})
+
+    assert not docker.container.inspect("alpine").state.running
+
+    result = docker.compose.execute(
+        "alpine", ["bash", "-c", "echo $SOME_VARIABLE"], tty=False
+    )
+
+    assert result == "test-call"
+
+
+def test_docker_compose_run_process_envs(tmp_path: Path):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+    )
+
+    docker.compose.up(envs={"SOME_VARIABLE_TO_INSERT": "test-up"})
+
+    assert not docker.container.inspect("alpine").state.running
+
+    result = docker.compose.run(
+        "busybox",
+        ["echo", "${SOME_VARIABLE}"],
+        remove=True,
+        tty=False,
+        envs={"SOME_VARIABLE_TO_INSERT": "test-exec"},
+    )
+    assert result == "test-exec"
+
+
+def test_docker_compose_run_process_envs_override(tmp_path: Path):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+        compose_envs={"SOME_VARIABLE_TO_INSERT": "test-client"},
+    )
+
+    docker.compose.up()
+
+    assert not docker.container.inspect("alpine").state.running
+
+    result = docker.compose.run(
+        "busybox",
+        ["echo", "${SOME_VARIABLE}"],
+        remove=True,
+        tty=False,
+        envs={"SOME_VARIABLE_TO_INSERT": "test-exec"},
+    )
+    assert result == "test-exec"
+
+
 def test_docker_compose_ps():
     docker.compose.up(["my_service", "busybox"], detach=True)
     containers = docker.compose.ps()
