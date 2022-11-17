@@ -322,13 +322,18 @@ class ComposeCLI(DockerCLICaller):
         host, port = str(result).split(":")
         return host, int(port)
 
-    def ps(self) -> List[python_on_whales.components.container.cli_wrapper.Container]:
+    def ps(
+        self,
+        services: Optional[List[str]] = None,
+    ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
         # Returns
             A `List[python_on_whales.Container]`
         """
         full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
+        if services:
+            full_cmd += services
         result = run(full_cmd)
         ids = result.splitlines()
         # The first line might be a warning for experimental
