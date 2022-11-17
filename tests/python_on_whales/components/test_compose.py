@@ -223,6 +223,9 @@ def test_docker_compose_ps():
     containers = docker.compose.ps()
     names = set(x.name for x in containers)
     assert names == {"components_my_service_1", "components_busybox_1"}
+    containers = docker.compose.ps(["my_service"])
+    names = set(x.name for x in containers)
+    assert names == {"components_my_service_1"}
     docker.compose.down()
 
 
