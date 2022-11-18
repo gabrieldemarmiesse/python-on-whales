@@ -218,6 +218,16 @@ def test_docker_compose_up_down_some_services():
     docker.compose.down(timeout=1)
 
 
+def test_docker_compose_up_no_recreate():
+    docker.compose.up(["busybox"], detach=True)
+    containers = docker.compose.ps()
+    container_id = containers[0].id
+    docker.compose.up(["busybox"], scales={"busybox": 2}, detach=True, recreate=False)
+    container_ids = set(x.id for x in docker.compose.ps())
+    assert container_id in container_ids
+    docker.compose.down(timeout=1)
+
+
 def test_docker_compose_ps():
     docker.compose.up(["my_service", "busybox"], detach=True)
     containers = docker.compose.ps()

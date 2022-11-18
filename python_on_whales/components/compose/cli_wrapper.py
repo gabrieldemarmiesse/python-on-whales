@@ -653,6 +653,7 @@ class ComposeCLI(DockerCLICaller):
         scales: Dict[str, int] = {},
         attach_dependencies: bool = False,
         force_recreate: bool = False,
+        recreate: bool = True,
         no_build: bool = False,
         color: bool = True,
         log_prefix: bool = True,
@@ -682,6 +683,8 @@ class ComposeCLI(DockerCLICaller):
             attach_dependencies: Attach to dependent containers.
             force_recreate: Recreate containers even if their configuration and image
                 haven't changed.
+            recreate: Recreate the containers if already exist.
+                `recreate=False` and `force_recreate=True` are incompatible.
             no_build: Don't build an image, even if it's missing.
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
@@ -702,6 +705,7 @@ class ComposeCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")
         full_cmd.add_flag("--attach-dependencies", attach_dependencies)
         full_cmd.add_flag("--force-recreate", force_recreate)
+        full_cmd.add_flag("--no-recreate", not recreate)
         full_cmd.add_flag("--no-build", no_build)
         full_cmd.add_flag("--no-color", not color)
         full_cmd.add_flag("--no-log-prefix", not log_prefix)
