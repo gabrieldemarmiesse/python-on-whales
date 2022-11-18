@@ -491,7 +491,7 @@ class ComposeCLI(DockerCLICaller):
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
         # envs: Dict[str, str] = {},
-        # labels: Dict[str, str] = {},
+        labels: Dict[str, str] = {},
         name: Optional[str] = None,
         tty: bool = True,
         stream: bool = False,
@@ -517,6 +517,7 @@ class ComposeCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with the Container.
                     If `False`, returns the command stdout as string.
+            labels: Add or override labels
             name: Assign a name to the container.
             dependencies: Also start linked services.
             publish: Publish a container's port(s) to the host.
@@ -569,6 +570,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.append(service)
         full_cmd += command
 

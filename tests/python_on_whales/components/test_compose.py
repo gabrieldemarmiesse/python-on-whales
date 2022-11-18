@@ -469,6 +469,22 @@ def test_compose_run_detach():
     assert container.logs() == "dodo\n"
 
 
+def test_docker_compose_run_labels():
+    container = docker.compose.run(
+        "alpine",
+        ["echo", "dodo"],
+        labels={"traefik.enable": "false", "hello": "world"},
+        detach=True,
+        tty=False,
+    )
+
+    time.sleep(0.1)
+    print(container.config.labels)
+    assert container.config.labels.get("traefik.enable") == "false"
+    assert container.config.labels.get("hello") == "world"
+    docker.compose.down(timeout=1)
+
+
 def test_compose_version():
     assert "Docker Compose version v2" in docker.compose.version()
 
