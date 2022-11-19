@@ -218,6 +218,16 @@ def test_docker_compose_up_down_some_services():
     docker.compose.down(timeout=1)
 
 
+def test_docker_compose_up_no_recreate():
+    docker.compose.up(["busybox"], detach=True)
+    containers = docker.compose.ps()
+    container_id = containers[0].id
+    docker.compose.up(["busybox"], scales={"busybox": 2}, detach=True, recreate=False)
+    container_ids = set(x.id for x in docker.compose.ps())
+    assert container_id in container_ids
+    docker.compose.down(timeout=1)
+
+
 def test_docker_compose_ps():
     docker.compose.up(["my_service", "busybox"], detach=True)
     containers = docker.compose.ps()
@@ -467,6 +477,22 @@ def test_compose_run_detach():
     time.sleep(0.1)
     assert not container.state.running
     assert container.logs() == "dodo\n"
+
+
+def test_docker_compose_run_labels():
+    container = docker.compose.run(
+        "alpine",
+        ["echo", "dodo"],
+        labels={"traefik.enable": "false", "hello": "world"},
+        detach=True,
+        tty=False,
+    )
+
+    time.sleep(0.1)
+    print(container.config.labels)
+    assert container.config.labels.get("traefik.enable") == "false"
+    assert container.config.labels.get("hello") == "world"
+    docker.compose.down(timeout=1)
 
 
 def test_compose_version():
