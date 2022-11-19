@@ -15,6 +15,8 @@ services:
   busybox:
     image: busybox:latest
     command: sleep infinity
+    environment:
+     - SOME_VARIABLE=${SOME_VARIABLE_TO_INSERT:-nothing}
   busybox-2-electric-boogaloo:
     image: busybox:latest
     depends_on:

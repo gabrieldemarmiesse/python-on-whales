@@ -27,6 +27,7 @@ class ComposeCLI(DockerCLICaller):
         pull: bool = False,
         quiet: bool = False,
         ssh: Optional[str] = None,
+        envs: Dict[str, str] = {},
     ):
         """Build services declared in a yaml compose file.
 
@@ -43,6 +44,7 @@ class ComposeCLI(DockerCLICaller):
             quiet: Don't print anything
             ssh: Set SSH authentications used when building service images.
                 (use `'default'` for using your default SSH Agent)
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["build"]
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
@@ -56,9 +58,13 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += services
-        run(full_cmd, capture_stdout=False)
 
-    def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, capture_stdout=False, env=run_envs)
+
+    def config(
+        self, return_json: bool = False, envs: Dict[str, str] = {}
+    ) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the configuration of the compose stack for further inspection.
 
         For example
@@ -76,12 +82,15 @@ class ComposeCLI(DockerCLICaller):
                 lists and dicts corresponding to the json response, unmodified.
                 It may be useful if you just want to print the config or want to access
                 a field that was not in the `ComposeConfig` class.
+            envs: A dictionary of environment variables to set for the compose process.
 
         # Returns
             A `ComposeConfig` object if `return_json` is `False`, and a `dict` otherwise.
         """
         full_cmd = self.docker_compose_cmd + ["config", "--format", "json"]
-        result = run(full_cmd, capture_stdout=True)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+
         if return_json:
             return json.loads(result)
         else:
@@ -94,6 +103,7 @@ class ComposeCLI(DockerCLICaller):
         force_recreate: bool = False,
         no_build: bool = False,
         no_recreate=False,
+        envs: Dict[str, str] = {},
     ):
         """Creates containers for a service.
 
@@ -110,6 +120,7 @@ class ComposeCLI(DockerCLICaller):
             no_build: Don't build an image, even if it's missing.
             no_recreate: If containers already exist, don't recreate them.
                 Incompatible with `force_recreate=True`.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["create"]
         full_cmd.add_flag("--build", build)
@@ -120,7 +131,9 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd, capture_stdout=False)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, capture_stdout=False, env=run_envs)
 
     def down(
         self,
@@ -129,6 +142,7 @@ class ComposeCLI(DockerCLICaller):
         timeout: Optional[int] = None,
         volumes: bool = False,
         quiet: bool = False,
+        envs: Dict[str, str] = {},
     ):
         """Stops and removes the containers
 
@@ -144,6 +158,7 @@ class ComposeCLI(DockerCLICaller):
                 volumes attached to containers.
             quiet: If `False`, send to stderr and stdout the progress spinners with
                 the messages. If `True`, do not display anything.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["down"]
         full_cmd.add_flag("--remove-orphans", remove_orphans)
@@ -151,7 +166,8 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
 
-        run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, capture_stderr=quiet, capture_stdout=quiet, env=run_envs)
 
     def events(self):
         """Not yet implemented"""
@@ -178,7 +194,7 @@ class ComposeCLI(DockerCLICaller):
                  nothing is returned by the function. By default, the execute command returns only when the
                  command has finished running, and the function will raise an exception `DockerException` if the command
                  exits with a non-zero exit code. If `False`, the command is executed and the stdout is returned.
-            envs: A dictionary of environment variables to set in the container.
+            envs: A dictionary of environment variables to set in the container or compose process.
             index: The index of the container to execute the command in (default 1) if there are multiple containers for this service.
             tty: If `True`, allocate a pseudo-TTY. Use `False` to get the output of the command.
             privileged: If `True`, run the command in privileged mode.
@@ -195,15 +211,23 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
         full_cmd += [service] + command
+
+        # Note: We set both `--env` and process env. Environment variables set
+        # inside the docker-compose file cannot be overridden by the `--env` flag
+        # so the two envs serve diferent purposes.
+        run_envs = {**self.docker_compose_envs, **envs}
         if detach:
-            run(full_cmd)
+            run(full_cmd, env=run_envs)
         elif tty:
-            run(full_cmd, capture_stdout=False, capture_stderr=False)
+            run(full_cmd, capture_stdout=False, capture_stderr=False, env=run_envs)
         else:
-            return run(full_cmd)
+            return run(full_cmd, env=run_envs)
 
     def kill(
-        self, services: Union[str, List[str]] = None, signal: Optional[str] = None
+        self,
+        services: Union[str, List[str]] = None,
+        signal: Optional[str] = None,
+        envs: Dict[str, str] = {},
     ):
         """Kills the container(s) of a service
 
@@ -214,6 +238,7 @@ class ComposeCLI(DockerCLICaller):
                 An empty list means that no services are going to be killed, the function is then
                 a no-op.
             signal: the signal to send to the container. Default is `"SIGKILL"`
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["kill"]
         full_cmd.add_simple_arg("--signal", signal)
@@ -221,7 +246,9 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def logs(
         self,
@@ -233,6 +260,7 @@ class ComposeCLI(DockerCLICaller):
         since: Optional[str] = None,
         until: Optional[str] = None,
         stream: bool = False,
+        envs: Dict[str, str] = {},
     ):
         """View output from containers
 
@@ -253,6 +281,7 @@ class ComposeCLI(DockerCLICaller):
                 `"stdout"`. `content` is the content of the line as bytes.
                 Take a look at [the user guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
                 to have an example of the output.
+            envs: A dictionary of environment variables to set for the compose process.
         # Returns
             `str` if `stream=False` (the default), `Iterable[Tuple[str, bytes]]`
             if `stream=True`.
@@ -266,13 +295,18 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--until", until)
         full_cmd += to_list(services)
 
-        iterator = stream_stdout_and_stderr(full_cmd)
+        run_envs = {**self.docker_compose_envs, **envs}
+        iterator = stream_stdout_and_stderr(full_cmd, env=run_envs)
         if stream:
             return iterator
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def pause(self, services: Union[str, List[str], None] = None):
+    def pause(
+        self,
+        services: Union[str, List[str], None] = None,
+        envs: Dict[str, str] = {},
+    ):
         """Pause one or more services
 
         # Arguments
@@ -281,16 +315,24 @@ class ComposeCLI(DockerCLICaller):
                 of a specific service. A list of string means the call will pause
                 the containers of all the services specified. So if an empty list
                 is provided, then this function call is a no-op.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["pause"]
         if services == []:
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def port(
-        self, service: str, private_port: str, index: int = 1, protocol: str = "tcp"
+        self,
+        service: str,
+        private_port: str,
+        index: int = 1,
+        protocol: str = "tcp",
+        envs: Dict[str, str] = {},
     ) -> Tuple[Optional[str], Optional[int]]:
         """Returns the public port for a port binding.
 
@@ -299,6 +341,7 @@ class ComposeCLI(DockerCLICaller):
             private_port: The private port.
             index: Index of the container if service has multiple replicas (default 1)
             protocol: tcp or udp (default "tcp").
+            envs: A dictionary of environment variables to set for the compose process.
 
         # Returns
             tuple with (host, port). If port is unknown, then host and port are None.
@@ -313,7 +356,8 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--protocol", protocol)
         full_cmd += [service, private_port]
 
-        result = run(full_cmd)
+        run_envs = {**self.docker_compose_envs, **envs}
+        result = run(full_cmd, env=run_envs)
         if result == ":0":
             # docker compose cli joins host:str with port:int in the result. If port is unknown
             # then result has default value for the both variables (str->empty string, int -> 0)
@@ -325,16 +369,23 @@ class ComposeCLI(DockerCLICaller):
     def ps(
         self,
         services: Optional[List[str]] = None,
+        envs: Dict[str, str] = {},
     ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
+
+        # Arguments
+            services: The list of services to select.
+            envs: A dictionary of environment variables to set for the compose process.
 
         # Returns
             A `List[python_on_whales.Container]`
         """
         full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
         if services:
-            full_cmd += services
-        result = run(full_cmd)
+            full_cmd += service
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        result = run(full_cmd, env=run_envs)
         ids = result.splitlines()
         # The first line might be a warning for experimental
         # See https://github.com/docker/compose-cli/issues/1108
@@ -345,13 +396,17 @@ class ComposeCLI(DockerCLICaller):
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def ls(
-        self, all: bool = False, filters: Dict[str, str] = {}
+        self,
+        all: bool = False,
+        filters: Dict[str, str] = {},
+        envs: Dict[str, str] = {},
     ) -> List[ComposeProject]:
         """Returns a list of docker compose projects
 
         # Arguments
-            all_stopped: Results include all stopped compose projects.
-            project_filters: Filter results based on conditions provided.
+            all: Results include all stopped compose projects.
+            filters: Filter results based on conditions provided.
+            envs: A dictionary of environment variables to set for the compose process.
 
         # Returns
             A `List[python_on_whales.ComposeProject]`
@@ -359,6 +414,8 @@ class ComposeCLI(DockerCLICaller):
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+
+        run_envs = {**self.docker_compose_envs, **envs}
 
         return [
             ComposeProject(
@@ -376,7 +433,7 @@ class ComposeCLI(DockerCLICaller):
                 ]
                 or None,
             )
-            for proj in json.loads(run(full_cmd))
+            for proj in json.loads(run(full_cmd, env=run_envs))
         ]
 
     def pull(
@@ -385,6 +442,7 @@ class ComposeCLI(DockerCLICaller):
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
         quiet: bool = False,
+        envs: Dict[str, str] = {},
     ):
         """Pull service images
 
@@ -397,6 +455,7 @@ class ComposeCLI(DockerCLICaller):
             include_deps: Also pull services declared as dependencies
             quiet: By default, the progress bars are printed in stdout and stderr (both).
                 To disable all output, use `quiet=True`
+            envs: A dictionary of environment variables to set for the compose process.
 
         """
         full_cmd = self.docker_compose_cmd + ["pull"]
@@ -408,9 +467,15 @@ class ComposeCLI(DockerCLICaller):
         elif services is not None:
             services = to_list(services)
             full_cmd += services
-        run(full_cmd, capture_stdout=False, capture_stderr=False)
 
-    def push(self, services: Optional[List[str]] = None):
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, capture_stdout=False, capture_stderr=False, env=run_envs)
+
+    def push(
+        self,
+        services: Optional[List[str]] = None,
+        envs: Dict[str, str] = {},
+    ):
         """Push service images
 
         # Arguments
@@ -418,18 +483,22 @@ class ComposeCLI(DockerCLICaller):
                 services will be pushed. If no services are specified (`None`, the default
                 behavior) all images of all services are pushed.
                 If an empty list is provided, then the function call is a no-op.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["push"]
         if services == []:
             return
         elif services is not None:
             full_cmd += services
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def restart(
         self,
         services: Union[str, List[str], None] = None,
         timeout: Union[int, timedelta, None] = None,
+        envs: Dict[str, str] = {},
     ):
         """Restart containers
 
@@ -441,6 +510,7 @@ class ComposeCLI(DockerCLICaller):
                 `None` means the CLI default value (10s).
                 See [the docker stop docs](https://docs.docker.com/engine/reference/commandline/stop/)
                 for more details about this argument.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["restart"]
 
@@ -452,13 +522,16 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def rm(
         self,
         services: Union[str, List[str], None] = None,
         stop: bool = False,
         volumes: bool = False,
+        envs: Dict[str, str] = {},
     ):
         """
         Removes stopped service containers
@@ -474,6 +547,7 @@ class ComposeCLI(DockerCLICaller):
                 If an empty list is provided, this function call is a no-op.
             stop: Stop the containers, if required, before removing
             volumes: Remove any anonymous volumes attached to containers
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["rm", "--force"]
         full_cmd.add_flag("--stop", stop)
@@ -482,7 +556,9 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def run(
         self,
@@ -490,7 +566,7 @@ class ComposeCLI(DockerCLICaller):
         command: List[str] = [],
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
-        # envs: Dict[str, str] = {},
+        envs: Dict[str, str] = {},
         # labels: Dict[str, str] = {},
         name: Optional[str] = None,
         tty: bool = True,
@@ -528,6 +604,7 @@ class ComposeCLI(DockerCLICaller):
             stream: Similar to `docker.run(..., stream=True)`.
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
+            envs: A dictionary of environment variables to set for the compose process.
 
         # Returns:
             Optional[str]
@@ -572,35 +649,45 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.append(service)
         full_cmd += command
 
+        run_envs = {**self.docker_compose_envs, **envs}
+
         if stream:
-            return stream_stdout_and_stderr(full_cmd)
+            return stream_stdout_and_stderr(full_cmd, env=run_envs)
         else:
-            result = run(full_cmd, tty=tty)
+            result = run(full_cmd, tty=tty, env=run_envs)
             if detach:
                 Container = python_on_whales.components.container.cli_wrapper.Container
                 return Container(self.client_config, result, is_immutable_id=True)
             else:
                 return result
 
-    def start(self, services: Union[str, List[str], None] = None):
+    def start(
+        self,
+        services: Union[str, List[str], None] = None,
+        envs: Dict[str, str] = {},
+    ):
         """Start the specified services.
 
         # Arguments
             services: The names of one or more services to start.
                 If `None` (the default), it means all services will start.
                 If an empty list is provided, this function call is a no-op.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["start"]
         if services == []:
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def stop(
         self,
         services: Union[str, List[str], None] = None,
         timeout: Union[int, timedelta, None] = None,
+        envs: Dict[str, str] = {},
     ):
         """Stop services
 
@@ -610,6 +697,7 @@ class ComposeCLI(DockerCLICaller):
                 If an empty list is provided, this function call is a no-op.
             timeout: Number of seconds or timedelta (will be converted to seconds).
                 Specify a shutdown timeout. Default is 10s.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         if isinstance(timeout, timedelta):
             timeout = int(timeout.total_seconds())
@@ -620,13 +708,19 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def top(self):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, services: Union[str, List[str], None] = None):
+    def unpause(
+        self,
+        services: Union[str, List[str], None] = None,
+        envs: Dict[str, str] = {},
+    ):
         """Unpause one or more services
 
         # Arguments
@@ -634,13 +728,16 @@ class ComposeCLI(DockerCLICaller):
                 If `None` (the default), all services are unpaused.
                 If services is an empty list, the function call does nothing,
                 it's a no-op.
+            envs: A dictionary of environment variables to set for the compose process.
         """
         full_cmd = self.docker_compose_cmd + ["unpause"]
         if services == []:
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+
+        run_envs = {**self.docker_compose_envs, **envs}
+        run(full_cmd, env=run_envs)
 
     def up(
         self,
@@ -656,6 +753,7 @@ class ComposeCLI(DockerCLICaller):
         log_prefix: bool = True,
         start: bool = True,
         quiet: bool = False,
+        envs: Dict[str, str] = {},
     ):
         """Start the containers.
 
@@ -686,6 +784,7 @@ class ComposeCLI(DockerCLICaller):
             start: Start the service after creating them.
             quiet: By default, some progress bars and logs are sent to stderr and stdout.
                 Set `quiet=True` to avoid having any output.
+            envs: A dictionary of environment variables to set for the compose process.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -710,8 +809,10 @@ class ComposeCLI(DockerCLICaller):
         elif services is not None:
             services = to_list(services)
             full_cmd += services
+
+        run_envs = {**self.docker_compose_envs, **envs}
         # important information is written to both stdout AND stderr.
-        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet, env=run_envs)
 
     def version(self) -> str:
         """Returns the version of docker compose as a `str`."""

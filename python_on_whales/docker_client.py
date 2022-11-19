@@ -1,6 +1,6 @@
 import base64
 import warnings
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
@@ -56,6 +56,7 @@ class DockerClient(DockerCLICaller):
             the [documentation for profiles](https://docs.docker.com/compose/profiles/).
         compose_env_file: .env file containing the environments variables to inject
             into the compose project. By default, it uses `./.env`.
+        compose_envs: Environment variables to inject into the docker compose process.
         compose_project_name: The name of the compose project. It will be prefixed to
             networks, volumes and containers created by compose.
         compose_project_directory: Use an alternate working directory. By default, it
@@ -100,6 +101,7 @@ class DockerClient(DockerCLICaller):
         compose_project_name: Optional[str] = None,
         compose_project_directory: Optional[ValidPath] = None,
         compose_compatibility: Optional[bool] = None,
+        compose_envs: Optional[Dict[str, str]] = None,
         client_binary: str = "docker",
         client_call: List[str] = ["docker"],
     ):
@@ -128,6 +130,7 @@ class DockerClient(DockerCLICaller):
                 compose_project_name=compose_project_name,
                 compose_project_directory=compose_project_directory,
                 compose_compatibility=compose_compatibility,
+                compose_envs=compose_envs,
                 client_call=client_call,
             )
         super().__init__(client_config)
