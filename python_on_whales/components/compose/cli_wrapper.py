@@ -322,13 +322,18 @@ class ComposeCLI(DockerCLICaller):
         host, port = str(result).split(":")
         return host, int(port)
 
-    def ps(self) -> List[python_on_whales.components.container.cli_wrapper.Container]:
+    def ps(
+        self,
+        services: Optional[List[str]] = None,
+    ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
         # Returns
             A `List[python_on_whales.Container]`
         """
         full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
+        if services:
+            full_cmd += services
         result = run(full_cmd)
         ids = result.splitlines()
         # The first line might be a warning for experimental
@@ -486,7 +491,7 @@ class ComposeCLI(DockerCLICaller):
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
         # envs: Dict[str, str] = {},
-        # labels: Dict[str, str] = {},
+        labels: Dict[str, str] = {},
         name: Optional[str] = None,
         tty: bool = True,
         stream: bool = False,
@@ -512,6 +517,7 @@ class ComposeCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with the Container.
                     If `False`, returns the command stdout as string.
+            labels: Add or override labels
             name: Assign a name to the container.
             dependencies: Also start linked services.
             publish: Publish a container's port(s) to the host.
@@ -564,6 +570,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.append(service)
         full_cmd += command
 
@@ -646,6 +653,7 @@ class ComposeCLI(DockerCLICaller):
         scales: Dict[str, int] = {},
         attach_dependencies: bool = False,
         force_recreate: bool = False,
+        recreate: bool = True,
         no_build: bool = False,
         color: bool = True,
         log_prefix: bool = True,
@@ -675,6 +683,8 @@ class ComposeCLI(DockerCLICaller):
             attach_dependencies: Attach to dependent containers.
             force_recreate: Recreate containers even if their configuration and image
                 haven't changed.
+            recreate: Recreate the containers if already exist.
+                `recreate=False` and `force_recreate=True` are incompatible.
             no_build: Don't build an image, even if it's missing.
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
@@ -695,6 +705,7 @@ class ComposeCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")
         full_cmd.add_flag("--attach-dependencies", attach_dependencies)
         full_cmd.add_flag("--force-recreate", force_recreate)
+        full_cmd.add_flag("--no-recreate", not recreate)
         full_cmd.add_flag("--no-build", no_build)
         full_cmd.add_flag("--no-color", not color)
         full_cmd.add_flag("--no-log-prefix", not log_prefix)

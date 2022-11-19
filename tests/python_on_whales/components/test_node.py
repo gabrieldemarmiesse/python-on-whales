@@ -29,6 +29,21 @@ def test_list_nodes():
 
 
 @pytest.mark.usefixtures("swarm_mode")
+def test_add_label():
+    nodes = docker.node.list()
+    nodes[0].update(labels_add={"foo": "bar"})
+    assert nodes[0].spec.labels["foo"] == "bar"
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_remove_label():
+    nodes = docker.node.list()
+    nodes[0].update(labels_add={"foo": "bar"})
+    nodes[0].update(rm_labels=["foo"])
+    assert "foo" not in nodes[0].spec.labels
+
+
+@pytest.mark.usefixtures("swarm_mode")
 def test_tasks():
     service = docker.service.create("busybox", ["sleep", "infinity"])
 
