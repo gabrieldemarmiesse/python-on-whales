@@ -869,3 +869,25 @@ def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> 
         tty=False,
         capture_stderr=False,
     )
+
+
+def test_container_call_create_never_pull_error() -> None:
+
+    test_image = "alpine:latest"
+
+    if docker.image.exists(test_image):
+        docker.image.remove(test_image, force=True)
+
+    with pytest.raises(DockerException):
+        docker.container.create(test_image, pull="never")
+
+
+def test_container_call_run_never_pull_error() -> None:
+
+    test_image = "alpine:latest"
+
+    if docker.image.exists(test_image):
+        docker.image.remove(test_image, force=True)
+
+    with pytest.raises(DockerException):
+        docker.container.run(test_image, pull="never")
