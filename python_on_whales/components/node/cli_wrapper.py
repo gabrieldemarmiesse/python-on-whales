@@ -238,7 +238,7 @@ class NodeCLI(DockerCLICaller):
             full_cmd += ["--label-add", f"{label_name}={label_value}"]
 
         for label in rm_labels:
-            full_cmd += ["--rm-label", label]
+            full_cmd += ["--label-rm", label]
 
         full_cmd.add_simple_arg("--role", role)
         full_cmd.append(node)
