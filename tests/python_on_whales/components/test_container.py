@@ -702,3 +702,320 @@ def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd + ["attach", test_container_name], tty=True
     )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_default_pull(
+    image_mock: Mock, _: Mock, run_mock: Mock
+) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name)
+
+    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["create", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_missing_pull(
+    image_mock: Mock, _: Mock, run_mock: Mock
+) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name, pull="missing")
+
+    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["create", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_always_pull(
+    image_mock: Mock, _: Mock, run_mock: Mock
+) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name, pull="always")
+
+    image_cli_mock._pull_if_necessary.assert_not_called()
+    image_cli_mock.pull.assert_called_once_with(test_image_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["create", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.create(test_image_name, pull="never")
+
+    image_cli_mock._pull_if_necessary.assert_not_called()
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["create", "--pull", "never", test_image_name]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.run(test_image_name)
+
+    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["container", "run", test_image_name],
+        tty=False,
+        capture_stderr=False,
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.run(test_image_name, pull="missing")
+
+    image_cli_mock._pull_if_necessary.assert_called_once_with(test_image_name)
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["container", "run", test_image_name],
+        tty=False,
+        capture_stderr=False,
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.run(test_image_name, pull="always")
+
+    image_cli_mock._pull_if_necessary.assert_not_called()
+    image_cli_mock.pull.assert_called_once_with(test_image_name)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd + ["container", "run", test_image_name],
+        tty=False,
+        capture_stderr=False,
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container")
+@patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
+def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+
+    image_cli_mock = Mock()
+    image_mock.return_value = image_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.run(test_image_name, pull="never")
+
+    image_cli_mock._pull_if_necessary.assert_not_called()
+    image_cli_mock.pull.assert_not_called()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["container", "run", "--pull", "never", test_image_name],
+        tty=False,
+        capture_stderr=False,
+    )
+
+
+def test_container_call_create_never_pull_error() -> None:
+
+    test_image = "alpine:latest"
+
+    if docker.image.exists(test_image):
+        docker.image.remove(test_image, force=True)
+
+    with pytest.raises(DockerException):
+        docker.container.create(test_image, pull="never")
+
+
+def test_container_call_run_never_pull_error() -> None:
+
+    test_image = "alpine:latest"
+
+    if docker.image.exists(test_image):
+        docker.image.remove(test_image, force=True)
+
+    with pytest.raises(DockerException):
+        docker.container.run(test_image, pull="never")
+
+
+def test_container_call_create_missing_pull_unexistent() -> None:
+
+    base_image_name = "alpine:latest"
+
+    if docker.image.exists(base_image_name):
+        docker.image.remove(base_image_name, force=True)
+    assert not docker.image.exists(base_image_name)
+    docker.container.create(base_image_name, pull="missing")
+    assert docker.image.exists(base_image_name)
+
+
+def test_container_call_create_missing_pull_existent(tmp_path, docker_registry) -> None:
+
+    base_image_name = "alpine:latest"
+    test_image_name = f"{docker_registry}/{base_image_name}"
+
+    base_image = docker.image.pull(base_image_name)
+    base_image.tag(test_image_name)
+    docker.push(test_image_name)
+    remote_id = base_image.id
+
+    (tmp_path / "dodo.txt").write_text("Hello world!")
+    updated_image = base_image.copy_to(
+        tmp_path / "dodo.txt", "/dada.txt", new_tag=test_image_name
+    )
+    local_id = updated_image.id
+
+    assert remote_id != local_id
+    docker.container.create(test_image_name, pull="missing")
+    assert docker.image.inspect(test_image_name).id == local_id
+
+
+def test_container_call_run_missing_pull_unexistent() -> None:
+
+    base_image_name = "alpine:latest"
+
+    if docker.image.exists(base_image_name):
+        docker.image.remove(base_image_name, force=True)
+    assert not docker.image.exists(base_image_name)
+    docker.container.run(base_image_name, pull="missing")
+    assert docker.image.exists(base_image_name)
+
+
+def test_container_call_run_missing_pull_existent(tmp_path, docker_registry) -> None:
+
+    base_image_name = "alpine:latest"
+    test_image_name = f"{docker_registry}/{base_image_name}"
+
+    base_image = docker.image.pull(base_image_name)
+    base_image.tag(test_image_name)
+    docker.push(test_image_name)
+    remote_id = base_image.id
+
+    (tmp_path / "dodo.txt").write_text("Hello world!")
+    updated_image = base_image.copy_to(
+        tmp_path / "dodo.txt", "/dada.txt", new_tag=test_image_name
+    )
+    local_id = updated_image.id
+
+    assert remote_id != local_id
+    docker.container.run(test_image_name, pull="missing")
+    assert docker.image.inspect(test_image_name).id == local_id
+
+
+def test_container_call_create_always_pull_unexistent() -> None:
+
+    base_image_name = "alpine:latest"
+
+    if docker.image.exists(base_image_name):
+        docker.image.remove(base_image_name, force=True)
+    assert not docker.image.exists(base_image_name)
+    docker.container.create(base_image_name, pull="always")
+    assert docker.image.exists(base_image_name)
+
+
+def test_container_call_create_always_pull_existent(tmp_path, docker_registry) -> None:
+
+    base_image_name = "alpine:latest"
+    test_image_name = f"{docker_registry}/{base_image_name}"
+
+    base_image = docker.image.pull(base_image_name)
+    base_image.tag(test_image_name)
+    docker.push(test_image_name)
+    remote_id = base_image.id
+
+    (tmp_path / "dodo.txt").write_text("Hello world!")
+    updated_image = base_image.copy_to(
+        tmp_path / "dodo.txt", "/dada.txt", new_tag=test_image_name
+    )
+    local_id = updated_image.id
+
+    assert remote_id != local_id
+    docker.container.create(test_image_name, pull="always")
+    assert docker.image.inspect(test_image_name).id == remote_id
+
+
+def test_container_call_run_always_pull_unexistent() -> None:
+
+    base_image_name = "alpine:latest"
+
+    if docker.image.exists(base_image_name):
+        docker.image.remove(base_image_name, force=True)
+    assert not docker.image.exists(base_image_name)
+    docker.container.run(base_image_name, pull="always")
+    assert docker.image.exists(base_image_name)
+
+
+def test_container_call_run_always_pull_existent(tmp_path, docker_registry) -> None:
+
+    base_image_name = "alpine:latest"
+    test_image_name = f"{docker_registry}/{base_image_name}"
+
+    base_image = docker.image.pull(base_image_name)
+    base_image.tag(test_image_name)
+    docker.push(test_image_name)
+    remote_id = base_image.id
+
+    (tmp_path / "dodo.txt").write_text("Hello world!")
+    updated_image = base_image.copy_to(
+        tmp_path / "dodo.txt", "/dada.txt", new_tag=test_image_name
+    )
+    local_id = updated_image.id
+
+    assert remote_id != local_id
+    docker.container.run(test_image_name, pull="always")
+    assert docker.image.inspect(test_image_name).id == remote_id
