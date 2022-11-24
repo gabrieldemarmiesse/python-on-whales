@@ -807,30 +807,28 @@ services:
         file.write(base_cfg + service_to_remove)
 
     docker.compose.up(detach=True)
-    containers = docker.compose.ps()
-    assert len(containers) == 2
-    container_ids = [container.id for container in containers]
+    compose_containers = docker.compose.ps()
+    assert len(compose_containers) == 2
+    compose_container_ids = {container.id for container in compose_containers}
 
     # updating the docker compose file to have only 1 service configured
     with open(compose_file, "w") as file:
         file.write(base_cfg)
 
-    docker.compose.up(detach=True)
-    containers = docker.compose.ps()
-    assert len(containers) == 1
-    container_ids.remove(containers[0].id)
-    # remaining id belongs to the container of the removed service
-    removed_service_container_id = container_ids[0]
+    def check_running_containers(expected):
+        containers = docker.ps()
+        container_ids = {container.id for container in containers}
+        assert len(compose_container_ids.intersection(container_ids)) == expected
 
-    # container of the removed service is still running
-    assert len(docker.ps(filters={"id": removed_service_container_id})) == 1
+    docker.compose.up(detach=True)
+    # both containers running
+    check_running_containers(2)
 
     # calling with remove_orphans flag
     docker.compose.up(detach=True, remove_orphans=True)
-    assert len(docker.compose.ps()) == 1
-
-    # container of the removed service was stopped
-    assert len(docker.ps(filters={"id": removed_service_container_id})) == 0
+    # orphan container (of the removed service) was stopped
+    check_running_containers(1)
 
     docker.compose.down(timeout=1)
+    check_running_containers(0)
     remove(compose_file)
