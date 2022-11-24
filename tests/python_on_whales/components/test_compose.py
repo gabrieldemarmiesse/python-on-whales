@@ -784,11 +784,11 @@ def test_compose_ls_project_multiple_statuses():
 
 
 def test_docker_compose_up_remove_orphans():
-    compose_file = tempfile.mktemp(prefix='test_docker_compose_up_remove_orphans_', suffix='.yml')
+    compose_file = tempfile.mktemp(
+        prefix="test_docker_compose_up_remove_orphans_", suffix=".yml"
+    )
     docker = DockerClient(
-        compose_files=[
-            compose_file
-        ],
+        compose_files=[compose_file],
         compose_compatibility=True,
     )
     base_cfg = """version: "3.7"
@@ -803,8 +803,8 @@ services:
 """
 
     # writing the docker compose file with 2 services configured
-    with open(compose_file, 'w') as file:
-        file.write(base_cfg+service_to_remove)
+    with open(compose_file, "w") as file:
+        file.write(base_cfg + service_to_remove)
 
     docker.compose.up(detach=True)
     containers = docker.compose.ps()
@@ -812,7 +812,7 @@ services:
     container_ids = [container.id for container in containers]
 
     # updating the docker compose file to have only 1 service configured
-    with open(compose_file, 'w') as file:
+    with open(compose_file, "w") as file:
         file.write(base_cfg)
 
     docker.compose.up(detach=True)
@@ -823,14 +823,14 @@ services:
     removed_service_container_id = container_ids[0]
 
     # container of the removed service is still running
-    assert len(docker.ps(filters={'id': removed_service_container_id})) == 1
+    assert len(docker.ps(filters={"id": removed_service_container_id})) == 1
 
     # calling with remove_orphans flag
     docker.compose.up(detach=True, remove_orphans=True)
     assert len(docker.compose.ps()) == 1
 
     # container of the removed service was stopped
-    assert len(docker.ps(filters={'id': removed_service_container_id})) == 0
+    assert len(docker.ps(filters={"id": removed_service_container_id})) == 0
 
     docker.compose.down(timeout=1)
     remove(compose_file)
