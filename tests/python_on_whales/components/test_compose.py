@@ -834,4 +834,3 @@ services:
 
     docker.compose.down(timeout=1)
     remove(compose_file)
-
