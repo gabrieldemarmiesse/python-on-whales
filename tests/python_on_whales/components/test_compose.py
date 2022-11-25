@@ -783,6 +783,22 @@ def test_compose_ls_project_multiple_statuses():
     d.compose.down(timeout=1)
 
 
+def check_number_of_running_containers(
+    docker_client, expected, countable_container_ids
+):
+    """
+    Check that we have the expected number of running containers out of the specified ones,
+    Running containers that do not have their id in the list won't be counted.
+    :param docker_client: docker client to use
+    :param expected: the number of expected running containers
+    :param countable_container_ids: a list of container ids
+    :return: None
+    """
+    containers = docker_client.ps()
+    container_ids = {container.id for container in containers}
+    assert len(set(countable_container_ids).intersection(container_ids)) == expected
+
+
 def test_docker_compose_up_remove_orphans():
     compose_file = tempfile.mktemp(
         prefix="test_docker_compose_up_remove_orphans_", suffix=".yml"
@@ -814,20 +830,15 @@ services:
     # updating the docker compose file to have only 1 service configured
     compose_file.write_text(base_cfg)
 
-    def check_running_containers(expected):
-        containers = docker.ps()
-        container_ids = {container.id for container in containers}
-        assert len(compose_container_ids.intersection(container_ids)) == expected
-
     docker.compose.up(detach=True)
     # both containers running
-    check_running_containers(2)
+    check_number_of_running_containers(docker, 2, compose_container_ids)
 
     # calling with remove_orphans flag
     docker.compose.up(detach=True, remove_orphans=True)
     # orphan container (of the removed service) was stopped
-    check_running_containers(1)
+    check_number_of_running_containers(docker, 1, compose_container_ids)
 
     docker.compose.down(timeout=1)
-    check_running_containers(0)
+    check_number_of_running_containers(docker, 0, compose_container_ids)
     remove(compose_file)
