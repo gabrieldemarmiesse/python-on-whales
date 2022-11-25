@@ -655,6 +655,7 @@ class ComposeCLI(DockerCLICaller):
         force_recreate: bool = False,
         recreate: bool = True,
         no_build: bool = False,
+        remove_orphans: bool = False,
         color: bool = True,
         log_prefix: bool = True,
         start: bool = True,
@@ -686,6 +687,7 @@ class ComposeCLI(DockerCLICaller):
             recreate: Recreate the containers if already exist.
                 `recreate=False` and `force_recreate=True` are incompatible.
             no_build: Don't build an image, even if it's missing.
+            remove_orphans: Remove containers for services not defined in the Compose file.
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
             start: Start the service after creating them.
@@ -710,6 +712,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--no-color", not color)
         full_cmd.add_flag("--no-log-prefix", not log_prefix)
         full_cmd.add_flag("--no-start", not start)
+        full_cmd.add_flag("--remove-orphans", remove_orphans)
 
         if services == []:
             return

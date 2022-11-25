@@ -1,7 +1,8 @@
 import signal
+import tempfile
 import time
 from datetime import datetime, timedelta
-from os import makedirs
+from os import makedirs, remove
 from pathlib import Path
 
 import pytest
@@ -780,3 +781,64 @@ def test_compose_ls_project_multiple_statuses():
         assert sorted(project.config_files) == sorted(d.client_config.compose_files)
 
     d.compose.down(timeout=1)
+
+
+def check_number_of_running_containers(
+    docker_client, expected, countable_container_ids
+):
+    """
+    Check that we have the expected number of running containers out of the specified ones,
+    Running containers that do not have their id in the list won't be counted.
+    :param docker_client: docker client to use
+    :param expected: the number of expected running containers
+    :param countable_container_ids: a list of container ids
+    :return: None
+    """
+    containers = docker_client.ps()
+    container_ids = {container.id for container in containers}
+    assert len(set(countable_container_ids).intersection(container_ids)) == expected
+
+
+def test_docker_compose_up_remove_orphans():
+    compose_file = tempfile.mktemp(
+        prefix="test_docker_compose_up_remove_orphans_", suffix=".yml"
+    )
+    compose_file = Path(compose_file)
+    docker = DockerClient(
+        compose_files=[compose_file],
+        compose_compatibility=True,
+    )
+    base_cfg = """version: "3.7"
+services:
+  busybox1:
+    image: busybox:latest
+    command: sleep infinity
+"""
+    service_to_remove = """  busybox2:
+    image: busybox:latest
+    command: sleep infinity
+"""
+
+    # writing the docker compose file with 2 services configured
+    compose_file.write_text(base_cfg + service_to_remove)
+
+    docker.compose.up(detach=True)
+    compose_containers = docker.compose.ps()
+    assert len(compose_containers) == 2
+    compose_container_ids = {container.id for container in compose_containers}
+
+    # updating the docker compose file to have only 1 service configured
+    compose_file.write_text(base_cfg)
+
+    docker.compose.up(detach=True)
+    # both containers running
+    check_number_of_running_containers(docker, 2, compose_container_ids)
+
+    # calling with remove_orphans flag
+    docker.compose.up(detach=True, remove_orphans=True)
+    # orphan container (of the removed service) was stopped
+    check_number_of_running_containers(docker, 1, compose_container_ids)
+
+    docker.compose.down(timeout=1)
+    check_number_of_running_containers(docker, 0, compose_container_ids)
+    remove(compose_file)
