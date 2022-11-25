@@ -787,6 +787,7 @@ def test_docker_compose_up_remove_orphans():
     compose_file = tempfile.mktemp(
         prefix="test_docker_compose_up_remove_orphans_", suffix=".yml"
     )
+    compose_file = Path(compose_file)
     docker = DockerClient(
         compose_files=[compose_file],
         compose_compatibility=True,
@@ -803,8 +804,7 @@ services:
 """
 
     # writing the docker compose file with 2 services configured
-    with open(compose_file, "w") as file:
-        file.write(base_cfg + service_to_remove)
+    compose_file.write_text(base_cfg + service_to_remove)
 
     docker.compose.up(detach=True)
     compose_containers = docker.compose.ps()
@@ -812,8 +812,7 @@ services:
     compose_container_ids = {container.id for container in compose_containers}
 
     # updating the docker compose file to have only 1 service configured
-    with open(compose_file, "w") as file:
-        file.write(base_cfg)
+    compose_file.write_text(base_cfg)
 
     def check_running_containers(expected):
         containers = docker.ps()
