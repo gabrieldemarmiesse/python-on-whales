@@ -107,9 +107,13 @@ class ClientConfig:
         )
 
     def _get_docker_compose_path(self) -> List[str]:
-        if 0 == subprocess.call(["docker", "compose"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+        if 0 == subprocess.call(
+            ["docker", "compose"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        ):
             return ["docker", "compose"]
-        elif 0 == subprocess.call(["docker-compose"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+        elif 0 == subprocess.call(
+            ["docker-compose"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        ):
             return ["docker-compose"]
 
         raise ClientNotFoundError(
@@ -120,7 +124,9 @@ class ClientConfig:
 
     def _get_docker_compose_call_with_path(self) -> List[Union[Path, str]]:
         if self._docker_compose_call_with_path is None:
-            self._docker_compose_call_with_path = list(map(Path, self._get_docker_compose_path())) + self.client_call[1:]
+            self._docker_compose_call_with_path = (
+                list(map(Path, self._get_docker_compose_path())) + self.client_call[1:]
+            )
 
         return self._docker_compose_call_with_path
 
