@@ -113,9 +113,9 @@ class ClientConfig:
             return ["docker-compose"]
 
         raise ClientNotFoundError(
-            f"The binary 'docker-compose' or the docker compose add-in could not be found on your PATH. "
-            f"Please ensure that your PATH is has the directory of the binary you're looking for. "
-            f"You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
+            "The binary 'docker-compose' or the docker compose add-in could not be found on your PATH. "
+            "Please ensure that your PATH is has the directory of the binary you're looking for. "
+            "You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
         )
 
     def _get_docker_compose_call_with_path(self) -> List[Union[Path, str]]:
