@@ -1,5 +1,6 @@
 import json
 import shutil
+import subprocess
 import tempfile
 import warnings
 from dataclasses import dataclass, field
@@ -66,6 +67,7 @@ class ClientConfig:
     compose_compatibility: Optional[bool] = None
     client_call: List[str] = field(default_factory=lambda: ["docker"])
     _client_call_with_path: Optional[List[Union[Path, str]]] = None
+    _docker_compose_call_with_path: Optional[List[Union[Path, str]]] = None
 
     def get_client_call_with_path(self) -> List[Union[Path, str]]:
         if self._client_call_with_path is None:
@@ -103,6 +105,24 @@ class ClientConfig:
             f"Please ensure that your PATH is has the directory of the binary you're looking for. "
             f"You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
         )
+
+    def _get_docker_compose_path(self) -> List[str]:
+        if 0 == subprocess.call(["docker", "compose"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+            return ["docker", "compose"]
+        elif 0 == subprocess.call(["docker-compose"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+            return ["docker-compose"]
+
+        raise ClientNotFoundError(
+            f"The binary 'docker-compose' or the docker compose add-in could not be found on your PATH. "
+            f"Please ensure that your PATH is has the directory of the binary you're looking for. "
+            f"You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
+        )
+
+    def _get_docker_compose_call_with_path(self) -> List[Union[Path, str]]:
+        if self._docker_compose_call_with_path is None:
+            self._docker_compose_call_with_path = list(map(Path, self._get_docker_compose_path())) + self.client_call[1:]
+
+        return self._docker_compose_call_with_path
 
     @property
     def docker_cmd(self) -> Command:
@@ -143,7 +163,7 @@ class ClientConfig:
 
     @property
     def docker_compose_cmd(self) -> Command:
-        base_cmd = self.docker_cmd + ["compose"]
+        base_cmd = Command(self._get_docker_compose_call_with_path())
         base_cmd.add_args_list("--file", self.compose_files)
         base_cmd.add_args_list("--profile", self.compose_profiles)
         base_cmd.add_simple_arg("--env-file", self.compose_env_file)
