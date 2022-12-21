@@ -98,23 +98,19 @@ class ContextCLI(DockerCLICaller):
             from_: create context from a named context
             from_host: use endpoint configuration from existing named context
         """
-        existing_contexts = [str(x) for x in self.list()]
-        if context not in existing_contexts:
-            full_cmd = self.docker_cmd + ["context", "create"]
-            if from_:
-                full_cmd += ["--from", from_]
+        full_cmd = self.docker_cmd + ["context", "create"]
+        if from_:
+            full_cmd.add_simple_arg("--from", from_)
+        else:
+            if from_host:
+                full_cmd.add_simple_arg("--docker from", from_host)
             else:
-                full_cmd += ["--docker"]
-                if from_host:
-                    if from_host in existing_contexts:
-                        full_cmd += [f"from={from_host}"]
-                else:
-                    full_cmd += [f"host={host}"]
-                if description:
-                    full_cmd += [f"--description={description}"]
+                full_cmd.add_simple_arg("--docker host", host)
+            if description:
+                full_cmd.add_simple_arg("--description", description)
 
-            full_cmd += [context]
-            run(full_cmd)
+        full_cmd += [context]
+        run(full_cmd)
 
     @overload
     def inspect(self, x: Union[None, str]) -> Context:
