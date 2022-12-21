@@ -103,9 +103,9 @@ class ContextCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--from", from_)
         else:
             if from_host:
-                full_cmd.add_simple_arg("--docker from", from_host)
+                full_cmd.add_simple_arg("--docker", f"from={from_host}")
             else:
-                full_cmd.add_simple_arg("--docker host", host)
+                full_cmd.add_simple_arg("--docker", f"host={host}")
             if description:
                 full_cmd.add_simple_arg("--description", description)
 
