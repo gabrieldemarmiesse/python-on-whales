@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
@@ -80,37 +82,91 @@ class Context(ReloadableObjectFromJson):
 ValidContext = Union[Context, str]
 
 
+@dataclass
+class DockerContextConfig:
+    from_: Optional[ValidContext] = None
+    host: Optional[str] = None
+    certificate_authority: Union[Path, str, None] = None
+    certificate: Union[Path, str, None] = None
+    key: Union[Path, str, None] = None
+    skip_tls_verify: bool = False
+
+    def format_for_docker_cli(self) -> str:
+        list_of_args = []
+        if self.from_ is not None:
+            list_of_args.append(f"from={self.from_}")
+        if self.host is not None:
+            list_of_args.append(f"host={self.host}")
+        if self.certificate_authority is not None:
+            list_of_args.append(f"ca={self.certificate_authority}")
+        if self.certificate is not None:
+            list_of_args.append(f"cert={self.certificate}")
+        if self.key is not None:
+            list_of_args.append(f"key={self.key}")
+        list_of_args.append(f"skip-tls-verify={self.skip_tls_verify}")
+
+        return ",".join(list_of_args)
+
+
+@dataclass
+class KubernetesContextConfig:
+    from_: Optional[ValidContext] = None
+    config_file: Union[str, Path, None] = None
+    context_override: Optional[str] = None
+    namespace_override: Optional[str] = None
+
+    def format_for_docker_cli(self) -> str:
+        list_of_args = []
+        if self.from_ is not None:
+            list_of_args.append(f"from={self.from_}")
+        if self.config_file is not None:
+            list_of_args.append(f"config-file={self.config_file}")
+        if self.context_override is not None:
+            list_of_args.append(f"context-override={self.context_override}")
+        if self.namespace_override is not None:
+            list_of_args.append(f"namespace-override={self.namespace_override}")
+        return ",".join(list_of_args)
+
+
 class ContextCLI(DockerCLICaller):
     def create(
-            self,
-            context: str,
-            host: str = None,
-            description: str = None,
-            from_: str = None,
-            from_host: ValidContext = None
-    ):
+        self,
+        context_name: str,
+        default_stack_orchestrator: Optional[str] = None,
+        description: Optional[str] = None,
+        from_: Optional[ValidContext] = None,
+        docker: Union[dict[str, Any], DockerContextConfig, None] = None,
+        kubernetes: Union[dict[str, Any], KubernetesContextConfig, None] = None,
+    ) -> Context:
         """Creates a new context
 
         # Arguments
             context: name of the context to create
-            host: uri of the host to access
-            description: description of the context
-            from_: create context from a named context
-            from_host: use endpoint configuration from existing named context
+            default_stack_orchestrator: Default orchestrator for stack operations to use with this context (swarm|kubernetes|all)
+            description: Description of the context
+            docker: Set the docker endpoint
+            from_: Create context from a named context
+            kubernetes: Set the kubernetes endpoint
         """
-        full_cmd = self.docker_cmd + ["context", "create"]
-        if from_:
-            full_cmd.add_simple_arg("--from", from_)
-        else:
-            if from_host:
-                full_cmd.add_simple_arg("--docker", f"from={from_host}")
-            else:
-                full_cmd.add_simple_arg("--docker", f"host={host}")
-            if description:
-                full_cmd.add_simple_arg("--description", description)
+        if isinstance(docker, dict):
+            docker = DockerContextConfig(**docker)
+        if isinstance(kubernetes, dict):
+            kubernetes = KubernetesContextConfig(**kubernetes)
 
-        full_cmd += [context]
+        full_cmd = self.docker_cmd + ["context", "create"]
+
+        full_cmd.add_simple_arg(
+            "--default-stack-orchestrator", default_stack_orchestrator
+        )
+        full_cmd.add_simple_arg("--description", description)
+        full_cmd.add_simple_arg("--from", from_)
+        if docker is not None:
+            full_cmd.add_simple_arg("--docker", docker.format_for_docker_cli())
+        if kubernetes is not None:
+            full_cmd.add_simple_arg("--kubernetes", kubernetes.format_for_docker_cli())
+        full_cmd.append(context_name)
         run(full_cmd)
+        return self.inspect(context_name)
 
     @overload
     def inspect(self, x: Union[None, str]) -> Context:
