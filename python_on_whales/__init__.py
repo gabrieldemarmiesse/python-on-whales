@@ -2,7 +2,7 @@ from .client_config import ClientNotFoundError
 from .components.buildx.cli_wrapper import Builder
 from .components.config.cli_wrapper import Config
 from .components.container.cli_wrapper import Container, ContainerStats
-from .components.context.cli_wrapper import Context
+from .components.context.cli_wrapper import Context, DockerContextConfig, KubernetesContextConfig
 from .components.image.cli_wrapper import Image
 from .components.network.cli_wrapper import Network
 from .components.node.cli_wrapper import Node

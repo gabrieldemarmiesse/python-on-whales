@@ -78,6 +78,9 @@ class Context(ReloadableObjectFromJson):
         """Use this context"""
         ContextCLI(self.client_config).use(self)
 
+    def __repr__(self):
+        return f"python_on_whales.Context(name='{self.name}', endpoints={self.endpoints})"
+
 
 ValidContext = Union[Context, str]
 
@@ -135,8 +138,8 @@ class ContextCLI(DockerCLICaller):
         default_stack_orchestrator: Optional[str] = None,
         description: Optional[str] = None,
         from_: Optional[ValidContext] = None,
-        docker: Union[dict[str, Any], DockerContextConfig, None] = None,
-        kubernetes: Union[dict[str, Any], KubernetesContextConfig, None] = None,
+        docker: Union[Dict[str, Any], DockerContextConfig, None] = None,
+        kubernetes: Union[Dict[str, Any], KubernetesContextConfig, None] = None,
     ) -> Context:
         """Creates a new context
 
@@ -144,9 +147,11 @@ class ContextCLI(DockerCLICaller):
             context: name of the context to create
             default_stack_orchestrator: Default orchestrator for stack operations to use with this context (swarm|kubernetes|all)
             description: Description of the context
-            docker: Set the docker endpoint
+            docker: Set the docker endpoint, you can use a dict of a class to
+                specify the options. The class is `python_on_whales.DockerContextConfig`.
             from_: Create context from a named context
-            kubernetes: Set the kubernetes endpoint
+            kubernetes: Set the kubernetes endpoint. You can use a dict or a class to specify the options. The class
+                is `python_on_whales.KubernetesContextConfig`.
         """
         if isinstance(docker, dict):
             docker = DockerContextConfig(**docker)
