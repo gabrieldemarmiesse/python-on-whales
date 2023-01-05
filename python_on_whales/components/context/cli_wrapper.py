@@ -79,7 +79,9 @@ class Context(ReloadableObjectFromJson):
         ContextCLI(self.client_config).use(self)
 
     def __repr__(self):
-        return f"python_on_whales.Context(name='{self.name}', endpoints={self.endpoints})"
+        return (
+            f"python_on_whales.Context(name='{self.name}', endpoints={self.endpoints})"
+        )
 
 
 ValidContext = Union[Context, str]

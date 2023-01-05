@@ -15,7 +15,9 @@ def test_load_json(json_file):
 def test_create_context():
     testname = "testpow"
     all_contexts_before = set(docker.context.list())
-    docker.context.create(testname, "ssh://test@test.domain", "Python on whales testing context")
+    docker.context.create(
+        testname, "ssh://test@test.domain", "Python on whales testing context"
+    )
     all_contexts_after = set(docker.context.list())
     assert all_contexts_after != all_contexts_before
     assert testname in [str(x) for x in all_contexts_after]
