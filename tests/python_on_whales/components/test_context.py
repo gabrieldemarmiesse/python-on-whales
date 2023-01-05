@@ -12,6 +12,24 @@ def test_load_json(json_file):
     # we could do more checks here if needed
 
 
+def test_create_context():
+    testname = "testpow"
+    host = "ssh://test@test.domain"
+    description = "Python on whales testing context"
+
+    all_contexts_before = set(docker.context.list())
+    with docker.context.create(
+        testname, docker=dict(host=host), description=description
+    ) as new_context:
+        assert new_context.name == testname
+        assert new_context.endpoints["docker"].host == host
+        assert new_context.metadata["Description"] == description
+
+        assert new_context not in all_contexts_before
+
+        assert new_context in docker.context.list()
+
+
 def test_inpect():
     default_context = docker.context.inspect()
     assert default_context.name == "default"
