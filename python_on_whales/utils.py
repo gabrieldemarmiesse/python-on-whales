@@ -78,7 +78,7 @@ def run(
     capture_stdout: bool = True,
     capture_stderr: bool = True,
     input: bytes = None,
-    return_stderr: Literal[True] = False,
+    return_stderr: Literal[True] = True,
     env: Dict[str, str] = {},
     tty: bool = False,
 ) -> Tuple[str, str]:
