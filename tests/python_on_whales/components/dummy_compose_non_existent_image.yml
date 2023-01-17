@@ -4,6 +4,9 @@ services:
   busybox:
     image: busybox:latest
     command: sleep infinity
+    ports:
+      - "3000"
+      - "4000/udp"
   ghost:
     build:
       context: ghost_context

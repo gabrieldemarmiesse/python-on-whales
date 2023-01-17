@@ -175,6 +175,21 @@ class Container(ReloadableObjectFromJson):
     # --------------------------------------------------------------------
     # public methods
 
+    def attach(
+        self,
+        detach_keys: Optional[str] = None,
+        stdin: bool = True,
+        sig_proxy: bool = True,
+    ) -> None:
+        """Attach local standard input, output, and error streams to a running container.
+
+        Alias: `docker.attach(...)`
+
+        See the [`docker.container.attach`](../sub-commands/container.md#attach) command for
+        information about the arguments.
+        """
+        ContainerCLI(self.client_config).attach(self, detach_keys, not stdin, sig_proxy)
+
     def commit(
         self,
         tag: Optional[str] = None,
@@ -353,9 +368,35 @@ class ContainerCLI(DockerCLICaller):
         super().__init__(*args, **kwargs)
         self.remove = self.remove
 
-    def attach(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def attach(
+        self,
+        container: ValidContainer,
+        detach_keys: Optional[str] = None,
+        stdin: bool = True,
+        sig_proxy: bool = True,
+    ) -> None:
+        """Attach local standard input, output, and error streams to a running container
+
+        Alias: `docker.attach(...)`
+
+        # Arguments
+            container: The running container to attach to
+            detach_keys: Override the key sequence for detaching a container
+            stdin: Attach STDIN
+            sig_proxy: Proxy all received signals to the process (default true)
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
+        """
+        self.inspect(container)
+
+        full_cmd = self.docker_cmd + ["attach"]
+        full_cmd.add_simple_arg("--detach-keys", detach_keys)
+        full_cmd.add_flag("--no-stdin", not stdin)
+        full_cmd.add_flag("--sig-proxy", sig_proxy)
+        full_cmd.append(container)
+
+        run(full_cmd, tty=True)
 
     def commit(
         self,
@@ -516,6 +557,7 @@ class ContainerCLI(DockerCLICaller):
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
+        pull: str = "missing",
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
@@ -554,9 +596,15 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
-        python_on_whales.components.image.cli_wrapper.ImageCLI(
+
+        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
-        )._pull_if_necessary(image)
+        )
+        if pull == "missing":
+            image_cli._pull_if_necessary(image)
+        elif pull == "always":
+            image_cli.pull(image)
+
         full_cmd = self.docker_cmd + ["create"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
@@ -662,6 +710,9 @@ class ContainerCLI(DockerCLICaller):
 
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
+
+        if pull == "never":
+            full_cmd.add_simple_arg("--pull", "never")
 
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
@@ -897,7 +948,7 @@ class ContainerCLI(DockerCLICaller):
 
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "kill"]
@@ -1014,7 +1065,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["pause"]
@@ -1195,6 +1246,7 @@ class ContainerCLI(DockerCLICaller):
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
+        pull: str = "missing",
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
@@ -1352,6 +1404,7 @@ class ContainerCLI(DockerCLICaller):
                 the tuple to signify that you want a random free port on the host. For example:
                 `publish=[(80,)]`.
             publish_all: Publish all exposed ports to random ports.
+            pull: Pull image before running ("always"|"missing"|"never") (default "missing").
             read_only: Mount the container's root filesystem as read only.
             restart: Restart policy to apply when a container exits (default "no")
             remove: Automatically remove the container when it exits.
@@ -1376,9 +1429,13 @@ class ContainerCLI(DockerCLICaller):
             and a `python_on_whales.Container` if detach is `True`.
         """
 
-        python_on_whales.components.image.cli_wrapper.ImageCLI(
+        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
-        )._pull_if_necessary(image)
+        )
+        if pull == "missing":
+            image_cli._pull_if_necessary(image)
+        elif pull == "always":
+            image_cli.pull(image)
 
         full_cmd = self.docker_cmd + ["container", "run"]
 
@@ -1489,6 +1546,9 @@ class ContainerCLI(DockerCLICaller):
         self._add_publish_to_command(full_cmd, publish)
         full_cmd.add_flag("--publish-all", publish_all)
 
+        if pull == "never":
+            full_cmd.add_simple_arg("--pull", "never")
+
         full_cmd.add_flag("--read-only", read_only)
         full_cmd.add_simple_arg("--restart", restart)
         full_cmd.add_flag("--rm", remove)
@@ -1551,7 +1611,7 @@ class ContainerCLI(DockerCLICaller):
             containers: One or a list of containers.
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         if attach and len(containers) > 1:
@@ -1631,7 +1691,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         containers = to_list(containers)
-        if not containers:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "stop"]
@@ -1666,7 +1726,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         x = to_list(x)
-        if not x:
+        if x == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "unpause"]
@@ -1721,7 +1781,7 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
         x = to_list(x)
-        if not x:
+        if x == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "update"]

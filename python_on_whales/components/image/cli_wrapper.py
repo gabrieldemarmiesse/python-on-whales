@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
@@ -7,11 +8,14 @@ from subprocess import PIPE, Popen
 from typing import Any, Dict, Iterator, List, Optional, Union, overload
 
 import python_on_whales.components.buildx.cli_wrapper
-import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
+)
+from python_on_whales.components.container.cli_wrapper import (
+    ContainerCLI,
+    ContainerConfig,
 )
 from python_on_whales.components.image.models import (
     ImageGraphDriver,
@@ -81,7 +85,7 @@ class Image(ReloadableObjectFromJson):
     @property
     def container_config(
         self,
-    ) -> python_on_whales.components.container.cli_wrapper.ContainerConfig:
+    ) -> ContainerConfig:
         return self._get_inspect_result().container_config
 
     @property
@@ -95,7 +99,7 @@ class Image(ReloadableObjectFromJson):
     @property
     def config(
         self,
-    ) -> python_on_whales.components.container.cli_wrapper.ContainerConfig:
+    ) -> ContainerConfig:
         return self._get_inspect_result().config
 
     @property
@@ -157,18 +161,23 @@ class Image(ReloadableObjectFromJson):
         """
         return ImageCLI(self.client_config).tag(self, new_tag)
 
-    def copy_from(self, path_in_image: ValidPath, destination: ValidPath):
+    def copy_from(
+        self, path_in_image: ValidPath, destination: ValidPath, pull: str = "missing"
+    ):
         """Copy a file from a docker image in the local filesystem.
 
         See the `docker.image.copy_from` command for information about the arguments.
         """
-        return ImageCLI(self.client_config).copy_from(self, path_in_image, destination)
+        return ImageCLI(self.client_config).copy_from(
+            self, path_in_image, destination, pull
+        )
 
     def copy_to(
         self,
         local_path: ValidPath,
         path_in_image: ValidPath,
         new_tag: Optional[str] = None,
+        pull: str = "missing",
     ) -> Image:
         """Copy a file from the local filesystem in a docker image to create a new
         docker image.
@@ -178,7 +187,7 @@ class Image(ReloadableObjectFromJson):
         See the `docker.image.copy_to` command for information about the arguments.
         """
         return ImageCLI(self.client_config).copy_to(
-            self, local_path, path_in_image, new_tag
+            self, local_path, path_in_image, new_tag, pull
         )
 
     def exists(self) -> bool:
@@ -399,7 +408,12 @@ class ImageCLI(DockerCLICaller):
             raise DockerException(full_cmd, exit_code)
         return stdout.decode().splitlines()
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Image]:
+    def list(
+        self,
+        repository_or_tag: Optional[str] = None,
+        filters: Dict[str, str] = {},
+        all: bool = False,
+    ) -> List[Image]:
         """Returns the list of Docker images present on the machine.
 
         Alias: `docker.images()`
@@ -409,6 +423,21 @@ class ImageCLI(DockerCLICaller):
         # Returns
             A `List[python_on_whales.Image]` object.
         """
+        # previously the signature was
+        # def list(self,filters: Dict[str, str] = {}) -> List[Image]:
+        # so to avoid breakages when people used positional arguments, we can check the types and send a warning
+        if isinstance(repository_or_tag, dict):
+            # after a while, we can convert that to an error. No hurry though.
+            warnings.warn(
+                f"You are calling docker.image.list({repository_or_tag}) with the filter as the first argument."
+                f"Since Python-on-whales v0.51.0, the first argument has be changed to `repository_or_tag`."
+                f"To fix this warning, please add the filters keyword argument, "
+                f"like so: docker.image.list(filters={repository_or_tag}) ",
+                DeprecationWarning,
+            )
+            filters = repository_or_tag
+            repository_or_tag = None
+
         full_cmd = self.docker_cmd + [
             "image",
             "list",
@@ -416,6 +445,10 @@ class ImageCLI(DockerCLICaller):
             "--no-trunc",
         ]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_flag("--all", all)
+
+        if repository_or_tag is not None:
+            full_cmd.append(repository_or_tag)
 
         ids = run(full_cmd).splitlines()
         # the list of tags is bigger than the number of images. We uniquify
@@ -502,7 +535,7 @@ class ImageCLI(DockerCLICaller):
         # this is just to raise a correct exception if the images don't exist
         self.inspect(x)
 
-        if len(x) == 0:
+        if x == []:
             return
         elif len(x) == 1:
             self._push_single_tag(x[0], quiet=quiet)
@@ -545,6 +578,8 @@ class ImageCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["image", "rm"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--no-prune", not prune)
+        if x == []:
+            return
         for image in to_list(x):
             full_cmd.append(image)
 
@@ -651,11 +686,13 @@ class ImageCLI(DockerCLICaller):
             return self.pull(image)
 
     def copy_from(
-        self, image: ValidImage, path_in_image: ValidPath, destination: ValidPath
+        self,
+        image: ValidImage,
+        path_in_image: ValidPath,
+        destination: ValidPath,
+        pull: str = "missing",
     ):
-        with python_on_whales.components.container.cli_wrapper.ContainerCLI(
-            self.client_config
-        ).create(image) as tmp_container:
+        with ContainerCLI(self.client_config).create(image, pull=pull) as tmp_container:
             tmp_container.copy_from(path_in_image, destination)
 
     def copy_to(
@@ -664,9 +701,10 @@ class ImageCLI(DockerCLICaller):
         local_path: ValidPath,
         path_in_image: ValidPath,
         new_tag: Optional[str] = None,
+        pull: str = "missing",
     ) -> Image:
-        with python_on_whales.components.container.cli_wrapper.ContainerCLI(
-            self.client_config
-        ).create(base_image) as tmp_container:
+        with ContainerCLI(self.client_config).create(
+            base_image, pull=pull
+        ) as tmp_container:
             tmp_container.copy_to(local_path, path_in_image)
             return tmp_container.commit(tag=new_tag)

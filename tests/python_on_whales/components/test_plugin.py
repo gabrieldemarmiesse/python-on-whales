@@ -34,3 +34,11 @@ def test_plugin_upgrade():
     with docker.plugin.install(test_plugin_name) as my_plugin:
         my_plugin.disable()
         my_plugin.upgrade()
+
+
+def test_remove_empty_plugin_list():
+    with docker.plugin.install(test_plugin_name) as my_plugin:
+        plugins_set = set(docker.plugin.list())
+        assert my_plugin in plugins_set
+        docker.plugin.remove([])
+        assert set(docker.plugin.list()) == plugins_set

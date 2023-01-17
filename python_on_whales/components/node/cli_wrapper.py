@@ -108,6 +108,8 @@ class NodeCLI(DockerCLICaller):
             x: One or a list of nodes.
         """
         full_cmd = self.docker_cmd + ["node", "demote"]
+        if x == []:
+            return
         full_cmd += to_list(x)
         run(full_cmd)
 
@@ -151,11 +153,13 @@ class NodeCLI(DockerCLICaller):
             x: One or a list of nodes.
         """
         full_cmd = self.docker_cmd + ["node", "promote"]
+        if x == []:
+            return
         full_cmd += to_list(x)
         run(full_cmd)
 
     def ps(
-        self, x: Union[ValidNode, List[ValidNode]] = []
+        self, x: Union[ValidNode, List[ValidNode], None] = None
     ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks running on one or more nodes.
 
@@ -170,12 +174,21 @@ class NodeCLI(DockerCLICaller):
         # Arguments
             x: One or more nodes (can be id, name or `python_on_whales.Node` object.).
                 If the argument is not provided, it defaults to the current node.
+                An empty list means an empty list will also be returned.
 
         # Returns
             `List[python_on_whales.Task]`
         """
+        if x == []:
+            return []
+        elif x is None:
+            # this is the default, on the command line, nothing is provided, and then
+            # it automatically defaults to the current node.
+            command_args = []
+        else:
+            command_args = to_list(x)
         full_cmd = (
-            self.docker_cmd + ["node", "ps", "--quiet", "--no-trunc"] + to_list(x)
+            self.docker_cmd + ["node", "ps", "--quiet", "--no-trunc"] + command_args
         )
         ids = run(full_cmd).splitlines()
         return [
@@ -195,6 +208,8 @@ class NodeCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["node", "remove"]
         full_cmd.add_flag("--force", force)
+        if x == []:
+            return
         full_cmd += to_list(x)
         run(full_cmd)
 
@@ -223,7 +238,7 @@ class NodeCLI(DockerCLICaller):
             full_cmd += ["--label-add", f"{label_name}={label_value}"]
 
         for label in rm_labels:
-            full_cmd += ["--rm-label", label]
+            full_cmd += ["--label-rm", label]
 
         full_cmd.add_simple_arg("--role", role)
         full_cmd.append(node)

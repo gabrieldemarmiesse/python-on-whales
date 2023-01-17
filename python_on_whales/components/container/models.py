@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pydantic
 
@@ -163,7 +163,7 @@ class ContainerHostConfig(DockerCamelModel):
     container_id_file: Path
     log_config: ContainerLogConfig
     network_mode: str
-    port_bindings: Dict[str, List[PortBinding]]
+    port_bindings: Dict[str, Optional[List[PortBinding]]]
     restart_policy: ContainerRestartPolicy
     auto_remove: bool
     volume_driver: str

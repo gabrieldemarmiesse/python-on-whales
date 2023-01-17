@@ -1,7 +1,8 @@
 import signal
+import tempfile
 import time
 from datetime import datetime, timedelta
-from os import makedirs
+from os import makedirs, remove
 from pathlib import Path
 
 import pytest
@@ -29,6 +30,57 @@ docker = DockerClient(
 
 def mock_KeyboardInterrupt(signum, frame):
     raise KeyboardInterrupt("Time is up")
+
+
+def test_build_empty_list_of_services():
+    previous_images = set(docker.image.list())
+    docker.compose.build([])
+    assert previous_images == set(docker.image.list())
+
+
+def test_create_empty_list_of_services():
+    previous_containers = set(docker.ps(all=True))
+    docker.compose.create([])
+    assert previous_containers == set(docker.ps(all=True))
+
+
+def test_kill_empty_list_of_services():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    time.sleep(1)
+    all_running_containers = set(docker.ps())
+    docker.compose.kill([])
+    assert all_running_containers == set(docker.ps())
+    docker.compose.down(timeout=1)
+
+
+def test_pause_empty_list_of_services():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    time.sleep(1)
+    number_of_paused_containers = len([x for x in docker.ps() if x.state.paused])
+    docker.compose.pause([])
+    assert number_of_paused_containers == len(
+        [x for x in docker.ps() if x.state.paused]
+    )
+    docker.compose.down(timeout=1)
+
+
+def test_remove_empty_list_of_services():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    time.sleep(1)
+    number_of_containers = len(docker.ps())
+    docker.compose.rm([], stop=True)
+    assert number_of_containers == len(docker.ps())
+    docker.compose.down(timeout=1)
+
+
+def test_pull_empty_list_of_services():
+    len_list_of_images = len(docker.image.list())
+    docker.compose.pull([])
+    assert len_list_of_images == len(docker.image.list())
+
+
+def test_push_empty_list_of_services():
+    docker.compose.push([])
 
 
 def test_compose_project_name():
@@ -167,11 +219,24 @@ def test_docker_compose_up_down_some_services():
     docker.compose.down(timeout=1)
 
 
+def test_docker_compose_up_no_recreate():
+    docker.compose.up(["busybox"], detach=True)
+    containers = docker.compose.ps()
+    container_id = containers[0].id
+    docker.compose.up(["busybox"], scales={"busybox": 2}, detach=True, recreate=False)
+    container_ids = set(x.id for x in docker.compose.ps())
+    assert container_id in container_ids
+    docker.compose.down(timeout=1)
+
+
 def test_docker_compose_ps():
     docker.compose.up(["my_service", "busybox"], detach=True)
     containers = docker.compose.ps()
     names = set(x.name for x in containers)
     assert names == {"components_my_service_1", "components_busybox_1"}
+    containers = docker.compose.ps(["my_service"])
+    names = set(x.name for x in containers)
+    assert names == {"components_my_service_1"}
     docker.compose.down()
 
 
@@ -202,6 +267,25 @@ def test_docker_compose_restart():
     docker.compose.down()
 
 
+def test_docker_compose_restart_empty_list_of_services():
+    docker.compose.up(["my_service"], detach=True)
+    time.sleep(2)
+
+    for container in docker.compose.ps():
+        assert (datetime.now(pytz.utc) - container.state.started_at) > timedelta(
+            seconds=2
+        )
+
+    docker.compose.restart([], timeout=1)
+
+    for container in docker.compose.ps():
+        assert (datetime.now(pytz.utc) - container.state.started_at) > timedelta(
+            seconds=2
+        )
+
+    docker.compose.down()
+
+
 def test_docker_compose_kill():
     docker.compose.up(["my_service", "busybox"], detach=True)
 
@@ -224,8 +308,12 @@ def test_docker_compose_pull():
         docker.image.remove("alpine")
     except NoSuchImage:
         pass
+    docker.compose.pull("busybox")
     docker.compose.pull(["busybox", "alpine"])
     docker.image.inspect(["busybox", "alpine"])
+
+    # pull with quiet should work too
+    docker.compose.pull(["busybox", "alpine"], quiet=True)
 
 
 def test_docker_compose_pull_ignore_pull_failures():
@@ -259,7 +347,7 @@ def test_docker_compose_up_abort_on_container_exit():
         ],
         compose_compatibility=True,
     )
-    docker.compose.up(["alpine"], abort_on_container_exit=True)
+    docker.compose.up("alpine", abort_on_container_exit=True)
     for container in docker.compose.ps():
         assert not container.state.running
     docker.compose.down()
@@ -390,6 +478,22 @@ def test_compose_run_detach():
     time.sleep(0.1)
     assert not container.state.running
     assert container.logs() == "dodo\n"
+
+
+def test_docker_compose_run_labels():
+    container = docker.compose.run(
+        "alpine",
+        ["echo", "dodo"],
+        labels={"traefik.enable": "false", "hello": "world"},
+        detach=True,
+        tty=False,
+    )
+
+    time.sleep(0.1)
+    print(container.config.labels)
+    assert container.config.labels.get("traefik.enable") == "false"
+    assert container.config.labels.get("hello") == "world"
+    docker.compose.down(timeout=1)
 
 
 def test_compose_version():
@@ -587,3 +691,154 @@ def test_compose_multiple_profiles():
     assert "components_second_profile_test_service_1" in container_names
 
     docker.compose.down(timeout=1)
+
+
+def test_compose_port():
+    d = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_non_existent_image.yml"
+        ]
+    )
+    service = "busybox"
+    d.compose.up(services=[service], detach=True)
+
+    expected_tcp_host, expected_tcp_port, expected_udp_host, expected_udp_port = (
+        None,
+        None,
+        None,
+        None,
+    )
+    for container in d.compose.ps():
+        if service in container.name:
+            tcp_cfg = container.network_settings.ports["3000/tcp"][0]
+            expected_tcp_host, expected_tcp_port = tcp_cfg["HostIp"], int(
+                tcp_cfg["HostPort"]
+            )
+            udp_cfg = container.network_settings.ports["4000/udp"][0]
+            expected_udp_host, expected_udp_port = udp_cfg["HostIp"], int(
+                udp_cfg["HostPort"]
+            )
+            break
+
+    tcp_host, tcp_port = d.compose.port(service, "3000")
+    assert expected_tcp_host == tcp_host
+    assert expected_tcp_port == tcp_port
+
+    udp_host, udp_port = d.compose.port(service, "4000", protocol="udp")
+    assert expected_udp_host == udp_host
+    assert expected_udp_port == udp_port
+
+    invalid_protocol_host, invalid_protocol_type = d.compose.port(
+        service, "4000", protocol="tcp"
+    )
+    assert invalid_protocol_host is None
+    assert invalid_protocol_type is None
+
+    unknown_host, unknown_port = d.compose.port(service, "1111")
+    assert unknown_host is None
+    assert unknown_port is None
+
+    try:
+        _ = d.compose.port("", "123")
+        assert False, "error should be raised for empty service"
+    except ValueError as e:
+        assert e.args == ValueError("Service cannot be empty").args
+
+    try:
+        _ = d.compose.port(service, "")
+        assert False, "error should be raised for empty port"
+    except ValueError as e:
+        assert e.args == ValueError("Private port cannot be empty").args
+
+    d.compose.down(timeout=1)
+
+
+def test_compose_ls_project_multiple_statuses():
+    d = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml",
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml",
+        ],
+        compose_compatibility=True,
+        compose_project_name="test_compose_ls",
+    )
+    d.compose.up(["alpine", "dodo"], detach=True)
+    time.sleep(2)
+
+    projects = d.compose.ls(all=True)
+    project = [
+        proj
+        for proj in projects
+        if proj.name == d.compose.client_config.compose_project_name
+    ][0]
+
+    assert project.running == 1
+    assert project.exited == 1
+    assert project.paused == 0
+    if project.config_files:
+        assert sorted(project.config_files) == sorted(d.client_config.compose_files)
+
+    d.compose.down(timeout=1)
+
+
+def check_number_of_running_containers(
+    docker_client, expected, countable_container_ids
+):
+    """
+    Check that we have the expected number of running containers out of the specified ones,
+    Running containers that do not have their id in the list won't be counted.
+    :param docker_client: docker client to use
+    :param expected: the number of expected running containers
+    :param countable_container_ids: a list of container ids
+    :return: None
+    """
+    containers = docker_client.ps()
+    container_ids = {container.id for container in containers}
+    assert len(set(countable_container_ids).intersection(container_ids)) == expected
+
+
+def test_docker_compose_up_remove_orphans():
+    compose_file = tempfile.mktemp(
+        prefix="test_docker_compose_up_remove_orphans_", suffix=".yml"
+    )
+    compose_file = Path(compose_file)
+    docker = DockerClient(
+        compose_files=[compose_file],
+        compose_compatibility=True,
+    )
+    base_cfg = """version: "3.7"
+services:
+  busybox1:
+    image: busybox:latest
+    command: sleep infinity
+"""
+    service_to_remove = """  busybox2:
+    image: busybox:latest
+    command: sleep infinity
+"""
+
+    # writing the docker compose file with 2 services configured
+    compose_file.write_text(base_cfg + service_to_remove)
+
+    docker.compose.up(detach=True)
+    compose_containers = docker.compose.ps()
+    assert len(compose_containers) == 2
+    compose_container_ids = {container.id for container in compose_containers}
+
+    # updating the docker compose file to have only 1 service configured
+    compose_file.write_text(base_cfg)
+
+    docker.compose.up(detach=True)
+    # both containers running
+    check_number_of_running_containers(docker, 2, compose_container_ids)
+
+    # calling with remove_orphans flag
+    docker.compose.up(detach=True, remove_orphans=True)
+    # orphan container (of the removed service) was stopped
+    check_number_of_running_containers(docker, 1, compose_container_ids)
+
+    docker.compose.down(timeout=1)
+    check_number_of_running_containers(docker, 0, compose_container_ids)
+    remove(compose_file)

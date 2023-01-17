@@ -144,7 +144,10 @@ class ConfigCLI(DockerCLICaller):
         # Arguments
             x: One or a list of configs. Valid values are the id of the config or
                 a `python_on_whales.Config` object.
+                An empty list means the function call does nothing.
         """
         full_cmd = self.docker_cmd + ["config", "rm"]
+        if x == []:
+            return
         full_cmd += to_list(x)
         run(full_cmd)

@@ -7,9 +7,10 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.compose.models import ComposeConfig
+from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
     format_dict_for_cli,
+    parse_ls_status_count,
     run,
     stream_stdout_and_stderr,
     to_list,
@@ -19,7 +20,7 @@ from python_on_whales.utils import (
 class ComposeCLI(DockerCLICaller):
     def build(
         self,
-        services: List[str] = [],
+        services: Optional[List[str]] = None,
         build_args: Dict[str, str] = {},
         cache: bool = True,
         progress: Optional[str] = None,
@@ -30,8 +31,9 @@ class ComposeCLI(DockerCLICaller):
         """Build services declared in a yaml compose file.
 
         # Arguments
-            services: The services to build (as strings).
-                If empty (default), all services are built.
+            services: The services to build (as list of strings).
+                If `None` (default), all services are built.
+                An empty list means that nothing will be built.
             build_arguments: Set build-time variables for services. For example
                  `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
             cache: Set to `False` if you don't want to use the cache to build your images
@@ -49,7 +51,11 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--quiet", quiet)
         full_cmd.add_simple_arg("--ssh", ssh)
-        full_cmd += services
+
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += services
         run(full_cmd, capture_stdout=False)
 
     def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
@@ -83,7 +89,7 @@ class ComposeCLI(DockerCLICaller):
 
     def create(
         self,
-        services: Union[str, List[str]] = [],
+        services: Union[str, List[str], None] = None,
         build: bool = False,
         force_recreate: bool = False,
         no_build: bool = False,
@@ -92,6 +98,12 @@ class ComposeCLI(DockerCLICaller):
         """Creates containers for a service.
 
         # Arguments
+            services: The name of the services for which the containers will
+                be created. The default `None` means that the containers for all
+                services will be created. A single string means we will create the
+                container for a single service. A list of string means we will create
+                the containers for each service in the list. An empty list means nothing
+                will be created, the function call is then a no-op.
             build: Build images before starting containers.
             force_recreate: Recreate containers even if their configuration and
                 image haven't changed.
@@ -104,7 +116,10 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--force-recreate", force_recreate)
         full_cmd.add_flag("--no-build", no_build)
         full_cmd.add_flag("--no-recreate", no_recreate)
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd, capture_stdout=False)
 
     def down(
@@ -113,6 +128,7 @@ class ComposeCLI(DockerCLICaller):
         remove_images: Optional[str] = None,
         timeout: Optional[int] = None,
         volumes: bool = False,
+        quiet: bool = False,
     ):
         """Stops and removes the containers
 
@@ -126,6 +142,8 @@ class ComposeCLI(DockerCLICaller):
             volumes: Remove named volumes declared in the
                 volumes section of the Compose file and anonymous
                 volumes attached to containers.
+            quiet: If `False`, send to stderr and stdout the progress spinners with
+                the messages. If `True`, do not display anything.
         """
         full_cmd = self.docker_compose_cmd + ["down"]
         full_cmd.add_flag("--remove-orphans", remove_orphans)
@@ -133,7 +151,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
 
-        run(full_cmd)
+        run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
 
     def events(self):
         """Not yet implemented"""
@@ -164,7 +182,7 @@ class ComposeCLI(DockerCLICaller):
             index: The index of the container to execute the command in (default 1) if there are multiple containers for this service.
             tty: If `True`, allocate a pseudo-TTY. Use `False` to get the output of the command.
             privileged: If `True`, run the command in privileged mode.
-            user: The user name to use inside the container.
+            user: The username to use inside the container.
             workdir: The working directory inside the container.
         """
         full_cmd = self.docker_compose_cmd + ["exec"]
@@ -184,18 +202,25 @@ class ComposeCLI(DockerCLICaller):
         else:
             return run(full_cmd)
 
-    def kill(self, services: Union[str, List[str]] = [], signal: Optional[str] = None):
+    def kill(
+        self, services: Union[str, List[str]] = None, signal: Optional[str] = None
+    ):
         """Kills the container(s) of a service
 
         # Arguments
-            services: One or more service(s) to kill
+            services: One or more service(s) to kill. The default (`None`) is to kill all services.
+                A string means the call will kill one single service. A list of service names can
+                be provided to kill multiple services in one function call.
+                An empty list means that no services are going to be killed, the function is then
+                a no-op.
             signal: the signal to send to the container. Default is `"SIGKILL"`
         """
-        services = to_list(services)
-
         full_cmd = self.docker_compose_cmd + ["kill"]
         full_cmd.add_simple_arg("--signal", signal)
-        full_cmd += services
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
     def logs(
@@ -223,7 +248,7 @@ class ComposeCLI(DockerCLICaller):
             since: Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
             until: Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
             stream: Similar to the `stream` argument of `docker.run()`.
-                This function will then returns and iterator that will yield a
+                This function will then return and iterator that will yield a
                 tuple `(source, content)` with `source` being `"stderr"` or
                 `"stdout"`. `content` is the content of the line as bytes.
                 Take a look at [the user guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
@@ -247,23 +272,68 @@ class ComposeCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def pause(self, services: Union[str, List[str]] = []):
-        """Pause one or more services"""
+    def pause(self, services: Union[str, List[str], None] = None):
+        """Pause one or more services
+
+        # Arguments
+            services: `None` (the default) means pause all containers of all
+                compose services. A string means that the call will pause the container
+                of a specific service. A list of string means the call will pause
+                the containers of all the services specified. So if an empty list
+                is provided, then this function call is a no-op.
+        """
         full_cmd = self.docker_compose_cmd + ["pause"]
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
-    def port(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def port(
+        self, service: str, private_port: str, index: int = 1, protocol: str = "tcp"
+    ) -> Tuple[Optional[str], Optional[int]]:
+        """Returns the public port for a port binding.
 
-    def ps(self) -> List[python_on_whales.components.container.cli_wrapper.Container]:
+        # Arguments
+            service: The name of the service.
+            private_port: The private port.
+            index: Index of the container if service has multiple replicas (default 1)
+            protocol: tcp or udp (default "tcp").
+
+        # Returns
+            tuple with (host, port). If port is unknown, then host and port are None.
+        """
+        full_cmd = self.docker_compose_cmd + ["port"]
+        if service == "":
+            raise ValueError("Service cannot be empty")
+        if private_port == "":
+            raise ValueError("Private port cannot be empty")
+
+        full_cmd.add_simple_arg("--index", index)
+        full_cmd.add_simple_arg("--protocol", protocol)
+        full_cmd += [service, private_port]
+
+        result = run(full_cmd)
+        if result == ":0":
+            # docker compose cli joins host:str with port:int in the result. If port is unknown
+            # then result has default value for the both variables (str->empty string, int -> 0)
+            return None, None
+
+        host, port = str(result).split(":")
+        return host, int(port)
+
+    def ps(
+        self,
+        services: Optional[List[str]] = None,
+    ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
         # Returns
             A `List[python_on_whales.Container]`
         """
         full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
+        if services:
+            full_cmd += services
         result = run(full_cmd)
         ids = result.splitlines()
         # The first line might be a warning for experimental
@@ -274,49 +344,99 @@ class ComposeCLI(DockerCLICaller):
         Container = python_on_whales.components.container.cli_wrapper.Container
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
+    def ls(
+        self, all: bool = False, filters: Dict[str, str] = {}
+    ) -> List[ComposeProject]:
+        """Returns a list of docker compose projects
+
+        # Arguments
+            all_stopped: Results include all stopped compose projects.
+            project_filters: Filter results based on conditions provided.
+
+        # Returns
+            A `List[python_on_whales.ComposeProject]`
+        """
+        full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
+        full_cmd.add_flag("--all", all)
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+
+        return [
+            ComposeProject(
+                name=proj["Name"],
+                created=parse_ls_status_count(proj["Status"], "created"),
+                running=parse_ls_status_count(proj["Status"], "running"),
+                restarting=parse_ls_status_count(proj["Status"], "restarting"),
+                exited=parse_ls_status_count(proj["Status"], "exited"),
+                paused=parse_ls_status_count(proj["Status"], "paused"),
+                dead=parse_ls_status_count(proj["Status"], "dead"),
+                config_files=[
+                    Path(path)
+                    for path in proj.get("ConfigFiles", "").split(",")
+                    if "ConfigFiles" in proj
+                ]
+                or None,
+            )
+            for proj in json.loads(run(full_cmd))
+        ]
+
     def pull(
         self,
-        services: List[str] = [],
+        services: Union[List[str], str, None] = None,
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
+        quiet: bool = False,
     ):
         """Pull service images
 
         # Arguments
             services: The list of services to select. Only the images of those
-                services will be pulled. If no services are specified (the default
+                services will be pulled. If no services are specified (`None`) (the default
                 behavior) all images of all services are pulled.
+                If an empty list is provided, then the function call is a no-op.
             ignore_pull_failures: Pull what it can and ignores images with pull failures
             include_deps: Also pull services declared as dependencies
+            quiet: By default, the progress bars are printed in stdout and stderr (both).
+                To disable all output, use `quiet=True`
 
         """
         full_cmd = self.docker_compose_cmd + ["pull"]
         full_cmd.add_flag("--ignore-pull-failures", ignore_pull_failures)
         full_cmd.add_flag("--include-deps", include_deps)
-        full_cmd += services
-        run(full_cmd)
+        full_cmd.add_flag("--quiet", quiet)
+        if services == []:
+            return
+        elif services is not None:
+            services = to_list(services)
+            full_cmd += services
+        run(full_cmd, capture_stdout=False, capture_stderr=False)
 
-    def push(self, services: List[str] = []):
+    def push(self, services: Optional[List[str]] = None):
         """Push service images
 
         # Arguments
             services: The list of services to select. Only the images of those
-                services will be pushed. If no services are specified (the default
+                services will be pushed. If no services are specified (`None`, the default
                 behavior) all images of all services are pushed.
+                If an empty list is provided, then the function call is a no-op.
         """
         full_cmd = self.docker_compose_cmd + ["push"]
-        full_cmd += services
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += services
         run(full_cmd)
 
     def restart(
         self,
-        services: Union[str, List[str]] = [],
+        services: Union[str, List[str], None] = None,
         timeout: Union[int, timedelta, None] = None,
     ):
         """Restart containers
 
         # Arguments
-            services: The names of one or more services to restart (str or list of str)
+            services: The names of one or more services to restart (str or list of str).
+                If the argument is not specified, `services` is `None` and all services are restarted.
+                If `services` is an empty list, then the function call is a no-op.
             timeout: The shutdown timeout (`int` are interpreted as seconds).
                 `None` means the CLI default value (10s).
                 See [the docker stop docs](https://docs.docker.com/engine/reference/commandline/stop/)
@@ -328,12 +448,15 @@ class ComposeCLI(DockerCLICaller):
             timeout = int(timeout.total_seconds())
 
         full_cmd.add_simple_arg("--timeout", timeout)
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
     def rm(
         self,
-        services: Union[str, List[str]] = [],
+        services: Union[str, List[str], None] = None,
         stop: bool = False,
         volumes: bool = False,
     ):
@@ -346,14 +469,19 @@ class ComposeCLI(DockerCLICaller):
         Any data which is not in a volume will be lost.
 
         # Arguments
-            services: The names of one or more services to remove (str or list of str)
+            services: The names of one or more services to remove (str or list of str).
+                If `None` (the default) then all services are removed.
+                If an empty list is provided, this function call is a no-op.
             stop: Stop the containers, if required, before removing
             volumes: Remove any anonymous volumes attached to containers
         """
         full_cmd = self.docker_compose_cmd + ["rm", "--force"]
         full_cmd.add_flag("--stop", stop)
         full_cmd.add_flag("--volumes", volumes)
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
     def run(
@@ -363,7 +491,7 @@ class ComposeCLI(DockerCLICaller):
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
         # envs: Dict[str, str] = {},
-        # labels: Dict[str, str] = {},
+        labels: Dict[str, str] = {},
         name: Optional[str] = None,
         tty: bool = True,
         stream: bool = False,
@@ -389,6 +517,7 @@ class ComposeCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with the Container.
                     If `False`, returns the command stdout as string.
+            labels: Add or override labels
             name: Assign a name to the container.
             dependencies: Also start linked services.
             publish: Publish a container's port(s) to the host.
@@ -441,6 +570,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
         full_cmd.append(service)
         full_cmd += command
 
@@ -454,25 +584,32 @@ class ComposeCLI(DockerCLICaller):
             else:
                 return result
 
-    def start(self, services: Union[str, List[str]] = []):
+    def start(self, services: Union[str, List[str], None] = None):
         """Start the specified services.
 
         # Arguments
-            services: The names of one or more services to start
+            services: The names of one or more services to start.
+                If `None` (the default), it means all services will start.
+                If an empty list is provided, this function call is a no-op.
         """
         full_cmd = self.docker_compose_cmd + ["start"]
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
     def stop(
         self,
-        services: Union[str, List[str]] = [],
+        services: Union[str, List[str], None] = None,
         timeout: Union[int, timedelta, None] = None,
     ):
         """Stop services
 
         # Arguments
-            services: The names of one or more services to stop (str or list of str)
+            services: The names of one or more services to stop (str or list of str).
+                If `None` (the default), it means all services will stop.
+                If an empty list is provided, this function call is a no-op.
             timeout: Number of seconds or timedelta (will be converted to seconds).
                 Specify a shutdown timeout. Default is 10s.
         """
@@ -481,40 +618,57 @@ class ComposeCLI(DockerCLICaller):
 
         full_cmd = self.docker_compose_cmd + ["stop"]
         full_cmd.add_simple_arg("--timeout", timeout)
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
     def top(self):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, services: Union[str, List[str]] = []):
-        """Unpause one or more services"""
+    def unpause(self, services: Union[str, List[str], None] = None):
+        """Unpause one or more services
+
+        # Arguments
+            services: One or more service to unpause.
+                If `None` (the default), all services are unpaused.
+                If services is an empty list, the function call does nothing,
+                it's a no-op.
+        """
         full_cmd = self.docker_compose_cmd + ["unpause"]
-        full_cmd += to_list(services)
+        if services == []:
+            return
+        elif services is not None:
+            full_cmd += to_list(services)
         run(full_cmd)
 
     def up(
         self,
-        services: List[str] = [],
+        services: Union[List[str], str, None] = None,
         build: bool = False,
         detach: bool = False,
         abort_on_container_exit: bool = False,
         scales: Dict[str, int] = {},
         attach_dependencies: bool = False,
         force_recreate: bool = False,
+        recreate: bool = True,
         no_build: bool = False,
+        remove_orphans: bool = False,
         color: bool = True,
         log_prefix: bool = True,
         start: bool = True,
+        quiet: bool = False,
     ):
         """Start the containers.
 
         Reading the logs of the containers is not yet implemented.
 
         # Arguments
-            services: The services to start. If empty (default), all services are
-                started.
+            services: The services to start. If `None` (default), all services are
+                started. If an empty list is provided, the function call does nothing, it's
+                a no-op.
             build: If `True`, build the docker images before starting the containers
                 even if a docker image with this name already exists.
                 If `False` (the default), build only the docker images that do not already
@@ -530,10 +684,15 @@ class ComposeCLI(DockerCLICaller):
             attach_dependencies: Attach to dependent containers.
             force_recreate: Recreate containers even if their configuration and image
                 haven't changed.
+            recreate: Recreate the containers if already exist.
+                `recreate=False` and `force_recreate=True` are incompatible.
             no_build: Don't build an image, even if it's missing.
+            remove_orphans: Remove containers for services not defined in the Compose file.
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
             start: Start the service after creating them.
+            quiet: By default, some progress bars and logs are sent to stderr and stdout.
+                Set `quiet=True` to avoid having any output.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -548,13 +707,20 @@ class ComposeCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")
         full_cmd.add_flag("--attach-dependencies", attach_dependencies)
         full_cmd.add_flag("--force-recreate", force_recreate)
+        full_cmd.add_flag("--no-recreate", not recreate)
         full_cmd.add_flag("--no-build", no_build)
         full_cmd.add_flag("--no-color", not color)
         full_cmd.add_flag("--no-log-prefix", not log_prefix)
         full_cmd.add_flag("--no-start", not start)
+        full_cmd.add_flag("--remove-orphans", remove_orphans)
 
-        full_cmd += services
-        run(full_cmd, capture_stdout=False)
+        if services == []:
+            return
+        elif services is not None:
+            services = to_list(services)
+            full_cmd += services
+        # important information is written to both stdout AND stderr.
+        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     def version(self) -> str:
         """Returns the version of docker compose as a `str`."""

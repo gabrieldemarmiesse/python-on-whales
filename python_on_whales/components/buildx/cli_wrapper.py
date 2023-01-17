@@ -60,6 +60,14 @@ class Builder(ReloadableObject):
     def driver(self) -> str:
         return self._get_inspect_result().driver
 
+    @property
+    def status(self) -> str:
+        return self._get_inspect_result().status
+
+    @property
+    def platforms(self) -> List[str]:
+        return self._get_inspect_result().platforms
+
     def __repr__(self):
         return f"python_on_whales.Builder(name='{self.name}', driver='{self.driver}')"
 
@@ -552,4 +560,4 @@ def format_dict_for_buildx(options: Dict[str, str]) -> str:
 
 def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:
     for origin, value in stream_stdout_and_stderr(full_cmd, env=env):
-        yield value.decode()
+        yield value.decode(errors="replace")

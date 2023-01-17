@@ -46,6 +46,22 @@ def test_buildx_build_streaming_logs(tmp_path):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_streaming_logs_with_decode_error_handling(tmp_path):
+    # This will simulate buildx clipping log output in the middle of a UTF-8 character
+    bad_encoding_dockerfile = (
+        dockerfile_content1
+        + """
+    RUN printf '\\xE2\\x9E'
+    """
+    )
+    (tmp_path / "Dockerfile").write_text(bad_encoding_dockerfile)
+    output = list(docker.buildx.build(tmp_path, cache=False, stream_logs=True))
+    assert output[0] == "#1 [internal] load build definition from Dockerfile\n"
+    assert len([x for x in output if "�" in x]) == 1
+    assert "#7 DONE" in output[-1]
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_load_docker_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     my_image = docker.buildx.build(tmp_path, load=True)
@@ -360,11 +376,32 @@ Status:    inactive
 Platforms:
 """
 
+some_builder_info_with_platforms = """
+Name:   blissful_swartz
+Driver: docker-container
+
+Nodes:
+Name:      blissful_swartz0
+Endpoint:  unix:///var/run/docker.sock
+Status:    running
+Platforms: linux/amd64, linux/arm64
+"""
+
 
 def test_builder_inspect_result_from_string():
     a = BuilderInspectResult.from_str(some_builder_info)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
+    assert a.status == "inactive"
+    assert a.platforms == []
+
+
+def test_builder_inspect_result_platforms_from_string():
+    a = BuilderInspectResult.from_str(some_builder_info_with_platforms)
+    assert a.name == "blissful_swartz"
+    assert a.driver == "docker-container"
+    assert a.status == "running"
+    assert a.platforms == ["linux/amd64", "linux/arm64"]
 
 
 bake_test_dir = PROJECT_ROOT / "tests/python_on_whales/components/bake_tests"

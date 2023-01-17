@@ -1,13 +1,23 @@
 <img src="https://raw.githubusercontent.com/gabrieldemarmiesse/python-on-whales/master/img/full.png" alt="logo" class="responsive" style="width: 80%; height: auto;">
 
+------------------------------------------------------------------------
+
+[![Run tests](https://github.com/gabrieldemarmiesse/python-on-whales/actions/workflows/python-package.yml/badge.svg?branch=master)](https://github.com/gabrieldemarmiesse/python-on-whales/actions/workflows/python-package.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/gabrieldemarmiesse/python-on-whales/blob/master/LICENSE)
+[![Downloads](https://pepy.tech/badge/python-on-whales/month)](https://pepy.tech/project/python-on-whales)
+
+
+------------------------------------------------------------------------
 A Docker client for Python, designed to be fun and intuitive!
 
 Works on Linux, macOS and Windows, for Python 3.7 and above. 
 
-The docs can be found at this address: <https://gabrieldemarmiesse.github.io/python-on-whales/>
+* [Documentation](https://gabrieldemarmiesse.github.io/python-on-whales/)
+* [Github repository](https://github.com/gabrieldemarmiesse/python-on-whales)
 
-The GitHub repo can be found at this address: <https://github.com/gabrieldemarmiesse/python-on-whales>
-
+------------------------------------------------------------------------
 
 ## How to install?
 
@@ -240,40 +250,16 @@ too: `docker.buildx.build(...)`, `docker.stack.deploy(...)`...
 
 Use the right tool for the right job 🙂
 
-## Where is the project now? Where is it going?
-
-| sub-command  | Functions implemented  | Progress |
-|---|---|---|
-| buildx  | 10/11 | ![92%](https://progress-bar.dev/92) |
-| compose  | 18/23 | ![73%](https://progress-bar.dev/78) |
-| config  | 4/4 | ![50%](https://progress-bar.dev/100) |
-| container | 22/24 | ![50%](https://progress-bar.dev/91) |
-| context  | 4/6 | ![50%](https://progress-bar.dev/67) |
-| image  | 12/13 | ![50%](https://progress-bar.dev/92) |
-| manifest  | 0/4 | ![50%](https://progress-bar.dev/0) |
-| network  | 7/7 | ![100%](https://progress-bar.dev/100) |
-| node  | 7/7 | ![100%](https://progress-bar.dev/100) |
-| plugins  | 10/10 | ![50%](https://progress-bar.dev/100) |
-| secret  | 4/4 | ![100%](https://progress-bar.dev/100) |
-| service  | 7/9 | ![50%](https://progress-bar.dev/78) |
-| stack  | 5/5 | ![100%](https://progress-bar.dev/100) |
-| swarm  | 8/8 | ![100%](https://progress-bar.dev/100) |
-| system  | 3/4 | ![50%](https://progress-bar.dev/75) |
-| trust  | 0/3 | ![50%](https://progress-bar.dev/0) |
-| volume  | 7/7 | ![50%](https://progress-bar.dev/100) |
-
-Take those numbers with a grain of salt. The functions don't all need the same amount of work to be implemented.
-
 ## Alternatives to Docker: Podman, nerdctl...
 
 Support for Docker-compatible clients like [Podman](https://podman.io/) and [Nerdctl](https://github.com/containerd/nerdctl) was introduced in Python-on-whales version 0.44.0.
 
-You can use an arbitrary binary to execute Docker commands by using the argument `client_binary` of `python_on_whales.DockerCLient`.
+You can use an arbitrary binary to execute Docker commands by using the argument `client_call` of `python_on_whales.DockerCLient`.
 Here is an example:
 ```python
 >>> from python_on_whales import DockerClient
 
->>> nerdctl = DockerClient(client_binary="nerdctl")
+>>> nerdctl = DockerClient(client_call=["nerdctl"])
 
 >>> nerdctl.pull("python:3.9")
 docker.io/library/python:3.9:                                                     resolved       |++++++++++++++++++++++++++++++++++++++|
@@ -292,6 +278,19 @@ layer-sha256:32a180f5cf85702e7680719c40c39c07972b1176355df5a621de9eb87ad07ce2:  
 elapsed: 35.9s                                                                    total:  333.5  (9.3 MiB/s)
 
 python_on_whales.Image(id='sha256:f033692e2c5ab', tags=['python:3.9'])
+```
+
+You can do something similar with podman:
+
+```python
+from python_on_whales import DockerClient
+
+podman = DockerClient(client_call=["podman"])
+
+podman.pull("hello-world")
+podman.run("hello-world")
+print(podman.ps())
+...
 ```
 
 

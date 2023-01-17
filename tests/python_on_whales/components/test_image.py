@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
 
 from python_on_whales import docker
@@ -47,8 +49,35 @@ def test_save_iterator_bytes():
 
 
 def test_filter_when_listing():
-    docker.pull("hello-world")
+    docker.pull(["hello-world", "busybox"])
     images_listed = docker.image.list(filters=dict(reference="hello-world"))
+    tags = set()
+    for image in images_listed:
+        for tag in image.repo_tags:
+            tags.add(tag)
+    assert tags == {"hello-world:latest"}
+
+
+def test_filter_when_listing_old_signature():
+    """Check backward compatibility"""
+    docker.pull(["hello-world", "busybox"])
+    with pytest.warns(DeprecationWarning) as warnings_emmitted:
+        images_listed = docker.image.list({"reference": "hello-world"})
+
+    warning_message = str(warnings_emmitted.list[0].message)
+    assert "docker.image.list({'reference': 'hello-world'}" in warning_message
+    assert "docker.image.list(filters={'reference': 'hello-world'}" in warning_message
+    tags = set()
+    for image in images_listed:
+        for tag in image.repo_tags:
+            tags.add(tag)
+    assert tags == {"hello-world:latest"}
+
+
+def test_use_first_argument_to_filter():
+    """Check backward compatibility"""
+    docker.pull(["hello-world", "busybox"])
+    images_listed = docker.image.list("hello-world")
     tags = set()
     for image in images_listed:
         for tag in image.repo_tags:
@@ -176,6 +205,13 @@ def test_prune():
         docker.image.inspect("busybox")
 
 
+def test_remove_nothing():
+    with docker.pull("hello-world"):
+        all_images = set(docker.image.list())
+        docker.image.remove([])
+        assert all_images == set(docker.image.list())
+
+
 @pytest.mark.parametrize(
     "docker_function", [docker.image.inspect, docker.image.remove, docker.push]
 )
@@ -218,3 +254,71 @@ def test_exists():
     assert docker.image.exists("busybox")
 
     assert not docker.image.exists("dudurghurozgiozpfezjigfoeioengizeonig")
+
+
+@patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
+def test_copy_from_default_pull(container_mock: Mock) -> None:
+
+    container_cli_mock = MagicMock()
+    container_mock.return_value = container_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.image.copy_from(
+        test_image_name, "test_path_in_image", "test_local_destination"
+    )
+
+    container_cli_mock.create.assert_called_with(test_image_name, pull="missing")
+
+
+@patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
+def test_copy_from_pull(container_mock: Mock) -> None:
+
+    container_cli_mock = MagicMock()
+    container_mock.return_value = container_cli_mock
+
+    test_image_name = "test_dummy_image"
+    test_pull_flag = "test_pull_flag_value"
+
+    docker.image.copy_from(
+        test_image_name,
+        "test_path_in_image",
+        "test_local_destination",
+        pull=test_pull_flag,
+    )
+
+    container_cli_mock.create.assert_called_with(test_image_name, pull=test_pull_flag)
+
+
+@patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
+def test_copy_to_default_pull(container_mock: Mock) -> None:
+
+    container_cli_mock = MagicMock()
+    container_mock.return_value = container_cli_mock
+
+    test_image_name = "test_dummy_image"
+
+    docker.image.copy_to(
+        test_image_name, "test_local_destination", "test_path_in_image"
+    )
+
+    container_cli_mock.create.assert_called_with(test_image_name, pull="missing")
+
+
+@patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
+def test_copy_to_pull(container_mock: Mock) -> None:
+
+    container_cli_mock = MagicMock()
+    container_mock.return_value = container_cli_mock
+
+    test_image_name = "test_dummy_image"
+    test_pull_flag = "test_pull_flag_value"
+
+    docker.image.copy_to(
+        test_image_name,
+        "test_local_destination",
+        "test_path_in_image",
+        pull=test_pull_flag,
+    )
+
+    container_cli_mock.create.assert_called_with(test_image_name, pull=test_pull_flag)
