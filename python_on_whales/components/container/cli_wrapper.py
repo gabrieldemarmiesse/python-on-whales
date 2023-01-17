@@ -492,6 +492,7 @@ class ContainerCLI(DockerCLICaller):
         cap_add: List[str] = [],
         cap_drop: List[str] = [],
         cgroup_parent: Optional[str] = None,
+        cgroupns: Optional[str] = None,
         cidfile: Optional[ValidPath] = None,
         cpu_period: Optional[int] = None,
         cpu_quota: Optional[int] = None,
@@ -617,6 +618,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
+        full_cmd.add_simple_arg("--cgroupns", cgroupns)
         full_cmd.add_simple_arg("--cidfile", cidfile)
 
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
@@ -1180,6 +1182,7 @@ class ContainerCLI(DockerCLICaller):
         cap_add: List[str] = [],
         cap_drop: List[str] = [],
         cgroup_parent: Optional[str] = None,
+        cgroupns: Optional[str] = None,
         cidfile: Optional[ValidPath] = None,
         cpu_period: Optional[int] = None,
         cpu_quota: Optional[int] = None,
@@ -1449,6 +1452,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
+        full_cmd.add_simple_arg("--cgroupns", cgroupns)
         full_cmd.add_simple_arg("--cidfile", cidfile)
 
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
