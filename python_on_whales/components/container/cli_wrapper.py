@@ -1349,6 +1349,7 @@ class ContainerCLI(DockerCLICaller):
                 `add_hosts=[("my_host_1", "192.168.30.31"), ("host2", "192.168.80.81")]`
             blkio_weight: Block IO (relative weight), between 10 and 1000,
                 or 0 to disable (default 0)
+            cgroupns: Cgroup namespace mode to use, one of 'host' or 'private'.
             cpu_period: Limit CPU CFS (Completely Fair Scheduler) period
             cpu_quota: Limit CPU CFS (Completely Fair Scheduler) quota
             cpu_rt_period: Limit CPU real-time period in microseconds
