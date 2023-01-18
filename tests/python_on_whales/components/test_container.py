@@ -142,6 +142,13 @@ def test_container_create_with_random_ports():
         assert container.network_settings.ports["90/tcp"][0]["HostPort"] is not None
 
 
+def test_container_create_with_cgroupns():
+    with docker.container.run(
+        "ubuntu", ["sleep", "infinity"], cgroupns="host"
+    ) as container:
+        assert container.host_config.cgroupns_mode == "host"
+
+
 def test_fails_correctly_create_start():
     python_code = """
 import sys
