@@ -8,11 +8,11 @@ from python_on_whales.utils import ValidPath, run
 class SwarmCLI(DockerCLICaller):
     def ca(
         self,
-        ca_certificate: ValidPath = None,
-        ca_key: ValidPath = None,
-        certificate_expiry: Union[int, timedelta] = None,
+        ca_certificate: Optional[ValidPath] = None,
+        ca_key: Optional[ValidPath] = None,
+        certificate_expiry: Union[int, timedelta, None] = None,
         detach: bool = False,
-        external_ca: str = None,
+        external_ca: Optional[str] = None,
         rotate: bool = False,
     ):
         """Get and rotate the root CA
@@ -95,11 +95,11 @@ class SwarmCLI(DockerCLICaller):
     def join(
         self,
         manager_address: str,
-        advertise_address: str = None,
+        advertise_address: Optional[str] = None,
         availability: str = "active",
-        data_path_address: str = None,
-        listen_address: str = None,
-        token: str = None,
+        data_path_address: Optional[str] = None,
+        listen_address: Optional[str] = None,
+        token: Optional[str] = None,
     ):
         """Joins a swarm
 
