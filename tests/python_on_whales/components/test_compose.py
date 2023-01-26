@@ -242,7 +242,8 @@ def test_docker_compose_ps():
 
 def test_docker_compose_start():
     docker.compose.create(["busybox"])
-    assert not docker.compose.ps()[0].state.running
+    assert not docker.compose.ps(all=True)[0].state.running
+    assert docker.compose.ps() == []
     docker.compose.start(["busybox"])
     assert docker.compose.ps()[0].state.running
     docker.compose.down(timeout=1)

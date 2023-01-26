@@ -325,6 +325,7 @@ class ComposeCLI(DockerCLICaller):
     def ps(
         self,
         services: Optional[List[str]] = None,
+        all: bool = False,
     ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
@@ -332,6 +333,7 @@ class ComposeCLI(DockerCLICaller):
             A `List[python_on_whales.Container]`
         """
         full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
+        full_cmd.add_flag("--all", all)
         if services:
             full_cmd += services
         result = run(full_cmd)
