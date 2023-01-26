@@ -22,3 +22,25 @@ from .exceptions import DockerException
 
 # alias
 docker = DockerClient()
+
+__all__ = [
+    "Builder",
+    "ClientNotFoundError",
+    "Config",
+    "Container",
+    "ContainerStats",
+    "Context",
+    "DockerContextConfig",
+    "DockerException",
+    "Image",
+    "KubernetesContextConfig",
+    "Network",
+    "Node",
+    "Plugin",
+    "Secret",
+    "Service",
+    "Stack",
+    "SystemInfo",
+    "Task",
+    "Volume",
+]
