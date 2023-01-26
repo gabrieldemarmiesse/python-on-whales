@@ -290,7 +290,11 @@ class ComposeCLI(DockerCLICaller):
         run(full_cmd)
 
     def port(
-        self, service: str, private_port: str, index: int = 1, protocol: str = "tcp"
+        self,
+        service: str,
+        private_port: Union[str, int],
+        index: int = 1,
+        protocol: str = "tcp",
     ) -> Tuple[Optional[str], Optional[int]]:
         """Returns the public port for a port binding.
 
@@ -325,6 +329,7 @@ class ComposeCLI(DockerCLICaller):
     def ps(
         self,
         services: Optional[List[str]] = None,
+        all: bool = False,
     ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
@@ -332,6 +337,7 @@ class ComposeCLI(DockerCLICaller):
             A `List[python_on_whales.Container]`
         """
         full_cmd = self.docker_compose_cmd + ["ps", "--quiet"]
+        full_cmd.add_flag("--all", all)
         if services:
             full_cmd += services
         result = run(full_cmd)
