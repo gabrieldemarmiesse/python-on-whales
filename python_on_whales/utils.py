@@ -75,12 +75,12 @@ class DockerCamelModel(pydantic.BaseModel):
 @overload
 def run(
     args: List[Any],
-    capture_stdout: bool = True,
-    capture_stderr: bool = True,
-    input: bytes = None,
-    return_stderr: Literal[True] = False,
-    env: Dict[str, str] = {},
-    tty: bool = False,
+    capture_stdout: bool = ...,
+    capture_stderr: bool = ...,
+    input: bytes = ...,
+    return_stderr: Literal[True] = ...,
+    env: Dict[str, str] = ...,
+    tty: bool = ...,
 ) -> Tuple[str, str]:
     ...
 
@@ -88,12 +88,12 @@ def run(
 @overload
 def run(
     args: List[Any],
-    capture_stdout: bool = True,
-    capture_stderr: bool = True,
-    input: bytes = None,
-    return_stderr: Literal[False] = False,
-    env: Dict[str, str] = {},
-    tty: bool = False,
+    capture_stdout: bool = ...,
+    capture_stderr: bool = ...,
+    input: bytes = ...,
+    return_stderr: Literal[False] = ...,
+    env: Dict[str, str] = ...,
+    tty: bool = ...,
 ) -> str:
     ...
 
