@@ -6,7 +6,7 @@ RUN chmod a+x /docker-buildx
 #-----------------------------------------------------------------------------
 FROM busybox as get_compose
 
-RUN wget -O /docker-compose https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-darwin-x86_64
+RUN wget -O /docker-compose https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-x86_64
 RUN chmod a+x /docker-compose
 
 
