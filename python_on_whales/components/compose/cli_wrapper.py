@@ -290,7 +290,11 @@ class ComposeCLI(DockerCLICaller):
         run(full_cmd)
 
     def port(
-        self, service: str, private_port: str, index: int = 1, protocol: str = "tcp"
+        self,
+        service: str,
+        private_port: Union[str, int],
+        index: int = 1,
+        protocol: str = "tcp",
     ) -> Tuple[Optional[str], Optional[int]]:
         """Returns the public port for a port binding.
 
