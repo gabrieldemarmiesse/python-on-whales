@@ -935,7 +935,7 @@ class ContainerCLI(DockerCLICaller):
     def kill(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
-        signal: str = None,
+        signal: Optional[str] = None,
     ) -> None:
         """Kill a container.
 
