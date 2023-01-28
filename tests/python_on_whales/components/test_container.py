@@ -144,7 +144,7 @@ def test_container_create_with_random_ports():
 
 def test_container_create_with_cgroupns():
     with docker.container.run(
-        "ubuntu", ["sleep", "infinity"], cgroupns="host"
+        "ubuntu", ["sleep", "infinity"], cgroupns="host", detach=True, stop_timeout=1
     ) as container:
         assert container.host_config.cgroupns_mode == "host"
 
