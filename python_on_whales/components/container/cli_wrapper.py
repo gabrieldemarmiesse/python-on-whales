@@ -492,6 +492,7 @@ class ContainerCLI(DockerCLICaller):
         cap_add: List[str] = [],
         cap_drop: List[str] = [],
         cgroup_parent: Optional[str] = None,
+        cgroupns: Optional[str] = None,
         cidfile: Optional[ValidPath] = None,
         cpu_period: Optional[int] = None,
         cpu_quota: Optional[int] = None,
@@ -617,6 +618,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
+        full_cmd.add_simple_arg("--cgroupns", cgroupns)
         full_cmd.add_simple_arg("--cidfile", cidfile)
 
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
@@ -1180,6 +1182,7 @@ class ContainerCLI(DockerCLICaller):
         cap_add: List[str] = [],
         cap_drop: List[str] = [],
         cgroup_parent: Optional[str] = None,
+        cgroupns: Optional[str] = None,
         cidfile: Optional[ValidPath] = None,
         cpu_period: Optional[int] = None,
         cpu_quota: Optional[int] = None,
@@ -1346,6 +1349,7 @@ class ContainerCLI(DockerCLICaller):
                 `add_hosts=[("my_host_1", "192.168.30.31"), ("host2", "192.168.80.81")]`
             blkio_weight: Block IO (relative weight), between 10 and 1000,
                 or 0 to disable (default 0)
+            cgroupns: Cgroup namespace mode to use, one of 'host' or 'private'.
             cpu_period: Limit CPU CFS (Completely Fair Scheduler) period
             cpu_quota: Limit CPU CFS (Completely Fair Scheduler) quota
             cpu_rt_period: Limit CPU real-time period in microseconds
@@ -1449,6 +1453,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
+        full_cmd.add_simple_arg("--cgroupns", cgroupns)
         full_cmd.add_simple_arg("--cidfile", cidfile)
 
         full_cmd.add_simple_arg("--cpu-period", cpu_period)
