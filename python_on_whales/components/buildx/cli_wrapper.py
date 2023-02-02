@@ -206,24 +206,33 @@ class BuildxCLI(DockerCLICaller):
         context_path: ValidPath,
         add_hosts: Dict[str, str] = {},
         allow: List[str] = [],
+        attest: Optional[Dict[str, str]] = None,
         build_args: Dict[str, str] = {},
+        # TODO: build_context
         builder: Optional[ValidBuilder] = None,
         cache: bool = True,
+        # TODO: cache_filters
         cache_from: Union[str, Dict[str, str], List[Dict[str, str]], None] = None,
         cache_to: Union[str, Dict[str, str], None] = None,
+        # TODO: cgroup_parent
         file: Optional[ValidPath] = None,
         labels: Dict[str, str] = {},
         load: bool = False,
+        # TODO: metadata_file
         network: Optional[str] = None,
         output: Dict[str, str] = {},
         platforms: Optional[List[str]] = None,
         progress: Union[str, bool] = "auto",
+        provenance: Union[bool, Dict[str, str], None] = None,
         pull: bool = False,
         push: bool = False,
+        sbom: Union[bool, Dict[str, str], None] = None,
         secrets: Union[str, List[str]] = [],
+        # TODO shm_size
         ssh: Optional[str] = None,
         tags: Union[str, List[str]] = [],
         target: Optional[str] = None,
+        # TODO: ulimit
         stream_logs: bool = False,
     ) -> Union[
         None, python_on_whales.components.image.cli_wrapper.Image, Iterator[str]
@@ -242,6 +251,7 @@ class BuildxCLI(DockerCLICaller):
             add_hosts: Hosts to add. `add_hosts={"my_host1": "192.168.32.35"}`
             allow: List of extra privileges.
                 Eg `allow=["network.host", "security.insecure"]`
+            attest: Attestation parameters. Eg `attest={"type": "sbom", "generator": "my_image"}`
             build_args: The build arguments.
                 ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
             builder: Specify which builder to use.
@@ -273,8 +283,13 @@ class BuildxCLI(DockerCLICaller):
                 `platforms=["linux/amd64", "linux/arm64"]`
             progress: Set type of progress output (auto, plain, tty, or False).
                 Use plain to keep the container output on screen
+            provenance: Shortand for `attest={"type": "provenance"}`.
+                Eg `provenance=True` or `provenance=dict(mode="max")`. `provenance=False` might be needed
+                if you are having the
+                issue [Default image output from buildx v0.10 cannot run on Google Cloud Run or AWS Lambda](https://github.com/docker/buildx/issues/1533)
             pull: Always attempt to pull a newer version of the image
             push: Shorthand for `output=dict(type="registry")`.
+            sbom: Shorthand for `attest={"type": "sbom"}`. Eg `sbom=True`.
             secrets: One or more secrets passed as string(s). For example
                 `secrets="id=aws,src=/home/my_user/.aws/credentials"`
             ssh: SSH agent socket or keys to expose to the build
@@ -299,14 +314,23 @@ class BuildxCLI(DockerCLICaller):
             "--add-host", format_dict_for_cli(add_hosts, separator=":")
         )
         full_cmd.add_args_list("--allow", allow)
+        full_cmd.add_simple_arg("--attest", format_dict_for_buildx(attest))
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
 
         full_cmd.add_simple_arg("--ssh", ssh)
 
+        if isinstance(provenance, bool):
+            full_cmd.append(f"--provenance={str(provenance).lower()}")
+        elif isinstance(provenance, dict):
+            full_cmd.add_simple_arg("--provenance", format_dict_for_buildx(provenance))
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--push", push)
+        if isinstance(sbom, bool):
+            full_cmd.append(f"--sbom={str(sbom).lower()}")
+        elif isinstance(sbom, dict):
+            full_cmd.add_simple_arg("--sbom", format_dict_for_buildx(sbom))
         full_cmd.add_flag("--load", load)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
