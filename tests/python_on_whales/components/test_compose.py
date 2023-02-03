@@ -53,6 +53,13 @@ def test_kill_empty_list_of_services():
     docker.compose.down(timeout=1)
 
 
+def test_wait_for_service():
+    docker.compose.up(["my_service"], detach=True, wait=True)
+    all_running_containers = set(docker.ps())
+    assert len(all_running_containers) == 1
+    docker.compose.down(timeout=1)
+
+
 def test_pause_empty_list_of_services():
     docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
     time.sleep(1)
