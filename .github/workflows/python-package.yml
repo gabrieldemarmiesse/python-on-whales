@@ -15,6 +15,7 @@ jobs:
         sudo service docker restart
         sleep 2
         docker info
+        docker buildx create --use --name mybuilder --driver-opt network=host --buildkitd-flags '--allow-insecure-entitlement network.host'
         bash tests/run_tests.sh
 
   build-windows:
