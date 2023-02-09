@@ -16,6 +16,8 @@ jobs:
         sleep 2
         docker info
         docker buildx create --use --name mybuilder --driver-opt network=host --buildkitd-flags '--allow-insecure-entitlement network.host'
+        wget https://github.com/docker/buildx/releases/download/v0.10.0/buildx-v0.10.0.linux-amd64
+        wget https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-x86_64
         bash tests/run_tests.sh
 
   build-windows:
