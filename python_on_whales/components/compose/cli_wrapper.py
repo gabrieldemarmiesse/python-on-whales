@@ -666,6 +666,7 @@ class ComposeCLI(DockerCLICaller):
         log_prefix: bool = True,
         start: bool = True,
         quiet: bool = False,
+        wait: bool = False,
     ):
         """Start the containers.
 
@@ -699,6 +700,7 @@ class ComposeCLI(DockerCLICaller):
             start: Start the service after creating them.
             quiet: By default, some progress bars and logs are sent to stderr and stdout.
                 Set `quiet=True` to avoid having any output.
+            wait: Wait for services to be running|healthy. Implies detached mode.
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -708,6 +710,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_flag("--wait", wait)
         full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
         for service, scale in scales.items():
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")
