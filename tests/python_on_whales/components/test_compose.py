@@ -54,10 +54,23 @@ def test_kill_empty_list_of_services():
 
 
 def test_wait_for_service():
-    docker.compose.up(["my_service"], detach=True, wait=True)
-    all_running_containers = set(docker.ps())
-    assert len(all_running_containers) == 1
-    docker.compose.down(timeout=1)
+    docker = python_on_whales.DockerClient(
+        compose_files=[Path(__file__).parent / "compose-with-healthcheck.yml"]
+    )
+    # ensure environment is clean
+    docker.compose.down(timeout=1, volumes=True)
+
+    docker.compose.up(["my_postgres"], detach=True)
+    # this should be too fast and the healthcheck shouldn't be ready
+    container = docker.compose.ps()[0]
+    assert container.state.health.status == "starting"
+    docker.compose.down(timeout=1, volumes=True)
+
+    # now we use wait, and we check that it's healthy as soon as the function returns
+    docker.compose.up(["my_postgres"], detach=True, wait=True)
+    container = docker.compose.ps()[0]
+    assert container.state.health.status == "healthy"
+    docker.compose.down(timeout=1, volumes=True)
 
 
 def test_pause_empty_list_of_services():
