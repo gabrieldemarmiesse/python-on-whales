@@ -69,7 +69,6 @@ def test_service_scale():
 
 @pytest.mark.usefixtures("swarm_mode")
 def test_context_manager():
-
     with pytest.raises(RuntimeError):
         with docker.service.create("busybox", ["sleep", "infinity"]) as my_service:
             assert my_service.spec.task_template.container_spec.image.startswith(

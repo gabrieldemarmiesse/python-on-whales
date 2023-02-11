@@ -258,7 +258,6 @@ def test_exists():
 
 @patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
 def test_copy_from_default_pull(container_mock: Mock) -> None:
-
     container_cli_mock = MagicMock()
     container_mock.return_value = container_cli_mock
 
@@ -273,7 +272,6 @@ def test_copy_from_default_pull(container_mock: Mock) -> None:
 
 @patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
 def test_copy_from_pull(container_mock: Mock) -> None:
-
     container_cli_mock = MagicMock()
     container_mock.return_value = container_cli_mock
 
@@ -292,7 +290,6 @@ def test_copy_from_pull(container_mock: Mock) -> None:
 
 @patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
 def test_copy_to_default_pull(container_mock: Mock) -> None:
-
     container_cli_mock = MagicMock()
     container_mock.return_value = container_cli_mock
 
@@ -307,7 +304,6 @@ def test_copy_to_default_pull(container_mock: Mock) -> None:
 
 @patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
 def test_copy_to_pull(container_mock: Mock) -> None:
-
     container_cli_mock = MagicMock()
     container_mock.return_value = container_cli_mock
 
