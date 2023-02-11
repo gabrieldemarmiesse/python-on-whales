@@ -60,14 +60,14 @@ def test_wait_for_service():
     # ensure environment is clean
     docker.compose.down(timeout=1, volumes=True)
 
-    docker.compose.up(["my_postgres"], detach=True)
+    docker.compose.up(["my_redis"], detach=True)
     # this should be too fast and the healthcheck shouldn't be ready
     container = docker.compose.ps()[0]
     assert container.state.health.status == "starting"
     docker.compose.down(timeout=1, volumes=True)
 
     # now we use wait, and we check that it's healthy as soon as the function returns
-    docker.compose.up(["my_postgres"], detach=True, wait=True)
+    docker.compose.up(["my_redis"], detach=True, wait=True)
     container = docker.compose.ps()[0]
     assert container.state.health.status == "healthy"
     docker.compose.down(timeout=1, volumes=True)

@@ -533,23 +533,27 @@ def test_exec_env_file(tmp_path):
 
 def test_export_file(tmp_path):
     dest = tmp_path / "dodo.tar"
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+    with docker.run("busybox", ["sleep", "infinity"], detach=True, remove=True) as c:
         c.export(dest)
 
     assert dest.exists()
     assert dest.stat().st_size > 10_000
 
 
-# TODO: fixme
-@pytest.mark.xfail
-def test_exec_privilged_flag():
-    with docker.run(
-        "ubuntu:18.04", ["sleep", "infinity"], detach=True, remove=True
-    ) as c:
-        c.execute(["apt-get", "update"])
-        c.execute(["apt-get", "install", "-y", "iproute2"])
-        c.execute(["ip", "link", "add", "dummy0", "type", "dummy"], privileged=True)
-        c.execute(["ip", "link", "delete", "dummy0"], privileged=True)
+def test_exec_privilged_flag(mocker):
+    fake_completed_process = mocker.MagicMock()
+    fake_completed_process.returncode = 0
+
+    patched_run = mocker.patch("subprocess.run")
+    patched_run.return_value = fake_completed_process
+    docker.execute("my_container", ["some_command"], privileged=True)
+
+    assert patched_run.call_args[0][0][1:] == [
+        "exec",
+        "--privileged",
+        "my_container",
+        "some_command",
+    ]
 
 
 def test_exec_change_user():
