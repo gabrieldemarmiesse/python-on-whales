@@ -15,10 +15,13 @@ from python_on_whales.exceptions import NoSuchImage
 from python_on_whales.test_utils import get_all_jsons
 from python_on_whales.utils import PROJECT_ROOT
 
-pytestmark = pytest.mark.skipif(
-    not python_on_whales.docker.compose.is_installed(),
-    reason="Those tests need docker compose.",
-)
+pytestmark = [
+    pytest.mark.skipif(
+        not python_on_whales.docker.compose.is_installed(),
+        reason="Those tests need docker compose.",
+    ),
+    pytest.mark.mark_component_compose,
+]
 
 docker = DockerClient(
     compose_files=[
