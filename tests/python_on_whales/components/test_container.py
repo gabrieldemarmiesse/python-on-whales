@@ -18,8 +18,6 @@ from python_on_whales.components.container.models import (
 from python_on_whales.exceptions import DockerException, NoSuchContainer
 from python_on_whales.test_utils import get_all_jsons, random_name
 
-pytestmark = pytest.mark.mark_component_container
-
 
 @pytest.mark.parametrize("json_file", get_all_jsons("containers"))
 def test_load_json(json_file):
