@@ -106,7 +106,6 @@ class ClientConfig:
 
     @property
     def docker_cmd(self) -> Command:
-
         result = Command(self.get_client_call_with_path())
 
         if self.config is not None:

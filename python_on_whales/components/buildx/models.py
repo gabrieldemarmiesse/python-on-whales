@@ -13,7 +13,6 @@ class BuilderInspectResult:
 
     @classmethod
     def from_str(cls, string: str) -> BuilderInspectResult:
-
         string = string.strip()
         result_dict = {}
         for line in string.splitlines():

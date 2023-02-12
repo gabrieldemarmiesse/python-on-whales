@@ -9,7 +9,6 @@ class DockerException(Exception):
         stdout: Optional[bytes] = None,
         stderr: Optional[bytes] = None,
     ):
-
         self.docker_command: List[str] = command_launched
         self.return_code: int = return_code
         if stdout is None:

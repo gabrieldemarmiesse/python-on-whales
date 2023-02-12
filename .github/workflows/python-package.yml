@@ -18,7 +18,7 @@ jobs:
         sleep 2
         docker info
         pip install -e .
-        pip install -r ./tests/test-requirements.txt
+        pip install -r ./lint-requirements.txt
         flake8
         isort --check ./
         black --check ./
