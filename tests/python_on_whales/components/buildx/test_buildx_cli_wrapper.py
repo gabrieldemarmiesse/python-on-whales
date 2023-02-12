@@ -237,11 +237,15 @@ def test_multiarch_build(tmp_path, docker_registry):
 
 
 @pytest.mark.usefixtures("with_container_driver")
-@pytest.mark.parametrize("kwargs", [dict(sbom=True),
-                                    dict(provenance=True),
-                                    dict(attest=dict(type="provenance",mode="min")),
-                                    dict(provenance=dict(mode="max"))
-                                    ])
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        dict(sbom=True),
+        dict(provenance=True),
+        dict(attest=dict(type="provenance", mode="min")),
+        dict(provenance=dict(mode="max")),
+    ],
+)
 def test_buildx_build_attestations(tmp_path, kwargs):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, **kwargs)
