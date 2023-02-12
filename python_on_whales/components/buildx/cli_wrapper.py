@@ -314,9 +314,7 @@ class BuildxCLI(DockerCLICaller):
             "--add-host", format_dict_for_cli(add_hosts, separator=":")
         )
         full_cmd.add_args_list("--allow", allow)
-        if isinstance(attest, bool):
-            full_cmd.append(f"--attest={str(attest).lower()}")
-        elif isinstance(attest, dict):
+        if isinstance(attest, dict):
             full_cmd.add_simple_arg("--attest", format_dict_for_buildx(attest))
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
         full_cmd.add_simple_arg("--builder", builder)

@@ -236,6 +236,17 @@ def test_multiarch_build(tmp_path, docker_registry):
     docker.pull(f"{docker_registry}/dodo:1")
 
 
+@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.parametrize("kwargs", [dict(sbom=True),
+                                    dict(provenance=True),
+                                    dict(attest=dict(type="provenance",mode="min")),
+                                    dict(provenance=dict(mode="max"))
+                                    ])
+def test_buildx_build_attestations(tmp_path, kwargs):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.buildx.build(tmp_path, **kwargs)
+
+
 def test_buildx_build_context_manager2(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     buildx_builder = docker.buildx.create()
