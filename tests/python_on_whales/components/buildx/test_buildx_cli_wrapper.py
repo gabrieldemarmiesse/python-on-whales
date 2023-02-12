@@ -320,7 +320,6 @@ def test_legacy_build_multiple_tags(tmp_path):
 
 @pytest.mark.usefixtures("with_docker_driver")
 def test_cache_invalidity(tmp_path):
-
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with set_cache_validity_period(100):
         image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])

@@ -522,7 +522,6 @@ def test_exec_env():
 
 
 def test_exec_env_file(tmp_path):
-
     env_file = tmp_path / "variables.env"
     env_file.write_text("DODO=dada\n")
 
@@ -533,23 +532,27 @@ def test_exec_env_file(tmp_path):
 
 def test_export_file(tmp_path):
     dest = tmp_path / "dodo.tar"
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+    with docker.run("busybox", ["sleep", "infinity"], detach=True, remove=True) as c:
         c.export(dest)
 
     assert dest.exists()
     assert dest.stat().st_size > 10_000
 
 
-# TODO: fixme
-@pytest.mark.xfail
-def test_exec_privilged_flag():
-    with docker.run(
-        "ubuntu:18.04", ["sleep", "infinity"], detach=True, remove=True
-    ) as c:
-        c.execute(["apt-get", "update"])
-        c.execute(["apt-get", "install", "-y", "iproute2"])
-        c.execute(["ip", "link", "add", "dummy0", "type", "dummy"], privileged=True)
-        c.execute(["ip", "link", "delete", "dummy0"], privileged=True)
+def test_exec_privilged_flag(mocker):
+    fake_completed_process = mocker.MagicMock()
+    fake_completed_process.returncode = 0
+
+    patched_run = mocker.patch("subprocess.run")
+    patched_run.return_value = fake_completed_process
+    docker.execute("my_container", ["some_command"], privileged=True)
+
+    assert patched_run.call_args[0][0][1:] == [
+        "exec",
+        "--privileged",
+        "my_container",
+        "some_command",
+    ]
 
 
 def test_exec_change_user():
@@ -645,7 +648,6 @@ def test_run_detached_interactive():
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
 def test_attach_default(run_mock: Mock, inspect_mock: Mock) -> None:
-
     test_container_name = "test_dummy_container"
 
     docker.attach(test_container_name)
@@ -661,7 +663,6 @@ def test_attach_default(run_mock: Mock, inspect_mock: Mock) -> None:
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
 def test_attach_detach_keys_argument(run_mock: Mock, inspect_mock: Mock) -> None:
-
     test_container_name = "test_dummy_container"
     test_detach_key = "dummy"
 
@@ -684,7 +685,6 @@ def test_attach_detach_keys_argument(run_mock: Mock, inspect_mock: Mock) -> None
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
 def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock) -> None:
-
     test_container_name = "test_dummy_container"
 
     docker.attach(test_container_name, stdin=False)
@@ -700,7 +700,6 @@ def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock) -> None:
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
 def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
-
     test_container_name = "test_dummy_container"
 
     docker.attach(test_container_name, sig_proxy=False)
@@ -717,7 +716,6 @@ def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
 def test_container_create_default_pull(
     image_mock: Mock, _: Mock, run_mock: Mock
 ) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -738,7 +736,6 @@ def test_container_create_default_pull(
 def test_container_create_missing_pull(
     image_mock: Mock, _: Mock, run_mock: Mock
 ) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -759,7 +756,6 @@ def test_container_create_missing_pull(
 def test_container_create_always_pull(
     image_mock: Mock, _: Mock, run_mock: Mock
 ) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -778,7 +774,6 @@ def test_container_create_always_pull(
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -797,7 +792,6 @@ def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) 
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -818,7 +812,6 @@ def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -839,7 +832,6 @@ def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -860,7 +852,6 @@ def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) ->
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
 def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
-
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -879,7 +870,6 @@ def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> 
 
 
 def test_container_call_create_never_pull_error() -> None:
-
     test_image = "alpine:latest"
 
     if docker.image.exists(test_image):
@@ -890,7 +880,6 @@ def test_container_call_create_never_pull_error() -> None:
 
 
 def test_container_call_run_never_pull_error() -> None:
-
     test_image = "alpine:latest"
 
     if docker.image.exists(test_image):
@@ -901,7 +890,6 @@ def test_container_call_run_never_pull_error() -> None:
 
 
 def test_container_call_create_missing_pull_unexistent() -> None:
-
     base_image_name = "alpine:latest"
 
     if docker.image.exists(base_image_name):
@@ -912,7 +900,6 @@ def test_container_call_create_missing_pull_unexistent() -> None:
 
 
 def test_container_call_create_missing_pull_existent(tmp_path, docker_registry) -> None:
-
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
@@ -933,7 +920,6 @@ def test_container_call_create_missing_pull_existent(tmp_path, docker_registry) 
 
 
 def test_container_call_run_missing_pull_unexistent() -> None:
-
     base_image_name = "alpine:latest"
 
     if docker.image.exists(base_image_name):
@@ -944,7 +930,6 @@ def test_container_call_run_missing_pull_unexistent() -> None:
 
 
 def test_container_call_run_missing_pull_existent(tmp_path, docker_registry) -> None:
-
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
@@ -965,7 +950,6 @@ def test_container_call_run_missing_pull_existent(tmp_path, docker_registry) -> 
 
 
 def test_container_call_create_always_pull_unexistent() -> None:
-
     base_image_name = "alpine:latest"
 
     if docker.image.exists(base_image_name):
@@ -976,7 +960,6 @@ def test_container_call_create_always_pull_unexistent() -> None:
 
 
 def test_container_call_create_always_pull_existent(tmp_path, docker_registry) -> None:
-
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
@@ -997,7 +980,6 @@ def test_container_call_create_always_pull_existent(tmp_path, docker_registry) -
 
 
 def test_container_call_run_always_pull_unexistent() -> None:
-
     base_image_name = "alpine:latest"
 
     if docker.image.exists(base_image_name):
@@ -1008,7 +990,6 @@ def test_container_call_run_always_pull_unexistent() -> None:
 
 
 def test_container_call_run_always_pull_existent(tmp_path, docker_registry) -> None:
-
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
