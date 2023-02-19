@@ -2,11 +2,9 @@ import json
 from typing import Any, Dict, Iterator, Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.buildx.cli_wrapper import stream_buildx_logs
 from python_on_whales.utils import run
 
 from .models import Manifest
-
 
 class ImagetoolsCLI(DockerCLICaller):
     def inspect(self, name: str) -> Manifest:
@@ -18,7 +16,7 @@ class ImagetoolsCLI(DockerCLICaller):
     def create(
         self,
         source: str,
-        tag: str,
+        tag: Optional[str],
         append: bool = False,
         stream_logs: bool = False,
         file: Optional[str] = None,
@@ -61,3 +59,8 @@ class ImagetoolsCLI(DockerCLICaller):
         else:
             run(full_cmd)
             return json.loads(run(full_cmd + source))
+
+
+def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:
+    for origin, value in stream_stdout_and_stderr(full_cmd, env=env):
+        yield value.decode(errors="replace")
