@@ -1,5 +1,5 @@
-from typing import Any, Dict, Iterator, Optional, Union
 import json
+from typing import Any, Dict, Iterator, Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.buildx.cli_wrapper import stream_buildx_logs
