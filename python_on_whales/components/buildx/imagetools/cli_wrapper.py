@@ -24,7 +24,7 @@ class ImagetoolsCLI(DockerCLICaller):
         file: Optional[str] = None,
         progress: Union[str, bool] = "auto",
         dry_run: Optional[bool] = False,
-        builder: Optional[str] = None, # TODO: inherit ValidBuilder from python_on_whales.components.buildx.cli_wrapper?
+        builder: Optional[str] = None,
         ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
         """
         Create a new manifest list based on source manifests.
