@@ -38,7 +38,7 @@ class ImagetoolsCLI(DockerCLICaller):
         # Arguments
             source: The source manifest to create, change
             append: Append to existing manifest
-            dru_run: Show final image instead of pushing
+            dry_run: Show final image instead of pushing
             file: Read source descriptor from file
             progress: Set type of progress output (`"auto"`, `"plain"`, `"tty"`,
                 or `False`). Use plain to keep the container output on screen
