@@ -25,7 +25,7 @@ class ImagetoolsCLI(DockerCLICaller):
         progress: Union[str, bool] = "auto",
         dry_run: Optional[bool] = False,
         builder: Optional[str] = None,
-        ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
+    ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
         """
         Create a new manifest list based on source manifests.
         The source manifests can be manifest lists or single platform distribution manifests and
