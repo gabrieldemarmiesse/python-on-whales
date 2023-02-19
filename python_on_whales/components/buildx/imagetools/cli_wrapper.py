@@ -2,9 +2,10 @@ import json
 from typing import Any, Dict, Iterator, Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.utils import run
+from python_on_whales.utils import run, stream_stdout_and_stderr
 
 from .models import Manifest
+
 
 class ImagetoolsCLI(DockerCLICaller):
     def inspect(self, name: str) -> Manifest:
