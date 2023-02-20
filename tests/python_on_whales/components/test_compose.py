@@ -9,7 +9,7 @@ import pytest
 import pytz
 
 import python_on_whales
-from python_on_whales import DockerClient
+from python_on_whales import DockerClient, DockerException
 from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.exceptions import NoSuchImage
 from python_on_whales.test_utils import get_all_jsons
@@ -51,6 +51,26 @@ def test_kill_empty_list_of_services():
     docker.compose.kill([])
     assert all_running_containers == set(docker.ps())
     docker.compose.down(timeout=1)
+
+
+def test_wait_for_service():
+    docker = python_on_whales.DockerClient(
+        compose_files=[Path(__file__).parent / "compose-with-healthcheck.yml"]
+    )
+    # ensure environment is clean
+    docker.compose.down(timeout=1, volumes=True)
+
+    docker.compose.up(["my_redis"], detach=True)
+    # this should be too fast and the healthcheck shouldn't be ready
+    container = docker.compose.ps()[0]
+    assert container.state.health.status == "starting"
+    docker.compose.down(timeout=1, volumes=True)
+
+    # now we use wait, and we check that it's healthy as soon as the function returns
+    docker.compose.up(["my_redis"], detach=True, wait=True)
+    container = docker.compose.ps()[0]
+    assert container.state.health.status == "healthy"
+    docker.compose.down(timeout=1, volumes=True)
 
 
 def test_pause_empty_list_of_services():
@@ -242,7 +262,8 @@ def test_docker_compose_ps():
 
 def test_docker_compose_start():
     docker.compose.create(["busybox"])
-    assert not docker.compose.ps()[0].state.running
+    assert not docker.compose.ps(all=True)[0].state.running
+    assert docker.compose.ps() == []
     docker.compose.start(["busybox"])
     assert docker.compose.ps()[0].state.running
     docker.compose.down(timeout=1)
@@ -709,19 +730,13 @@ def test_compose_port():
         None,
         None,
     )
-    for container in d.compose.ps():
-        if service in container.name:
-            tcp_cfg = container.network_settings.ports["3000/tcp"][0]
-            expected_tcp_host, expected_tcp_port = tcp_cfg["HostIp"], int(
-                tcp_cfg["HostPort"]
-            )
-            udp_cfg = container.network_settings.ports["4000/udp"][0]
-            expected_udp_host, expected_udp_port = udp_cfg["HostIp"], int(
-                udp_cfg["HostPort"]
-            )
-            break
+    container = next(filter(lambda x: service in x.name, d.compose.ps()))
+    tcp_cfg = container.network_settings.ports["3000/tcp"][0]
+    expected_tcp_host, expected_tcp_port = tcp_cfg["HostIp"], int(tcp_cfg["HostPort"])
+    udp_cfg = container.network_settings.ports["4000/udp"][0]
+    expected_udp_host, expected_udp_port = udp_cfg["HostIp"], int(udp_cfg["HostPort"])
 
-    tcp_host, tcp_port = d.compose.port(service, "3000")
+    tcp_host, tcp_port = d.compose.port(service, "3000", protocol="tcp")
     assert expected_tcp_host == tcp_host
     assert expected_tcp_port == tcp_port
 
@@ -729,27 +744,21 @@ def test_compose_port():
     assert expected_udp_host == udp_host
     assert expected_udp_port == udp_port
 
-    invalid_protocol_host, invalid_protocol_type = d.compose.port(
-        service, "4000", protocol="tcp"
-    )
-    assert invalid_protocol_host is None
-    assert invalid_protocol_type is None
+    with pytest.raises(DockerException) as err:
+        d.compose.port(service, "4000", protocol="tcp")
+    assert "no port 4000/tcp for container components-busybox-1" in str(err)
 
-    unknown_host, unknown_port = d.compose.port(service, "1111")
-    assert unknown_host is None
-    assert unknown_port is None
+    with pytest.raises(DockerException) as err:
+        d.compose.port(service, "1111")
+    assert "no port 1111/tcp for container components-busybox-1" in str(err)
 
-    try:
-        _ = d.compose.port("", "123")
-        assert False, "error should be raised for empty service"
-    except ValueError as e:
-        assert e.args == ValueError("Service cannot be empty").args
+    with pytest.raises(ValueError) as err:
+        d.compose.port("", "123")
+    assert "Service cannot be empty" in str(err)
 
-    try:
-        _ = d.compose.port(service, "")
-        assert False, "error should be raised for empty port"
-    except ValueError as e:
-        assert e.args == ValueError("Private port cannot be empty").args
+    with pytest.raises(ValueError) as err:
+        d.compose.port(service, "")
+    assert "Private port cannot be empty" in str(err)
 
     d.compose.down(timeout=1)
 

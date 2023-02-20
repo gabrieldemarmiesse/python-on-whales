@@ -1,13 +1,20 @@
 name: Run tests
 
-on: [push, pull_request]
+
+on:
+  push:
+    branches:
+      - master
+  pull_request: {}
 
 jobs:
-  build-linux:
-
+  build-linux-lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
     - name: Run all tests
       run: |
         cat /etc/docker/daemon.json
@@ -15,7 +22,73 @@ jobs:
         sudo service docker restart
         sleep 2
         docker info
-        bash tests/run_tests.sh
+        pip install -e .
+        pip install -r ./lint-requirements.txt
+        flake8
+        isort --check ./
+        black --check ./
+
+  build-linux-test-with-binaries-other-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+    - name: Run all tests
+      run: |
+        bash tests/ci-setup.sh
+        pytest -v --durations=10 --ignore=tests/python_on_whales/components
+
+
+  build-linux-test-component:
+    strategy:
+      matrix:
+        component:
+          - buildx
+          - test_compose.py
+          - test_config.py
+          - test_container.py
+          - test_context.py
+          - test_image.py
+          - test_manifest.py
+          - test_network.py
+          - test_node.py
+          - test_plugin.py
+          - test_service.py
+          - test_stack.py
+          - test_swarm.py
+          - test_system.py
+          - test_task.py
+          - test_volume.py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Run test
+        run: |
+          bash tests/ci-setup.sh
+          pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+
+  build-linux-test-without-any-binary:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+    - name: Run all tests
+      run: |
+        cat /etc/docker/daemon.json
+        echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        sleep 2
+        docker info
+        pip install -e .
+        pip install -r ./tests/test-requirements.txt
+        pytest -v --durations=10 ./tests/python_on_whales/components/buildx
 
   build-windows:
     runs-on: windows-latest

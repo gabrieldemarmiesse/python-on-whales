@@ -36,7 +36,6 @@ def test_remove_empty_stack_list():
 
 
 def test_stack_ps_and_services(with_test_stack):
-
     all_services = docker.service.list()
 
     assert set(all_services) == set(with_test_stack.services())

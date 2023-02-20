@@ -236,6 +236,21 @@ def test_multiarch_build(tmp_path, docker_registry):
     docker.pull(f"{docker_registry}/dodo:1")
 
 
+@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        dict(sbom=True),
+        dict(provenance=True),
+        dict(attest=dict(type="provenance", mode="min")),
+        dict(provenance=dict(mode="max")),
+    ],
+)
+def test_buildx_build_attestations(tmp_path, kwargs):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.buildx.build(tmp_path, **kwargs)
+
+
 def test_buildx_build_context_manager2(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     buildx_builder = docker.buildx.create()
@@ -309,7 +324,6 @@ def test_legacy_build_multiple_tags(tmp_path):
 
 @pytest.mark.usefixtures("with_docker_driver")
 def test_cache_invalidity(tmp_path):
-
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     with set_cache_validity_period(100):
         image = docker.buildx.build(tmp_path, tags=["hello1", "hello2"])
@@ -422,6 +436,7 @@ def change_cwd():
 def test_bake(only_print):
     config = docker.buildx.bake(files=[bake_file], print=only_print)
     assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
         "target": {
             "my_out1": {
                 "context": ".",
@@ -435,7 +450,7 @@ def test_bake(only_print):
                 "tags": ["pretty_image2:1.0.0"],
                 "target": "out2",
             },
-        }
+        },
     }
 
 
@@ -445,6 +460,7 @@ def test_bake(only_print):
 def test_bake_with_load(only_print):
     config = docker.buildx.bake(files=[bake_file], load=True, print=only_print)
     assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
         "target": {
             "my_out1": {
                 "context": ".",
@@ -460,7 +476,7 @@ def test_bake_with_load(only_print):
                 "target": "out2",
                 "output": ["type=docker"],
             },
-        }
+        },
     }
 
 
@@ -472,6 +488,7 @@ def test_bake_with_variables(only_print):
         files=[bake_file], print=only_print, variables={"TAG": "3.0.4"}
     )
     assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
         "target": {
             "my_out1": {
                 "context": ".",
@@ -485,7 +502,7 @@ def test_bake_with_variables(only_print):
                 "tags": ["pretty_image2:3.0.4"],
                 "target": "out2",
             },
-        }
+        },
     }
 
 
@@ -498,6 +515,7 @@ def test_bake_with_variables_2(only_print, monkeypatch):
         files=[bake_file], print=only_print, variables={"TAG": "3.0.4"}
     )
     assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
         "target": {
             "my_out1": {
                 "context": ".",
@@ -511,7 +529,7 @@ def test_bake_with_variables_2(only_print, monkeypatch):
                 "tags": ["pretty_image2:3.0.4"],
                 "target": "out2",
             },
-        }
+        },
     }
 
 

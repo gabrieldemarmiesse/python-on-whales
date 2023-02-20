@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -72,11 +72,11 @@ class ManifestCLI(DockerCLICaller):
         self,
         name: str,
         manifest: str,
-        arch: str = None,
-        os: str = None,
-        os_features: List[str] = None,
-        os_version: str = None,
-        variant: str = None,
+        arch: Optional[str] = None,
+        os: Optional[str] = None,
+        os_features: Optional[List[str]] = None,
+        os_version: Optional[str] = None,
+        variant: Optional[str] = None,
     ) -> ManifestList:
         """Annotates a Docker manifest list.
 

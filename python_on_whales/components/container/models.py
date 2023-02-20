@@ -172,6 +172,7 @@ class ContainerHostConfig(DockerCamelModel):
     capabilities: List[str]
     cap_add: List[str]
     cap_drop: List[str]
+    cgroupns_mode: str
     dns: List[str]
     dns_options: List[str]
     dns_search: List[str]

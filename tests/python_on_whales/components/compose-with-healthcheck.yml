@@ -1,0 +1,9 @@
+
+services:
+  my_redis:
+    image: redis:7.0.8-alpine3.17
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5

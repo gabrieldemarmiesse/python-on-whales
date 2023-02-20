@@ -279,7 +279,7 @@ class ImageCLI(DockerCLICaller):
             self.client_config
         )
         full_cmd.append(context_path)
-        image_id = run(full_cmd).strip()
+        image_id = run(full_cmd).splitlines()[-1].strip()
         return docker_image.inspect(image_id)
 
     def history(self):
