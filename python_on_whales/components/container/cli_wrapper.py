@@ -1452,7 +1452,7 @@ class ContainerCLI(DockerCLICaller):
         if not isinstance(command, list):
             error_message = (
                 "When calling docker.run(), the second argument ('command') "
-                "should be a list."
+                "should be a list. "
                 "Here are some examples:"
                 "docker.run('ubuntu', ['ls']), "
                 "docker.run('ubuntu', ['cat', '/some/file.txt'])"
