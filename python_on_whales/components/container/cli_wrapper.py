@@ -1432,6 +1432,16 @@ class ContainerCLI(DockerCLICaller):
             The container output as a string if detach is `False` (the default),
             and a `python_on_whales.Container` if detach is `True`.
         """
+        if not isinstance(command, list):
+            error_message = ("When calling docker.run(), the second argument ('command') "
+            "should be a list, not a string."
+            "Here are some examples:"
+            "docker.run('ubuntu', ['ls']), "
+            "docker.run('ubuntu', ['cat', '/some/file.txt'])")
+            if isinstance(command, str):
+                # boy this is the most common error in the world
+                error_message += f" In your case, you can try docker.run('{image}', {command.split()}, ...)."
+            raise TypeError(error_message)
 
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
