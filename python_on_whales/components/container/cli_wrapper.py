@@ -833,7 +833,7 @@ class ContainerCLI(DockerCLICaller):
         if not isinstance(command, list):
             error_message = (
                 "When calling docker.execute(), the second argument ('command') "
-                "should be a list."
+                "should be a list. "
                 "Here are some examples:"
                 "docker.execute('somecontainer', ['ls']), "
                 "docker.execute('somecontainer', ['cat', '/some/file.txt'])"
