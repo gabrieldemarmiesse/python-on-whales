@@ -19,6 +19,7 @@ def test_imagetools_inspect_single_image():
     assert a.schema_version == 2
     assert a.config.media_type.startswith("application/")
 
+
 def test_imagetools_create_multiarch():
     a = docker.buildx.imagetools.create("python:3.7.0")
     assert a.media_type.startswith("application/")
@@ -54,6 +55,7 @@ def test_use_builder():
         docker.buildx.use(my_builder)
         docker.buildx.use("default")
         docker.buildx.use(my_builder, default=True, global_=True)
+
 
 @pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
