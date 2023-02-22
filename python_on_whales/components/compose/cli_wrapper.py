@@ -704,6 +704,7 @@ class ComposeCLI(DockerCLICaller):
             quiet: By default, some progress bars and logs are sent to stderr and stdout.
                 Set `quiet=True` to avoid having any output.
             wait: Wait for services to be running|healthy. Implies detached mode.
+            pull: Pull image before running (“always”|”missing”|”never”).
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
