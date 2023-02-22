@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+
+from typing_extensions import Literal
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
