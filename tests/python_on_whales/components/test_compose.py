@@ -239,6 +239,15 @@ def test_docker_compose_up_down_some_services():
     docker.compose.down(timeout=1)
 
 
+def test_docker_compose_up_pull_never():
+    try:
+        docker.image.remove("alpine")
+    except DockerException:
+        pass
+    with pytest.raises(DockerException):
+        docker.compose.up(["alpine"], pull="never")
+
+
 def test_docker_compose_up_no_recreate():
     docker.compose.up(["busybox"], detach=True)
     containers = docker.compose.ps()
