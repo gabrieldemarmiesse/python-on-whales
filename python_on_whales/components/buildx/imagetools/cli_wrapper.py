@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
@@ -16,10 +16,10 @@ class ImagetoolsCLI(DockerCLICaller):
 
     def create(
         self,
-        sources: list[str] = [],
-        tags: list[str] = [],
+        sources: List[str] = [],
+        tags: List[str] = [],
         append: bool = False,
-        files: list[Union[str, Path]] = [],
+        files: List[Union[str, Path]] = [],
         dry_run: bool = False,
         builder: Optional[str] = None,
     ) -> Optional[Manifest]:
