@@ -1,8 +1,8 @@
-import json
-from typing import Any, Dict, Iterator, Optional, Union
+from pathlib import Path
+from typing import Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.utils import run, stream_stdout_and_stderr
+from python_on_whales.utils import run
 
 from .models import Manifest
 
@@ -16,15 +16,13 @@ class ImagetoolsCLI(DockerCLICaller):
 
     def create(
         self,
-        source: str,
-        tag: Optional[str],
+        sources: list[str] = [],
+        tags: list[str] = [],
         append: bool = False,
-        stream_logs: bool = False,
-        file: Optional[str] = None,
-        progress: Union[str, bool] = "auto",
-        dry_run: Optional[bool] = False,
+        files: list[Union[str, Path]] = [],
+        dry_run: bool = False,
         builder: Optional[str] = None,
-    ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
+    ) -> Optional[Manifest]:
         """
         Create a new manifest list based on source manifests.
         The source manifests can be manifest lists or single platform distribution manifests and
@@ -38,30 +36,32 @@ class ImagetoolsCLI(DockerCLICaller):
             source: The source manifest to create, change
             append: Append to existing manifest
             dry_run: Show final image instead of pushing
-            file: Read source descriptor from file
-            progress: Set type of progress output (`"auto"`, `"plain"`, `"tty"`,
-                or `False`). Use plain to keep the container output on screen
+            files: Read source descriptor from file
             builder: The builder to use.
-
         """
+        if not isinstance(sources, list):
+            raise TypeError(
+                "The argument 'sources' of the function docker.buildx.imagetools.create() must be a list of strings."
+            )
+        if not isinstance(tags, list):
+            raise TypeError(
+                "The argument 'tags' of the function docker.buildx.imagetools.create() must be a list of strings."
+            )
+        if not isinstance(files, list):
+            raise TypeError(
+                "The argument 'files' of the function docker.buildx.imagetools.create() must be a list of strings."
+            )
+
         full_cmd = self.docker_cmd + ["buildx", "imagetools", "create"]
-
-        if progress != "auto" and isinstance(progress, str):
-            full_cmd += ["--progress", progress]
-
-        full_cmd.add_simple_arg("--tag", tag)
-        full_cmd.add_simple_arg("--file", file)
+        for tag in tags:
+            full_cmd.add_simple_arg("--tag", tag)
+        for file in files:
+            full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_flag("--append", append)
-        full_cmd.add_flag("--dry_run", dry_run)
+        full_cmd.add_flag("--dry-run", dry_run)
+        full_cmd += sources
 
-        if stream_logs:
-            return stream_buildx_logs(full_cmd + source)
-        else:
-            run(full_cmd)
-            return json.loads(run(full_cmd + source))
-
-
-def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:
-    for origin, value in stream_stdout_and_stderr(full_cmd, env=env):
-        yield value.decode(errors="replace")
+        result = run(full_cmd)
+        if dry_run:
+            return Manifest.parse_raw(result)
