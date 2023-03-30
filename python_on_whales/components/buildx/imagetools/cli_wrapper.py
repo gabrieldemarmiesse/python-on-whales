@@ -33,7 +33,7 @@ class ImagetoolsCLI(DockerCLICaller):
         and it contains a lot more information.
 
         # Arguments
-            source: The source manifest to create, change
+            sources: The sources manifest to create, change
             append: Append to existing manifest
             dry_run: Show final image instead of pushing
             files: Read source descriptor from file
