@@ -31,6 +31,13 @@ def test_simple_command():
     assert "Hello from Docker!" in output
 
 
+def test_simple_mistake_on_run():
+    with pytest.raises(TypeError) as err:
+        docker.run("ubuntu", "ls")
+    assert "docker.run('ubuntu', ['ls'], ...)" in str(err)
+    docker.run("ubuntu", ["ls"], remove=True)
+
+
 def test_simple_command_create_start():
     output = docker.container.create("hello-world", remove=True).start(attach=True)
     assert "Hello from Docker!" in output
@@ -322,6 +329,17 @@ def test_execute():
     exec_result = docker.execute(my_container, ["echo", "dodo"])
     assert exec_result == "dodo"
     docker.kill(my_container)
+
+
+def test_execute_simple_mistake():
+    with docker.run(
+        "busybox:1", ["sleep", "infinity"], detach=True, remove=True
+    ) as my_container:
+        with pytest.raises(TypeError) as err:
+            docker.execute(my_container, "echo dodo")
+        assert f"docker.execute('{my_container.name}', ['echo', 'dodo'], ...)" in str(
+            err
+        )
 
 
 def test_execute_stream():

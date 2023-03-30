@@ -5,6 +5,8 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
+from typing_extensions import Literal
+
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
@@ -667,6 +669,7 @@ class ComposeCLI(DockerCLICaller):
         start: bool = True,
         quiet: bool = False,
         wait: bool = False,
+        pull: Literal["always", "missing", "never", None] = None,
     ):
         """Start the containers.
 
@@ -701,6 +704,7 @@ class ComposeCLI(DockerCLICaller):
             quiet: By default, some progress bars and logs are sent to stderr and stdout.
                 Set `quiet=True` to avoid having any output.
             wait: Wait for services to be running|healthy. Implies detached mode.
+            pull: Pull image before running (“always”|”missing”|”never”).
 
         # Returns
             `None` at the moment. The plan is to be able to capture and stream the logs later.
@@ -722,6 +726,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--no-log-prefix", not log_prefix)
         full_cmd.add_flag("--no-start", not start)
         full_cmd.add_flag("--remove-orphans", remove_orphans)
+        full_cmd.add_simple_arg("--pull", pull)
 
         if services == []:
             return

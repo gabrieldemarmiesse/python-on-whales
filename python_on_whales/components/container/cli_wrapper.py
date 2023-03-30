@@ -830,6 +830,23 @@ class ContainerCLI(DockerCLICaller):
         # Raises
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
+        if not isinstance(command, list):
+            error_message = (
+                "When calling docker.execute(), the second argument ('command') "
+                "should be a list. "
+                "Here are some examples:"
+                "docker.execute('somecontainer', ['ls']), "
+                "docker.execute('somecontainer', ['cat', '/some/file.txt'])"
+            )
+            if isinstance(command, str):
+                # boy this is the most common error in the world
+                if isinstance(container, str):
+                    container = self.inspect(container)
+                error_message += (
+                    f" In your case, command should not be a string. "
+                    f"You can try docker.execute('{container.name}', {command.split()}, ...)."
+                )
+            raise TypeError(error_message)
         full_cmd = self.docker_cmd + ["exec"]
 
         full_cmd.add_flag("--detach", detach)
@@ -1432,6 +1449,21 @@ class ContainerCLI(DockerCLICaller):
             The container output as a string if detach is `False` (the default),
             and a `python_on_whales.Container` if detach is `True`.
         """
+        if not isinstance(command, list):
+            error_message = (
+                "When calling docker.run(), the second argument ('command') "
+                "should be a list. "
+                "Here are some examples:"
+                "docker.run('ubuntu', ['ls']), "
+                "docker.run('ubuntu', ['cat', '/some/file.txt'])"
+            )
+            if isinstance(command, str):
+                # boy this is the most common error in the world
+                error_message += (
+                    f" In your case, command should not be a string. "
+                    f"You can try docker.run('{image}', {command.split()}, ...)."
+                )
+            raise TypeError(error_message)
 
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config

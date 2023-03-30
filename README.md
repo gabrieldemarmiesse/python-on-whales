@@ -225,7 +225,7 @@ implementing new features much easier and safer. For example, it's
 anytime soon because rewriting a large Go codebase in Python is hard work.
 
 
-![](./img/docker_clients.png)
+![](https://github.com/gabrieldemarmiesse/python-on-whales/blob/b09e4b560c7a1428f0d8afa103c2980b89ac467a/img/docker_clients.png)
 
 
 ## Should I use Docker-py or Python on Whales?
