@@ -4,7 +4,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, overload
+from typing import Any, Tuple, Union, overload
 
 import python_on_whales.components.buildx
 import python_on_whales.components.container
@@ -35,7 +35,7 @@ class Volume(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["volume", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]):
+    def _parse_json_object(self, json_object: dict[str, Any]):
         return VolumeInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> VolumeInspectResult:
@@ -59,11 +59,11 @@ class Volume(ReloadableObjectFromJson):
         return self._get_inspect_result().created_at
 
     @property
-    def status(self) -> Optional[Dict[str, Any]]:
+    def status(self) -> dict[str, Any] | None:
         return self._get_inspect_result().status
 
     @property
-    def labels(self) -> Dict[str, str]:
+    def labels(self) -> dict[str, str]:
         return self._get_inspect_result().labels
 
     @property
@@ -71,7 +71,7 @@ class Volume(ReloadableObjectFromJson):
         return self._get_inspect_result().scope
 
     @property
-    def options(self) -> Optional[Dict[str, str]]:
+    def options(self) -> dict[str, str] | None:
         return self._get_inspect_result().options
 
     def __repr__(self):
@@ -83,11 +83,11 @@ class Volume(ReloadableObjectFromJson):
 
     def clone(
         self,
-        new_volume_name: Optional[str] = None,
-        driver: Optional[str] = None,
-        labels: Dict[str, str] = {},
-        options: Dict[str, str] = {},
-    ) -> "Volume":
+        new_volume_name: str | None = None,
+        driver: str | None = None,
+        labels: dict[str, str] = {},
+        options: dict[str, str] = {},
+    ) -> Volume:
         """Creates a new volume and copy all the data inside.
 
         See the [`docker.volume.clone`](../sub-commands/volume.md#clone) command for
@@ -114,10 +114,10 @@ VolumePath = Tuple[Union[Volume, str], ValidPath]
 class VolumeCLI(DockerCLICaller):
     def create(
         self,
-        volume_name: Optional[str] = None,
-        driver: Optional[str] = None,
-        labels: Dict[str, str] = {},
-        options: Dict[str, str] = {},
+        volume_name: str | None = None,
+        driver: str | None = None,
+        labels: dict[str, str] = {},
+        options: dict[str, str] = {},
     ) -> Volume:
         """Creates a volume
 
@@ -146,10 +146,10 @@ class VolumeCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Volume]:
+    def inspect(self, x: list[str]) -> list[Volume]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Volume, List[Volume]]:
+    def inspect(self, x: str | list[str]) -> Volume | list[Volume]:
         if isinstance(x, str):
             return Volume(self.client_config, x)
         else:
@@ -171,7 +171,7 @@ class VolumeCLI(DockerCLICaller):
         else:
             return True
 
-    def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
+    def list(self, filters: dict[str, str | int] = {}) -> list[Volume]:
         """List volumes
 
         # Arguments
@@ -192,7 +192,7 @@ class VolumeCLI(DockerCLICaller):
             Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
         ]
 
-    def prune(self, filters: Dict[str, Union[str, int]] = {}) -> None:
+    def prune(self, filters: dict[str, str | int] = {}) -> None:
         """Remove volumes
 
         # Arguments
@@ -207,7 +207,7 @@ class VolumeCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
+    def remove(self, x: ValidVolume | list[ValidVolume]):
         """Removes one or more volumes
 
         # Arguments
@@ -226,10 +226,10 @@ class VolumeCLI(DockerCLICaller):
     def clone(
         self,
         source: ValidVolume,
-        new_volume_name: Optional[str] = None,
-        driver: Optional[str] = None,
-        labels: Dict[str, str] = {},
-        options: Dict[str, str] = {},
+        new_volume_name: str | None = None,
+        driver: str | None = None,
+        labels: dict[str, str] = {},
+        options: dict[str, str] = {},
     ) -> Volume:
         """Clone a volume.
 
@@ -251,8 +251,8 @@ class VolumeCLI(DockerCLICaller):
 
     def copy(
         self,
-        source: Union[ValidPath, VolumePath],
-        destination: Union[ValidPath, VolumePath],
+        source: ValidPath | VolumePath,
+        destination: ValidPath | VolumePath,
     ):
         """Copy files/folders between a volume and the local filesystem.
 

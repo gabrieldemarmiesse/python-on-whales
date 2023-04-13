@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 import python_on_whales.components.service.cli_wrapper
 import python_on_whales.components.task.cli_wrapper
@@ -29,10 +29,10 @@ class Stack:
     def remove(self) -> None:
         StackCLI(self.client_config).remove(self)
 
-    def ps(self) -> List[python_on_whales.components.task.cli_wrapper.Task]:
+    def ps(self) -> list[python_on_whales.components.task.cli_wrapper.Task]:
         return StackCLI(self.client_config).ps(self)
 
-    def services(self) -> List[python_on_whales.components.service.cli_wrapper.Service]:
+    def services(self) -> list[python_on_whales.components.service.cli_wrapper.Service]:
         return StackCLI(self.client_config).services(self)
 
 
@@ -43,13 +43,13 @@ class StackCLI(DockerCLICaller):
     def deploy(
         self,
         name: str,
-        compose_files: Union[ValidPath, List[ValidPath]] = [],
-        orchestrator: Optional[str] = None,
+        compose_files: ValidPath | list[ValidPath] = [],
+        orchestrator: str | None = None,
         prune: bool = False,
         resolve_image: str = "always",
         with_registry_auth: bool = False,
-        env_files: List[ValidPath] = [],
-        variables: Dict[str, str] = {},
+        env_files: list[ValidPath] = [],
+        variables: dict[str, str] = {},
     ) -> Stack:
         """Deploys a stack.
 
@@ -92,7 +92,7 @@ class StackCLI(DockerCLICaller):
         run(full_cmd, capture_stdout=False, env=env)
         return Stack(self.client_config, name)
 
-    def list(self) -> List[Stack]:
+    def list(self) -> list[Stack]:
         """Returns a list of `python_on_whales.Stack`
 
         # Returns
@@ -104,7 +104,7 @@ class StackCLI(DockerCLICaller):
 
     def ps(
         self, x: ValidStack
-    ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
+    ) -> list[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks in this stack.
 
         ```python
@@ -131,7 +131,7 @@ class StackCLI(DockerCLICaller):
             for id_ in ids
         ]
 
-    def remove(self, x: Union[ValidStack, List[ValidStack]]) -> None:
+    def remove(self, x: ValidStack | list[ValidStack]) -> None:
         """Removes one or more stacks.
 
         # Arguments
@@ -145,7 +145,7 @@ class StackCLI(DockerCLICaller):
 
     def services(
         self, stack: ValidStack
-    ) -> List[python_on_whales.components.service.cli_wrapper.Service]:
+    ) -> list[python_on_whales.components.service.cli_wrapper.Service]:
         """List the services present in the stack.
 
         # Arguments

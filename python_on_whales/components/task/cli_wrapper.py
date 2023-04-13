@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import python_on_whales.components.service.cli_wrapper
 from python_on_whales.client_config import (
@@ -28,7 +28,7 @@ class Task(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> TaskInspectResult:
+    def _parse_json_object(self, json_object: dict[str, Any]) -> TaskInspectResult:
         return TaskInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> TaskInspectResult:
@@ -52,11 +52,11 @@ class Task(ReloadableObjectFromJson):
         return self._get_inspect_result().updated_at
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         return self._get_inspect_result().name
 
     @property
-    def labels(self) -> Dict[str, str]:
+    def labels(self) -> dict[str, str]:
         return self._get_inspect_result().labels
 
     @property
@@ -68,7 +68,7 @@ class Task(ReloadableObjectFromJson):
         return self._get_inspect_result().service_id
 
     @property
-    def slot(self) -> Optional[int]:
+    def slot(self) -> int | None:
         return self._get_inspect_result().slot
 
     @property
@@ -76,7 +76,7 @@ class Task(ReloadableObjectFromJson):
         return self._get_inspect_result().node_id
 
     @property
-    def assigned_generic_resources(self) -> Optional[List[AssignedGenericResources]]:
+    def assigned_generic_resources(self) -> list[AssignedGenericResources] | None:
         return self._get_inspect_result().assigned_generic_resources
 
     @property
@@ -92,7 +92,7 @@ class Task(ReloadableObjectFromJson):
 
 
 class TaskCLI(DockerCLICaller):
-    def list(self) -> List[Task]:
+    def list(self) -> list[Task]:
         """Returns all tasks in the swarm
 
         # Returns
@@ -103,7 +103,7 @@ class TaskCLI(DockerCLICaller):
         )
         return service_cli.ps(service_cli.list())
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Task, List[Task]]:
+    def inspect(self, x: str | list[str]) -> Task | list[Task]:
         """Returns a `python_on_whales.Task` object from its ID."""
         if isinstance(x, str):
             return Task(self.client_config, x)

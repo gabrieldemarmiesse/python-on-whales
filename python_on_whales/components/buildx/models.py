@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
 
 
 @dataclass
@@ -9,7 +8,7 @@ class BuilderInspectResult:
     name: str
     driver: str
     status: str
-    platforms: List[str] = field(default_factory=lambda: [])
+    platforms: list[str] = field(default_factory=lambda: [])
 
     @classmethod
     def from_str(cls, string: str) -> BuilderInspectResult:

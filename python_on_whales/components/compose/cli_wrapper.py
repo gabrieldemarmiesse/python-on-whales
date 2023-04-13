@@ -3,9 +3,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-
-from typing_extensions import Literal
+from typing import Any, Iterable, Literal
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
@@ -22,13 +20,13 @@ from python_on_whales.utils import (
 class ComposeCLI(DockerCLICaller):
     def build(
         self,
-        services: Optional[List[str]] = None,
-        build_args: Dict[str, str] = {},
+        services: list[str] | None = None,
+        build_args: dict[str, str] = {},
         cache: bool = True,
-        progress: Optional[str] = None,
+        progress: str | None = None,
         pull: bool = False,
         quiet: bool = False,
-        ssh: Optional[str] = None,
+        ssh: str | None = None,
     ):
         """Build services declared in a yaml compose file.
 
@@ -60,7 +58,7 @@ class ComposeCLI(DockerCLICaller):
             full_cmd += services
         run(full_cmd, capture_stdout=False)
 
-    def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
+    def config(self, return_json: bool = False) -> ComposeConfig | dict[str, Any]:
         """Returns the configuration of the compose stack for further inspection.
 
         For example
@@ -91,7 +89,7 @@ class ComposeCLI(DockerCLICaller):
 
     def create(
         self,
-        services: Union[str, List[str], None] = None,
+        services: str | list[str] | None = None,
         build: bool = False,
         force_recreate: bool = False,
         no_build: bool = False,
@@ -127,8 +125,8 @@ class ComposeCLI(DockerCLICaller):
     def down(
         self,
         remove_orphans: bool = False,
-        remove_images: Optional[str] = None,
-        timeout: Optional[int] = None,
+        remove_images: str | None = None,
+        timeout: int | None = None,
         volumes: bool = False,
         quiet: bool = False,
     ):
@@ -162,15 +160,15 @@ class ComposeCLI(DockerCLICaller):
     def execute(
         self,
         service: str,
-        command: List[str],
+        command: list[str],
         detach: bool = False,
-        envs: Dict[str, str] = {},
+        envs: dict[str, str] = {},
         index: int = 1,
         tty: bool = True,
         privileged: bool = False,
-        user: Optional[str] = None,
-        workdir: Union[str, Path, None] = None,
-    ) -> Optional[str]:
+        user: str | None = None,
+        workdir: str | Path | None = None,
+    ) -> str | None:
         """Execute a command in a running container.
 
         # Arguments
@@ -204,9 +202,7 @@ class ComposeCLI(DockerCLICaller):
         else:
             return run(full_cmd)
 
-    def kill(
-        self, services: Union[str, List[str]] = None, signal: Optional[str] = None
-    ):
+    def kill(self, services: str | list[str] = None, signal: str | None = None):
         """Kills the container(s) of a service
 
         # Arguments
@@ -227,13 +223,13 @@ class ComposeCLI(DockerCLICaller):
 
     def logs(
         self,
-        services: Union[str, List[str]] = [],
-        tail: Optional[str] = None,
+        services: str | list[str] = [],
+        tail: str | None = None,
         follow: bool = False,
         no_log_prefix: bool = False,
         timestamps: bool = False,
-        since: Optional[str] = None,
-        until: Optional[str] = None,
+        since: str | None = None,
+        until: str | None = None,
         stream: bool = False,
     ):
         """View output from containers
@@ -274,7 +270,7 @@ class ComposeCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def pause(self, services: Union[str, List[str], None] = None):
+    def pause(self, services: str | list[str] | None = None):
         """Pause one or more services
 
         # Arguments
@@ -294,10 +290,10 @@ class ComposeCLI(DockerCLICaller):
     def port(
         self,
         service: str,
-        private_port: Union[str, int],
+        private_port: str | int,
         index: int = 1,
         protocol: str = "tcp",
-    ) -> Tuple[Optional[str], Optional[int]]:
+    ) -> tuple[str | None, int | None]:
         """Returns the public port for a port binding.
 
         # Arguments
@@ -330,9 +326,9 @@ class ComposeCLI(DockerCLICaller):
 
     def ps(
         self,
-        services: Optional[List[str]] = None,
+        services: list[str] | None = None,
         all: bool = False,
-    ) -> List[python_on_whales.components.container.cli_wrapper.Container]:
+    ) -> list[python_on_whales.components.container.cli_wrapper.Container]:
         """Returns the containers that were created by the current project.
 
         # Returns
@@ -353,8 +349,8 @@ class ComposeCLI(DockerCLICaller):
         return [Container(self.client_config, x, is_immutable_id=True) for x in ids]
 
     def ls(
-        self, all: bool = False, filters: Dict[str, str] = {}
-    ) -> List[ComposeProject]:
+        self, all: bool = False, filters: dict[str, str] = {}
+    ) -> list[ComposeProject]:
         """Returns a list of docker compose projects
 
         # Arguments
@@ -389,7 +385,7 @@ class ComposeCLI(DockerCLICaller):
 
     def pull(
         self,
-        services: Union[List[str], str, None] = None,
+        services: list[str] | str | None = None,
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
         quiet: bool = False,
@@ -418,7 +414,7 @@ class ComposeCLI(DockerCLICaller):
             full_cmd += services
         run(full_cmd, capture_stdout=False, capture_stderr=False)
 
-    def push(self, services: Optional[List[str]] = None):
+    def push(self, services: list[str] | None = None):
         """Push service images
 
         # Arguments
@@ -436,8 +432,8 @@ class ComposeCLI(DockerCLICaller):
 
     def restart(
         self,
-        services: Union[str, List[str], None] = None,
-        timeout: Union[int, timedelta, None] = None,
+        services: str | list[str] | None = None,
+        timeout: int | timedelta | None = None,
     ):
         """Restart containers
 
@@ -464,7 +460,7 @@ class ComposeCLI(DockerCLICaller):
 
     def rm(
         self,
-        services: Union[str, List[str], None] = None,
+        services: str | list[str] | None = None,
         stop: bool = False,
         volumes: bool = False,
     ):
@@ -495,29 +491,29 @@ class ComposeCLI(DockerCLICaller):
     def run(
         self,
         service: str,
-        command: List[str] = [],
+        command: list[str] = [],
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
         # envs: Dict[str, str] = {},
-        labels: Dict[str, str] = {},
-        name: Optional[str] = None,
+        labels: dict[str, str] = {},
+        name: str | None = None,
         tty: bool = True,
         stream: bool = False,
         dependencies: bool = True,
-        publish: List[
+        publish: list[
             python_on_whales.components.container.cli_wrapper.ValidPortMapping
         ] = [],
         remove: bool = False,
         service_ports: bool = False,
         use_aliases: bool = False,
-        user: Optional[str] = None,
+        user: str | None = None,
         # volumes: bool = "todo",
-        workdir: Union[None, str, Path] = None,
-    ) -> Union[
-        str,
-        python_on_whales.components.container.cli_wrapper.Container,
-        Iterable[Tuple[str, bytes]],
-    ]:
+        workdir: None | str | Path = None,
+    ) -> (
+        str
+        | python_on_whales.components.container.cli_wrapper.Container
+        | Iterable[tuple[str, bytes]]
+    ):
         """Run a one-off command on a service.
 
         # Arguments
@@ -592,7 +588,7 @@ class ComposeCLI(DockerCLICaller):
             else:
                 return result
 
-    def start(self, services: Union[str, List[str], None] = None):
+    def start(self, services: str | list[str] | None = None):
         """Start the specified services.
 
         # Arguments
@@ -609,8 +605,8 @@ class ComposeCLI(DockerCLICaller):
 
     def stop(
         self,
-        services: Union[str, List[str], None] = None,
-        timeout: Union[int, timedelta, None] = None,
+        services: str | list[str] | None = None,
+        timeout: int | timedelta | None = None,
     ):
         """Stop services
 
@@ -636,7 +632,7 @@ class ComposeCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, services: Union[str, List[str], None] = None):
+    def unpause(self, services: str | list[str] | None = None):
         """Unpause one or more services
 
         # Arguments
@@ -654,11 +650,11 @@ class ComposeCLI(DockerCLICaller):
 
     def up(
         self,
-        services: Union[List[str], str, None] = None,
+        services: list[str] | str | None = None,
         build: bool = False,
         detach: bool = False,
         abort_on_container_exit: bool = False,
-        scales: Dict[str, int] = {},
+        scales: dict[str, int] = {},
         attach_dependencies: bool = False,
         force_recreate: bool = False,
         recreate: bool = True,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Union, overload
 
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
@@ -43,7 +43,7 @@ class Service(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["service", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> ServiceInspectResult:
+    def _parse_json_object(self, json_object: dict[str, Any]) -> ServiceInspectResult:
         return ServiceInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> ServiceInspectResult:
@@ -71,7 +71,7 @@ class Service(ReloadableObjectFromJson):
         return self._get_inspect_result().spec
 
     @property
-    def previous_spec(self) -> Optional[ServiceSpec]:
+    def previous_spec(self) -> ServiceSpec | None:
         return self._get_inspect_result().previous_spec
 
     @property
@@ -79,10 +79,10 @@ class Service(ReloadableObjectFromJson):
         return self._get_inspect_result().endpoint
 
     @property
-    def update_status(self) -> Optional[ServiceUpdateStatus]:
+    def update_status(self) -> ServiceUpdateStatus | None:
         return self._get_inspect_result().update_status
 
-    def ps(self) -> List[python_on_whales.components.task.cli_wrapper.Task]:
+    def ps(self) -> list[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of tasks of this service."""
         return ServiceCLI(self.client_config).ps(self)
 
@@ -118,7 +118,7 @@ class Service(ReloadableObjectFromJson):
         self,
         detach: bool = False,
         force: bool = False,
-        image: Optional[str] = None,
+        image: str | None = None,
         with_registry_authentication: bool = False,
     ):
         """Updates a service
@@ -144,35 +144,35 @@ class ServiceCLI(DockerCLICaller):
     def create(
         self,
         image: str,
-        command: Union[str, List[str], None],
-        cap_add: List[str] = [],
-        cap_drop: List[str] = [],
-        constraints: List[str] = [],
+        command: str | list[str] | None,
+        cap_add: list[str] = [],
+        cap_drop: list[str] = [],
+        constraints: list[str] = [],
         detach: bool = False,
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
-        endpoint_mode: Optional[str] = None,
-        entrypoint: Optional[str] = None,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
-        generic_resources: List[str] = [],
-        groups: List[str] = [],
+        dns: list[str] = [],
+        dns_options: list[str] = [],
+        dns_search: list[str] = [],
+        endpoint_mode: str | None = None,
+        entrypoint: str | None = None,
+        envs: dict[str, str] = {},
+        env_files: ValidPath | list[ValidPath] = [],
+        generic_resources: list[str] = [],
+        groups: list[str] = [],
         healthcheck: bool = True,
-        health_cmd: Optional[str] = None,
-        health_interval: Union[None, int, timedelta] = None,
-        health_retries: Optional[int] = None,
-        health_start_period: Union[None, int, timedelta] = None,
-        health_timeout: Union[None, int, timedelta] = None,
-        hosts: Dict[str, str] = {},
-        hostname: Optional[str] = None,
+        health_cmd: str | None = None,
+        health_interval: None | int | timedelta = None,
+        health_retries: int | None = None,
+        health_start_period: None | int | timedelta = None,
+        health_timeout: None | int | timedelta = None,
+        hosts: dict[str, str] = {},
+        hostname: str | None = None,
         init: bool = False,
-        isolation: Optional[str] = None,
-        labels: Dict[str, str] = {},
-        limit_cpu: Optional[float] = None,
-        limit_memory: Optional[str] = None,
-        limit_pids: Optional[int] = None,
-        log_driver: Optional[str] = None,
+        isolation: str | None = None,
+        labels: dict[str, str] = {},
+        limit_cpu: float | None = None,
+        limit_memory: str | None = None,
+        limit_pids: int | None = None,
+        log_driver: str | None = None,
     ):
         """Creates a Docker swarm service.
 
@@ -237,10 +237,10 @@ class ServiceCLI(DockerCLICaller):
         pass
 
     @overload
-    def inspect(self, x: List[str]) -> List[Service]:
+    def inspect(self, x: list[str]) -> list[Service]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Service, List[Service]]:
+    def inspect(self, x: str | list[str]) -> Service | list[Service]:
         """Returns one or a list of `python_on_whales.Service` object(s).
 
         # Raises
@@ -272,8 +272,8 @@ class ServiceCLI(DockerCLICaller):
         self,
         service: ValidService,
         details: bool = False,
-        since: Union[None, datetime, timedelta] = None,
-        tail: Optional[int] = None,
+        since: None | datetime | timedelta = None,
+        tail: int | None = None,
         timestamps: bool = False,
         follow: bool = False,
         raw: bool = False,
@@ -335,7 +335,7 @@ class ServiceCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def list(self) -> List[Service]:
+    def list(self) -> list[Service]:
         """Returns the list of services
 
         # Returns
@@ -365,8 +365,8 @@ class ServiceCLI(DockerCLICaller):
         ]
 
     def ps(
-        self, x: Union[ValidService, List[ValidService]]
-    ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
+        self, x: ValidService | list[ValidService]
+    ) -> list[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks associated with this service.
 
         You can pass multiple services at once at this function.
@@ -400,7 +400,7 @@ class ServiceCLI(DockerCLICaller):
             for id_ in ids
         ]
 
-    def remove(self, services: Union[ValidService, List[ValidService]]) -> None:
+    def remove(self, services: ValidService | list[ValidService]) -> None:
         """Removes a service
 
         # Arguments
@@ -424,7 +424,7 @@ class ServiceCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def scale(self, new_scales: Dict[ValidService, int], detach: bool = False) -> None:
+    def scale(self, new_scales: dict[ValidService, int], detach: bool = False) -> None:
         """Scale one or more services.
 
         # Arguments
@@ -452,7 +452,7 @@ class ServiceCLI(DockerCLICaller):
         service: ValidService,
         detach: bool = False,
         force: bool = False,
-        image: Optional[str] = None,
+        image: str | None = None,
         with_registry_authentication: bool = False,
     ):
         """Update a service

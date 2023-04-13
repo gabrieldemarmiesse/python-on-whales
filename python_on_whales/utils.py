@@ -6,10 +6,9 @@ from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import Any, Iterable, Literal, Tuple, Union, overload
 
 import pydantic
-from typing_extensions import Literal
 
 from python_on_whales.exceptions import (
     DockerException,
@@ -74,12 +73,12 @@ class DockerCamelModel(pydantic.BaseModel):
 
 @overload
 def run(
-    args: List[Any],
+    args: list[Any],
     capture_stdout: bool = ...,
     capture_stderr: bool = ...,
     input: bytes = ...,
     return_stderr: Literal[True] = ...,
-    env: Dict[str, str] = ...,
+    env: dict[str, str] = ...,
     tty: bool = ...,
 ) -> Tuple[str, str]:
     ...
@@ -87,24 +86,24 @@ def run(
 
 @overload
 def run(
-    args: List[Any],
+    args: list[Any],
     capture_stdout: bool = ...,
     capture_stderr: bool = ...,
     input: bytes = ...,
     return_stderr: Literal[False] = ...,
-    env: Dict[str, str] = ...,
+    env: dict[str, str] = ...,
     tty: bool = ...,
 ) -> str:
     ...
 
 
 def run(
-    args: List[Any],
+    args: list[Any],
     capture_stdout: bool = True,
     capture_stderr: bool = True,
-    input: Optional[bytes] = None,
+    input: bytes | None = None,
     return_stderr: bool = False,
-    env: Dict[str, str] = {},
+    env: dict[str, str] = {},
     tty: bool = False,
 ) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
@@ -190,7 +189,7 @@ def run(
         return post_process_stream(completed_process.stdout)
 
 
-def post_process_stream(stream: Optional[bytes]):
+def post_process_stream(stream: bytes | None):
     if stream is None:
         return ""
     stream = stream.decode()
@@ -234,7 +233,7 @@ def reader(pipe, pipe_name, queue):
 
 
 def stream_stdout_and_stderr(
-    full_cmd: list, env: Dict[str, str] = None
+    full_cmd: list, env: dict[str, str] = None
 ) -> Iterable[Tuple[str, bytes]]:
     if env is None:
         subprocess_env = None
@@ -264,11 +263,11 @@ def stream_stdout_and_stderr(
         raise DockerException(full_cmd, exit_code, stderr=full_stderr)
 
 
-def format_dict_for_cli(dictionary: Dict[str, str], separator="="):
+def format_dict_for_cli(dictionary: dict[str, str], separator="="):
     return [f"{key}{separator}{value}" for key, value in dictionary.items()]
 
 
-def read_env_file(env_file: Path) -> Dict[str, str]:
+def read_env_file(env_file: Path) -> dict[str, str]:
     result_dict = {}
     for line in env_file.read_text().splitlines():
         line = line.strip()
@@ -286,7 +285,7 @@ def read_env_file(env_file: Path) -> Dict[str, str]:
     return result_dict
 
 
-def read_env_files(env_files: List[Path]) -> Dict[str, str]:
+def read_env_files(env_files: list[Path]) -> dict[str, str]:
     result_dict = {}
     for file in env_files:
         result_dict.update(read_env_file(file))

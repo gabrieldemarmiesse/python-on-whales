@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -21,7 +21,7 @@ class Context(ReloadableObjectFromJson):
     def __init__(
         self,
         client_config: ClientConfig,
-        reference: Optional[str],
+        reference: str | None,
         is_immutable_id=False,
     ):
         super().__init__(client_config, "name", reference, is_immutable_id)
@@ -32,13 +32,13 @@ class Context(ReloadableObjectFromJson):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.remove(force=True)
 
-    def _fetch_inspect_result_json(self, reference: Optional[str]):
+    def _fetch_inspect_result_json(self, reference: str | None):
         full_cmd = self.docker_cmd + ["context", "inspect"]
         if reference is not None:
             full_cmd.append(reference)
         return run(full_cmd)
 
-    def _parse_json_object(self, json_object: Dict[str, Any]):
+    def _parse_json_object(self, json_object: dict[str, Any]):
         return ContextInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> ContextInspectResult:
@@ -50,11 +50,11 @@ class Context(ReloadableObjectFromJson):
         return self._get_immutable_id()
 
     @property
-    def metadata(self) -> Dict[str, str]:
+    def metadata(self) -> dict[str, str]:
         return self._get_inspect_result().metadata
 
     @property
-    def endpoints(self) -> Dict[str, ContextEndpoint]:
+    def endpoints(self) -> dict[str, ContextEndpoint]:
         return self._get_inspect_result().endpoints
 
     @property
@@ -89,11 +89,11 @@ ValidContext = Union[Context, str]
 
 @dataclass
 class DockerContextConfig:
-    from_: Optional[ValidContext] = None
-    host: Optional[str] = None
-    certificate_authority: Union[Path, str, None] = None
-    certificate: Union[Path, str, None] = None
-    key: Union[Path, str, None] = None
+    from_: ValidContext | None = None
+    host: str | None = None
+    certificate_authority: Path | str | None = None
+    certificate: Path | str | None = None
+    key: Path | str | None = None
     skip_tls_verify: bool = False
 
     def format_for_docker_cli(self) -> str:
@@ -115,10 +115,10 @@ class DockerContextConfig:
 
 @dataclass
 class KubernetesContextConfig:
-    from_: Optional[ValidContext] = None
-    config_file: Union[str, Path, None] = None
-    context_override: Optional[str] = None
-    namespace_override: Optional[str] = None
+    from_: ValidContext | None = None
+    config_file: str | Path | None = None
+    context_override: str | None = None
+    namespace_override: str | None = None
 
     def format_for_docker_cli(self) -> str:
         list_of_args = []
@@ -137,11 +137,11 @@ class ContextCLI(DockerCLICaller):
     def create(
         self,
         context_name: str,
-        default_stack_orchestrator: Optional[str] = None,
-        description: Optional[str] = None,
-        from_: Optional[ValidContext] = None,
-        docker: Union[Dict[str, Any], DockerContextConfig, None] = None,
-        kubernetes: Union[Dict[str, Any], KubernetesContextConfig, None] = None,
+        default_stack_orchestrator: str | None = None,
+        description: str | None = None,
+        from_: ValidContext | None = None,
+        docker: dict[str, Any] | DockerContextConfig | None = None,
+        kubernetes: dict[str, Any] | KubernetesContextConfig | None = None,
     ) -> Context:
         """Creates a new context
 
@@ -176,16 +176,14 @@ class ContextCLI(DockerCLICaller):
         return self.inspect(context_name)
 
     @overload
-    def inspect(self, x: Union[None, str]) -> Context:
+    def inspect(self, x: None | str) -> Context:
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Context]:
+    def inspect(self, x: list[str]) -> list[Context]:
         ...
 
-    def inspect(
-        self, x: Union[None, str, List[str]] = None
-    ) -> Union[Context, List[Context]]:
+    def inspect(self, x: None | str | list[str] = None) -> Context | list[Context]:
         """Returns the context object. If no argument is provided, returns the
         current context."""
         if isinstance(x, str) or x is None:
@@ -193,7 +191,7 @@ class ContextCLI(DockerCLICaller):
         else:
             return [Context(self.client_config, ref) for ref in x]
 
-    def list(self) -> List[Context]:
+    def list(self) -> list[Context]:
         """List all Docker contexts available
 
         # Returns
@@ -205,7 +203,7 @@ class ContextCLI(DockerCLICaller):
         ids = run(full_cmd).splitlines()
         return [Context(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
-    def remove(self, x: Union[ValidContext, List[ValidContext]], force: bool = False):
+    def remove(self, x: ValidContext | list[ValidContext], force: bool = False):
         """Removes one or more contexts
 
         # Arguments

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -30,7 +30,7 @@ class Plugin(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["plugin", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> PluginInspectResult:
+    def _parse_json_object(self, json_object: dict[str, Any]) -> PluginInspectResult:
         return PluginInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> PluginInspectResult:
@@ -84,13 +84,13 @@ class Plugin(ReloadableObjectFromJson):
         """Remove this plugin"""
         self._docker_plugin.remove(self, force=force)
 
-    def set(self, configuration: Dict[str, str]) -> None:
+    def set(self, configuration: dict[str, str]) -> None:
         """Set the configuration for this plugin"""
         self._docker_plugin.set(self, configuration)
 
     def upgrade(
         self,
-        remote: Optional[str] = None,
+        remote: str | None = None,
         disable_content_trust: bool = True,
         skip_remote_check: bool = False,
     ) -> None:
@@ -149,10 +149,10 @@ class PluginCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Plugin]:
+    def inspect(self, x: list[str]) -> list[Plugin]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Plugin, List[Plugin]]:
+    def inspect(self, x: str | list[str]) -> Plugin | list[Plugin]:
         """Returns a `python_on_whales.Plugin` object from a string
         (name or id of the plugin)
 
@@ -170,8 +170,8 @@ class PluginCLI(DockerCLICaller):
     def install(
         self,
         plugin_name: str,
-        configuration: Dict[str, str] = {},
-        alias: Optional[str] = None,
+        configuration: dict[str, str] = {},
+        alias: str | None = None,
         disable: bool = False,
         disable_content_trust: bool = True,
     ) -> Plugin:
@@ -203,7 +203,7 @@ class PluginCLI(DockerCLICaller):
             return Plugin(self.client_config, alias)
         return Plugin(self.client_config, plugin_name)
 
-    def list(self) -> List[Plugin]:
+    def list(self) -> list[Plugin]:
         """Returns a `List[python_on_whales.Plugin` that are installed on the daemon."""
         full_cmd = self.docker_cmd + [
             "plugin",
@@ -228,9 +228,7 @@ class PluginCLI(DockerCLICaller):
         full_cmd.append(plugin)
         run(full_cmd)
 
-    def remove(
-        self, x: Union[ValidPlugin, List[ValidPlugin]], force: bool = False
-    ) -> None:
+    def remove(self, x: ValidPlugin | list[ValidPlugin], force: bool = False) -> None:
         """Removes one or more plugins
 
         # Arguments
@@ -244,7 +242,7 @@ class PluginCLI(DockerCLICaller):
         full_cmd += to_list(x)
         run(full_cmd)
 
-    def set(self, plugin: ValidPlugin, configuration: Dict[str, str]) -> None:
+    def set(self, plugin: ValidPlugin, configuration: dict[str, str]) -> None:
         """Change the settings for a plugin
 
         # Arguments
@@ -260,7 +258,7 @@ class PluginCLI(DockerCLICaller):
     def upgrade(
         self,
         plugin: ValidPlugin,
-        remote: Optional[str] = None,
+        remote: str | None = None,
         disable_content_trust: bool = True,
         skip_remote_check: bool = False,
     ) -> None:

@@ -4,18 +4,7 @@ import inspect
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    TypedDict,
-    Union,
-    overload,
-)
+from typing import Any, Iterable, Literal, Tuple, TypedDict, Union, overload
 
 import pydantic
 
@@ -91,7 +80,7 @@ class Container(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["container", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]):
+    def _parse_json_object(self, json_object: dict[str, Any]):
         return ContainerInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> ContainerInspectResult:
@@ -113,7 +102,7 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().path
 
     @property
-    def args(self) -> List[str]:
+    def args(self) -> list[str]:
         return self._get_inspect_result().args
 
     @property
@@ -173,7 +162,7 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().app_armor_profile
 
     @property
-    def exec_ids(self) -> Optional[List[str]]:
+    def exec_ids(self) -> list[str] | None:
         return self._get_inspect_result().exec_ids
 
     @property
@@ -185,15 +174,15 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().graph_driver
 
     @property
-    def size_rw(self) -> Optional[int]:
+    def size_rw(self) -> int | None:
         return self._get_inspect_result().size_rw
 
     @property
-    def size_root_fs(self) -> Optional[int]:
+    def size_root_fs(self) -> int | None:
         return self._get_inspect_result().size_root_fs
 
     @property
-    def mounts(self) -> List[Mount]:
+    def mounts(self) -> list[Mount]:
         return self._get_inspect_result().mounts
 
     @property
@@ -212,7 +201,7 @@ class Container(ReloadableObjectFromJson):
 
     def attach(
         self,
-        detach_keys: Optional[str] = None,
+        detach_keys: str | None = None,
         stdin: bool = True,
         sig_proxy: bool = True,
     ) -> None:
@@ -227,9 +216,9 @@ class Container(ReloadableObjectFromJson):
 
     def commit(
         self,
-        tag: Optional[str] = None,
-        author: Optional[str] = None,
-        message: Optional[str] = None,
+        tag: str | None = None,
+        author: str | None = None,
+        message: str | None = None,
         pause: bool = True,
     ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Create a new image from the container's changes.
@@ -249,7 +238,7 @@ class Container(ReloadableObjectFromJson):
     def copy_to(self, local_path: ValidPath, container_path: ValidPath):
         return ContainerCLI(self.client_config).copy(local_path, (self, container_path))
 
-    def diff(self) -> Dict[str, str]:
+    def diff(self) -> dict[str, str]:
         """Returns the diff of this container filesystem.
 
         See the [`docker.container.diff`](../sub-commands/container.md) command for
@@ -259,17 +248,17 @@ class Container(ReloadableObjectFromJson):
 
     def execute(
         self,
-        command: Union[str, List[str]],
+        command: str | list[str],
         detach: bool = False,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
+        envs: dict[str, str] = {},
+        env_files: ValidPath | list[ValidPath] = [],
         interactive: bool = False,
         privileged: bool = False,
         tty: bool = False,
-        user: Optional[str] = None,
-        workdir: Optional[ValidPath] = None,
+        user: str | None = None,
+        workdir: ValidPath | None = None,
         stream: bool = False,
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+    ) -> None | str | Iterable[tuple[str, bytes]]:
         """Execute a command in this container
 
         See the [`docker.container.execute`](../sub-commands/container.md#execute)
@@ -308,10 +297,10 @@ class Container(ReloadableObjectFromJson):
     def logs(
         self,
         details: bool = False,
-        since: Union[None, datetime, timedelta] = None,
-        tail: Optional[int] = None,
+        since: None | datetime | timedelta = None,
+        tail: int | None = None,
         timestamps: bool = False,
-        until: Union[None, datetime, timedelta] = None,
+        until: None | datetime | timedelta = None,
     ) -> str:
         """Returns the logs of the container
 
@@ -346,7 +335,7 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).rename(self, new_name)
 
-    def restart(self, time: Optional[Union[int, timedelta]] = None) -> None:
+    def restart(self, time: int | timedelta | None = None) -> None:
         """Restarts this container.
 
         See the [`docker.container.restart`](../sub-commands/container.md#restart) command for
@@ -364,7 +353,7 @@ class Container(ReloadableObjectFromJson):
 
     def start(
         self, attach: bool = False, stream: bool = False
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+    ) -> None | str | Iterable[tuple[str, bytes]]:
         """Starts this container.
 
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
@@ -372,7 +361,7 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).start(self, attach, stream)
 
-    def stop(self, time: Union[int, timedelta] = None) -> None:
+    def stop(self, time: int | timedelta = None) -> None:
         """Stops this container.
 
         See the [`docker.container.stop`](../sub-commands/container.md#stop) command for
@@ -406,7 +395,7 @@ class ContainerCLI(DockerCLICaller):
     def attach(
         self,
         container: ValidContainer,
-        detach_keys: Optional[str] = None,
+        detach_keys: str | None = None,
         stdin: bool = True,
         sig_proxy: bool = True,
     ) -> None:
@@ -436,9 +425,9 @@ class ContainerCLI(DockerCLICaller):
     def commit(
         self,
         container: ValidContainer,
-        tag: Optional[str] = None,
-        author: Optional[str] = None,
-        message: Optional[str] = None,
+        tag: str | None = None,
+        author: str | None = None,
+        message: str | None = None,
         pause: bool = True,
     ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Create a new image from a container's changes
@@ -471,8 +460,8 @@ class ContainerCLI(DockerCLICaller):
 
     def copy(
         self,
-        source: Union[ValidPath, ContainerPath],
-        destination: Union[ValidPath, ContainerPath],
+        source: ValidPath | ContainerPath,
+        destination: ValidPath | ContainerPath,
     ):
         """Copy files/folders between a container and the local filesystem
 
@@ -519,103 +508,102 @@ class ContainerCLI(DockerCLICaller):
     def create(
         self,
         image: str,
-        command: List[str] = [],
+        command: list[str] = [],
         *,
-        add_hosts: List[Tuple[str, str]] = [],
-        blkio_weight: Optional[int] = None,
-        blkio_weight_device: List[str] = [],
-        cap_add: List[str] = [],
-        cap_drop: List[str] = [],
-        cgroup_parent: Optional[str] = None,
-        cgroupns: Optional[str] = None,
-        cidfile: Optional[ValidPath] = None,
-        cpu_period: Optional[int] = None,
-        cpu_quota: Optional[int] = None,
-        cpu_rt_period: Optional[int] = None,
-        cpu_rt_runtime: Optional[int] = None,
-        cpu_shares: Optional[int] = None,
-        cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
+        add_hosts: list[tuple[str, str]] = [],
+        blkio_weight: int | None = None,
+        blkio_weight_device: list[str] = [],
+        cap_add: list[str] = [],
+        cap_drop: list[str] = [],
+        cgroup_parent: str | None = None,
+        cgroupns: str | None = None,
+        cidfile: ValidPath | None = None,
+        cpu_period: int | None = None,
+        cpu_quota: int | None = None,
+        cpu_rt_period: int | None = None,
+        cpu_rt_runtime: int | None = None,
+        cpu_shares: int | None = None,
+        cpus: float | None = None,
+        cpuset_cpus: list[int] | None = None,
+        cpuset_mems: list[int] | None = None,
         detach: bool = False,
-        devices: List[str] = [],
-        device_cgroup_rules: List[str] = [],
-        device_read_bps: List[str] = [],
-        device_read_iops: List[str] = [],
-        device_write_bps: List[str] = [],
-        device_write_iops: List[str] = [],
+        devices: list[str] = [],
+        device_cgroup_rules: list[str] = [],
+        device_read_bps: list[str] = [],
+        device_read_iops: list[str] = [],
+        device_write_bps: list[str] = [],
+        device_write_iops: list[str] = [],
         content_trust: bool = False,
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
-        domainname: Optional[str] = None,
-        entrypoint: Optional[str] = None,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
-        expose: Union[int, List[int]] = [],
-        gpus: Union[int, str, None] = None,
-        groups_add: List[str] = [],
+        dns: list[str] = [],
+        dns_options: list[str] = [],
+        dns_search: list[str] = [],
+        domainname: str | None = None,
+        entrypoint: str | None = None,
+        envs: dict[str, str] = {},
+        env_files: ValidPath | list[ValidPath] = [],
+        expose: int | list[int] = [],
+        gpus: int | str | None = None,
+        groups_add: list[str] = [],
         healthcheck: bool = True,
-        health_cmd: Optional[str] = None,
-        health_interval: Union[None, int, timedelta] = None,
-        health_retries: Optional[int] = None,
-        health_start_period: Union[None, int, timedelta] = None,
-        health_timeout: Union[None, int, timedelta] = None,
-        hostname: Optional[str] = None,
+        health_cmd: str | None = None,
+        health_interval: None | int | timedelta = None,
+        health_retries: int | None = None,
+        health_start_period: None | int | timedelta = None,
+        health_timeout: None | int | timedelta = None,
+        hostname: str | None = None,
         init: bool = False,
-        ip: Optional[str] = None,
-        ip6: Optional[str] = None,
-        ipc: Optional[str] = None,
-        isolation: Optional[str] = None,
-        kernel_memory: Union[int, str, None] = None,
-        labels: Dict[str, str] = {},
-        label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
-        link_local_ip: List[str] = [],
-        log_driver: Optional[str] = None,
-        log_options: List[str] = [],
-        mac_address: Optional[str] = None,
-        memory: Union[int, str, None] = None,
-        memory_reservation: Union[int, str, None] = None,
-        memory_swap: Union[int, str, None] = None,
-        memory_swappiness: Optional[int] = None,
-        mounts: List[List[str]] = [],
-        name: Optional[str] = None,
-        networks: List[
+        ip: str | None = None,
+        ip6: str | None = None,
+        ipc: str | None = None,
+        isolation: str | None = None,
+        kernel_memory: int | str | None = None,
+        labels: dict[str, str] = {},
+        label_files: list[ValidPath] = [],
+        link: list[ValidContainer] = [],
+        link_local_ip: list[str] = [],
+        log_driver: str | None = None,
+        log_options: list[str] = [],
+        mac_address: str | None = None,
+        memory: int | str | None = None,
+        memory_reservation: int | str | None = None,
+        memory_swap: int | str | None = None,
+        memory_swappiness: int | None = None,
+        mounts: list[list[str]] = [],
+        name: str | None = None,
+        networks: list[
             python_on_whales.components.network.cli_wrapper.ValidNetwork
         ] = [],
-        network_aliases: List[str] = [],
+        network_aliases: list[str] = [],
         oom_kill: bool = True,
-        oom_score_adj: Optional[int] = None,
-        pid: Optional[str] = None,
-        pids_limit: Optional[int] = None,
-        platform: Optional[str] = None,
+        oom_score_adj: int | None = None,
+        pid: str | None = None,
+        pids_limit: int | None = None,
+        platform: str | None = None,
         privileged: bool = False,
-        publish: List[ValidPortMapping] = [],
+        publish: list[ValidPortMapping] = [],
         publish_all: bool = False,
         pull: str = "missing",
         read_only: bool = False,
-        restart: Optional[str] = None,
+        restart: str | None = None,
         remove: bool = False,
-        runtime: Optional[str] = None,
-        security_options: List[str] = [],
-        shm_size: Union[int, str, None] = None,
+        runtime: str | None = None,
+        security_options: list[str] = [],
+        shm_size: int | str | None = None,
         sig_proxy: bool = True,
-        stop_signal: Optional[str] = None,
-        stop_timeout: Optional[int] = None,
-        storage_options: List[str] = [],
-        sysctl: Dict[str, str] = {},
-        tmpfs: List[ValidPath] = [],
-        ulimit: List[str] = [],
-        user: Optional[str] = None,
-        userns: Optional[str] = None,
-        uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
-        volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
-        workdir: Optional[ValidPath] = None,
+        stop_signal: str | None = None,
+        stop_timeout: int | None = None,
+        storage_options: list[str] = [],
+        sysctl: dict[str, str] = {},
+        tmpfs: list[ValidPath] = [],
+        ulimit: list[str] = [],
+        user: str | None = None,
+        userns: str | None = None,
+        uts: str | None = None,
+        volumes: None
+        | (list[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]) = [],
+        volume_driver: str | None = None,
+        volumes_from: list[ValidContainer] = [],
+        workdir: ValidPath | None = None,
     ) -> Container:
         """Creates a container, but does not start it.
 
@@ -802,7 +790,7 @@ class ContainerCLI(DockerCLICaller):
                     "The size of the tuples in the publish list must be 1, 2, or 3"
                 )
 
-    def diff(self, container: ValidContainer) -> Dict[str, str]:
+    def diff(self, container: ValidContainer) -> dict[str, str]:
         """List all the files modified, added or deleted since the container started.
 
         Alias: `docker.diff(...)`
@@ -826,17 +814,17 @@ class ContainerCLI(DockerCLICaller):
     def execute(
         self,
         container: ValidContainer,
-        command: Union[str, List[str]],
+        command: str | list[str],
         detach: bool = False,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
+        envs: dict[str, str] = {},
+        env_files: ValidPath | list[ValidPath] = [],
         interactive: bool = False,
         privileged: bool = False,
         tty: bool = False,
-        user: Optional[str] = None,
-        workdir: Optional[ValidPath] = None,
+        user: str | None = None,
+        workdir: ValidPath | None = None,
         stream: bool = False,
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+    ) -> None | str | Iterable[tuple[str, bytes]]:
         """Execute a command inside a container
 
         Alias: `docker.execute(...)`
@@ -961,10 +949,10 @@ class ContainerCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Container]:
+    def inspect(self, x: list[str]) -> list[Container]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Container, List[Container]]:
+    def inspect(self, x: str | list[str]) -> Container | list[Container]:
         """Returns a container object from a name or ID.
 
         # Arguments
@@ -986,8 +974,8 @@ class ContainerCLI(DockerCLICaller):
 
     def kill(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
-        signal: Optional[str] = None,
+        containers: ValidContainer | list[ValidContainer],
+        signal: str | None = None,
     ) -> None:
         """Kill a container.
 
@@ -1014,15 +1002,15 @@ class ContainerCLI(DockerCLICaller):
 
     def logs(
         self,
-        container: Union[Container, str],
+        container: Container | str,
         details: bool = False,
-        since: Union[None, datetime, timedelta] = None,
-        tail: Optional[int] = None,
+        since: None | datetime | timedelta = None,
+        tail: int | None = None,
         timestamps: bool = False,
-        until: Union[None, datetime, timedelta] = None,
+        until: None | datetime | timedelta = None,
         follow: bool = False,
         stream: bool = False,
-    ) -> Union[str, Iterable[Tuple[str, bytes]]]:
+    ) -> str | Iterable[tuple[str, bytes]]:
         """Returns the logs of a container as a string or an iterator.
 
         Alias: `docker.logs(...)`
@@ -1086,7 +1074,7 @@ class ContainerCLI(DockerCLICaller):
 
     def list(
         self, all: bool = False, filters: DockerContainerListFilters = {}
-    ) -> List[Container]:
+    ) -> list[Container]:
         """List the containers on the host.
 
         Alias: `docker.ps(...)`
@@ -1109,7 +1097,7 @@ class ContainerCLI(DockerCLICaller):
             for x in run(full_cmd).splitlines()
         ]
 
-    def pause(self, containers: Union[ValidContainer, List[ValidContainer]]):
+    def pause(self, containers: ValidContainer | list[ValidContainer]):
         """Pauses one or more containers
 
         Alias: `docker.pause(...)`
@@ -1130,7 +1118,7 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def prune(self, filters: Dict[str, str] = {}) -> None:
+    def prune(self, filters: dict[str, str] = {}) -> None:
         """Remove containers that are not running.
 
         # Arguments
@@ -1163,8 +1151,8 @@ class ContainerCLI(DockerCLICaller):
 
     def restart(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
-        time: Optional[Union[int, timedelta]] = None,
+        containers: ValidContainer | list[ValidContainer],
+        time: int | timedelta | None = None,
     ):
         """Restarts one or more container.
 
@@ -1196,7 +1184,7 @@ class ContainerCLI(DockerCLICaller):
 
     def remove(
         self,
-        containers: Union[Container, str, List[Union[Container, str]]],
+        containers: Container | str | list[Container | str],
         force: bool = False,
         volumes: bool = False,
     ) -> None:
@@ -1228,107 +1216,106 @@ class ContainerCLI(DockerCLICaller):
     def run(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
-        command: List[str] = [],
+        command: list[str] = [],
         *,
-        add_hosts: List[Tuple[str, str]] = [],
-        blkio_weight: Optional[int] = None,
-        blkio_weight_device: List[str] = [],
-        cap_add: List[str] = [],
-        cap_drop: List[str] = [],
-        cgroup_parent: Optional[str] = None,
-        cgroupns: Optional[str] = None,
-        cidfile: Optional[ValidPath] = None,
-        cpu_period: Optional[int] = None,
-        cpu_quota: Optional[int] = None,
-        cpu_rt_period: Optional[int] = None,
-        cpu_rt_runtime: Optional[int] = None,
-        cpu_shares: Optional[int] = None,
-        cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
+        add_hosts: list[tuple[str, str]] = [],
+        blkio_weight: int | None = None,
+        blkio_weight_device: list[str] = [],
+        cap_add: list[str] = [],
+        cap_drop: list[str] = [],
+        cgroup_parent: str | None = None,
+        cgroupns: str | None = None,
+        cidfile: ValidPath | None = None,
+        cpu_period: int | None = None,
+        cpu_quota: int | None = None,
+        cpu_rt_period: int | None = None,
+        cpu_rt_runtime: int | None = None,
+        cpu_shares: int | None = None,
+        cpus: float | None = None,
+        cpuset_cpus: list[int] | None = None,
+        cpuset_mems: list[int] | None = None,
         detach: bool = False,
-        devices: List[str] = [],
-        device_cgroup_rules: List[str] = [],
-        device_read_bps: List[str] = [],
-        device_read_iops: List[str] = [],
-        device_write_bps: List[str] = [],
-        device_write_iops: List[str] = [],
+        devices: list[str] = [],
+        device_cgroup_rules: list[str] = [],
+        device_read_bps: list[str] = [],
+        device_read_iops: list[str] = [],
+        device_write_bps: list[str] = [],
+        device_write_iops: list[str] = [],
         content_trust: bool = False,
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
-        domainname: Optional[str] = None,
-        entrypoint: Optional[str] = None,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
-        expose: Union[int, List[int]] = [],
-        gpus: Union[int, str, None] = None,
-        groups_add: List[str] = [],
+        dns: list[str] = [],
+        dns_options: list[str] = [],
+        dns_search: list[str] = [],
+        domainname: str | None = None,
+        entrypoint: str | None = None,
+        envs: dict[str, str] = {},
+        env_files: ValidPath | list[ValidPath] = [],
+        expose: int | list[int] = [],
+        gpus: int | str | None = None,
+        groups_add: list[str] = [],
         healthcheck: bool = True,
-        health_cmd: Optional[str] = None,
-        health_interval: Union[None, int, timedelta] = None,
-        health_retries: Optional[int] = None,
-        health_start_period: Union[None, int, timedelta] = None,
-        health_timeout: Union[None, int, timedelta] = None,
-        hostname: Optional[str] = None,
+        health_cmd: str | None = None,
+        health_interval: None | int | timedelta = None,
+        health_retries: int | None = None,
+        health_start_period: None | int | timedelta = None,
+        health_timeout: None | int | timedelta = None,
+        hostname: str | None = None,
         init: bool = False,
         interactive: bool = False,
-        ip: Optional[str] = None,
-        ip6: Optional[str] = None,
-        ipc: Optional[str] = None,
-        isolation: Optional[str] = None,
-        kernel_memory: Union[int, str, None] = None,
-        labels: Dict[str, str] = {},
-        label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
-        link_local_ip: List[str] = [],
-        log_driver: Optional[str] = None,
-        log_options: List[str] = [],
-        mac_address: Optional[str] = None,
-        memory: Union[int, str, None] = None,
-        memory_reservation: Union[int, str, None] = None,
-        memory_swap: Union[int, str, None] = None,
-        memory_swappiness: Optional[int] = None,
-        mounts: List[List[str]] = [],
-        name: Optional[str] = None,
-        networks: List[
+        ip: str | None = None,
+        ip6: str | None = None,
+        ipc: str | None = None,
+        isolation: str | None = None,
+        kernel_memory: int | str | None = None,
+        labels: dict[str, str] = {},
+        label_files: list[ValidPath] = [],
+        link: list[ValidContainer] = [],
+        link_local_ip: list[str] = [],
+        log_driver: str | None = None,
+        log_options: list[str] = [],
+        mac_address: str | None = None,
+        memory: int | str | None = None,
+        memory_reservation: int | str | None = None,
+        memory_swap: int | str | None = None,
+        memory_swappiness: int | None = None,
+        mounts: list[list[str]] = [],
+        name: str | None = None,
+        networks: list[
             python_on_whales.components.network.cli_wrapper.ValidNetwork
         ] = [],
-        network_aliases: List[str] = [],
+        network_aliases: list[str] = [],
         oom_kill: bool = True,
-        oom_score_adj: Optional[int] = None,
-        pid: Optional[str] = None,
-        pids_limit: Optional[int] = None,
-        platform: Optional[str] = None,
+        oom_score_adj: int | None = None,
+        pid: str | None = None,
+        pids_limit: int | None = None,
+        platform: str | None = None,
         privileged: bool = False,
-        publish: List[ValidPortMapping] = [],
+        publish: list[ValidPortMapping] = [],
         publish_all: bool = False,
         pull: str = "missing",
         read_only: bool = False,
-        restart: Optional[str] = None,
+        restart: str | None = None,
         remove: bool = False,
-        runtime: Optional[str] = None,
-        security_options: List[str] = [],
-        shm_size: Union[int, str, None] = None,
+        runtime: str | None = None,
+        security_options: list[str] = [],
+        shm_size: int | str | None = None,
         sig_proxy: bool = True,
-        stop_signal: Optional[str] = None,
-        stop_timeout: Optional[int] = None,
-        storage_options: List[str] = [],
+        stop_signal: str | None = None,
+        stop_timeout: int | None = None,
+        storage_options: list[str] = [],
         stream: bool = False,
-        sysctl: Dict[str, str] = {},
-        tmpfs: List[ValidPath] = [],
+        sysctl: dict[str, str] = {},
+        tmpfs: list[ValidPath] = [],
         tty: bool = False,
-        ulimit: List[str] = [],
-        user: Optional[str] = None,
-        userns: Optional[str] = None,
-        uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
-        volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
-        workdir: Optional[ValidPath] = None,
-    ) -> Union[Container, str, Iterable[Tuple[str, bytes]]]:
+        ulimit: list[str] = [],
+        user: str | None = None,
+        userns: str | None = None,
+        uts: str | None = None,
+        volumes: None
+        | (list[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]) = [],
+        volume_driver: str | None = None,
+        volumes_from: list[ValidContainer] = [],
+        workdir: ValidPath | None = None,
+    ) -> Container | str | Iterable[tuple[str, bytes]]:
         """Runs a container
 
         You can use `docker.run` or `docker.container.run` to call this function.
@@ -1672,10 +1659,10 @@ class ContainerCLI(DockerCLICaller):
 
     def start(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: ValidContainer | list[ValidContainer],
         attach: bool = False,
         stream: bool = False,
-    ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
+    ) -> None | str | Iterable[tuple[str, bytes]]:
         """Starts one or more stopped containers.
 
         Aliases: `docker.start`, `docker.container.start`,
@@ -1706,7 +1693,7 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def stats(self, all: bool = False) -> List[ContainerStats]:
+    def stats(self, all: bool = False) -> list[ContainerStats]:
         """Get containers resource usage statistics
 
         Alias: `docker.stats(...)`
@@ -1747,8 +1734,8 @@ class ContainerCLI(DockerCLICaller):
 
     def stop(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
-        time: Union[int, timedelta] = None,
+        containers: ValidContainer | list[ValidContainer],
+        time: int | timedelta = None,
     ):
         """Stops one or more running containers
 
@@ -1788,7 +1775,7 @@ class ContainerCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, x: Union[ValidContainer, List[ValidContainer]]):
+    def unpause(self, x: ValidContainer | list[ValidContainer]):
         """Unpause all processes within one or more containers
 
         Alias: `docker.unpause(...)`
@@ -1809,22 +1796,22 @@ class ContainerCLI(DockerCLICaller):
 
     def update(
         self,
-        x: Union[ValidContainer, List[ValidContainer]],
-        blkio_weight: Optional[int] = None,
-        cpu_period: Optional[int] = None,
-        cpu_quota: Optional[int] = None,
-        cpu_rt_period: Optional[int] = None,
-        cpu_rt_runtime: Optional[int] = None,
-        cpu_shares: Optional[int] = None,
-        cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
-        kernel_memory: Union[int, str, None] = None,
-        memory: Union[int, str, None] = None,
-        memory_reservation: Union[int, str, None] = None,
-        memory_swap: Union[int, str, None] = None,
-        pids_limit: Optional[int] = None,
-        restart: Optional[str] = None,
+        x: ValidContainer | list[ValidContainer],
+        blkio_weight: int | None = None,
+        cpu_period: int | None = None,
+        cpu_quota: int | None = None,
+        cpu_rt_period: int | None = None,
+        cpu_rt_runtime: int | None = None,
+        cpu_shares: int | None = None,
+        cpus: float | None = None,
+        cpuset_cpus: list[int] | None = None,
+        cpuset_mems: list[int] | None = None,
+        kernel_memory: int | str | None = None,
+        memory: int | str | None = None,
+        memory_reservation: int | str | None = None,
+        memory_swap: int | str | None = None,
+        pids_limit: int | None = None,
+        restart: str | None = None,
     ):
         """Update configuration of one or more containers
 
@@ -1882,12 +1869,10 @@ class ContainerCLI(DockerCLICaller):
         ...
 
     @overload
-    def wait(self, x: List[ValidContainer]) -> List[int]:
+    def wait(self, x: list[ValidContainer]) -> list[int]:
         ...
 
-    def wait(
-        self, x: Union[ValidContainer, List[ValidContainer]]
-    ) -> Union[int, List[int]]:
+    def wait(self, x: ValidContainer | list[ValidContainer]) -> int | list[int]:
         """Block until one or more containers stop, then returns their exit codes
 
         Alias: `docker.wait(...)`
@@ -1956,7 +1941,7 @@ class ContainerCLI(DockerCLICaller):
 
 
 class ContainerStats:
-    def __init__(self, json_dict: Dict[str, Any]):
+    def __init__(self, json_dict: dict[str, Any]):
         """Takes a json_dict with container stats from the CLI and
         parses it.
         """
@@ -1989,14 +1974,14 @@ class ContainerStats:
         return f"<{self.__class__} object, attributes are {attr}>"
 
 
-def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
+def join_if_not_none(sequence: list | None) -> str | None:
     if sequence is None:
         return None
     sequence = [str(x) for x in sequence]
     return ",".join(sequence)
 
 
-def to_seconds(duration: Union[None, int, timedelta]) -> Optional[str]:
+def to_seconds(duration: None | int | timedelta) -> str | None:
     if duration is None:
         return None
     if isinstance(duration, timedelta):

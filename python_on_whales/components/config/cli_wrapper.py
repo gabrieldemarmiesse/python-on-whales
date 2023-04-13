@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Union, overload
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -32,7 +32,7 @@ class Config(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["config", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]):
+    def _parse_json_object(self, json_object: dict[str, Any]):
         return ConfigInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> ConfigInspectResult:
@@ -75,9 +75,9 @@ class ConfigCLI(DockerCLICaller):
     def create(
         self,
         name: str,
-        file: Union[str, Path],
-        labels: Dict[str, str] = {},
-        template_driver: Optional[str] = None,
+        file: str | Path,
+        labels: dict[str, str] = {},
+        template_driver: str | None = None,
     ) -> Config:
         """Create a config from a file
 
@@ -104,10 +104,10 @@ class ConfigCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Config]:
+    def inspect(self, x: list[str]) -> list[Config]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Config, List[Config]]:
+    def inspect(self, x: str | list[str]) -> Config | list[Config]:
         """Returns a `python_on_whales.Config` object based on its name or id.
 
         # Argument
@@ -122,7 +122,7 @@ class ConfigCLI(DockerCLICaller):
         else:
             return [Config(self.client_config, reference) for reference in x]
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Config]:
+    def list(self, filters: dict[str, str] = {}) -> list[Config]:
         """List all config available in the swarm.
 
         # Arguments
@@ -138,7 +138,7 @@ class ConfigCLI(DockerCLICaller):
         ids = output.splitlines()
         return [Config(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
-    def remove(self, x: Union[ValidConfig, List[ValidConfig]]):
+    def remove(self, x: ValidConfig | list[ValidConfig]):
         """Remove one or more configs.
 
         # Arguments

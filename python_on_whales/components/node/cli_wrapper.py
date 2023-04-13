@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Union, overload
 
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
@@ -29,7 +29,7 @@ class Node(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["node", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> NodeInspectResult:
+    def _parse_json_object(self, json_object: dict[str, Any]) -> NodeInspectResult:
         return NodeInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> NodeInspectResult:
@@ -65,7 +65,7 @@ class Node(ReloadableObjectFromJson):
         return self._get_inspect_result().status
 
     @property
-    def manager_status(self) -> Optional[NodeManagerStatus]:
+    def manager_status(self) -> NodeManagerStatus | None:
         return self._get_inspect_result().manager_status
 
     def __repr__(self):
@@ -73,10 +73,10 @@ class Node(ReloadableObjectFromJson):
 
     def update(
         self,
-        availability: Optional[str] = None,
-        labels_add: Dict[str, str] = {},
-        rm_labels: List[str] = [],
-        role: Optional[str] = None,
+        availability: str | None = None,
+        labels_add: dict[str, str] = {},
+        rm_labels: list[str] = [],
+        role: str | None = None,
     ) -> None:
         """Updates this Swarm node.
 
@@ -87,7 +87,7 @@ class Node(ReloadableObjectFromJson):
             self, availability, labels_add, rm_labels, role
         )
 
-    def ps(self) -> List[python_on_whales.components.task.cli_wrapper.Task]:
+    def ps(self) -> list[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of tasks running on this node
 
         # Returns
@@ -101,7 +101,7 @@ ValidNode = Union[Node, str]
 
 
 class NodeCLI(DockerCLICaller):
-    def demote(self, x: Union[ValidNode, List[ValidNode]]):
+    def demote(self, x: ValidNode | list[ValidNode]):
         """Demote one or more nodes from manager in the swarm
 
         # Arguments
@@ -118,10 +118,10 @@ class NodeCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Node]:
+    def inspect(self, x: list[str]) -> list[Node]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Node, List[Node]]:
+    def inspect(self, x: str | list[str]) -> Node | list[Node]:
         """Returns a `python_on_whales.Node` object from a string
         (id or hostname of the node)
 
@@ -136,7 +136,7 @@ class NodeCLI(DockerCLICaller):
         else:
             return [Node(self.client_config, reference) for reference in x]
 
-    def list(self) -> List[Node]:
+    def list(self) -> list[Node]:
         """Returns the list of nodes in this swarm.
 
         # Returns
@@ -146,7 +146,7 @@ class NodeCLI(DockerCLICaller):
         all_ids = run(full_cmd).splitlines()
         return [Node(self.client_config, x, is_immutable_id=True) for x in all_ids]
 
-    def promote(self, x: Union[ValidNode, List[ValidNode]]):
+    def promote(self, x: ValidNode | list[ValidNode]):
         """Promote one or more nodes to manager in the swarm
 
         # Arguments
@@ -159,8 +159,8 @@ class NodeCLI(DockerCLICaller):
         run(full_cmd)
 
     def ps(
-        self, x: Union[ValidNode, List[ValidNode], None] = None
-    ) -> List[python_on_whales.components.task.cli_wrapper.Task]:
+        self, x: ValidNode | list[ValidNode] | None = None
+    ) -> list[python_on_whales.components.task.cli_wrapper.Task]:
         """Returns the list of swarm tasks running on one or more nodes.
 
         ```python
@@ -198,7 +198,7 @@ class NodeCLI(DockerCLICaller):
             for id_ in ids
         ]
 
-    def remove(self, x: Union[ValidNode, List[ValidNode]], force: bool = False):
+    def remove(self, x: ValidNode | list[ValidNode], force: bool = False):
         """Remove one or more nodes from the swarm
 
         # Arguments
@@ -216,10 +216,10 @@ class NodeCLI(DockerCLICaller):
     def update(
         self,
         node: ValidNode,
-        availability: Optional[str] = None,
-        labels_add: Dict[str, str] = {},
-        rm_labels: List[str] = [],
-        role: Optional[str] = None,
+        availability: str | None = None,
+        labels_add: dict[str, str] = {},
+        rm_labels: list[str] = [],
+        role: str | None = None,
     ) -> None:
         """Updates a Swarm node.
 

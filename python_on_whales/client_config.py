@@ -5,7 +5,7 @@ import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 import pydantic
 
@@ -47,27 +47,27 @@ class Command(list):
 
 @dataclass
 class ClientConfig:
-    config: Optional[ValidPath] = None
-    context: Optional[str] = None
-    debug: Optional[bool] = None
-    host: Optional[str] = None
-    log_level: Optional[str] = None
-    tls: Optional[bool] = None
-    tlscacert: Optional[ValidPath] = None
-    tlscert: Optional[ValidPath] = None
-    tlskey: Optional[ValidPath] = None
-    tlsverify: Optional[bool] = None
-    client_binary_path: Optional[ValidPath] = None
-    compose_files: List[ValidPath] = field(default_factory=list)
-    compose_profiles: List[str] = field(default_factory=list)
-    compose_env_file: Optional[ValidPath] = None
-    compose_project_name: Optional[str] = None
-    compose_project_directory: Optional[ValidPath] = None
-    compose_compatibility: Optional[bool] = None
-    client_call: List[str] = field(default_factory=lambda: ["docker"])
-    _client_call_with_path: Optional[List[Union[Path, str]]] = None
+    config: ValidPath | None = None
+    context: str | None = None
+    debug: bool | None = None
+    host: str | None = None
+    log_level: str | None = None
+    tls: bool | None = None
+    tlscacert: ValidPath | None = None
+    tlscert: ValidPath | None = None
+    tlskey: ValidPath | None = None
+    tlsverify: bool | None = None
+    client_binary_path: ValidPath | None = None
+    compose_files: list[ValidPath] = field(default_factory=list)
+    compose_profiles: list[str] = field(default_factory=list)
+    compose_env_file: ValidPath | None = None
+    compose_project_name: str | None = None
+    compose_project_directory: ValidPath | None = None
+    compose_compatibility: bool | None = None
+    client_call: list[str] = field(default_factory=lambda: ["docker"])
+    _client_call_with_path: list[Union[Path, str]] | None = None
 
-    def get_client_call_with_path(self) -> List[Union[Path, str]]:
+    def get_client_call_with_path(self) -> list[Union[Path, str]]:
         if self._client_call_with_path is None:
             self._client_call_with_path = [
                 Path(self._get_docker_path())
@@ -234,7 +234,7 @@ class ReloadableObjectFromJson(ReloadableObject):
     def _fetch_inspect_result_json(self, reference):
         raise NotImplementedError
 
-    def _parse_json_object(self, json_object: Dict[str, Any]):
+    def _parse_json_object(self, json_object: dict[str, Any]):
         raise NotImplementedError
 
     def _fetch_and_parse_inspect_result(self, reference: str):
@@ -259,8 +259,8 @@ class ReloadableObjectFromJson(ReloadableObject):
             ) from err
 
 
-def bulk_reload(docker_objects: List[ReloadableObjectFromJson]):
-    assert len(set(x.client_config for x in docker_objects)) == 1
+def bulk_reload(docker_objects: list[ReloadableObjectFromJson]):
+    assert len({x.client_config for x in docker_objects}) == 1
     all_ids = [x._get_immutable_id() for x in docker_objects]
     full_cmd = docker_objects[0].docker_cmd + ["inspect"] + all_ids
     json_str = run(full_cmd)

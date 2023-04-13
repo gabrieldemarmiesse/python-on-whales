@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Union, overload
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import (
@@ -32,7 +32,7 @@ class Network(ReloadableObjectFromJson):
     def _fetch_inspect_result_json(self, reference):
         return run(self.docker_cmd + ["network", "inspect", reference])
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> NetworkInspectResult:
+    def _parse_json_object(self, json_object: dict[str, Any]) -> NetworkInspectResult:
         return NetworkInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> NetworkInspectResult:
@@ -80,15 +80,15 @@ class Network(ReloadableObjectFromJson):
         return self._get_inspect_result().ingress
 
     @property
-    def containers(self) -> Dict[str, NetworkContainer]:
+    def containers(self) -> dict[str, NetworkContainer]:
         return self._get_inspect_result().containers
 
     @property
-    def options(self) -> Dict[str, Any]:
+    def options(self) -> dict[str, Any]:
         return self._get_inspect_result().options
 
     @property
-    def labels(self) -> Dict[str, str]:
+    def labels(self) -> dict[str, str]:
         return self._get_inspect_result().labels
 
     @property
@@ -134,11 +134,11 @@ class NetworkCLI(DockerCLICaller):
         self,
         network: ValidNetwork,
         container: python_on_whales.components.container.cli_wrapper.ValidContainer,
-        alias: Optional[str] = None,
-        driver_options: List[str] = [],
-        ip: Optional[str] = None,
-        ip6: Optional[str] = None,
-        links: List[
+        alias: str | None = None,
+        driver_options: list[str] = [],
+        ip: str | None = None,
+        ip6: str | None = None,
+        links: list[
             python_on_whales.components.container.cli_wrapper.ValidContainer
         ] = [],
     ) -> None:
@@ -166,11 +166,11 @@ class NetworkCLI(DockerCLICaller):
         self,
         name: str,
         attachable: bool = False,
-        driver: Optional[str] = None,
-        gateway: Optional[str] = None,
-        subnet: Optional[str] = None,
-        labels: Dict[str, str] = {},
-        options: List[str] = [],
+        driver: str | None = None,
+        gateway: str | None = None,
+        subnet: str | None = None,
+        labels: dict[str, str] = {},
+        options: list[str] = [],
     ) -> Network:
         """Creates a Docker network.
 
@@ -212,28 +212,28 @@ class NetworkCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Network]:
+    def inspect(self, x: list[str]) -> list[Network]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Network, List[Network]]:
+    def inspect(self, x: str | list[str]) -> Network | list[Network]:
         if isinstance(x, str):
             return Network(self.client_config, x)
         else:
             return [Network(self.client_config, reference) for reference in x]
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Network]:
+    def list(self, filters: dict[str, str] = {}) -> list[Network]:
         full_cmd = self.docker_cmd + ["network", "ls", "--no-trunc", "--quiet"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         ids = run(full_cmd).splitlines()
         return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
-    def prune(self, filters: Dict[str, str] = {}):
+    def prune(self, filters: dict[str, str] = {}):
         full_cmd = self.docker_cmd + ["network", "prune", "--force"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
-    def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
+    def remove(self, networks: ValidNetwork | list[ValidNetwork]):
         """Removes a Docker network
 
         # Arguments

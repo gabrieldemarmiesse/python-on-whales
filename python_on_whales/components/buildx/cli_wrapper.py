@@ -4,7 +4,7 @@ import json
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Iterator, Union
 
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
@@ -32,7 +32,7 @@ class Builder(ReloadableObject):
     def __init__(
         self,
         client_config: ClientConfig,
-        reference: Optional[str],
+        reference: str | None,
         is_immutable_id=False,
     ):
         super().__init__(client_config, "name", reference, is_immutable_id)
@@ -44,7 +44,7 @@ class Builder(ReloadableObject):
         self.remove()
 
     def _fetch_and_parse_inspect_result(
-        self, reference: Optional[str]
+        self, reference: str | None
     ) -> BuilderInspectResult:
         full_cmd = self.docker_cmd + ["buildx", "inspect"]
         if reference is not None:
@@ -65,7 +65,7 @@ class Builder(ReloadableObject):
         return self._get_inspect_result().status
 
     @property
-    def platforms(self) -> List[str]:
+    def platforms(self) -> list[str]:
         return self._get_inspect_result().platforms
 
     def __repr__(self):
@@ -103,19 +103,19 @@ class BuildxCLI(DockerCLICaller):
 
     def bake(
         self,
-        targets: Union[str, List[str]] = [],
-        builder: Optional[ValidBuilder] = None,
-        files: Union[ValidPath, List[ValidPath]] = [],
+        targets: str | list[str] = [],
+        builder: ValidBuilder | None = None,
+        files: ValidPath | list[ValidPath] = [],
         load: bool = False,
         cache: bool = True,
         print: bool = False,
-        progress: Union[str, bool] = "auto",
+        progress: str | bool = "auto",
         pull: bool = False,
         push: bool = False,
-        set: Dict[str, str] = {},
-        variables: Dict[str, str] = {},
+        set: dict[str, str] = {},
+        variables: dict[str, str] = {},
         stream_logs: bool = False,
-    ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
+    ) -> dict[str, dict[str, dict[str, Any]]] | Iterator[str]:
         """Bake is similar to make, it allows you to build things declared in a file.
 
         For example it allows you to build multiple docker image in parallel.
@@ -204,39 +204,37 @@ class BuildxCLI(DockerCLICaller):
     def build(
         self,
         context_path: ValidPath,
-        add_hosts: Dict[str, str] = {},
-        allow: List[str] = [],
-        attest: Optional[Dict[str, str]] = None,
-        build_args: Dict[str, str] = {},
+        add_hosts: dict[str, str] = {},
+        allow: list[str] = [],
+        attest: dict[str, str] | None = None,
+        build_args: dict[str, str] = {},
         # TODO: build_context
-        builder: Optional[ValidBuilder] = None,
+        builder: ValidBuilder | None = None,
         cache: bool = True,
         # TODO: cache_filters
-        cache_from: Union[str, Dict[str, str], List[Dict[str, str]], None] = None,
-        cache_to: Union[str, Dict[str, str], None] = None,
+        cache_from: str | dict[str, str] | list[dict[str, str]] | None = None,
+        cache_to: str | dict[str, str] | None = None,
         # TODO: cgroup_parent
-        file: Optional[ValidPath] = None,
-        labels: Dict[str, str] = {},
+        file: ValidPath | None = None,
+        labels: dict[str, str] = {},
         load: bool = False,
         # TODO: metadata_file
-        network: Optional[str] = None,
-        output: Dict[str, str] = {},
-        platforms: Optional[List[str]] = None,
-        progress: Union[str, bool] = "auto",
-        provenance: Union[bool, Dict[str, str], None] = None,
+        network: str | None = None,
+        output: dict[str, str] = {},
+        platforms: list[str] | None = None,
+        progress: str | bool = "auto",
+        provenance: bool | dict[str, str] | None = None,
         pull: bool = False,
         push: bool = False,
-        sbom: Union[bool, Dict[str, str], None] = None,
-        secrets: Union[str, List[str]] = [],
+        sbom: bool | dict[str, str] | None = None,
+        secrets: str | list[str] = [],
         # TODO shm_size
-        ssh: Optional[str] = None,
-        tags: Union[str, List[str]] = [],
-        target: Optional[str] = None,
+        ssh: str | None = None,
+        tags: str | list[str] = [],
+        target: str | None = None,
         # TODO: ulimit
         stream_logs: bool = False,
-    ) -> Union[
-        None, python_on_whales.components.image.cli_wrapper.Image, Iterator[str]
-    ]:
+    ) -> None | python_on_whales.components.image.cli_wrapper.Image | Iterator[str]:
         """Build a Docker image with builkit as backend.
 
         Alias: `docker.build(...)`
@@ -401,10 +399,10 @@ class BuildxCLI(DockerCLICaller):
 
     def _build_will_load_image(
         self,
-        builder: Optional[str],
+        builder: str | None,
         push: bool,
         load: bool,
-        output: Optional[Dict[str, str]],
+        output: dict[str, str] | None,
     ) -> bool:
         if load:
             return True
@@ -422,7 +420,7 @@ class BuildxCLI(DockerCLICaller):
 
         return False
 
-    def _method_to_get_image(self, builder: Optional[str]) -> GetImageMethod:
+    def _method_to_get_image(self, builder: str | None) -> GetImageMethod:
         """Getting around https://github.com/docker/buildx/issues/420"""
         builder = self.inspect(builder)
         if builder.driver == "docker":
@@ -432,12 +430,12 @@ class BuildxCLI(DockerCLICaller):
 
     def create(
         self,
-        context_or_endpoint: Optional[str] = None,
-        buildkitd_flags: Optional[str] = None,
-        config: Optional[ValidPath] = None,
-        driver: Optional[str] = None,
-        driver_options: Dict[str, str] = {},
-        name: Optional[str] = None,
+        context_or_endpoint: str | None = None,
+        buildkitd_flags: str | None = None,
+        config: ValidPath | None = None,
+        driver: str | None = None,
+        driver_options: dict[str, str] = {},
+        name: str | None = None,
         use: bool = False,
     ) -> Builder:
         """Create a new builder instance
@@ -475,7 +473,7 @@ class BuildxCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self, x: Optional[str] = None) -> Builder:
+    def inspect(self, x: str | None = None) -> Builder:
         """Returns a builder instance from the name.
 
         # Arguments
@@ -487,7 +485,7 @@ class BuildxCLI(DockerCLICaller):
         """
         return Builder(self.client_config, x, is_immutable_id=False)
 
-    def list(self) -> List[Builder]:
+    def list(self) -> list[Builder]:
         """Returns the list of `python_on_whales.Builder` available."""
         full_cmd = self.docker_cmd + ["buildx", "ls"]
         output = run(full_cmd)
@@ -501,7 +499,7 @@ class BuildxCLI(DockerCLICaller):
             Builder(self.client_config, x, is_immutable_id=True) for x in builders_names
         ]
 
-    def prune(self, all: bool = False, filters: Dict[str, str] = {}) -> None:
+    def prune(self, all: bool = False, filters: dict[str, str] = {}) -> None:
         """Remove build cache on the current builder.
 
         # Arguments
@@ -513,7 +511,7 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
-    def remove(self, builder: Union[Builder, str]) -> None:
+    def remove(self, builder: Builder | str) -> None:
         """Remove a builder
 
         # Arguments
@@ -524,7 +522,7 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.append(builder)
         run(full_cmd)
 
-    def stop(self, builder: Optional[ValidBuilder]) -> None:
+    def stop(self, builder: ValidBuilder | None) -> None:
         """Stop the builder instance
 
         # Arguments:
@@ -537,7 +535,7 @@ class BuildxCLI(DockerCLICaller):
         run(full_cmd)
 
     def use(
-        self, builder: Union[Builder, str], default: bool = False, global_: bool = False
+        self, builder: Builder | str, default: bool = False, global_: bool = False
     ) -> None:
         """Set the current builder instance
 
@@ -579,10 +577,10 @@ class BuildxCLI(DockerCLICaller):
         return "buildx" in help_output
 
 
-def format_dict_for_buildx(options: Dict[str, str]) -> str:
+def format_dict_for_buildx(options: dict[str, str]) -> str:
     return ",".join(format_dict_for_cli(options, separator="="))
 
 
-def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:
+def stream_buildx_logs(full_cmd: list, env: dict[str, str] = None) -> Iterator[str]:
     for origin, value in stream_stdout_and_stderr(full_cmd, env=env):
         yield value.decode(errors="replace")
