@@ -1,4 +1,4 @@
-pydantic>=1.5
+pydantic>=1.5,<2
 requests
 tqdm
 typer>=0.4.1
