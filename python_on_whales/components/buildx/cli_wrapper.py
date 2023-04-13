@@ -4,7 +4,7 @@ import json
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Literal, Optional, Union
 
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
@@ -109,7 +109,7 @@ class BuildxCLI(DockerCLICaller):
         load: bool = False,
         cache: bool = True,
         print: bool = False,
-        progress: Union[str, bool] = "auto",
+        progress: Literal["auto", "plain", "tty", False] = "auto",
         pull: bool = False,
         push: bool = False,
         set: Dict[str, str] = {},
@@ -222,7 +222,7 @@ class BuildxCLI(DockerCLICaller):
         network: Optional[str] = None,
         output: Dict[str, str] = {},
         platforms: Optional[List[str]] = None,
-        progress: Union[str, bool] = "auto",
+        progress: Literal["auto", "plain", "tty", False] = "auto",
         provenance: Union[bool, Dict[str, str], None] = None,
         pull: bool = False,
         push: bool = False,
