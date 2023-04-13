@@ -19,7 +19,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,  # will read the MANIFEST.in
     license="MIT",
-    python_requires=">=3.7, <4",
+    python_requires=">=3.8, <4",
     entry_points={
         "console_scripts": [
             "python-on-whales=python_on_whales.command_line_entrypoint:main"

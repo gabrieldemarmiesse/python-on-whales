@@ -34,7 +34,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.7'
+        python-version: '3.8'
     - name: Run all tests
       run: |
         bash tests/ci-setup.sh
@@ -66,7 +66,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: '3.8'
       - name: Run test
         run: |
           bash tests/ci-setup.sh
@@ -78,7 +78,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.7'
+        python-version: '3.8'
     - name: Run all tests
       run: |
         cat /etc/docker/daemon.json
@@ -96,7 +96,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.8
     - name: prepare
       run: |
         pip install -r tests/test-requirements.txt
@@ -120,7 +120,7 @@ jobs:
 #        docker-machine env default
 #    - uses: actions/setup-python@v2
 #      with:
-#        python-version: 3.7
+#        python-version: 3.8
 #    - name: prepare
 #      run: |
 #        pip install -r tests/test-requirements.txt
