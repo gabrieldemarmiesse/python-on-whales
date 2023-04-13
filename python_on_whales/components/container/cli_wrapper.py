@@ -4,7 +4,18 @@ import inspect
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    TypedDict,
+    Union,
+    overload,
+)
 
 import pydantic
 
@@ -34,6 +45,30 @@ from python_on_whales.utils import (
     run,
     stream_stdout_and_stderr,
     to_list,
+)
+
+DockerContainerListFilters = TypedDict(
+    "DockerContainerListFilters",
+    {
+        "id": str,
+        "name": str,
+        "label": str,
+        "exited": int,
+        "status": Literal[
+            "created", "restarting", "running", "removing", "paused", "exited", "dead"
+        ],
+        "ancestor": str,
+        "before": str,  # TODO: allow datetime
+        "since": str,  # TODO: allow datetime
+        "volume": str,  # TODO: allow Volumes
+        "network": str,  # TODO: allow Network
+        "publish": str,
+        "expose": str,
+        "health": Literal["starting", "healthy", "unhealthy", "none"],
+        "isolation": Literal["default", "process", "hyperv"],
+        "is-task": str,  # TODO: allow bool
+    },
+    total=False,
 )
 
 
@@ -1049,7 +1084,9 @@ class ContainerCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def list(self, all: bool = False, filters: Dict[str, str] = {}) -> List[Container]:
+    def list(
+        self, all: bool = False, filters: DockerContainerListFilters = {}
+    ) -> List[Container]:
         """List the containers on the host.
 
         Alias: `docker.ps(...)`
