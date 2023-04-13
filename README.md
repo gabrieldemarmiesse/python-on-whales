@@ -12,7 +12,7 @@
 ------------------------------------------------------------------------
 A Docker client for Python, designed to be fun and intuitive!
 
-Works on Linux, macOS and Windows, for Python 3.7 and above. 
+Works on Linux, macOS and Windows, for Python 3.8 and above. 
 
 * [Documentation](https://gabrieldemarmiesse.github.io/python-on-whales/)
 * [Github repository](https://github.com/gabrieldemarmiesse/python-on-whales)
