@@ -253,12 +253,12 @@ class BuildxCLI(DockerCLICaller):
                 Eg `allow=["network.host", "security.insecure"]`
             attest: Attestation parameters. Eg `attest={"type": "sbom", "generator": "my_image"}`
             build_args: The build arguments.
-                `build_args={[name]: [value], ...}`
+                ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
+            build_contexts: Additional build contexts.
+                `buld_contexts={[name]: [value], ...}`
                 Supports local directories, git repositories, HTTP URL to a tarball, a docker
                 image defined with a `docker-image://` prefix, and the `oci-layout://` protocol.
-                ex `build_args={"project2": "../path/to/project2/src", "qumu-src": "https://github.com/qemu/qemu.git"}`.
-            build_contexts: Additional build contexts.
-                ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
+                ex `buld_contexts={"project2": "../path/to/project2/src", "qumu-src": "https://github.com/qemu/qemu.git"}`.
             builder: Specify which builder to use.
             cache: Whether or not to use the cache
             cache_from: Works only with the container driver. Loads the cache
