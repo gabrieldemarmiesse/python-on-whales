@@ -208,7 +208,7 @@ class BuildxCLI(DockerCLICaller):
         allow: List[str] = [],
         attest: Optional[Dict[str, str]] = None,
         build_args: Dict[str, str] = {},
-        build_contexts: Dict[str, str] = {},
+        build_contexts: Dict[str, Union[str, ValidPath]] = {},
         builder: Optional[ValidBuilder] = None,
         cache: bool = True,
         # TODO: cache_filters
