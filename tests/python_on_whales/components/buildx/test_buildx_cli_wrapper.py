@@ -13,6 +13,11 @@ FROM busybox
 RUN touch /dada
 """
 
+dockerfile_content2 = """
+FROM busybox
+COPY --from=test_context test_file.txt /test_file.txt
+"""
+
 
 @pytest.fixture
 def with_docker_driver():
@@ -249,6 +254,35 @@ def test_multiarch_build(tmp_path, docker_registry):
 def test_buildx_build_attestations(tmp_path, kwargs):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, **kwargs)
+
+
+# Does the build work when passing extra contexts
+# without making use of them in the Dockerfile
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context1(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.buildx.build(tmp_path, build_contexts=dict(test_context=tmp_path))
+
+
+# Does the build work when passing extra contexts
+# when the Dockerfile does make use of them
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context2(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content2)
+    test_context = os.path.join(
+        os.path.dirname(__file__),
+        "test_context"
+    )
+    docker.buildx.build(tmp_path, build_contexts=dict(test_context=test_context))
+
+
+# Does the build fail when NOT passing extra contexts
+# when the dockerfile does make use of them
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context3(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content2)
+    with pytest.raises(DockerException):
+        docker.buildx.build(tmp_path)
 
 
 def test_buildx_build_context_manager2(tmp_path):
