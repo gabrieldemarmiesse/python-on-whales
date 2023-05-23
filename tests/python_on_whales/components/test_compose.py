@@ -322,7 +322,7 @@ def test_docker_compose_kill():
     for container in docker.compose.ps():
         assert container.state.running
 
-    docker.compose.kill("busybox")
+    docker.compose.kill("busybox", signal=9)
 
     assert not docker.container.inspect("components_busybox_1").state.running
 
