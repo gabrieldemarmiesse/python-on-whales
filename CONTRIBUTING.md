@@ -12,13 +12,13 @@ how to open a pull request in a github repository that you don't own.
 ## Building the docs
 
 All docstring are fetched and put in templates. Everything is done in markdown, 
-with the help of [keras-autodoc](https://gabrieldemarmiesse.github.io/keras-autodoc/) and
+with the help of [mkdocstrings](https://mkdocstrings.github.io/) and
 [mkdocs](https://www.mkdocs.org/).
 
 #### First install the dependencies:
 
 ```
-pip install keras-autodoc mkdocs Sphinx==3.5.4
+pip install -r doc-requirements.txt
 ```
 
 #### Generate the documentation files and serve them
