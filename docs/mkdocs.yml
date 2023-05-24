@@ -18,14 +18,19 @@ plugins:
       handlers:
         python:
           options:
+            docstring_style: sphinx
+            show_bases: false
             show_root_heading: true
+            show_source: false
             group_by_category: true
             show_category_heading: false
             heading_level: 1
             show_root_toc_entry: false
             separate_signature: true
+            merge_init_into_class: false
+            show_root_full_path: false
             docstring_options:
-              ignore_init_summary: true
+              ignore_init_summary: false
 nav:
   - Docker client: docker_client.md
   - Sub-commands:
