@@ -9,14 +9,13 @@ jobs:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
       - name: prepare
         run: |
-          pip install keras-autodoc -r ./requirements.txt
-          pip install Sphinx==3.5.4
+          pip install -r ./doc-requirements.txt
           pip install -e .
           python docs/autogen.py
           mv docs/generated_sources ./generated_sources
