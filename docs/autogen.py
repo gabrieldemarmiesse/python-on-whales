@@ -102,8 +102,7 @@ def md_generate(
 """
         filedata = filedata.replace(AUTOGEN_PATTERN, mkdocstring_output)
 
-        with open(target_file_path, "w") as fout:
-            fout.write(filedata)
+        target_file_path.write_text(filedata)
 
 
 def mkdoc_autogen():
