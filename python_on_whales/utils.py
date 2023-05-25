@@ -1,4 +1,5 @@
 import os
+import signal
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -313,6 +314,25 @@ def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
         return time_object.strftime("%Y-%m-%dT%H:%M:%S")
     elif isinstance(time_object, timedelta):
         return f"{time_object.total_seconds()}s"
+
+
+def format_signal_arg(signal_object: Optional[Union[int, str]]) -> Optional[str]:
+    if signal_object is None:
+        return None
+    else:
+        return format_signal_for_docker(signal_object)
+
+
+def format_signal_for_docker(signal_object: Union[int, str]) -> str:
+    if isinstance(signal_object, int):
+        return signal.Signals(signal_object).name
+    elif isinstance(signal_object, str):
+        if hasattr(signal.Signals, "SIG" + signal_object):
+            return "SIG" + signal_object
+        else:
+            return signal_object
+    else:
+        raise TypeError(f"Got unexpected signal type {type(signal_object).__name__!r}")
 
 
 def parse_ls_status_count(status_output, status) -> int:

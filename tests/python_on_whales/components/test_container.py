@@ -1,4 +1,5 @@
 import json
+import signal
 import sys
 import tempfile
 import time
@@ -371,6 +372,16 @@ def test_methods():
     my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True)
     my_container.kill()
     assert not my_container.state.running
+    my_container.remove()
+
+
+def test_kill_signal():
+    my_container = docker.run(
+        "busybox:1", ["sleep", "infinity"], init=True, detach=True
+    )
+    my_container.kill(signal=signal.SIGINT)
+    assert not my_container.state.running
+    assert my_container.state.exit_code == 130
     my_container.remove()
 
 
