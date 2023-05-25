@@ -79,7 +79,7 @@ pages = {
 
 
 def md_generate(
-    pages: t.Dict[str, list], template_path: str, destination_path: str
+    pages: Dict[str, list], template_path: str, destination_path: str
 ) -> None:
     for md_file in pages:
         template_file_path = f"{template_path}/{md_file}"
