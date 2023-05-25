@@ -1,6 +1,6 @@
 import os
 import shutil
-import typing as t
+import typing
 from pathlib import Path
 
 from docs_utils import add_all_code_examples, add_links
