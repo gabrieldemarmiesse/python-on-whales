@@ -38,7 +38,7 @@ jobs:
     - name: Run all tests
       run: |
         bash tests/ci-setup.sh
-        pytest -v --durations=10 --ignore=tests/python_on_whales/components
+        python -m pytest -v --durations=10 --ignore=tests/python_on_whales/components
 
 
   build-linux-test-component:
@@ -70,7 +70,7 @@ jobs:
       - name: Run test
         run: |
           bash tests/ci-setup.sh
-          pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+          python -m pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
 
   build-linux-test-without-any-binary:
     runs-on: ubuntu-latest
@@ -86,9 +86,9 @@ jobs:
         sudo service docker restart
         sleep 2
         docker info
-        pip install -e .
-        pip install -r ./tests/test-requirements.txt
-        pytest -v --durations=10 ./tests/python_on_whales/components/buildx
+        python -m pip install -e .
+        python -m pip install -r ./tests/test-requirements.txt
+        python -m pytest -v --durations=10 ./tests/python_on_whales/components/buildx
 
   build-windows:
     runs-on: windows-latest
@@ -99,12 +99,12 @@ jobs:
         python-version: 3.8
     - name: prepare
       run: |
-        pip install -r tests/test-requirements.txt
-        pip install -e .
+        python -m pip install -r tests/test-requirements.txt
+        python -m pip install -e .
     - name: Run all tests
       run: |
         docker run hello-world
-        pytest -v ./tests/python_on_whales/components/test_volume.py::test_simple_volume
+        python -m pytest -v ./tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:
