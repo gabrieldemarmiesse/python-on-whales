@@ -69,7 +69,6 @@ jobs:
           python-version: '3.8'
       - name: Run test
         run: |
-          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
           bash tests/ci-setup.sh
           python -m pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
 
