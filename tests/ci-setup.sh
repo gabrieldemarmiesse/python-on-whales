@@ -5,8 +5,8 @@ echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/dae
 sudo service docker restart
 sleep 2
 docker info
-pip install -e .
-pip install -r ./tests/test-requirements.txt
+python -m pip install -e .
+python -m pip install -r ./tests/test-requirements.txt
 
 mkdir -p ~/.docker/cli-plugins/
 wget -q https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-x86_64 -O ~/.docker/cli-plugins/docker-compose
