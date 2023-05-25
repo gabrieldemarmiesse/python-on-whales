@@ -890,9 +890,9 @@ services:
     compose_containers = docker.compose.ps()
     assert len(compose_containers) == 2
     compose_container_ids = {container.id for container in compose_containers}
-    
+
     docker.compose.stop()
-    
+
     # updating the docker compose file to have only 1 service configured
     compose_file.write_text(base_cfg)
 
@@ -906,9 +906,13 @@ services:
     check_number_of_running_containers(docker, 0, compose_container_ids)
     remove(compose_file)
 
+
 def test_docker_compose_run_build():
     docker.compose.run("my_service", build=True, detach=True, tty=False)
     docker.compose.stop()
     docker.compose.rm()
-    assert docker.compose.config().services['my_service'].image == docker.image.list("some_random_image")[0].repo_tags[0].split(":latest")[0]
+    assert (
+        docker.compose.config().services["my_service"].image
+        == docker.image.list("some_random_image")[0].repo_tags[0].split(":latest")[0]
+    )
     docker.image.remove("some_random_image", force=True)
