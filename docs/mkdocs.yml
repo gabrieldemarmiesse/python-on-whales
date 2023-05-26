@@ -5,6 +5,9 @@ docs_dir: generated_sources
 repo_url: "https://github.com/gabrieldemarmiesse/python-on-whales"
 site_description: 'Python on whales docs'
 
+theme:
+  name: material
+
 markdown_extensions:
 - pymdownx.snippets:
     check_paths: true
@@ -18,7 +21,7 @@ plugins:
       handlers:
         python:
           options:
-            docstring_style: sphinx
+            docstring_style: google
             show_bases: false
             show_root_heading: true
             show_source: false

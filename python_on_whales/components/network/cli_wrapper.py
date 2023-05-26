@@ -144,7 +144,7 @@ class NetworkCLI(DockerCLICaller):
     ) -> None:
         """Connect a container to a network
 
-        # Arguments
+        Parameters:
             network: The network to connect to
             container: The container to connect
             alias: Add network-scoped alias for the container
@@ -174,7 +174,7 @@ class NetworkCLI(DockerCLICaller):
     ) -> Network:
         """Creates a Docker network.
 
-        # Arguments
+        Parameters:
             name: The name of the network
 
         # Returns
@@ -198,7 +198,7 @@ class NetworkCLI(DockerCLICaller):
     ):
         """Disconnect a container from a network
 
-        # Arguments
+        Parameters:
             network: The name of the network.
             container: The container to disconnect.
         """
@@ -236,7 +236,7 @@ class NetworkCLI(DockerCLICaller):
     def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
         """Removes a Docker network
 
-        # Arguments
+        Parameters:
             networks: One or more networks.
         """
         if networks == []:
