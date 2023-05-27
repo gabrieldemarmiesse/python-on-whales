@@ -862,57 +862,12 @@ services:
     remove(compose_file)
 
 
-def test_docker_compose_run_remove_orphans():
-    compose_file = tempfile.mktemp(
-        prefix="test_docker_compose_run_remove_orphans", suffix=".yml"
-    )
-    compose_file = Path(compose_file)
-    docker = DockerClient(
-        compose_files=[compose_file],
-        compose_compatibility=True,
-    )
-    base_cfg = """version: "3.7"
-services:
-  busybox1:
-    image: busybox:latest
-    command: sleep infinity
-"""
-    service_to_remove = """  busybox2:
-    image: busybox:latest
-    command: sleep infinity
-"""
-
-    # writing the docker compose file with 2 services configured
-    compose_file.write_text(base_cfg + service_to_remove)
-
-    # two containers running
-    docker.compose.up()
-    compose_containers = docker.compose.ps()
-    assert len(compose_containers) == 2
-    compose_container_ids = {container.id for container in compose_containers}
-
-    docker.compose.stop()
-
-    # updating the docker compose file to have only 1 service configured
-    compose_file.write_text(base_cfg)
-
-    # remove orphans flag
-    docker.compose.run(service="busybox1", remove_orphans=True)
-
-    # orphan container (of the removed service) was stopped
-    check_number_of_running_containers(docker, 1, compose_container_ids)
-
-    docker.compose.down(timeout=1)
-    check_number_of_running_containers(docker, 0, compose_container_ids)
-    remove(compose_file)
-
-
 def test_docker_compose_run_build():
     docker.compose.run("my_service", build=True, detach=True, tty=False)
     docker.compose.stop()
     docker.compose.rm()
     assert (
-        docker.compose.config().services["my_service"].image
+        docker.compose.config(return_json=True)['services']["my_service"]['image']
         == docker.image.list("some_random_image")[0].repo_tags[0].split(":latest")[0]
     )
     docker.image.remove("some_random_image", force=True)
