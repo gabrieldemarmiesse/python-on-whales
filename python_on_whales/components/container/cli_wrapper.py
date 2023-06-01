@@ -1707,7 +1707,11 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def stats(self, all: bool = False) -> List[ContainerStats]:
+    def stats(
+        self,
+        containers: Union[ValidContainer, List[ValidContainer]] = [],
+        all: bool = False,
+    ) -> List[ContainerStats]:
         """Get containers resource usage statistics
 
         Alias: `docker.stats(...)`
@@ -1730,10 +1734,12 @@ class ContainerCLI(DockerCLICaller):
 
         # Arguments
             all: Get the stats of all containers, not just running ones.
+            containers: One or a list of containers.
 
         # Returns
             A `List[python_on_whales.ContainerStats]`.
         """
+        containers = to_list(containers)
         full_cmd = self.docker_cmd + [
             "container",
             "stats",
@@ -1743,6 +1749,7 @@ class ContainerCLI(DockerCLICaller):
             "--no-trunc",
         ]
         full_cmd.add_flag("--all", all)
+        full_cmd += containers
         stats_output = run(full_cmd)
         return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
 
