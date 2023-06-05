@@ -557,6 +557,10 @@ def test_docker_stats_cli_container(run_mock: Mock) -> None:
     )
 
 
+def test_docker_stats_cli_empty_selection() -> None:
+    assert docker.container.stats(containers=[]) == []
+
+
 def test_remove_anonymous_volume_too():
     container = docker.run("postgres:9.6.20-alpine", detach=True)
 
