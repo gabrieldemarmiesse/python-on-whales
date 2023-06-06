@@ -1749,8 +1749,13 @@ class ContainerCLI(DockerCLICaller):
         ]
         full_cmd.add_flag("--all", all)
 
-        if None not in containers:
-            full_cmd += containers
+        if containers == []:
+            return []
+        elif containers is None:
+            # the user didn't provide any filters
+            pass
+        else:
+            full_cmd += to_list(containers)
 
         stats_output = run(full_cmd)
         return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
