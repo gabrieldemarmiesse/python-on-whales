@@ -1739,12 +1739,6 @@ class ContainerCLI(DockerCLICaller):
         # Returns
             A `List[python_on_whales.ContainerStats]`.
         """
-        containers = to_list(containers)
-
-        if not containers:
-            # do nothing
-            return []
-
         full_cmd = self.docker_cmd + [
             "container",
             "stats",
