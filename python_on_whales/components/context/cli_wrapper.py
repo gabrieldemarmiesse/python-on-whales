@@ -145,7 +145,7 @@ class ContextCLI(DockerCLICaller):
     ) -> Context:
         """Creates a new context
 
-        # Arguments
+        Parameters:
             context: name of the context to create
             default_stack_orchestrator: Default orchestrator for stack operations to use with this context (swarm|kubernetes|all)
             description: Description of the context
@@ -208,7 +208,7 @@ class ContextCLI(DockerCLICaller):
     def remove(self, x: Union[ValidContext, List[ValidContext]], force: bool = False):
         """Removes one or more contexts
 
-        # Arguments
+        Parameters:
             x: One or more contexts, empty list means no-op.
             force: Force the removal of this context
         """
@@ -226,7 +226,7 @@ class ContextCLI(DockerCLICaller):
     def use(self, context: ValidContext):
         """Set the default context
 
-        # Arguments
+        Parameters:
             context: The context to set as default
         """
         full_cmd = self.docker_cmd + ["context", "use", context]

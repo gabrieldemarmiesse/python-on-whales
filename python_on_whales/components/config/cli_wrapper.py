@@ -84,7 +84,7 @@ class ConfigCLI(DockerCLICaller):
         See [the docker docs](https://docs.docker.com/engine/swarm/configs/)
         for more information about swarm configs.
 
-        # Arguments
+        Parameters:
             name: The config name.
             file: Tbe file to be used as config.
             labels: The labels to add to the config
@@ -125,7 +125,7 @@ class ConfigCLI(DockerCLICaller):
     def list(self, filters: Dict[str, str] = {}) -> List[Config]:
         """List all config available in the swarm.
 
-        # Arguments
+        Parameters:
             filters: If you want to filter the results based on a given condition.
                 For example, `docker.config.list(filters=dict(label="my_label=hello"))`.
 
@@ -141,7 +141,7 @@ class ConfigCLI(DockerCLICaller):
     def remove(self, x: Union[ValidConfig, List[ValidConfig]]):
         """Remove one or more configs.
 
-        # Arguments
+        Parameters:
             x: One or a list of configs. Valid values are the id of the config or
                 a `python_on_whales.Config` object.
                 An empty list means the function call does nothing.

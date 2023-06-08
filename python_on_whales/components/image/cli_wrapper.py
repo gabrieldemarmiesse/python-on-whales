@@ -241,7 +241,7 @@ class ImageCLI(DockerCLICaller):
         A `python_on_whales.Image` is returned, even when using multiple tags.
         That is because it will produce a single image with multiple tags.
 
-        # Arguments
+        Parameters:
             context_path: The path of the build context. Defaults to the current working directory
             add_hosts: Hosts to add. `add_hosts={"my_host1": "192.168.32.35"}`
             build_args: The build arguments.
@@ -298,7 +298,7 @@ class ImageCLI(DockerCLICaller):
 
         Alias: `docker.import_(...)`
 
-        # Arguments
+        Parameters:
             changes: Apply Dockerfile instruction to the created image
             message: Set commit message for imported image
             platform: Set platform if server is multi-platform capable
@@ -359,7 +359,7 @@ class ImageCLI(DockerCLICaller):
 
         Alias: `docker.load(...)`
 
-        # Arguments
+        Parameters:
             input: Path or input stream to load the images from.
             quiet: If you don't want to display the progress bars.
 
@@ -459,11 +459,11 @@ class ImageCLI(DockerCLICaller):
     def prune(self, all: bool = False, filter: Dict[str, str] = {}) -> str:
         """Remove unused images
 
-        # Arguments
+        Parameters:
             all: Remove all unused images, not just dangling ones
             filter: Provide filter values (e.g. `{"until": "<timestamp>"}`)
 
-        # Returns:
+        Returns:
             The output of the CLI (the layers removed).
         """
         full_cmd = self.docker_cmd + ["image", "prune", "--force"]
@@ -478,14 +478,14 @@ class ImageCLI(DockerCLICaller):
 
         Alias: `docker.pull(...)`
 
-        # Arguments
+        Parameters:
             x: The image name(s) . Can be a string or a list of strings. In case of
                 list, multithreading is used to pull the images.
                 The progress bars might look strange as multiple
                 processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
 
-        # Returns:
+        Returns:
             The Docker image loaded (`python_on_whales.Image` object).
             If a list was passed as input, then a `List[python_on_whales.Image]` will
             be returned.
@@ -520,7 +520,7 @@ class ImageCLI(DockerCLICaller):
 
         Alias: `docker.push(...)`
 
-        # Arguments
+        Parameters:
             x: Tag(s) or repo(s) to push. Can be a string or a list of strings.
                 If it's a list of string, python-on-whales will push all the images with
                 multiple threads. The progress bars might look strange as multiple
@@ -564,7 +564,7 @@ class ImageCLI(DockerCLICaller):
     ):
         """Remove one or more docker images.
 
-        # Arguments
+        Parameters:
             x: Single image or list of Docker images to remove. You can use tags or
                 `python_on_whales.Image` objects.
             force: Force removal of the image
@@ -594,7 +594,7 @@ class ImageCLI(DockerCLICaller):
 
         Alias: `docker.save(...)`
 
-        # Arguments
+        Parameters:
             images: Single docker image or list of docker images to save
             output: Path of the tar archive to produce. If `output` is None, a generator
                 of bytes is produced. It can be used to stream those bytes elsewhere,
@@ -660,7 +660,7 @@ class ImageCLI(DockerCLICaller):
 
         Alias: `docker.tag(...)`
 
-        # Arguments
+        Parameters:
             source_image: The Docker image to tag. You can use a tag to reference it.
             new_tag: The tag to add to the Docker image.
 

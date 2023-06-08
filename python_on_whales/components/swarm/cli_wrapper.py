@@ -17,7 +17,7 @@ class SwarmCLI(DockerCLICaller):
     ):
         """Get and rotate the root CA
 
-        # Arguments
+        Parameters:
             ca_certificate: Path to the PEM-formatted root CA certificate
                 to use for the new cluster
             ca_key: Path to the PEM-formatted root CA key to use
@@ -75,7 +75,7 @@ class SwarmCLI(DockerCLICaller):
         worker_docker.swarm.join("manager_hostname:2377", token=my_token)
         ```
 
-        # Arguments
+        Parameters:
             advertise_address: Advertised address (format: `<ip|interface>[:port]`)
             autolock: Enable manager autolocking (requiring an unlock key to start a
                 stopped manager)
@@ -103,7 +103,7 @@ class SwarmCLI(DockerCLICaller):
     ):
         """Joins a swarm
 
-        # Arguments
+        Parameters:
             manager_address: The address of the swarm manager in the format `"{ip}:{port}"`
             advertise_address: Advertised address (format: <ip|interface>[:port])
             availability: Availability of the node
@@ -130,7 +130,7 @@ class SwarmCLI(DockerCLICaller):
         This token can then be used
         with `docker.swarm.join("manager:2377", token=my_token)`.
 
-        # Arguments
+        Parameters:
             node_type: `"manager"` or `"worker"`
             rotate: Rotate join token
         """
@@ -142,7 +142,7 @@ class SwarmCLI(DockerCLICaller):
     def leave(self, force: bool = False) -> None:
         """Leave the swarm
 
-        # Arguments
+        Parameters:
             force: Force this node to leave the swarm, ignoring warnings
         """
         full_cmd = self.docker_cmd + ["swarm", "leave"]
@@ -153,7 +153,7 @@ class SwarmCLI(DockerCLICaller):
         """Unlock a swarm after the `--autolock` parameter was used and
         the daemon restarted.
 
-        # Arguments:
+        Parameters:
             key: The key to unlock the swarm. The key can be obtained on any manager
                 with `docker.swarm.unlock_key()`.
         """
@@ -163,7 +163,7 @@ class SwarmCLI(DockerCLICaller):
     def unlock_key(self, rotate: bool = False) -> str:
         """Gives you the key needed to unlock the swarm after a manager daemon reboot.
 
-        # Arguments
+        Parameters:
             rotate: Rotate the unlock key.
         """
         full_cmd = self.docker_cmd + ["swarm", "unlock-key", "--quiet"]
@@ -182,7 +182,7 @@ class SwarmCLI(DockerCLICaller):
     ):
         """Update the swarm configuration
 
-        # Arguments
+        Parameters:
             autolock: Change manager autolocking setting
             cert_expiry: Validity period for node certificates, default
                 is `datetime.timedelta(days=90)`. If `int`, it's a number of seconds.

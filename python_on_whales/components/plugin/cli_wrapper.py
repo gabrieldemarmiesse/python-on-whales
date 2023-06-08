@@ -109,7 +109,7 @@ class PluginCLI(DockerCLICaller):
     ) -> Plugin:
         """Create a plugin from a rootfs and configuration.
 
-        # Arguments
+        Parameters:
             plugin_name: The name you want to give to your plugin
             plugin_data_directory: Must contain config.json and rootfs directory.
             compress: Compress the context using gzip
@@ -123,7 +123,7 @@ class PluginCLI(DockerCLICaller):
     def disable(self, plugin: ValidPlugin, force: bool = False) -> None:
         """Disable a plugin
 
-        # Arguments
+        Parameters:
             plugin: The plugin to disable
             force: Force the disable of an active plugin
         """
@@ -135,7 +135,7 @@ class PluginCLI(DockerCLICaller):
     def enable(self, plugin: ValidPlugin, timeout: int = None) -> None:
         """Enable a plugin
 
-        # Arguments
+        Parameters:
             plugin: The plugin to enable
             timeout: HTTP client timeout (in seconds) (default 30)
         """
@@ -156,7 +156,7 @@ class PluginCLI(DockerCLICaller):
         """Returns a `python_on_whales.Plugin` object from a string
         (name or id of the plugin)
 
-        # Arguments
+        Parameters:
             x: One id or hostname or a list of name or ids
 
         # Returns
@@ -180,7 +180,7 @@ class PluginCLI(DockerCLICaller):
         Warning: `--grant-all-permissions` is enabled, which means the program won't
         stop to ask you to grant the permissions.
 
-        # Arguments
+        Parameters:
             plugin_name: The name of the plugin you want to install
             configuration: A `dict` adding configuration options to the plugin
             alias: Local name for plugin
@@ -218,7 +218,7 @@ class PluginCLI(DockerCLICaller):
         """Push a plugin to a registry.
 
 
-        # Arguments
+        Parameters:
             plugin: The plugin to push
             disable_content_trust: Skip image signing (default `True`)
         """
@@ -233,7 +233,7 @@ class PluginCLI(DockerCLICaller):
     ) -> None:
         """Removes one or more plugins
 
-        # Arguments
+        Parameters:
             plugin: One or more plugins to remove.
             force: Force the removal of this plugin.
         """
@@ -247,7 +247,7 @@ class PluginCLI(DockerCLICaller):
     def set(self, plugin: ValidPlugin, configuration: Dict[str, str]) -> None:
         """Change the settings for a plugin
 
-        # Arguments
+        Parameters:
             plugin: The plugin that needs its settings changed
             configuration: The new configuration options.
         """
@@ -269,7 +269,7 @@ class PluginCLI(DockerCLICaller):
         Warning: `--grant-all-permissions` is enabled, which means the program won't
         stop to ask you to grant the permissions.
 
-        # Arguments
+        Parameters:
             plugin: The plugin to upgrade
             remote: The remote to fetch the upgrade from
             disable_content_trust: Skip image verification (default `True`)

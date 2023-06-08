@@ -53,7 +53,7 @@ class StackCLI(DockerCLICaller):
     ) -> Stack:
         """Deploys a stack.
 
-        # Arguments
+        Parameters:
             name: The name of the stack to deploy. Mandatory.
             compose_files: One or more docker-compose files. If there are more than
             one, they will be fused together.
@@ -115,7 +115,7 @@ class StackCLI(DockerCLICaller):
         # running
         ```
 
-        # Arguments
+        Parameters:
             x: A stack . It can be name or a `python_on_whales.Stack` object.
 
         # Returns
@@ -134,7 +134,7 @@ class StackCLI(DockerCLICaller):
     def remove(self, x: Union[ValidStack, List[ValidStack]]) -> None:
         """Removes one or more stacks.
 
-        # Arguments
+        Parameters:
             x: One or more stacks, empty list means nothing will be done.
 
         """
@@ -148,7 +148,7 @@ class StackCLI(DockerCLICaller):
     ) -> List[python_on_whales.components.service.cli_wrapper.Service]:
         """List the services present in the stack.
 
-        # Arguments
+        Parameters:
             stack: A docker stack or the name of a stack.
 
         # Returns

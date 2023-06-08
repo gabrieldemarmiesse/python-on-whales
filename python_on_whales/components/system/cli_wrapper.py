@@ -103,7 +103,7 @@ class SystemCLI(DockerCLICaller):
         # the list of all events concerning the container "mycontainer"
         ```
 
-        # Arguments
+        Parameters:
             since:  Show all events created since timestamp
             until: 	Stream events until this timestamp
             filters: See the [Docker documentation page about filtering
@@ -158,7 +158,7 @@ class SystemCLI(DockerCLICaller):
     ) -> None:
         """Remove unused docker data
 
-        # Arguments
+        Parameters:
             all: Remove all unused images not just dangling ones
             volumes: Prune volumes
             filters: See the [Docker documentation page about filtering

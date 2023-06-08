@@ -80,7 +80,7 @@ class ManifestCLI(DockerCLICaller):
     ) -> ManifestList:
         """Annotates a Docker manifest list.
 
-        # Arguments
+        Parameters:
             name: The name of the manifest list
             manifest: The individual manifest to annotate
             arch: The manifest's architecture
@@ -108,7 +108,7 @@ class ManifestCLI(DockerCLICaller):
     ) -> ManifestList:
         """Creates a Docker manifest list.
 
-        # Arguments
+        Parameters:
             name: The name of the manifest list
             manifests: The list of manifests to add to the manifest list
 
@@ -145,7 +145,7 @@ class ManifestCLI(DockerCLICaller):
     def remove(self, manifest_lists: Union[ValidManifestList, List[ValidManifestList]]):
         """Removes a Docker manifest list or lists.
 
-        # Arguments
+        Parameters:
             manifest_lists: One or more manifest lists.
         """
         if manifest_lists == []:
