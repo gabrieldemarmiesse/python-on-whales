@@ -40,6 +40,7 @@ from python_on_whales.exceptions import NoSuchContainer
 from python_on_whales.utils import (
     ValidPath,
     format_dict_for_cli,
+    format_signal_arg,
     format_time_arg,
     removeprefix,
     run,
@@ -297,7 +298,7 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).export(self, output)
 
-    def kill(self, signal: str = None):
+    def kill(self, signal: Optional[Union[int, str]] = None):
         """Kill this container
 
         See the [`docker.container.kill`](../sub-commands/container.md#kill) command for
@@ -601,7 +602,7 @@ class ContainerCLI(DockerCLICaller):
         security_options: List[str] = [],
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
-        stop_signal: Optional[str] = None,
+        stop_signal: Optional[Union[int, str]] = None,
         stop_timeout: Optional[int] = None,
         storage_options: List[str] = [],
         sysctl: Dict[str, str] = {},
@@ -762,7 +763,7 @@ class ContainerCLI(DockerCLICaller):
         if sig_proxy is False:
             full_cmd += ["--sig-proxy", "false"]
 
-        full_cmd.add_simple_arg("--stop-signal", stop_signal)
+        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
         full_cmd.add_args_list("--storage-opt", storage_options)
@@ -987,7 +988,7 @@ class ContainerCLI(DockerCLICaller):
     def kill(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
-        signal: Optional[str] = None,
+        signal: Optional[Union[int, str]] = None,
     ) -> None:
         """Kill a container.
 
@@ -1007,7 +1008,7 @@ class ContainerCLI(DockerCLICaller):
             return
         full_cmd = self.docker_cmd + ["container", "kill"]
 
-        full_cmd.add_simple_arg("--signal", signal)
+        full_cmd.add_simple_arg("--signal", format_signal_arg(signal))
         full_cmd += containers
 
         run(full_cmd)
@@ -1311,7 +1312,7 @@ class ContainerCLI(DockerCLICaller):
         security_options: List[str] = [],
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
-        stop_signal: Optional[str] = None,
+        stop_signal: Optional[Union[int, str]] = None,
         stop_timeout: Optional[int] = None,
         storage_options: List[str] = [],
         stream: bool = False,
@@ -1634,7 +1635,7 @@ class ContainerCLI(DockerCLICaller):
         if sig_proxy is False:
             full_cmd += ["--sig-proxy", "false"]
 
-        full_cmd.add_simple_arg("--stop-signal", stop_signal)
+        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
         full_cmd.add_args_list("--storage-opt", storage_options)
@@ -1706,7 +1707,11 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def stats(self, all: bool = False) -> List[ContainerStats]:
+    def stats(
+        self,
+        containers: Optional[Union[ValidContainer, List[ValidContainer]]] = None,
+        all: bool = False,
+    ) -> List[ContainerStats]:
         """Get containers resource usage statistics
 
         Alias: `docker.stats(...)`
@@ -1729,6 +1734,7 @@ class ContainerCLI(DockerCLICaller):
 
         Parameters:
             all: Get the stats of all containers, not just running ones.
+            containers: One or a list of containers.
 
         # Returns
             A `List[python_on_whales.ContainerStats]`.
@@ -1742,6 +1748,15 @@ class ContainerCLI(DockerCLICaller):
             "--no-trunc",
         ]
         full_cmd.add_flag("--all", all)
+
+        if containers == []:
+            return []
+        elif containers is None:
+            # the user didn't provide any filters
+            pass
+        else:
+            full_cmd += to_list(containers)
+
         stats_output = run(full_cmd)
         return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
 

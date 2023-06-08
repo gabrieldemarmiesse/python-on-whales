@@ -12,6 +12,7 @@ from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
     format_dict_for_cli,
+    format_signal_arg,
     parse_ls_status_count,
     run,
     stream_stdout_and_stderr,
@@ -205,7 +206,9 @@ class ComposeCLI(DockerCLICaller):
             return run(full_cmd)
 
     def kill(
-        self, services: Union[str, List[str]] = None, signal: Optional[str] = None
+        self,
+        services: Union[str, List[str]] = None,
+        signal: Optional[Union[int, str]] = None,
     ):
         """Kills the container(s) of a service
 
@@ -218,7 +221,7 @@ class ComposeCLI(DockerCLICaller):
             signal: the signal to send to the container. Default is `"SIGKILL"`
         """
         full_cmd = self.docker_compose_cmd + ["kill"]
-        full_cmd.add_simple_arg("--signal", signal)
+        full_cmd.add_simple_arg("--signal", format_signal_arg(signal))
         if services == []:
             return
         elif services is not None:
