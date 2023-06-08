@@ -15,8 +15,7 @@ jobs:
           python-version: '3.8'
       - name: prepare
         run: |
-          pip install -r ./requirements.txt
-          pip install -e .
+          pip install -r ./requirements.txt -r docs/requirements.txt -e .
           python docs/autogen.py
           mv docs/generated_sources ./generated_sources
           mv docs/mkdocs.yml ./
