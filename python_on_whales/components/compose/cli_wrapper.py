@@ -33,7 +33,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Build services declared in a yaml compose file.
 
-        # Arguments
+        Parameters:
             services: The services to build (as list of strings).
                 If `None` (default), all services are built.
                 An empty list means that nothing will be built.
@@ -72,7 +72,7 @@ class ComposeCLI(DockerCLICaller):
         "redis"
         ```
 
-        # Arguments
+        Parameters:
             return_json: If `False`, a `ComposeConfig` object will be returned, and you
                 'll be able to take advantage of your IDE autocompletion. If you want the
                 full json output, you may use `return_json`. In this case, you'll get
@@ -100,7 +100,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Creates containers for a service.
 
-        # Arguments
+        Parameters:
             services: The name of the services for which the containers will
                 be created. The default `None` means that the containers for all
                 services will be created. A single string means we will create the
@@ -135,7 +135,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Stops and removes the containers
 
-        # Arguments
+        Parameters:
             remove_orphans: Remove containers for services not defined in
                 the Compose file.
             remove_images: Remove images used by services.
@@ -174,7 +174,7 @@ class ComposeCLI(DockerCLICaller):
     ) -> Optional[str]:
         """Execute a command in a running container.
 
-        # Arguments
+        Parameters:
             service: The name of the service.
             command: The command to execute.
             detach: If `True`, detach from the container after the command exits. In this case,
@@ -212,7 +212,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Kills the container(s) of a service
 
-        # Arguments
+        Parameters:
             services: One or more service(s) to kill. The default (`None`) is to kill all services.
                 A string means the call will kill one single service. A list of service names can
                 be provided to kill multiple services in one function call.
@@ -241,7 +241,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """View output from containers
 
-        # Arguments
+        Parameters:
             services: One or more service(s) to view
             tail: Number of lines to show from the end of the logs for each container. (default "all")
             follow: Follow log output ***WARNING***: With this
@@ -280,7 +280,7 @@ class ComposeCLI(DockerCLICaller):
     def pause(self, services: Union[str, List[str], None] = None):
         """Pause one or more services
 
-        # Arguments
+        Parameters:
             services: `None` (the default) means pause all containers of all
                 compose services. A string means that the call will pause the container
                 of a specific service. A list of string means the call will pause
@@ -303,7 +303,7 @@ class ComposeCLI(DockerCLICaller):
     ) -> Tuple[Optional[str], Optional[int]]:
         """Returns the public port for a port binding.
 
-        # Arguments
+        Parameters:
             service: The name of the service.
             private_port: The private port.
             index: Index of the container if service has multiple replicas (default 1)
@@ -360,7 +360,7 @@ class ComposeCLI(DockerCLICaller):
     ) -> List[ComposeProject]:
         """Returns a list of docker compose projects
 
-        # Arguments
+        Parameters:
             all_stopped: Results include all stopped compose projects.
             project_filters: Filter results based on conditions provided.
 
@@ -399,7 +399,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Pull service images
 
-        # Arguments
+        Parameters:
             services: The list of services to select. Only the images of those
                 services will be pulled. If no services are specified (`None`) (the default
                 behavior) all images of all services are pulled.
@@ -424,7 +424,7 @@ class ComposeCLI(DockerCLICaller):
     def push(self, services: Optional[List[str]] = None):
         """Push service images
 
-        # Arguments
+        Parameters:
             services: The list of services to select. Only the images of those
                 services will be pushed. If no services are specified (`None`, the default
                 behavior) all images of all services are pushed.
@@ -444,7 +444,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Restart containers
 
-        # Arguments
+        Parameters:
             services: The names of one or more services to restart (str or list of str).
                 If the argument is not specified, `services` is `None` and all services are restarted.
                 If `services` is an empty list, then the function call is a no-op.
@@ -479,7 +479,7 @@ class ComposeCLI(DockerCLICaller):
 
         Any data which is not in a volume will be lost.
 
-        # Arguments
+        Parameters:
             services: The names of one or more services to remove (str or list of str).
                 If `None` (the default) then all services are removed.
                 If an empty list is provided, this function call is a no-op.
@@ -523,7 +523,7 @@ class ComposeCLI(DockerCLICaller):
     ]:
         """Run a one-off command on a service.
 
-        # Arguments
+        Parameters:
             service: The name of the service.
             command: The command to execute.
             detach: if `True`, returns immediately with the Container.
@@ -541,7 +541,7 @@ class ComposeCLI(DockerCLICaller):
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
 
-        # Returns:
+        Returns:
             Optional[str]
 
         """
@@ -598,7 +598,7 @@ class ComposeCLI(DockerCLICaller):
     def start(self, services: Union[str, List[str], None] = None):
         """Start the specified services.
 
-        # Arguments
+        Parameters:
             services: The names of one or more services to start.
                 If `None` (the default), it means all services will start.
                 If an empty list is provided, this function call is a no-op.
@@ -617,7 +617,7 @@ class ComposeCLI(DockerCLICaller):
     ):
         """Stop services
 
-        # Arguments
+        Parameters:
             services: The names of one or more services to stop (str or list of str).
                 If `None` (the default), it means all services will stop.
                 If an empty list is provided, this function call is a no-op.
@@ -642,7 +642,7 @@ class ComposeCLI(DockerCLICaller):
     def unpause(self, services: Union[str, List[str], None] = None):
         """Unpause one or more services
 
-        # Arguments
+        Parameters:
             services: One or more service to unpause.
                 If `None` (the default), all services are unpaused.
                 If services is an empty list, the function call does nothing,
@@ -678,7 +678,7 @@ class ComposeCLI(DockerCLICaller):
 
         Reading the logs of the containers is not yet implemented.
 
-        # Arguments
+        Parameters:
             services: The services to start. If `None` (default), all services are
                 started. If an empty list is provided, the function call does nothing, it's
                 a no-op.

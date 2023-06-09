@@ -180,7 +180,7 @@ class ServiceCLI(DockerCLICaller):
         easier to read for complex applications.
         docker stack deploy is basically docker compose for swarm clusters.
 
-        # Arguments:
+        Parameters:
             image: The image to use as the base for the service.
             command: The command to execute in the container(s).
         """
@@ -284,7 +284,7 @@ class ServiceCLI(DockerCLICaller):
     ):
         """Returns the logs of a service as a string or an iterator.
 
-        # Arguments
+        Parameters:
             service: The service to get the logs of
             details: Show extra details provided to logs
             since: Use a datetime or timedelta to specify the lower
@@ -379,7 +379,7 @@ class ServiceCLI(DockerCLICaller):
         # running
         ```
 
-        # Arguments
+        Parameters:
             x: One or more services (can be id, name or `python_on_whales.Service` object.)
 
         # Returns
@@ -403,7 +403,7 @@ class ServiceCLI(DockerCLICaller):
     def remove(self, services: Union[ValidService, List[ValidService]]) -> None:
         """Removes a service
 
-        # Arguments
+        Parameters:
             services: One or a list of services to remove.
 
         # Raises
@@ -427,7 +427,7 @@ class ServiceCLI(DockerCLICaller):
     def scale(self, new_scales: Dict[ValidService, int], detach: bool = False) -> None:
         """Scale one or more services.
 
-        # Arguments
+        Parameters:
             new_scales: Mapping between services and the desired scales. For example
                 you can provide `new_scale={"service1": 4, "service2": 8}`
             detach: If True, does not wait for the services to converge and return
@@ -459,7 +459,7 @@ class ServiceCLI(DockerCLICaller):
 
         More options coming soon
 
-        # Arguments
+        Parameters:
             service: The service to update
             detach: Exit immediately instead of waiting for the service to converge
             force: Force update even if no changes require it

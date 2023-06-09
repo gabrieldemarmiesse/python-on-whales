@@ -2,8 +2,38 @@
 
 site_name: Python on whales
 docs_dir: generated_sources
+repo_url: "https://github.com/gabrieldemarmiesse/python-on-whales"
 site_description: 'Python on whales docs'
 
+theme:
+  name: material
+
+markdown_extensions:
+- pymdownx.snippets:
+    check_paths: true
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      custom_templates: templates
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_bases: false
+            show_root_heading: true
+            show_source: false
+            group_by_category: true
+            show_category_heading: false
+            heading_level: 1
+            show_root_toc_entry: false
+            separate_signature: true
+            merge_init_into_class: false
+            show_root_full_path: false
+            docstring_options:
+              ignore_init_summary: false
 nav:
   - Docker client: docker_client.md
   - Sub-commands:

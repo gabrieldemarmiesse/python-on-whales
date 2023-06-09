@@ -121,7 +121,7 @@ class VolumeCLI(DockerCLICaller):
     ) -> Volume:
         """Creates a volume
 
-        # Arguments
+        Parameters:
             volume_name: The volume name, if not provided, a long random
                 string will be used instead.
             driver: Specify volume driver name (default "local")
@@ -174,7 +174,7 @@ class VolumeCLI(DockerCLICaller):
     def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
         """List volumes
 
-        # Arguments
+        Parameters:
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
                 An example `filters=dict(dangling=1, driver="local")`.
@@ -195,7 +195,7 @@ class VolumeCLI(DockerCLICaller):
     def prune(self, filters: Dict[str, Union[str, int]] = {}) -> None:
         """Remove volumes
 
-        # Arguments
+        Parameters:
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
                 An example `filters=dict(dangling=1, driver="local")`.
@@ -210,7 +210,7 @@ class VolumeCLI(DockerCLICaller):
     def remove(self, x: Union[ValidVolume, List[ValidVolume]]):
         """Removes one or more volumes
 
-        # Arguments
+        Parameters:
             x: A volume or a list of volumes. An empty list as argument means
                 nothing is done.
         """
@@ -233,7 +233,7 @@ class VolumeCLI(DockerCLICaller):
     ) -> Volume:
         """Clone a volume.
 
-        # Arguments
+        Parameters:
             source: The volume to clone
             new_volume_name: The new volume name. If not given, a random name is chosen.
             driver: Specify volume driver name (default "local")
@@ -256,7 +256,7 @@ class VolumeCLI(DockerCLICaller):
     ):
         """Copy files/folders between a volume and the local filesystem.
 
-        # Arguments
+        Parameters:
             source: If `source` is a directory/file inside a Docker volume,
                 a tuple `(my_volume, path_in_volume)` must be provided. The volume
                 can be a `python_on_whales.Volume` or a volume name as `str`. The path

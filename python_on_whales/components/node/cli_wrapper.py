@@ -104,7 +104,7 @@ class NodeCLI(DockerCLICaller):
     def demote(self, x: Union[ValidNode, List[ValidNode]]):
         """Demote one or more nodes from manager in the swarm
 
-        # Arguments
+        Parameters:
             x: One or a list of nodes.
         """
         full_cmd = self.docker_cmd + ["node", "demote"]
@@ -125,7 +125,7 @@ class NodeCLI(DockerCLICaller):
         """Returns a `python_on_whales.Node` object from a string
         (id or hostname of the node)
 
-        # Arguments
+        Parameters:
             x: One id or hostname or a list of ids or hostnames
 
         # Returns
@@ -149,7 +149,7 @@ class NodeCLI(DockerCLICaller):
     def promote(self, x: Union[ValidNode, List[ValidNode]]):
         """Promote one or more nodes to manager in the swarm
 
-        # Arguments
+        Parameters:
             x: One or a list of nodes.
         """
         full_cmd = self.docker_cmd + ["node", "promote"]
@@ -171,7 +171,7 @@ class NodeCLI(DockerCLICaller):
         # running
         ```
 
-        # Arguments
+        Parameters:
             x: One or more nodes (can be id, name or `python_on_whales.Node` object.).
                 If the argument is not provided, it defaults to the current node.
                 An empty list means an empty list will also be returned.
@@ -201,7 +201,7 @@ class NodeCLI(DockerCLICaller):
     def remove(self, x: Union[ValidNode, List[ValidNode]], force: bool = False):
         """Remove one or more nodes from the swarm
 
-        # Arguments
+        Parameters:
             x: One node or a list of nodes. You can use the id or the hostname of a node.
                 You can also use a `python_on_whales.Node`.
             force: Force remove a node from the swarm
@@ -223,7 +223,7 @@ class NodeCLI(DockerCLICaller):
     ) -> None:
         """Updates a Swarm node.
 
-        # Arguments
+        Parameters:
             node: The node to update, you can use a string or a `python_on_whales.Node`
                 object.
             availability: Availability of the node ("active"|"pause"|"drain")

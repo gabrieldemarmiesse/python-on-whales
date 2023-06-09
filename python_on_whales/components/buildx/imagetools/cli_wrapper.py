@@ -32,7 +32,7 @@ class ImagetoolsCLI(DockerCLICaller):
         The CLI docs is [here](https://docs.docker.com/engine/reference/commandline/buildx_imagetools_create/)
         and it contains a lot more information.
 
-        # Arguments
+        Parameters:
             sources: The sources manifest to create, change
             append: Append to existing manifest
             dry_run: Show final image instead of pushing
