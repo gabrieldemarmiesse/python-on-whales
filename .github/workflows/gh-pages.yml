@@ -25,3 +25,4 @@ jobs:
         uses: mhausenblas/mkdocs-deploy-gh-pages@5498449191fe448fd9aa1c74969a6bf2c2a8bc49
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REQUIREMENTS: docs/requirements.txt

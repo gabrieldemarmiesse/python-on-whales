@@ -1,0 +1,6 @@
+mkdocstrings==0.20.0
+mkdocstrings-python==1.0.0
+mkdocs-autorefs==0.4.1
+mkdocs-material==9.1.14
+pymdown-extensions==10.0.1
+markdown==3.3.7
