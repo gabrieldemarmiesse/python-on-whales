@@ -383,6 +383,29 @@ def test_docker_compose_up_abort_on_container_exit():
     docker.compose.down()
 
 
+def test_docker_compose_up_no_attach_services(capfd):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_logs.yml"
+        ],
+        compose_compatibility=True,
+    )
+    docker.compose.up(no_attach_services=["my_service"])
+
+    container_names = [x.name for x in docker.compose.ps()]
+    stdout, _ = capfd.readouterr()
+    # Checking if we only attach to my_other_service
+    expected_output = "Attaching to my_other_service_1, my_other_service_2\n"
+    assert expected_output in stdout
+
+    # Checking if the my_service is spun up even if it's not attached
+    for name in container_names:
+        if "my_service" in name:
+            break
+    else:
+        raise AssertionError("my_service is not spun up as expected")
+
+
 def test_passing_env_files(tmp_path: Path):
     compose_env_file = tmp_path / "dodo.env"
     compose_env_file.write_text("SOME_VARIABLE_TO_INSERT=hello\n")
