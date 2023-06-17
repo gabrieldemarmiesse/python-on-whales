@@ -674,6 +674,7 @@ class ComposeCLI(DockerCLICaller):
         start: bool = True,
         quiet: bool = False,
         wait: bool = False,
+        no_attach_services: Union[List[str], str, None] = None,
         pull: Literal["always", "missing", "never", None] = None,
     ):
         """Start the containers.
@@ -709,6 +710,7 @@ class ComposeCLI(DockerCLICaller):
             quiet: By default, some progress bars and logs are sent to stderr and stdout.
                 Set `quiet=True` to avoid having any output.
             wait: Wait for services to be running|healthy. Implies detached mode.
+            no_attach_services: The services not to attach to.
             pull: Pull image before running (“always”|”missing”|”never”).
 
         # Returns
@@ -732,6 +734,11 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--no-start", not start)
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_simple_arg("--pull", pull)
+
+        if no_attach_services is not None:
+            no_attach_services = to_list(no_attach_services)
+            for service in no_attach_services:
+                full_cmd.add_simple_arg("--no-attach", service)
 
         if services == []:
             return
