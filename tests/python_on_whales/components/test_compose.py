@@ -407,7 +407,6 @@ def test_docker_compose_up_no_attach_services(capfd):
     docker.compose.down()
 
 
-
 def test_passing_env_files(tmp_path: Path):
     compose_env_file = tmp_path / "dodo.env"
     compose_env_file.write_text("SOME_VARIABLE_TO_INSERT=hello\n")
