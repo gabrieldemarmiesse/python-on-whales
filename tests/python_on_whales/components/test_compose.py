@@ -404,6 +404,8 @@ def test_docker_compose_up_no_attach_services(capfd):
             break
     else:
         raise AssertionError("my_service is not spun up as expected")
+    docker.compose.down()
+
 
 
 def test_passing_env_files(tmp_path: Path):
