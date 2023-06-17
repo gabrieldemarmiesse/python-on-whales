@@ -884,3 +884,14 @@ services:
     docker.compose.down(timeout=1)
     check_number_of_running_containers(docker, 0, compose_container_ids)
     remove(compose_file)
+
+
+def test_docker_compose_run_build():
+    docker.compose.run("my_service", build=True, detach=True, tty=False)
+    docker.compose.stop()
+    docker.compose.rm()
+    assert (
+        docker.compose.config(return_json=True)["services"]["my_service"]["image"]
+        == docker.image.list("some_random_image")[0].repo_tags[0].split(":latest")[0]
+    )
+    docker.image.remove("some_random_image", force=True)

@@ -499,6 +499,7 @@ class ComposeCLI(DockerCLICaller):
         self,
         service: str,
         command: List[str] = [],
+        build: bool = False,
         detach: bool = False,
         # entrypoint: Optional[List[str]] = None,
         # envs: Dict[str, str] = {},
@@ -563,6 +564,7 @@ class ComposeCLI(DockerCLICaller):
                 "Try setting tty=False in docker.compose.run(...)."
             )
         full_cmd = self.docker_compose_cmd + ["run"]
+        full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--name", name)
         full_cmd.add_flag("--no-TTY", not tty)
