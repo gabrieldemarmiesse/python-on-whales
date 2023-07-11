@@ -12,7 +12,7 @@ class ManifestConfig(pydantic.BaseModel):
 
 
 class ManifestLayer(pydantic.BaseModel):
-    media_type: str = pydantic.Field(alias="mediaType")
+    media_type: Optional[str] = pydantic.Field(alias="mediaType")
     digest: Optional[str]
     size: Optional[int]
 
@@ -25,15 +25,15 @@ class ManifestPlatform(pydantic.BaseModel):
 
 
 class ImageVariantManifest(pydantic.BaseModel):
-    media_type: str = pydantic.Field(alias="mediaType")
-    size: int
-    digest: str
+    media_type: Optional[str] = pydantic.Field(alias="mediaType")
+    size: Optional[int]
+    digest: Optional[str]
     platform: Optional[ManifestPlatform]
 
 
 class Manifest(pydantic.BaseModel):
-    media_type: str = pydantic.Field(alias="mediaType")
-    schema_version: int = pydantic.Field(alias="schemaVersion")
+    media_type:  Optional[str] = pydantic.Field(alias="mediaType")
+    schema_version:  Optional[int] = pydantic.Field(alias="schemaVersion")
     layers: Optional[List[ManifestLayer]]
     manifests: Optional[List[ImageVariantManifest]]
     config: Optional[ManifestConfig]

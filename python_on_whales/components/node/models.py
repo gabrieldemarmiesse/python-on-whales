@@ -8,33 +8,33 @@ from python_on_whales.utils import DockerCamelModel, all_fields_optional
 
 @all_fields_optional
 class NodeVersion(DockerCamelModel):
-    index: int
+    index:  Optional[int]
 
 
 @all_fields_optional
 class NodeSpec(DockerCamelModel):
     name: Optional[str]
-    labels: Dict[str, str]
-    role: str
-    availability: str
+    labels:  Optional[Dict[str, str]]
+    role:  Optional[str]
+    availability:  Optional[str]
 
 
 @all_fields_optional
 class NodePlatform(DockerCamelModel):
-    architecture: str
-    os: str = Field(alias="OS")
+    architecture:  Optional[str]
+    os:  Optional[str] = Field(None, alias="OS")
 
 
 @all_fields_optional
 class NodeNamedResourceSpec(DockerCamelModel):
-    kind: str
-    value: str
+    kind:  Optional[str]
+    value:  Optional[str]
 
 
 @all_fields_optional
 class NodeDiscreteResourceSpec(DockerCamelModel):
-    kind: str
-    value: int
+    kind:  Optional[str]
+    value:  Optional[int]
 
 
 @all_fields_optional
@@ -45,61 +45,61 @@ class NodeGenericResource(DockerCamelModel):
 
 @all_fields_optional
 class NodeResource(DockerCamelModel):
-    nano_cpus: int = Field(alias="NanoCPUs")
-    memory_bytes: int
+    nano_cpus:  Optional[int] = Field(None, alias="NanoCPUs")
+    memory_bytes:  Optional[int]
     generic_resources: Optional[List[NodeGenericResource]]
 
 
 @all_fields_optional
 class EnginePlugin(DockerCamelModel):
-    type: str
-    name: str
+    type:  Optional[str]
+    name:  Optional[str]
 
 
 @all_fields_optional
 class NodeEngine(DockerCamelModel):
-    engine_version: str
+    engine_version:  Optional[str]
     labels: Optional[Dict[str, str]]
-    plugins: List[EnginePlugin]
+    plugins:  Optional[List[EnginePlugin]]
 
 
 @all_fields_optional
 class NodeTLSInfo(DockerCamelModel):
-    trust_root: str
-    cert_issuer_subject: str
-    cert_issuer_public_key: str
+    trust_root:  Optional[str]
+    cert_issuer_subject:  Optional[str]
+    cert_issuer_public_key:  Optional[str]
 
 
 @all_fields_optional
 class NodeDescription(DockerCamelModel):
-    hostname: str
-    platform: NodePlatform
-    resources: NodeResource
-    engine: NodeEngine
-    tls_info: NodeTLSInfo
+    hostname:  Optional[str]
+    platform:  Optional[NodePlatform]
+    resources:  Optional[NodeResource]
+    engine:  Optional[NodeEngine]
+    tls_info:  Optional[NodeTLSInfo]
 
 
 @all_fields_optional
 class NodeStatus(DockerCamelModel):
-    state: str
+    state:  Optional[str]
     message: Optional[str]
-    addr: str
+    addr:  Optional[str]
 
 
 @all_fields_optional
 class NodeManagerStatus(DockerCamelModel):
-    leader: bool
-    reachability: str
-    addr: str
+    leader:  Optional[bool]
+    reachability:  Optional[str]
+    addr:  Optional[str]
 
 
 @all_fields_optional
 class NodeInspectResult(DockerCamelModel):
-    id: str = Field(alias="ID")
-    version: NodeVersion
-    created_at: datetime
-    updated_at: datetime
-    spec: NodeSpec
-    description: NodeDescription
-    status: NodeStatus
+    id:  Optional[str] = Field(None, alias="ID")
+    version:  Optional[NodeVersion]
+    created_at:  Optional[datetime]
+    updated_at:  Optional[datetime]
+    spec:  Optional[NodeSpec]
+    description:  Optional[NodeDescription]
+    status:  Optional[NodeStatus]
     manager_status: Optional[NodeManagerStatus]

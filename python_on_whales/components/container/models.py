@@ -9,330 +9,330 @@ from python_on_whales.utils import DockerCamelModel, all_fields_optional
 
 @all_fields_optional
 class ContainerHealthcheckResult(DockerCamelModel):
-    start: datetime
-    end: datetime
-    exit_code: int
-    output: str
+    start:  Optional[datetime]
+    end:  Optional[datetime]
+    exit_code:  Optional[int]
+    output:  Optional[str]
 
 
 @all_fields_optional
 class ContainerHealth(DockerCamelModel):
-    status: str
-    failing_streak: int
-    log: List[ContainerHealthcheckResult]
+    status:  Optional[str]
+    failing_streak:  Optional[int]
+    log:  Optional[List[ContainerHealthcheckResult]]
 
 
 @all_fields_optional
 class ContainerState(DockerCamelModel):
-    status: str
-    running: bool
-    paused: bool
-    restarting: bool
-    oom_killed: bool
-    dead: bool
-    pid: int
-    exit_code: int
-    error: str
-    started_at: datetime
-    finished_at: datetime
-    health: ContainerHealth
+    status:  Optional[str]
+    running:  Optional[bool]
+    paused:  Optional[bool]
+    restarting:  Optional[bool]
+    oom_killed:  Optional[bool]
+    dead:  Optional[bool]
+    pid:  Optional[int]
+    exit_code:  Optional[int]
+    error:  Optional[str]
+    started_at:  Optional[datetime]
+    finished_at:  Optional[datetime]
+    health:  Optional[ContainerHealth]
 
 
 @all_fields_optional
 class ContainerWeightDevice(DockerCamelModel):
-    path: Path
-    weight: int
+    path:  Optional[Path]
+    weight:  Optional[int]
 
 
 @all_fields_optional
 class ContainerThrottleDevice(DockerCamelModel):
-    path: Path
-    rate: int
+    path:  Optional[Path]
+    rate:  Optional[int]
 
 
 @all_fields_optional
 class ContainerDevice(DockerCamelModel):
-    path_on_host: Path
-    path_in_container: Path
-    cgroup_permissions: str
+    path_on_host:  Optional[Path]
+    path_in_container:  Optional[Path]
+    cgroup_permissions:  Optional[str]
 
 
 @all_fields_optional
 class ContainerDeviceRequest(DockerCamelModel):
-    driver: str
-    count: int
-    device_ids: List[str] = pydantic.Field(alias="DeviceIDs")
-    capabilities: List[Any]
-    options: Dict[str, str]
+    driver:  Optional[str]
+    count:  Optional[int]
+    device_ids:  Optional[List[str]] = pydantic.Field(None, alias="DeviceIDs")
+    capabilities:  Optional[List[Any]]
+    options:  Optional[Dict[str, str]]
 
 
 @all_fields_optional
 class ContainerUlimit(DockerCamelModel):
-    name: str
-    soft: int
-    hard: int
+    name:  Optional[str]
+    soft:  Optional[int]
+    hard:  Optional[int]
 
 
 @all_fields_optional
 class ContainerLogConfig(DockerCamelModel):
-    type: str
-    config: Any
+    type:  Optional[str]
+    config:  Optional[Any]
 
 
 @all_fields_optional
 class ContainerRestartPolicy(DockerCamelModel):
-    name: str
-    maximum_retry_count: int
+    name:  Optional[str]
+    maximum_retry_count:  Optional[int]
 
 
 @all_fields_optional
 class PortBinding(DockerCamelModel):
-    host_ip: str
-    host_port: str
+    host_ip:  Optional[str]
+    host_port:  Optional[str]
 
 
 @all_fields_optional
 class ContainerMountBindOption(DockerCamelModel):
-    propagation: str
-    non_recursive: bool
+    propagation:  Optional[str]
+    non_recursive:  Optional[bool]
 
 
 @all_fields_optional
 class ContainerVolumeDriverConfig(DockerCamelModel):
-    name: str
-    options: Dict[str, Any]
+    name:  Optional[str]
+    options:  Optional[Dict[str, Any]]
 
 
 @all_fields_optional
 class ContainerVolumeOptions(DockerCamelModel):
-    no_copy: bool
-    labels: Dict[str, str]
+    no_copy:  Optional[bool]
+    labels:  Optional[Dict[str, str]]
 
 
 @all_fields_optional
 class ContainerTmpfsOptions(DockerCamelModel):
-    size_bytes: int
-    mode: int
+    size_bytes:  Optional[int]
+    mode:  Optional[int]
 
 
 @all_fields_optional
 class ContainerMount(DockerCamelModel):
-    target: Path
-    source: str
-    type: str
-    read_only: bool
-    consistency: str
-    bind_options: ContainerMountBindOption
-    volume_options: ContainerVolumeOptions
-    tmpfs_options: ContainerTmpfsOptions
+    target:  Optional[Path]
+    source:  Optional[str]
+    type:  Optional[str]
+    read_only:  Optional[bool]
+    consistency:  Optional[str]
+    bind_options:  Optional[ContainerMountBindOption]
+    volume_options:  Optional[ContainerVolumeOptions]
+    tmpfs_options:  Optional[ContainerTmpfsOptions]
 
 
 @all_fields_optional
 class ContainerHostConfig(DockerCamelModel):
-    cpu_shares: int
-    memory: int
-    cgroup_parent: Path
-    blkio_weight: int
-    blkio_weight_device: List[ContainerWeightDevice]
-    blkio_device_read_bps: List[ContainerThrottleDevice]
-    blkio_device_write_bps: List[ContainerThrottleDevice]
-    blkio_device_read_iops: List[ContainerThrottleDevice]
-    blkio_device_write_iops: List[ContainerThrottleDevice]
-    cpu_period: int
-    cpu_quota: int
-    cpu_realtime_period: int
-    cpu_realtime_runtime: int
-    cpuset_cpus: str
-    cpuset_mems: str
-    devices: List[ContainerDevice]
-    device_cgroup_rules: List[str]
-    device_requests: List[ContainerDeviceRequest]
-    kernel_memory: int
-    kernel_memory_tcp: int
-    memory_reservation: int
-    memory_swap: int
-    memory_swappiness: int
-    nano_cpus: int
-    oom_kill_disable: bool
-    init: bool
-    pids_limit: int
-    ulimits: List[ContainerUlimit]
-    cpu_count: int
-    cpu_percent: int
-    binds: List[str]
-    container_id_file: Path
-    log_config: ContainerLogConfig
-    network_mode: str
-    port_bindings: Dict[str, Optional[List[PortBinding]]]
-    restart_policy: ContainerRestartPolicy
-    auto_remove: bool
-    volume_driver: str
-    volumes_from: List[str]
-    mounts: List[ContainerMount]
-    capabilities: List[str]
-    cap_add: List[str]
-    cap_drop: List[str]
-    cgroupns_mode: str
-    dns: List[str]
-    dns_options: List[str]
-    dns_search: List[str]
-    extra_hosts: List[str]
-    group_add: List[str]
-    ipc_mode: str
-    cgroup: str
-    links: List[str]
-    oom_score_adj: int
-    pid_mode: str
-    privileged: bool
-    publish_all_ports: bool
-    readonly_rootfs: bool
-    security_opt: List[str]
-    storage_opt: Any
-    tmpfs: Dict[Path, str]
-    uts_mode: str
-    userns_mode: str
-    shm_size: int
-    sysctls: Dict[str, Any]
-    runtime: str
-    console_size: Tuple[int, int]
-    isolation: str
-    masked_paths: List[Path]
-    readonly_paths: List[Path]
+    cpu_shares:  Optional[int]
+    memory:  Optional[int]
+    cgroup_parent:  Optional[Path]
+    blkio_weight:  Optional[int]
+    blkio_weight_device:  Optional[List[ContainerWeightDevice]]
+    blkio_device_read_bps:  Optional[List[ContainerThrottleDevice]]
+    blkio_device_write_bps:  Optional[List[ContainerThrottleDevice]]
+    blkio_device_read_iops:  Optional[List[ContainerThrottleDevice]]
+    blkio_device_write_iops:  Optional[List[ContainerThrottleDevice]]
+    cpu_period:  Optional[int]
+    cpu_quota:  Optional[int]
+    cpu_realtime_period:  Optional[int]
+    cpu_realtime_runtime:  Optional[int]
+    cpuset_cpus:  Optional[str]
+    cpuset_mems:  Optional[str]
+    devices:  Optional[List[ContainerDevice]]
+    device_cgroup_rules:  Optional[List[str]]
+    device_requests:  Optional[List[ContainerDeviceRequest]]
+    kernel_memory:  Optional[int]
+    kernel_memory_tcp:  Optional[int]
+    memory_reservation:  Optional[int]
+    memory_swap:  Optional[int]
+    memory_swappiness:  Optional[int]
+    nano_cpus:  Optional[int]
+    oom_kill_disable:  Optional[bool]
+    init:  Optional[bool]
+    pids_limit:  Optional[int]
+    ulimits:  Optional[List[ContainerUlimit]]
+    cpu_count:  Optional[int]
+    cpu_percent:  Optional[int]
+    binds:  Optional[List[str]]
+    container_id_file:  Optional[Path]
+    log_config:  Optional[ContainerLogConfig]
+    network_mode:  Optional[str]
+    port_bindings:  Optional[Dict[str, Optional[List[PortBinding]]]]
+    restart_policy:  Optional[ContainerRestartPolicy]
+    auto_remove:  Optional[bool]
+    volume_driver:  Optional[str]
+    volumes_from:  Optional[List[str]]
+    mounts:  Optional[List[ContainerMount]]
+    capabilities:  Optional[List[str]]
+    cap_add:  Optional[List[str]]
+    cap_drop:  Optional[List[str]]
+    cgroupns_mode:  Optional[str]
+    dns:  Optional[List[str]]
+    dns_options:  Optional[List[str]]
+    dns_search:  Optional[List[str]]
+    extra_hosts:  Optional[List[str]]
+    group_add:  Optional[List[str]]
+    ipc_mode:  Optional[str]
+    cgroup:  Optional[str]
+    links:  Optional[List[str]]
+    oom_score_adj:  Optional[int]
+    pid_mode:  Optional[str]
+    privileged:  Optional[bool]
+    publish_all_ports:  Optional[bool]
+    readonly_rootfs:  Optional[bool]
+    security_opt:  Optional[List[str]]
+    storage_opt: Any = None
+    tmpfs:  Optional[Dict[Path, str]]
+    uts_mode:  Optional[str]
+    userns_mode:  Optional[str]
+    shm_size:  Optional[int]
+    sysctls:  Optional[Dict[str, Any]]
+    runtime:  Optional[str]
+    console_size:  Optional[Tuple[int, int]]
+    isolation:  Optional[str]
+    masked_paths:  Optional[List[Path]]
+    readonly_paths:  Optional[List[Path]]
 
 
 @all_fields_optional
 class ContainerHealthCheck(DockerCamelModel):
-    test: List[str]
-    interval: int
-    timeout: int
-    retries: int
-    start_period: int
+    test:  Optional[List[str]]
+    interval:  Optional[int]
+    timeout:  Optional[int]
+    retries:  Optional[int]
+    start_period:  Optional[int]
 
 
 @all_fields_optional
 class ContainerConfig(DockerCamelModel):
-    hostname: str
-    domainname: str
-    user: str
-    attach_stdin: bool
-    attach_stdout: bool
-    attach_stderr: bool
-    exposed_ports: dict
-    tty: bool
-    open_stdin: bool
-    stdin_once: bool
-    env: List[str]
-    cmd: List[str]
-    healthcheck: ContainerHealthCheck
-    args_escaped: bool
-    image: str
-    volumes: dict
-    working_dir: Path
-    entrypoint: Union[List[str], str]
-    network_disabled: bool
-    mac_address: str
-    on_build: List[str]
-    labels: Dict[str, str]
-    stop_signal: str
-    stop_timeout: int
-    shell: List[str]
+    hostname:  Optional[str]
+    domainname:  Optional[str]
+    user:  Optional[str]
+    attach_stdin:  Optional[bool]
+    attach_stdout:  Optional[bool]
+    attach_stderr:  Optional[bool]
+    exposed_ports:  Optional[dict]
+    tty:  Optional[bool]
+    open_stdin:  Optional[bool]
+    stdin_once:  Optional[bool]
+    env:  Optional[List[str]]
+    cmd:  Optional[List[str]]
+    healthcheck:  Optional[ContainerHealthCheck]
+    args_escaped:  Optional[bool]
+    image:  Optional[str]
+    volumes:  Optional[dict]
+    working_dir:  Optional[Path]
+    entrypoint: Union[List[str], str, None] = None
+    network_disabled:  Optional[bool]
+    mac_address:  Optional[str]
+    on_build:  Optional[List[str]]
+    labels:  Optional[Dict[str, str]]
+    stop_signal:  Optional[str]
+    stop_timeout:  Optional[int]
+    shell:  Optional[List[str]]
 
 
 @all_fields_optional
 class Mount(DockerCamelModel):
-    type: str
-    name: str
-    source: str
-    destination: str
-    driver: str
-    mode: str
-    rw: bool
-    propagation: str
+    type:  Optional[str]
+    name:  Optional[str]
+    source:  Optional[str]
+    destination:  Optional[str]
+    driver:  Optional[str]
+    mode:  Optional[str]
+    rw:  Optional[bool]
+    propagation:  Optional[str]
 
 
 @all_fields_optional
 class ContainerEndpointIPAMConfig(DockerCamelModel):
-    ipv4_address: str
-    ipv6_address: str
-    link_local_ips: List[str]
+    ipv4_address:  Optional[str]
+    ipv6_address:  Optional[str]
+    link_local_ips:  Optional[List[str]]
 
 
 @all_fields_optional
 class NetworkInspectResult(DockerCamelModel):
-    ipam_config: ContainerEndpointIPAMConfig
-    links: List[str]
-    aliases: List[str]
-    network_id: str
-    endpoint_id: str
-    gateway: str
-    ip_address: str
-    ip_prefix_length: int
-    ipv6_gateway: str
-    global_ipv6_address: str
-    global_ipv6_prefix_length: int
-    mac_address: str
-    driver_options: dict
+    ipam_config:  Optional[ContainerEndpointIPAMConfig]
+    links:  Optional[List[str]]
+    aliases:  Optional[List[str]]
+    network_id:  Optional[str]
+    endpoint_id:  Optional[str]
+    gateway:  Optional[str]
+    ip_address:  Optional[str]
+    ip_prefix_length:  Optional[int]
+    ipv6_gateway:  Optional[str]
+    global_ipv6_address:  Optional[str]
+    global_ipv6_prefix_length:  Optional[int]
+    mac_address:  Optional[str]
+    driver_options:  Optional[dict]
 
 
 @all_fields_optional
 class ContainerNetworkAddress(DockerCamelModel):
-    addr: str
-    prefix_len: int
+    addr:  Optional[str]
+    prefix_len:  Optional[int]
 
 
 @all_fields_optional
 class NetworkSettings(DockerCamelModel):
-    bridge: str
-    sandbox_id: str
-    hairpin_mode: bool
-    link_local_ipv6_address: str
-    link_local_ipv6_prefix_length: int
-    ports: dict  # to rework
-    sandbox_key: Path
-    secondary_ip_addresses: List[ContainerNetworkAddress]
-    secondary_ipv6_addresses: List[ContainerNetworkAddress]
-    endpoint_id: str
-    gateway: str
-    global_ipv6_address: str
-    global_ipv6_prefix_length: int
-    ip_address: str
-    ip_prefix_length: int
-    ipv6_gateway: str
-    mac_address: str
-    networks: Dict[str, NetworkInspectResult]
+    bridge:  Optional[str]
+    sandbox_id:  Optional[str]
+    hairpin_mode:  Optional[bool]
+    link_local_ipv6_address:  Optional[str]
+    link_local_ipv6_prefix_length:  Optional[int]
+    ports:  Optional[dict]  # to rework
+    sandbox_key:  Optional[Path]
+    secondary_ip_addresses:  Optional[List[ContainerNetworkAddress]]
+    secondary_ipv6_addresses:  Optional[List[ContainerNetworkAddress]]
+    endpoint_id:  Optional[str]
+    gateway:  Optional[str]
+    global_ipv6_address:  Optional[str]
+    global_ipv6_prefix_length:  Optional[int]
+    ip_address:  Optional[str]
+    ip_prefix_length:  Optional[int]
+    ipv6_gateway:  Optional[str]
+    mac_address:  Optional[str]
+    networks:  Optional[Dict[str, NetworkInspectResult]]
 
 
 @all_fields_optional
 class ContainerGraphDriver(DockerCamelModel):
-    name: str
-    data: Dict[str, Any]
+    name:  Optional[str]
+    data:  Optional[Dict[str, Any]]
 
 
 @all_fields_optional
 class ContainerInspectResult(DockerCamelModel):
-    id: str
-    created: datetime
-    path: str
-    args: List[str]
-    state: ContainerState
-    image: str
-    resolv_conf_path: str
-    hostname_path: Path
-    hosts_path: Path
-    log_path: Path
-    node: Any
-    name: str
-    restart_count: int
-    driver: str
-    platform: str
-    mount_label: str
-    process_label: str
-    app_armor_profile: str
-    exec_ids: List[str]
-    host_config: ContainerHostConfig
-    graph_driver: ContainerGraphDriver
-    size_rw: int
-    size_root_fs: int
-    mounts: List[Mount]
-    config: ContainerConfig
-    network_settings: NetworkSettings
+    id:  Optional[str]
+    created:  Optional[datetime]
+    path:  Optional[str]
+    args:  Optional[List[str]]
+    state:  Optional[ContainerState]
+    image:  Optional[str]
+    resolv_conf_path:  Optional[str]
+    hostname_path:  Optional[Path]
+    hosts_path:  Optional[Path]
+    log_path:  Optional[Path]
+    node: Any = None
+    name:  Optional[str]
+    restart_count:  Optional[int]
+    driver:  Optional[str]
+    platform:  Optional[str]
+    mount_label:  Optional[str]
+    process_label:  Optional[str]
+    app_armor_profile:  Optional[str]
+    exec_ids:  Optional[List[str]]
+    host_config:  Optional[ContainerHostConfig]
+    graph_driver:  Optional[ContainerGraphDriver]
+    size_rw:  Optional[int]
+    size_root_fs:  Optional[int]
+    mounts:  Optional[List[Mount]]
+    config:  Optional[ContainerConfig]
+    network_settings:  Optional[NetworkSettings]

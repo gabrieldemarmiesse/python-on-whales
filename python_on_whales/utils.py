@@ -8,7 +8,7 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
-
+from importlib.metadata import version
 import pydantic
 from typing_extensions import Literal
 
@@ -22,7 +22,7 @@ from python_on_whales.exceptions import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[1]
-
+PYDANTIC_V2 = version("pydantic").startswith("2.")
 
 def title_if_necessary(string: str):
     if string.isupper():
@@ -70,7 +70,11 @@ def to_docker_camel(string):
 class DockerCamelModel(pydantic.BaseModel):
     class Config:
         alias_generator = to_docker_camel
-        allow_population_by_field_name = True
+
+        if PYDANTIC_V2:
+            allow_population_by_field_name = True
+        else:
+            populate_by_name = True
 
 
 @overload
@@ -296,9 +300,10 @@ def read_env_files(env_files: List[Path]) -> Dict[str, str]:
 
 def all_fields_optional(cls):
     """Decorator function used to modify a pydantic model's fields to all be optional."""
-    for field in cls.__fields__.values():
-        field.required = False
-        field.allow_none = True
+    if not PYDANTIC_V2:
+        for field in cls.__fields__.values():
+            field.required = False
+            field.allow_none = True
     return cls
 
 
