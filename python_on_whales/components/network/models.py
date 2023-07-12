@@ -1,39 +1,36 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from python_on_whales.utils import DockerCamelModel, all_fields_optional
+from python_on_whales.utils import DockerCamelModel
 
 
-@all_fields_optional
 class NetworkIPAM(DockerCamelModel):
-    driver: Optional[str]
-    config: Optional[List[Dict[str, Any]]]
-    options: Optional[Dict[str, Any]]
+    driver: Optional[str] = None
+    config: Optional[List[Dict[str, Any]]] = None
+    options: Optional[Dict[str, Any]] = None
 
 
-@all_fields_optional
 class NetworkContainer(DockerCamelModel):
-    name: Optional[str]
-    endpoint_id: Optional[str]
-    mac_address: Optional[str]
-    ipv4_address: Optional[str]
-    ipv6_address: Optional[str]
+    name: Optional[str] = None
+    endpoint_id: Optional[str] = None
+    mac_address: Optional[str] = None
+    ipv4_address: Optional[str] = None
+    ipv6_address: Optional[str] = None
 
 
-@all_fields_optional
 class NetworkInspectResult(DockerCamelModel):
-    name: Optional[str]
-    id: Optional[str]
-    created: Optional[datetime]
-    scope: Optional[str]
-    driver: Optional[str]
-    enable_ipv6: Optional[bool]
-    ipam: Optional[NetworkIPAM]
-    internal: Optional[bool]
-    attachable: Optional[bool]
-    ingress: Optional[bool]
-    containers: Optional[Dict[str, NetworkContainer]]
-    options: Optional[Dict[str, Any]]
-    labels: Optional[Dict[str, str]]
-    config_from: Optional[dict]
-    config_only: Optional[bool]
+    name: Optional[str] = None
+    id: Optional[str] = None
+    created: Optional[datetime] = None
+    scope: Optional[str] = None
+    driver: Optional[str] = None
+    enable_ipv6: Optional[bool] = None
+    ipam: Optional[NetworkIPAM] = None
+    internal: Optional[bool] = None
+    attachable: Optional[bool] = None
+    ingress: Optional[bool] = None
+    containers: Optional[Dict[str, NetworkContainer]] = None
+    options: Optional[Dict[str, Any]] = None
+    labels: Optional[Dict[str, str]] = None
+    config_from: Optional[dict] = None
+    config_only: Optional[bool] = None

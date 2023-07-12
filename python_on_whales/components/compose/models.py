@@ -4,33 +4,26 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
-from python_on_whales.utils import all_fields_optional
 
-
-@all_fields_optional
 class ServicePlacement(BaseModel):
     constraints: Optional[List[str]] = None
 
 
-@all_fields_optional
 class ResourcesLimits(BaseModel):
     cpus: Optional[float] = None
     memory: Optional[int] = None
 
 
-@all_fields_optional
 class ResourcesReservation(BaseModel):
     cpus: Union[float, str, None] = None
     memory: Optional[int] = None
 
 
-@all_fields_optional
 class ServiceResources(BaseModel):
     limits: Optional[ResourcesLimits] = None
     reservations: Optional[ResourcesReservation] = None
 
 
-@all_fields_optional
 class ServiceDeployConfig(BaseModel):
     labels: Optional[Dict[str, str]] = None
     resources: Optional[ServiceResources] = None
@@ -38,17 +31,14 @@ class ServiceDeployConfig(BaseModel):
     replicas: Optional[int] = None
 
 
-@all_fields_optional
 class DependencyCondition(BaseModel):
     condition: Optional[str] = None
 
 
-@all_fields_optional
 class ComposeServiceBuild(BaseModel):
     context: Optional[Path] = None
 
 
-@all_fields_optional
 class ComposeServicePort(BaseModel):
     mode: Optional[str] = None
     protocol: Optional[str] = None
@@ -56,7 +46,6 @@ class ComposeServicePort(BaseModel):
     target: Optional[int] = None
 
 
-@all_fields_optional
 class ComposeServiceVolume(BaseModel):
     bind: Optional[dict] = None
     source: Optional[str] = None
@@ -64,7 +53,6 @@ class ComposeServiceVolume(BaseModel):
     type: Optional[str] = None
 
 
-@all_fields_optional
 class ComposeConfigService(BaseModel):
     deploy: Optional[ServiceDeployConfig] = None
     blkio_config: Optional[Any] = None
@@ -90,7 +78,6 @@ class ComposeConfigService(BaseModel):
     volumes: Optional[List[ComposeServiceVolume]] = None
 
 
-@all_fields_optional
 class ComposeConfigNetwork(BaseModel):
     driver: Optional[str] = None
     name: Optional[str] = None
@@ -103,7 +90,6 @@ class ComposeConfigNetwork(BaseModel):
     labels: Annotated[Dict[str, str], Field(default_factory=dict)]
 
 
-@all_fields_optional
 class ComposeConfigVolume(BaseModel):
     driver: Optional[str] = None
     driver_opts: Optional[Dict[str, Any]] = None
@@ -112,7 +98,6 @@ class ComposeConfigVolume(BaseModel):
     name: Optional[str] = None
 
 
-@all_fields_optional
 class ComposeConfig(BaseModel):
     services: Optional[Dict[str, ComposeConfigService]] = None
     networks: Annotated[

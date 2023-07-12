@@ -300,15 +300,6 @@ def read_env_files(env_files: List[Path]) -> Dict[str, str]:
     return result_dict
 
 
-def all_fields_optional(cls):
-    """Decorator function used to modify a pydantic model's fields to all be optional."""
-    if not PYDANTIC_V2:
-        for field in cls.__fields__.values():
-            field.required = False
-            field.allow_none = True
-    return cls
-
-
 def format_time_arg(time_object):
     if time_object is None:
         return None

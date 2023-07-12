@@ -2,104 +2,91 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from pydantic import Field
+from typing_extensions import Annotated
 
-from python_on_whales.utils import DockerCamelModel, all_fields_optional
+from python_on_whales.utils import DockerCamelModel
 
 
-@all_fields_optional
 class NodeVersion(DockerCamelModel):
-    index: Optional[int]
+    index: Optional[int] = None
 
 
-@all_fields_optional
 class NodeSpec(DockerCamelModel):
-    name: Optional[str]
-    labels: Optional[Dict[str, str]]
-    role: Optional[str]
-    availability: Optional[str]
+    name: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    role: Optional[str] = None
+    availability: Optional[str] = None
 
 
-@all_fields_optional
 class NodePlatform(DockerCamelModel):
-    architecture: Optional[str]
-    os: Optional[str] = Field(None, alias="OS")
+    architecture: Optional[str] = None
+    os: Annotated[Optional[str], Field(alias="OS")] = None
 
 
-@all_fields_optional
 class NodeNamedResourceSpec(DockerCamelModel):
-    kind: Optional[str]
-    value: Optional[str]
+    kind: Optional[str] = None
+    value: Optional[str] = None
 
 
-@all_fields_optional
 class NodeDiscreteResourceSpec(DockerCamelModel):
-    kind: Optional[str]
-    value: Optional[int]
+    kind: Optional[str] = None
+    value: Optional[int] = None
 
 
-@all_fields_optional
 class NodeGenericResource(DockerCamelModel):
-    named_resource_spec: Optional[NodeNamedResourceSpec]
-    discrete_resource_spec: Optional[NodeDiscreteResourceSpec]
+    named_resource_spec: Optional[NodeNamedResourceSpec] = None
+    discrete_resource_spec: Optional[NodeDiscreteResourceSpec] = None
 
 
-@all_fields_optional
 class NodeResource(DockerCamelModel):
-    nano_cpus: Optional[int] = Field(None, alias="NanoCPUs")
-    memory_bytes: Optional[int]
-    generic_resources: Optional[List[NodeGenericResource]]
+    nano_cpus: Annotated[Optional[int], Field(alias="NanoCPUs")] = None
+    memory_bytes: Optional[int] = None
+    generic_resources: Optional[List[NodeGenericResource]] = None
 
 
-@all_fields_optional
 class EnginePlugin(DockerCamelModel):
-    type: Optional[str]
-    name: Optional[str]
+    type: Optional[str] = None
+    name: Optional[str] = None
 
 
-@all_fields_optional
 class NodeEngine(DockerCamelModel):
-    engine_version: Optional[str]
-    labels: Optional[Dict[str, str]]
-    plugins: Optional[List[EnginePlugin]]
+    engine_version: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    plugins: Optional[List[EnginePlugin]] = None
 
 
-@all_fields_optional
 class NodeTLSInfo(DockerCamelModel):
-    trust_root: Optional[str]
-    cert_issuer_subject: Optional[str]
-    cert_issuer_public_key: Optional[str]
+    trust_root: Optional[str] = None
+    cert_issuer_subject: Optional[str] = None
+    cert_issuer_public_key: Optional[str] = None
 
 
-@all_fields_optional
 class NodeDescription(DockerCamelModel):
-    hostname: Optional[str]
-    platform: Optional[NodePlatform]
-    resources: Optional[NodeResource]
-    engine: Optional[NodeEngine]
-    tls_info: Optional[NodeTLSInfo]
+    hostname: Optional[str] = None
+    platform: Optional[NodePlatform] = None
+    resources: Optional[NodeResource] = None
+    engine: Optional[NodeEngine] = None
+    tls_info: Optional[NodeTLSInfo] = None
 
 
-@all_fields_optional
 class NodeStatus(DockerCamelModel):
-    state: Optional[str]
-    message: Optional[str]
-    addr: Optional[str]
+    state: Optional[str] = None
+    message: Optional[str] = None
+    addr: Optional[str] = None
 
 
-@all_fields_optional
 class NodeManagerStatus(DockerCamelModel):
-    leader: Optional[bool]
-    reachability: Optional[str]
-    addr: Optional[str]
+    leader: Optional[bool] = None
+    reachability: Optional[str] = None
+    addr: Optional[str] = None
 
 
-@all_fields_optional
 class NodeInspectResult(DockerCamelModel):
-    id: Optional[str] = Field(None, alias="ID")
-    version: Optional[NodeVersion]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    spec: Optional[NodeSpec]
-    description: Optional[NodeDescription]
-    status: Optional[NodeStatus]
-    manager_status: Optional[NodeManagerStatus]
+    id: Annotated[Optional[str], Field(alias="ID")] = None
+    version: Optional[NodeVersion] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    spec: Optional[NodeSpec] = None
+    description: Optional[NodeDescription] = None
+    status: Optional[NodeStatus] = None
+    manager_status: Optional[NodeManagerStatus] = None

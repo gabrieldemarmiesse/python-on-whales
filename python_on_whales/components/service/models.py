@@ -2,105 +2,93 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from pydantic import Field
+from typing_extensions import Annotated
 
-from python_on_whales.utils import DockerCamelModel, all_fields_optional
+from python_on_whales.utils import DockerCamelModel
 
 
-@all_fields_optional
 class CPUMemoryQuotas(DockerCamelModel):
-    nano_cpus: Optional[int] = Field(None, alias="NanoCPUs")
-    memory_bytes: Optional[int]
+    nano_cpus: Annotated[Optional[int], Field(alias="NanoCPUs")] = None
+    memory_bytes: Optional[int] = None
 
 
-@all_fields_optional
 class Resources(DockerCamelModel):
-    limits: Optional[CPUMemoryQuotas]
-    reservations: Optional[CPUMemoryQuotas]
+    limits: Optional[CPUMemoryQuotas] = None
+    reservations: Optional[CPUMemoryQuotas] = None
 
 
-@all_fields_optional
 class ContainerSpec(DockerCamelModel):
-    image: Optional[str]
-    labels: Optional[Dict[str, str]]
-    privileges: Optional[Dict[str, Optional[str]]]
-    stop_grace_period: Optional[int]
-    isolation: Optional[str]
-    env: Optional[List[str]]
+    image: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    privileges: Optional[Dict[str, Optional[str]]] = None
+    stop_grace_period: Optional[int] = None
+    isolation: Optional[str] = None
+    env: Optional[List[str]] = None
 
 
-@all_fields_optional
 class TaskTemplate(DockerCamelModel):
-    container_spec: Optional[ContainerSpec]
-    resources: Optional[Resources]
+    container_spec: Optional[ContainerSpec] = None
+    resources: Optional[Resources] = None
 
 
-@all_fields_optional
 class ChangeConfig(DockerCamelModel):
-    parallelism: Optional[int]
-    failure_action: Optional[str]
-    monitor: Optional[int]
-    max_failure_ratio: Optional[int]
-    order: Optional[str]
+    parallelism: Optional[int] = None
+    failure_action: Optional[str] = None
+    monitor: Optional[int] = None
+    max_failure_ratio: Optional[int] = None
+    order: Optional[str] = None
 
 
-@all_fields_optional
 class ServiceSpec(DockerCamelModel):
-    name: Optional[str]
-    labels: Optional[Dict[str, str]]
-    mode: Optional[Dict[str, Any]]
-    update_config: Optional[ChangeConfig]
-    rollback_config: Optional[ChangeConfig]
-    task_template: Optional[TaskTemplate]
+    name: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    mode: Optional[Dict[str, Any]] = None
+    update_config: Optional[ChangeConfig] = None
+    rollback_config: Optional[ChangeConfig] = None
+    task_template: Optional[TaskTemplate] = None
 
 
-@all_fields_optional
 class ServiceVersion(DockerCamelModel):
-    index: Optional[int]
+    index: Optional[int] = None
 
 
-@all_fields_optional
 class EndpointPortConfig(DockerCamelModel):
-    name: Optional[str]
-    protocol: Optional[str]
-    target_port: Optional[int]
-    published_port: Optional[int]
-    publish_mode: Optional[str]
+    name: Optional[str] = None
+    protocol: Optional[str] = None
+    target_port: Optional[int] = None
+    published_port: Optional[int] = None
+    publish_mode: Optional[str] = None
 
 
-@all_fields_optional
 class ServiceEndpointSpec(DockerCamelModel):
-    mode: Optional[str]
-    ports: Optional[List[EndpointPortConfig]]
+    mode: Optional[str] = None
+    ports: Optional[List[EndpointPortConfig]] = None
 
 
-@all_fields_optional
 class VirtualIP(DockerCamelModel):
-    network_id: Optional[str]
-    addr: Optional[str]
+    network_id: Optional[str] = None
+    addr: Optional[str] = None
 
 
-@all_fields_optional
 class ServiceEndpoint(DockerCamelModel):
-    spec: Optional[ServiceEndpointSpec]
-    ports: Optional[List[EndpointPortConfig]]
-    virtual_ips: Optional[List[VirtualIP]]
+    spec: Optional[ServiceEndpointSpec] = None
+    ports: Optional[List[EndpointPortConfig]] = None
+    virtual_ips: Optional[List[VirtualIP]] = None
 
 
-@all_fields_optional
 class ServiceUpdateStatus(DockerCamelModel):
-    state: Optional[str]
-    started_at: Optional[str]
-    completed_at: Optional[str]
-    message: Optional[str]
+    state: Optional[str] = None
+    started_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    message: Optional[str] = None
 
 
-@all_fields_optional
 class ServiceInspectResult(DockerCamelModel):
-    id: Optional[str] = Field(None, alias="ID")
-    version: Optional[ServiceVersion]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    spec: Optional[ServiceSpec]
-    previous_spec: Optional[ServiceSpec]
-    endpoint: Optional[ServiceEndpoint]
-    update_status: Optional[ServiceUpdateStatus]
+    id: Annotated[Optional[str], Field(alias="ID")] = None
+    version: Optional[ServiceVersion] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    spec: Optional[ServiceSpec] = None
+    previous_spec: Optional[ServiceSpec] = None
+    endpoint: Optional[ServiceEndpoint] = None
+    update_status: Optional[ServiceUpdateStatus] = None

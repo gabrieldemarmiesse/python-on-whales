@@ -2,177 +2,158 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import pydantic
+from typing_extensions import Annotated
 
-from python_on_whales.utils import DockerCamelModel, all_fields_optional
+from python_on_whales.utils import DockerCamelModel
 
 
-@all_fields_optional
 class ObjectVersion(DockerCamelModel):
-    index: Optional[int]
+    index: Optional[int] = None
 
 
-@all_fields_optional
 class NamedResourceSpec(DockerCamelModel):
-    kind: Optional[str]
-    value: Optional[str]
+    kind: Optional[str] = None
+    value: Optional[str] = None
 
 
-@all_fields_optional
 class DiscreteResourceSpec(DockerCamelModel):
-    kind: Optional[str]
-    value: Optional[int]
+    kind: Optional[str] = None
+    value: Optional[int] = None
 
 
-@all_fields_optional
 class AssignedGenericResources(DockerCamelModel):
-    named_resource_spec: Optional[NamedResourceSpec]
-    discrete_resource_spec: Optional[DiscreteResourceSpec]
+    named_resource_spec: Optional[NamedResourceSpec] = None
+    discrete_resource_spec: Optional[DiscreteResourceSpec] = None
 
 
-@all_fields_optional
 class ContainerStatus(DockerCamelModel):
-    container_id: Optional[str] = pydantic.Field(None, alias="ContainerID")
-    pid: Optional[int] = pydantic.Field(None, alias="PID")
-    exit_code: Optional[int]
+    container_id: Annotated[Optional[str], pydantic.Field(alias="ContainerID")] = None
+    pid: Annotated[Optional[int], pydantic.Field(alias="PID")] = None
+    exit_code: Optional[int] = None
 
 
-@all_fields_optional
 class TaskStatus(DockerCamelModel):
-    timestamp: Optional[datetime]
-    state: Optional[str]
-    message: Optional[str]
-    err: Optional[str]
-    container_status: Optional[ContainerStatus]
+    timestamp: Optional[datetime] = None
+    state: Optional[str] = None
+    message: Optional[str] = None
+    err: Optional[str] = None
+    container_status: Optional[ContainerStatus] = None
 
 
-@all_fields_optional
 class LogDriver(DockerCamelModel):
-    name: Optional[str]
-    options: Optional[Dict[str, str]]
+    name: Optional[str] = None
+    options: Optional[Dict[str, str]] = None
 
 
-@all_fields_optional
 class NetworkAttachmentConfig(DockerCamelModel):
-    target: Optional[str]
-    aliases: Optional[List[str]]
-    driver_opts: Optional[Dict[str, str]]
+    target: Optional[str] = None
+    aliases: Optional[List[str]] = None
+    driver_opts: Optional[Dict[str, str]] = None
 
 
-@all_fields_optional
 class Platform(DockerCamelModel):
-    architecture: Optional[str]
-    os: Optional[str] = pydantic.Field(None, alias="OS")
+    architecture: Optional[str] = None
+    os: Annotated[Optional[str], pydantic.Field(alias="OS")] = None
 
 
-@all_fields_optional
 class Spread(DockerCamelModel):
-    spread_descriptor: Optional[str]
+    spread_descriptor: Optional[str] = None
 
 
-@all_fields_optional
 class Placement(DockerCamelModel):
-    constraints: Optional[List[str]]
-    preferences: Optional[List[Spread]]
-    max_replicas: Optional[int]
-    platforms: Optional[List[Platform]]
+    constraints: Optional[List[str]] = None
+    preferences: Optional[List[Spread]] = None
+    max_replicas: Optional[int] = None
+    platforms: Optional[List[Platform]] = None
 
 
-@all_fields_optional
 class RestartPolicy(DockerCamelModel):
-    condition: Optional[str]
-    delay: Optional[int]
-    max_attempts: Optional[int]
-    window: Optional[int]
+    condition: Optional[str] = None
+    delay: Optional[int] = None
+    max_attempts: Optional[int] = None
+    window: Optional[int] = None
 
 
-@all_fields_optional
 class PluginPrivilege(DockerCamelModel):
-    name: Optional[str]
-    description: Optional[str]
-    value: Optional[List[str]]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    value: Optional[List[str]] = None
 
 
-@all_fields_optional
 class PluginSpec(DockerCamelModel):
-    name: Optional[str]
-    remote: Optional[str]
-    disabled: Optional[bool]
-    plugin_privilege: Optional[List[PluginPrivilege]]
+    name: Optional[str] = None
+    remote: Optional[str] = None
+    disabled: Optional[bool] = None
+    plugin_privilege: Optional[List[PluginPrivilege]] = None
 
 
-@all_fields_optional
 class ContainerSpec(DockerCamelModel):
-    image: Optional[str]
-    labels: Optional[Dict[str, str]]
-    command: Optional[List[str]]
-    args: Optional[List[str]]
-    hostname: Optional[str]
-    env: Optional[List[str]]
-    dir: Optional[str]
-    user: Optional[str]
-    groups: Optional[List[str]]
-    privileges: Optional[Any]
-    tty: Optional[bool] = pydantic.Field(None, alias="TTY")
-    open_stdin: Optional[bool]
-    read_only: Optional[bool]
-    mounts: Optional[List[Any]]
-    stop_signal: Optional[str]
-    stop_grace_period: Optional[int]
+    image: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    command: Optional[List[str]] = None
+    args: Optional[List[str]] = None
+    hostname: Optional[str] = None
+    env: Optional[List[str]] = None
+    dir: Optional[str] = None
+    user: Optional[str] = None
+    groups: Optional[List[str]] = None
+    privileges: Any = None
+    tty: Annotated[Optional[bool], pydantic.Field(alias="TTY")] = None
+    open_stdin: Optional[bool] = None
+    read_only: Optional[bool] = None
+    mounts: Optional[List[Any]] = None
+    stop_signal: Optional[str] = None
+    stop_grace_period: Optional[int] = None
     health_check: Any = None
-    hosts: Optional[List[str]]
+    hosts: Optional[List[str]] = None
     dns_config: Any = None
-    secrets: Optional[List[Any]]
-    configs: Optional[List[Any]]
-    isolation: Optional[str]
-    init: Optional[bool]
-    sysctls: Optional[Any]
+    secrets: Optional[List[Any]] = None
+    configs: Optional[List[Any]] = None
+    isolation: Optional[str] = None
+    init: Optional[bool] = None
+    sysctls: Optional[Any] = None
 
 
-@all_fields_optional
 class NetworkAttachmentSpec(DockerCamelModel):
-    container_id: Optional[str] = pydantic.Field(None, alias="ContainerID")
+    container_id: Annotated[Optional[str], pydantic.Field(alias="ContainerID")] = None
 
 
-@all_fields_optional
 class ResourceObject(DockerCamelModel):
-    nano_cpus: Optional[int] = pydantic.Field(None, alias="NanoCPUs")
-    memory_bytes: Optional[int]
-    generic_resources: Optional[List[AssignedGenericResources]]
+    nano_cpus: Annotated[Optional[int], pydantic.Field(alias="NanoCPUs")] = None
+    memory_bytes: Optional[int] = None
+    generic_resources: Optional[List[AssignedGenericResources]] = None
 
 
-@all_fields_optional
 class Resources(DockerCamelModel):
-    limits: Optional[ResourceObject]
-    reservation: Optional[ResourceObject]
+    limits: Optional[ResourceObject] = None
+    reservation: Optional[ResourceObject] = None
 
 
-@all_fields_optional
 class TaskSpec(DockerCamelModel):
     # TODO: set types for Any
-    plugin_spec: Optional[PluginSpec]
-    container_spec: Optional[ContainerSpec]
-    network_attachment_spec: Optional[NetworkAttachmentSpec]
-    resources: Optional[Resources]
+    plugin_spec: Optional[PluginSpec] = None
+    container_spec: Optional[ContainerSpec] = None
+    network_attachment_spec: Optional[NetworkAttachmentSpec] = None
+    resources: Optional[Resources] = None
     restart_policy: Any = None
-    placement: Optional[Placement]
-    force_update: Optional[int]
-    runtime: Optional[str]
-    networks: Optional[List[NetworkAttachmentConfig]]
-    log_driver: Optional[LogDriver]
+    placement: Optional[Placement] = None
+    force_update: Optional[int] = None
+    runtime: Optional[str] = None
+    networks: Optional[List[NetworkAttachmentConfig]] = None
+    log_driver: Optional[LogDriver] = None
 
 
-@all_fields_optional
 class TaskInspectResult(DockerCamelModel):
-    id: Optional[str] = pydantic.Field(None, alias="ID")
-    version: Optional[ObjectVersion]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    name: Optional[str]
-    labels: Optional[Dict[str, str]]
-    spec: Optional[TaskSpec]
-    service_id: Optional[str] = pydantic.Field(None, alias="ServiceID")
-    slot: Optional[int]
-    node_id: Optional[str] = pydantic.Field(None, alias="NodeID")
-    assigned_generic_resources: Optional[List[AssignedGenericResources]]
-    status: Optional[TaskStatus]
-    desired_state: Optional[str]
+    id: Annotated[Optional[str], pydantic.Field(alias="ID")] = None
+    version: Optional[ObjectVersion] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    name: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    spec: Optional[TaskSpec] = None
+    service_id: Annotated[Optional[str], pydantic.Field(alias="ServiceID")] = None
+    slot: Optional[int] = None
+    node_id: Annotated[Optional[str], pydantic.Field(alias="NodeID")] = None
+    assigned_generic_resources: Optional[List[AssignedGenericResources]] = None
+    status: Optional[TaskStatus] = None
+    desired_state: Optional[str] = None
