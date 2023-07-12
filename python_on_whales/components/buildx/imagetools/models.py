@@ -32,8 +32,8 @@ class ImageVariantManifest(pydantic.BaseModel):
 
 
 class Manifest(pydantic.BaseModel):
-    media_type:  Optional[str] = pydantic.Field(alias="mediaType")
-    schema_version:  Optional[int] = pydantic.Field(alias="schemaVersion")
+    media_type: Optional[str] = pydantic.Field(alias="mediaType")
+    schema_version: Optional[int] = pydantic.Field(alias="schemaVersion")
     layers: Optional[List[ManifestLayer]]
     manifests: Optional[List[ImageVariantManifest]]
     config: Optional[ManifestConfig]

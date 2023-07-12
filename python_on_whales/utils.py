@@ -3,12 +3,13 @@ import signal
 import subprocess
 import sys
 from datetime import datetime, timedelta
+from importlib.metadata import version
 from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
-from importlib.metadata import version
+
 import pydantic
 from typing_extensions import Literal
 
@@ -23,6 +24,7 @@ from python_on_whales.exceptions import (
 
 PROJECT_ROOT = Path(__file__).parents[1]
 PYDANTIC_V2 = version("pydantic").startswith("2.")
+
 
 def title_if_necessary(string: str):
     if string.isupper():
