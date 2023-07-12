@@ -14,12 +14,11 @@ class DockerEventActor(DockerCamelModel):
     attributes: Optional[Dict[str, Any]] = pydantic.Field(None, alias="Attributes")
 
 
-@all_fields_optional
 class DockerEvent(DockerCamelModel):
     type: Optional[str] = pydantic.Field(None, alias="Type")
     action: Optional[str] = pydantic.Field(None, alias="Action")
     actor: Optional[DockerEventActor] = pydantic.Field(None, alias="Actor")
-    time: Optional[datetime]
+    time: Optional[datetime] = pydantic.Field(None, alias="time")
     time_nano: Optional[int] = pydantic.Field(None, alias="timeNano")
 
 
