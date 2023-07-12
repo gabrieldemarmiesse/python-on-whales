@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 import pydantic
+from typing_extensions import Annotated
 
 from python_on_whales.utils import DockerCamelModel
 
@@ -16,15 +17,15 @@ class ConfigSpecDriver(DockerCamelModel):
 
 
 class ConfigSpec(DockerCamelModel):
-    name: Optional[str]
-    labels: Optional[Dict[str, str]]
-    data: Optional[str]
-    templating: Optional[ConfigSpecDriver]
+    name: Optional[str] = None
+    labels: Optional[Dict[str, str]] = None
+    data: Optional[str] = None
+    templating: Optional[ConfigSpecDriver] = None
 
 
 class ConfigInspectResult(DockerCamelModel):
-    id: Optional[str] = pydantic.Field(None, alias="ID")
-    version: Optional[DockerObjectVersion]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    spec: Optional[ConfigSpec]
+    id: Annotated[Optional[str], pydantic.Field(alias="ID")] = None
+    version: Optional[DockerObjectVersion] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    spec: Optional[ConfigSpec] = None
