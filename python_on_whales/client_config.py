@@ -242,7 +242,7 @@ class ReloadableObjectFromJson(ReloadableObject):
         json_object = json.loads(json_str)[0]
         try:
             return self._parse_json_object(json_object)
-        except pydantic.error_wrappers.ValidationError as err:
+        except pydantic.ValidationError as err:
             fd, json_response_file = tempfile.mkstemp(suffix=".json", text=True)
             with open(json_response_file, "w") as f:
                 f.write(json_str)
