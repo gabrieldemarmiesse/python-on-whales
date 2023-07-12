@@ -7,24 +7,24 @@ from python_on_whales.utils import DockerCamelModel
 
 
 class DockerObjectVersion(DockerCamelModel):
-    index: int
+    index: Optional[int] = None
 
 
 class ConfigSpecDriver(DockerCamelModel):
-    name: str
-    options: Dict[str, Any]
+    name: Optional[str] = None
+    options: Optional[Dict[str, Any]] = None
 
 
 class ConfigSpec(DockerCamelModel):
-    name: str
-    labels: Dict[str, str]
-    data: str
+    name: Optional[str]
+    labels: Optional[Dict[str, str]]
+    data: Optional[str]
     templating: Optional[ConfigSpecDriver]
 
 
 class ConfigInspectResult(DockerCamelModel):
-    id: str = pydantic.Field(alias="ID")
-    version: DockerObjectVersion
-    created_at: datetime
-    updated_at: datetime
-    spec: ConfigSpec
+    id: Optional[str] = pydantic.Field(None, alias="ID")
+    version: Optional[DockerObjectVersion]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    spec: Optional[ConfigSpec]
