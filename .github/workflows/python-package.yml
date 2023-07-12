@@ -73,7 +73,7 @@ jobs:
       - name: Run test
         run: |
           bash tests/ci-setup.sh
-          pip install --upgrade pydantic==${{ matrix.component }}.*
+          pip install --upgrade pydantic==${{ matrix.pydantic-version }}.*
           python -m pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
 
   build-linux-test-without-any-binary:
