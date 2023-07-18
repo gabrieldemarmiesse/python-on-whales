@@ -5,7 +5,7 @@ PARAMETER_BLACKLIST = ['--password']
 
 def sanitized_command_string(command_launched: List[str]) -> str:
     """
-    iterates through the command launched and replaces the 
+    iterates through the command launched and replaces the
     value for the paramter in the PARAMETER_BLACKLIST
 
     Args:
