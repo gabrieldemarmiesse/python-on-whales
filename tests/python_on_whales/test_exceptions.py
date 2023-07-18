@@ -25,11 +25,11 @@ def test_exception_attributes():
 
 def test_exception_hide_password():
     # Exception has to be sanitized
-    with pytest.raises(DockerException, match=r".*\s(--password\s\*\*\*\s).*") as excinfo:
+    with pytest.raises(
+        DockerException, match=r".*\s(--password\s\*\*\*\s).*"
+    ) as excinfo:
         docker.login(
-            username="ignore_user",
-            password="ignore_password",
-            server="ignore_server"
+            username="ignore_user", password="ignore_password", server="ignore_server"
         )
     exception = excinfo.value
     assert "The docker command executed was" in str(exception)
@@ -38,7 +38,7 @@ def test_exception_hide_password():
         "--username",
         "ignore_user",
         "--password",
-        "ignore_password"
+        "ignore_password",
     ]
     assert exception.return_code > 0
     assert not exception.stdout
