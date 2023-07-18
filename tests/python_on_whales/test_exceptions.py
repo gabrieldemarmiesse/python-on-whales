@@ -22,6 +22,7 @@ def test_exception_attributes():
     assert not exception.stdout
     assert "wrong::" in exception.stderr
 
+
 def test_exception_hide_password():
     # Exception has to be sanitized
     with pytest.raises(DockerException, match=r".*\s(--password\s\*\*\*\s).*") as excinfo:
