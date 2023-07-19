@@ -209,14 +209,18 @@ class DockerClient(DockerCLICaller):
             username: The username
             password: The password
         """
-        full_cmd = self.docker_cmd + ["login"]
+        full_cmd = self.docker_cmd + ["login", "--password-stdin"]
 
         full_cmd.add_simple_arg("--username", username)
-        full_cmd.add_simple_arg("--password", password)
         if server is not None:
             full_cmd.append(server)
 
-        run(full_cmd, capture_stderr=False, capture_stdout=False)
+        run(
+            full_cmd,
+            capture_stderr=False,
+            capture_stdout=False,
+            input=str.encode(password),
+        )
 
     def logout(self, server: Optional[str] = None):
         """Logout from a Docker registry

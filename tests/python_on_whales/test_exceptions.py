@@ -21,3 +21,15 @@ def test_exception_attributes():
     assert exception.return_code > 0
     assert not exception.stdout
     assert "wrong::" in exception.stderr
+
+
+def test_not_showing_password_in_exception():
+    chosen_password = "ignore_password"
+    with pytest.raises(DockerException) as excinfo:
+        docker.login(username="ignore_user", password=chosen_password)
+    exception = excinfo.value
+    assert "The docker command executed was" in str(exception)
+    assert chosen_password not in str(exception)
+    assert chosen_password not in exception.docker_command
+    assert exception.return_code > 0
+    assert not exception.stdout
