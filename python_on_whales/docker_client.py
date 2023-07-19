@@ -219,7 +219,7 @@ class DockerClient(DockerCLICaller):
             full_cmd,
             capture_stderr=False,
             capture_stdout=False,
-            input=str.encode(password),
+            input=password.encode(),
         )
 
     def logout(self, server: Optional[str] = None):
