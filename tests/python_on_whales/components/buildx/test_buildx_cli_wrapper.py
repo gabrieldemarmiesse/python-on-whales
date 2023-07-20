@@ -293,7 +293,7 @@ def test_buildx_build_attestations(tmp_path, kwargs):
 
 # Does the build work when passing extra contexts
 # without making use of them in the Dockerfile
-@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_build_context1(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, build_contexts=dict(test_context="."))
@@ -301,7 +301,7 @@ def test_buildx_build_build_context1(tmp_path):
 
 # Does the build work when passing extra contexts
 # when the Dockerfile does make use of them
-@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("with_container_driver")
 @pytest.mark.parametrize(
     "test_context",
     [
@@ -336,7 +336,7 @@ def test_buildx_build_build_context_oci(tmp_path):
 
 
 # Test with docker image
-@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_build_context_image(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content3)
     docker.buildx.build(
@@ -347,7 +347,7 @@ def test_buildx_build_build_context_image(tmp_path):
 
 # Does the build fail when NOT passing extra contexts
 # when the dockerfile does make use of them
-@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_build_context_fail(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content2)
     with pytest.raises(DockerException):
