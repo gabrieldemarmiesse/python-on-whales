@@ -56,13 +56,7 @@ def with_oci_layout_compliant_dir(tmp_path):
 
     current_builder = docker.buildx.inspect()
     with docker.buildx.create(use=True):
-        docker.buildx.build(
-            tmp_path,
-            output={
-                "type": "oci",
-                "dest": tar_path
-            }
-        )
+        docker.buildx.build(tmp_path, output={"type": "oci", "dest": tar_path})
     docker.buildx.use(current_builder)
 
     # Extract tar to directory
@@ -307,20 +301,14 @@ def test_buildx_build_build_context1(tmp_path):
     "test_context",
     [
         # Test with local directory
-        os.path.join(
-            os.path.dirname(__file__),
-            "../../../.."
-        ),
+        os.path.join(os.path.dirname(__file__), "../../../.."),
         # Test with git repo
         "https://github.com/gabrieldemarmiesse/python-on-whales.git",
     ],
 )
 def test_buildx_build_build_context2(tmp_path, test_context):
     (tmp_path / "Dockerfile").write_text(dockerfile_content2)
-    docker.buildx.build(
-        tmp_path,
-        build_contexts=dict(test_context=test_context)
-    )
+    docker.buildx.build(tmp_path, build_contexts=dict(test_context=test_context))
 
 
 # Test with oci layout compliant directory
@@ -332,7 +320,7 @@ def test_buildx_build_build_context_oci(tmp_path):
         tmp_path,
         build_contexts=dict(
             test_context=f"oci-layout://{os.path.join(tmp_path, 'oci-layout')}"
-        )
+        ),
     )
 
 
