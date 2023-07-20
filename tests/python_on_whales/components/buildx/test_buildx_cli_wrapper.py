@@ -46,20 +46,23 @@ def with_container_driver():
     docker.buildx.use(current_builder)
 
 @pytest.fixture
-@pytest.mark.usefixtures("with_container_driver")
 def with_oci_layout_compliant_dir(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
 
     # Build the oci layout compliant directory
     tar_path = os.path.join(tmp_path, "oci-layout.tar")
     oci_folder_path = os.path.join(tmp_path, "oci-layout")
-    docker.buildx.build(
-        tmp_path,
-        output={
-            "type": "oci",
-            "dest": tar_path
-        }
-    )
+
+    current_builder = docker.buildx.inspect()
+    with docker.buildx.create(use=True):
+        docker.buildx.build(
+            tmp_path,
+            output={
+                "type": "oci",
+                "dest": tar_path
+            }
+        )
+    docker.buildx.use(current_builder)
 
     # Extract tar to directory
     tar = tarfile.open(tar_path)
@@ -290,7 +293,7 @@ def test_buildx_build_attestations(tmp_path, kwargs):
 
 # Does the build work when passing extra contexts
 # without making use of them in the Dockerfile
-@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_build_context1(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, build_contexts=dict(test_context="."))
@@ -298,7 +301,7 @@ def test_buildx_build_build_context1(tmp_path):
 
 # Does the build work when passing extra contexts
 # when the Dockerfile does make use of them
-@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.parametrize(
     "test_context",
     [
@@ -321,6 +324,7 @@ def test_buildx_build_build_context2(tmp_path, test_context):
 
 # Test with oci layout compliant directory
 @pytest.mark.usefixtures("with_oci_layout_compliant_dir")
+@pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_build_context_oci(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content4)
     docker.buildx.build(
@@ -332,7 +336,7 @@ def test_buildx_build_build_context_oci(tmp_path):
 
 
 # Test with docker image
-@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_build_context_image(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content3)
     docker.buildx.build(
@@ -343,7 +347,7 @@ def test_buildx_build_build_context_image(tmp_path):
 
 # Does the build fail when NOT passing extra contexts
 # when the dockerfile does make use of them
-@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_build_context_fail(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content2)
     with pytest.raises(DockerException):
