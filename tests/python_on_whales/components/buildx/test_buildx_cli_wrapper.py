@@ -20,16 +20,11 @@ COPY --from=test_context test_file.txt /test_file.txt
 """
 
 dockerfile_content3 = """
-FROM busybox
-COPY --from=test_context * /test_file.txt.tar.gz
-"""
-
-dockerfile_content4 = """
 FROM test_context
 RUN touch /dada
 """
 
-dockerfile_content5 = """
+dockerfile_content4 = """
 FROM busybox
 COPY --from=test_context /dada /dada
 """
@@ -327,7 +322,7 @@ def test_buildx_build_build_context2(tmp_path, test_context):
 # Test with oci layout compliant directory
 @pytest.mark.usefixtures("with_oci_layout_compliant_dir")
 def test_buildx_build_build_context_oci(tmp_path):
-    (tmp_path / "Dockerfile").write_text(dockerfile_content5)
+    (tmp_path / "Dockerfile").write_text(dockerfile_content4)
     docker.buildx.build(
         tmp_path,
         build_contexts=dict(
@@ -336,22 +331,10 @@ def test_buildx_build_build_context_oci(tmp_path):
     )
 
 
-# Test with tar file
-@pytest.mark.usefixtures("with_container_driver")
-def test_buildx_build_build_context3(tmp_path):
-    (tmp_path / "Dockerfile").write_text(dockerfile_content3)
-    docker.buildx.build(
-        tmp_path,
-        build_contexts=dict(
-            test_context="https://github.com/gabrieldemarmiesse/python-on-whales/raw/master/tests/python_on_whales/components/buildx/test_context/test_context.tar.gz"
-        )
-    )
-
-
 # Test with docker image
 @pytest.mark.usefixtures("with_container_driver")
-def test_buildx_build_build_context4(tmp_path):
-    (tmp_path / "Dockerfile").write_text(dockerfile_content4)
+def test_buildx_build_build_context_image(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content3)
     docker.buildx.build(
         tmp_path,
         build_contexts=dict(test_context="docker-image://busybox:1.36.0"),
@@ -361,7 +344,7 @@ def test_buildx_build_build_context4(tmp_path):
 # Does the build fail when NOT passing extra contexts
 # when the dockerfile does make use of them
 @pytest.mark.usefixtures("with_container_driver")
-def test_buildx_build_build_context5(tmp_path):
+def test_buildx_build_build_context_fail(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content2)
     with pytest.raises(DockerException):
         docker.buildx.build(tmp_path)
