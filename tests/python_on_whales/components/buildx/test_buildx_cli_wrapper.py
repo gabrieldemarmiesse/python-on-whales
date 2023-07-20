@@ -60,9 +60,8 @@ def with_oci_layout_compliant_dir(tmp_path):
     docker.buildx.use(current_builder)
 
     # Extract tar to directory
-    tar = tarfile.open(tar_path)
-    tar.extractall(oci_folder_path)
-    tar.close()
+    with tarfile.open(tar_path) as tar:
+        tar.extractall(oci_folder_path)
 
 
 @pytest.mark.usefixtures("with_docker_driver")
@@ -301,7 +300,7 @@ def test_buildx_build_build_context1(tmp_path):
     "test_context",
     [
         # Test with local directory
-        os.path.join(os.path.dirname(__file__), "../../../.."),
+        PROJECT_ROOT,
         # Test with git repo
         "https://github.com/gabrieldemarmiesse/python-on-whales.git",
     ],
