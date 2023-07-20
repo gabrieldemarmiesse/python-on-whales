@@ -16,7 +16,7 @@ RUN touch /dada
 
 dockerfile_content2 = """
 FROM busybox
-COPY --from=test_context test_file.txt /test_file.txt
+COPY --from=test_context README.md /README.md
 """
 
 dockerfile_content3 = """
@@ -305,10 +305,10 @@ def test_buildx_build_build_context1(tmp_path):
         # Test with local directory
         os.path.join(
             os.path.dirname(__file__),
-            "test_context"
+            "../../../.."
         ),
         # Test with git repo
-        "https://github.com/gabrieldemarmiesse/python-on-whales.git#master:tests/python_on_whales/components/buildx/test_context",
+        "https://github.com/gabrieldemarmiesse/python-on-whales.git",
     ],
 )
 def test_buildx_build_build_context2(tmp_path, test_context):
