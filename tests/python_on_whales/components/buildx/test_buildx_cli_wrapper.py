@@ -1,4 +1,5 @@
 import os
+import tarfile
 
 import pytest
 
@@ -28,6 +29,11 @@ FROM test_context
 RUN touch /dada
 """
 
+dockerfile_content5 = """
+FROM busybox
+COPY --from=test_context /dada /dada
+"""
+
 
 @pytest.fixture
 def with_docker_driver():
@@ -43,6 +49,27 @@ def with_container_driver():
     with docker.buildx.create(use=True):
         yield
     docker.buildx.use(current_builder)
+
+@pytest.fixture
+@pytest.mark.usefixtures("with_container_driver")
+def with_oci_layout_compliant_dir(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+
+    # Build the oci layout compliant directory
+    tar_path = os.path.join(tmp_path, "oci-layout.tar")
+    oci_folder_path = os.path.join(tmp_path, "oci-layout")
+    docker.buildx.build(
+        tmp_path,
+        output={
+            "type": "oci",
+            "dest": tar_path
+        }
+    )
+
+    # Extract tar to directory
+    tar = tarfile.open(tar_path)
+    tar.extractall(oci_folder_path)
+    tar.close()
 
 
 @pytest.mark.usefixtures("with_docker_driver")
@@ -297,6 +324,18 @@ def test_buildx_build_build_context2(tmp_path, test_context):
     )
 
 
+# Test with oci layout compliant directory
+@pytest.mark.usefixtures("with_oci_layout_compliant_dir")
+def test_buildx_build_build_context_oci(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content5)
+    docker.buildx.build(
+        tmp_path,
+        build_contexts=dict(
+            test_context=f"oci-layout://{os.path.join(tmp_path, 'oci-layout')}"
+        )
+    )
+
+
 # Test with tar file
 @pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_build_context3(tmp_path):
@@ -309,6 +348,7 @@ def test_buildx_build_build_context3(tmp_path):
     )
 
 
+# Test with docker image
 @pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_build_context4(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content4)
