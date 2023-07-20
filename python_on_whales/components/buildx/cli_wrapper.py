@@ -123,7 +123,7 @@ class BuildxCLI(DockerCLICaller):
         The CLI docs is [here](https://github.com/docker/buildx#buildx-bake-options-target)
         and it contains a lot more information.
 
-        # Arguments
+        Parameters:
             targets: Targets or groups of targets to build.
             builder: The builder to use.
             files: Build definition file(s)
@@ -246,7 +246,7 @@ class BuildxCLI(DockerCLICaller):
         If no image is loaded into the Docker daemon (if `push=True` for ex),
         then `None` is returned.
 
-        # Arguments
+        Parameters:
             context_path: The path of the build context.
             add_hosts: Hosts to add. `add_hosts={"my_host1": "192.168.32.35"}`
             allow: List of extra privileges.
@@ -448,7 +448,7 @@ class BuildxCLI(DockerCLICaller):
     ) -> Builder:
         """Create a new builder instance
 
-        # Arguments
+        Parameters:
             context_or_endpoint:
             buildkitd_flags: Flags for buildkitd daemon
             config: BuildKit config file
@@ -484,7 +484,7 @@ class BuildxCLI(DockerCLICaller):
     def inspect(self, x: Optional[str] = None) -> Builder:
         """Returns a builder instance from the name.
 
-        # Arguments
+        Parameters:
             x: If `None` (the default), returns the current builder. If a string is provided,
                 the builder that has this name is returned.
 
@@ -510,7 +510,7 @@ class BuildxCLI(DockerCLICaller):
     def prune(self, all: bool = False, filters: Dict[str, str] = {}) -> None:
         """Remove build cache on the current builder.
 
-        # Arguments
+        Parameters:
             all: Remove all cache, not just dangling layers
             filters: Filters to use, for example `filters=dict(until="24h")`
         """
@@ -522,7 +522,7 @@ class BuildxCLI(DockerCLICaller):
     def remove(self, builder: Union[Builder, str]) -> None:
         """Remove a builder
 
-        # Arguments
+        Parameters:
             builder: The builder to remove
         """
         full_cmd = self.docker_cmd + ["buildx", "rm"]
@@ -533,7 +533,7 @@ class BuildxCLI(DockerCLICaller):
     def stop(self, builder: Optional[ValidBuilder]) -> None:
         """Stop the builder instance
 
-        # Arguments:
+        Parameters:
             builder: The builder to stop. If `None` (the default value),
                 the current builder is stopped.
         """
@@ -547,7 +547,7 @@ class BuildxCLI(DockerCLICaller):
     ) -> None:
         """Set the current builder instance
 
-        # Arguments
+        Parameters:
             builder: The builder to use
             default: Set builder as default for the current context
             global_: Builder will be used even when changing contexts

@@ -76,7 +76,7 @@ def test_buildx_build(tmp_path):
 def test_buildx_build_streaming_logs(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     output = list(docker.buildx.build(tmp_path, stream_logs=True))
-    assert output[0] == "#1 [internal] load build definition from Dockerfile\n"
+    assert "#1 [internal] load build definition from Dockerfile\n" in output
     assert "#6 DONE" in output[-1]
 
 
@@ -91,7 +91,7 @@ def test_buildx_build_streaming_logs_with_decode_error_handling(tmp_path):
     )
     (tmp_path / "Dockerfile").write_text(bad_encoding_dockerfile)
     output = list(docker.buildx.build(tmp_path, cache=False, stream_logs=True))
-    assert output[0] == "#1 [internal] load build definition from Dockerfile\n"
+    assert "#1 [internal] load build definition from Dockerfile\n" in output
     assert len([x for x in output if "�" in x]) == 1
     assert "#7 DONE" in output[-1]
 

@@ -40,6 +40,7 @@ from python_on_whales.exceptions import NoSuchContainer
 from python_on_whales.utils import (
     ValidPath,
     format_dict_for_cli,
+    format_signal_arg,
     format_time_arg,
     removeprefix,
     run,
@@ -297,7 +298,7 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).export(self, output)
 
-    def kill(self, signal: str = None):
+    def kill(self, signal: Optional[Union[int, str]] = None):
         """Kill this container
 
         See the [`docker.container.kill`](../sub-commands/container.md#kill) command for
@@ -414,7 +415,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.attach(...)`
 
-        # Arguments
+        Parameters:
             container: The running container to attach to
             detach_keys: Override the key sequence for detaching a container
             stdin: Attach STDIN
@@ -443,7 +444,7 @@ class ContainerCLI(DockerCLICaller):
     ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Create a new image from a container's changes
 
-        # Arguments
+        Parameters:
             container: The container to create the image from
             tag: tag to apply on the image produced
             author: Author (e.g., "John Hannibal Smith <hannibal@a-team.com>")
@@ -489,7 +490,7 @@ class ContainerCLI(DockerCLICaller):
 
         Doesn't yet support sending or receiving iterators of Python bytes.
 
-        # Arguments
+        Parameters:
             source: Local path or tuple. When using a tuple, the first element
                 of the tuple is the container, the second element is the path in
                 the container. ex: `source=("my-container", "/usr/bin/something")`.
@@ -601,7 +602,7 @@ class ContainerCLI(DockerCLICaller):
         security_options: List[str] = [],
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
-        stop_signal: Optional[str] = None,
+        stop_signal: Optional[Union[int, str]] = None,
         stop_timeout: Optional[int] = None,
         storage_options: List[str] = [],
         sysctl: Dict[str, str] = {},
@@ -762,7 +763,7 @@ class ContainerCLI(DockerCLICaller):
         if sig_proxy is False:
             full_cmd += ["--sig-proxy", "false"]
 
-        full_cmd.add_simple_arg("--stop-signal", stop_signal)
+        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
         full_cmd.add_args_list("--storage-opt", storage_options)
@@ -807,7 +808,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.diff(...)`
 
-        # Arguments
+        Parameters:
             container: The container to inspect
 
         # Returns
@@ -841,7 +842,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.execute(...)`
 
-        # Arguments
+        Parameters:
             container: The container to execute the command in.
             command: The command to execute.
             detach: if `True`, returns immediately with `None`. If `False`,
@@ -859,7 +860,7 @@ class ContainerCLI(DockerCLICaller):
             workdir: Working directory inside the container
             stream: Similar to `docker.run(..., stream=True)`.
 
-        # Returns:
+        Returns:
             Optional[str]
 
         # Raises
@@ -937,7 +938,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.export(...)`
 
-        # Arguments
+        Parameters:
             container: The container to export.
             output: The path of the output tar archive. Returning a generator of bytes
                 is not yet implemented.
@@ -967,11 +968,11 @@ class ContainerCLI(DockerCLICaller):
     def inspect(self, x: Union[str, List[str]]) -> Union[Container, List[Container]]:
         """Returns a container object from a name or ID.
 
-        # Arguments
+        Parameters:
             reference: A container name or ID, or a list of container names
                 and/or IDs
 
-        # Returns:
+        Returns:
             A `python_on_whales.Container` object or a list of those
             if a list of IDs was passed as input.
 
@@ -987,13 +988,13 @@ class ContainerCLI(DockerCLICaller):
     def kill(
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
-        signal: Optional[str] = None,
+        signal: Optional[Union[int, str]] = None,
     ) -> None:
         """Kill a container.
 
         Alias: `docker.kill(...)`
 
-        # Arguments
+        Parameters:
             containers: One or more containers to kill
             signal: The signal to send the container
 
@@ -1007,7 +1008,7 @@ class ContainerCLI(DockerCLICaller):
             return
         full_cmd = self.docker_cmd + ["container", "kill"]
 
-        full_cmd.add_simple_arg("--signal", signal)
+        full_cmd.add_simple_arg("--signal", format_signal_arg(signal))
         full_cmd += containers
 
         run(full_cmd)
@@ -1027,7 +1028,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.logs(...)`
 
-        # Arguments
+        Parameters:
             container: The container to get the logs of
             details: Show extra details provided to logs
             since: Use a datetime or timedelta to specify the lower
@@ -1091,7 +1092,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.ps(...)`
 
-        # Arguments
+        Parameters:
             all: If `True`, also returns containers that are not running.
 
         # Returns
@@ -1114,7 +1115,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.pause(...)`
 
-        # Arguments
+        Parameters:
             containers: One or more containers to pause
 
         # Raises
@@ -1133,7 +1134,7 @@ class ContainerCLI(DockerCLICaller):
     def prune(self, filters: Dict[str, str] = {}) -> None:
         """Remove containers that are not running.
 
-        # Arguments
+        Parameters:
             filters: Filters as strings or list of strings
         """
         if isinstance(filter, list):
@@ -1151,7 +1152,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.rename(...)`
 
-        # Arguments
+        Parameters:
             container: The container to rename
             new_name: The new name of the container.
 
@@ -1170,7 +1171,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.restart(...)`
 
-        # Arguments
+        Parameters:
             containers: One or more containers to restart
             time: Amount of to wait for stop before killing the container (default 10s).
                 If `int`, the unit is seconds.
@@ -1204,7 +1205,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.remove(...)`
 
-        # Arguments
+        Parameters:
             containers: One or more containers.
             force: Force the removal of a running container (uses SIGKILL)
             volumes: Remove anonymous volumes associated with the container
@@ -1311,7 +1312,7 @@ class ContainerCLI(DockerCLICaller):
         security_options: List[str] = [],
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
-        stop_signal: Optional[str] = None,
+        stop_signal: Optional[Union[int, str]] = None,
         stop_timeout: Optional[int] = None,
         storage_options: List[str] = [],
         stream: bool = False,
@@ -1396,7 +1397,7 @@ class ContainerCLI(DockerCLICaller):
         var
         ```
 
-        # Arguments
+        Parameters:
             image: The docker image to use for the container
             command: List of arguments to provide to the container.
             add_hosts: hosts to add in the format of a tuple. For example,
@@ -1634,7 +1635,7 @@ class ContainerCLI(DockerCLICaller):
         if sig_proxy is False:
             full_cmd += ["--sig-proxy", "false"]
 
-        full_cmd.add_simple_arg("--stop-signal", stop_signal)
+        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
         full_cmd.add_args_list("--storage-opt", storage_options)
@@ -1681,7 +1682,7 @@ class ContainerCLI(DockerCLICaller):
         Aliases: `docker.start`, `docker.container.start`,
         `python_on_whales.Container.start`.
 
-        # Arguments
+        Parameters:
             containers: One or a list of containers.
         """
         containers = to_list(containers)
@@ -1706,7 +1707,11 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def stats(self, all: bool = False) -> List[ContainerStats]:
+    def stats(
+        self,
+        containers: Optional[Union[ValidContainer, List[ValidContainer]]] = None,
+        all: bool = False,
+    ) -> List[ContainerStats]:
         """Get containers resource usage statistics
 
         Alias: `docker.stats(...)`
@@ -1727,8 +1732,9 @@ class ContainerCLI(DockerCLICaller):
 
         The data unit is the byte.
 
-        # Arguments
+        Parameters:
             all: Get the stats of all containers, not just running ones.
+            containers: One or a list of containers.
 
         # Returns
             A `List[python_on_whales.ContainerStats]`.
@@ -1742,6 +1748,15 @@ class ContainerCLI(DockerCLICaller):
             "--no-trunc",
         ]
         full_cmd.add_flag("--all", all)
+
+        if containers == []:
+            return []
+        elif containers is None:
+            # the user didn't provide any filters
+            pass
+        else:
+            full_cmd += to_list(containers)
+
         stats_output = run(full_cmd)
         return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
 
@@ -1757,7 +1772,7 @@ class ContainerCLI(DockerCLICaller):
         Aliases: `docker.stop`, `docker.container.stop`,
         `python_on_whales.Container.stop`.
 
-        # Arguments
+        Parameters:
             containers: One or a list of containers.
             time: Seconds to wait for stop before killing a container (default 10)
 
@@ -1793,7 +1808,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.unpause(...)`
 
-        # Arguments
+        Parameters:
             x: One or more containers (name, id or `python_on_whales.Container` object).
 
         # Raises
@@ -1830,7 +1845,7 @@ class ContainerCLI(DockerCLICaller):
 
         Alias: `docker.update(...)`
 
-        # Arguments
+        Parameters:
             x: One or a list of containers to update.
             blkio_weight: Block IO (relative weight), between 10 and 1000,
                 or 0 to disable (default 0)
@@ -1893,7 +1908,7 @@ class ContainerCLI(DockerCLICaller):
         Alias: `docker.wait(...)`
 
 
-        # Arguments
+        Parameters:
             x: One or a list of containers to wait for.
 
         # Returns

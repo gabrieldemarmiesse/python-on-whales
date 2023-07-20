@@ -1,7 +1,9 @@
 import os
+import signal
 import subprocess
 import sys
 from datetime import datetime, timedelta
+from importlib.metadata import version
 from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
@@ -21,6 +23,7 @@ from python_on_whales.exceptions import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[1]
+PYDANTIC_V2 = version("pydantic").startswith("2.")
 
 
 def title_if_necessary(string: str):
@@ -69,7 +72,11 @@ def to_docker_camel(string):
 class DockerCamelModel(pydantic.BaseModel):
     class Config:
         alias_generator = to_docker_camel
-        allow_population_by_field_name = True
+
+        if PYDANTIC_V2:
+            allow_population_by_field_name = True
+        else:
+            populate_by_name = True
 
 
 @overload
@@ -295,9 +302,10 @@ def read_env_files(env_files: List[Path]) -> Dict[str, str]:
 
 def all_fields_optional(cls):
     """Decorator function used to modify a pydantic model's fields to all be optional."""
-    for field in cls.__fields__.values():
-        field.required = False
-        field.allow_none = True
+    if not PYDANTIC_V2:
+        for field in cls.__fields__.values():
+            field.required = False
+            field.allow_none = True
     return cls
 
 
@@ -313,6 +321,25 @@ def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
         return time_object.strftime("%Y-%m-%dT%H:%M:%S")
     elif isinstance(time_object, timedelta):
         return f"{time_object.total_seconds()}s"
+
+
+def format_signal_arg(signal_object: Optional[Union[int, str]]) -> Optional[str]:
+    if signal_object is None:
+        return None
+    else:
+        return format_signal_for_docker(signal_object)
+
+
+def format_signal_for_docker(signal_object: Union[int, str]) -> str:
+    if isinstance(signal_object, int):
+        return signal.Signals(signal_object).name
+    elif isinstance(signal_object, str):
+        if hasattr(signal.Signals, "SIG" + signal_object):
+            return "SIG" + signal_object
+        else:
+            return signal_object
+    else:
+        raise TypeError(f"Got unexpected signal type {type(signal_object).__name__!r}")
 
 
 def parse_ls_status_count(status_output, status) -> int:

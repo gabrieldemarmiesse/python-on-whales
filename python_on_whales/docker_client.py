@@ -40,7 +40,7 @@ class DockerClient(DockerCLICaller):
     print(docker.run("hello-world")
     ```
 
-    # Arguments
+    Parameters:
         config: Location of client config files (default "~/.docker")
         context: Name of the context to use to connect to the
             daemon (overrides DOCKER_HOST env var
@@ -203,25 +203,29 @@ class DockerClient(DockerCLICaller):
 
         If no server is specified, the default is defined by the daemon.
 
-        # Arguments
+        Parameters:
             server: The server to log into. For example, with a self-hosted registry
                 it might be something like `server="192.168.0.10:5000"`
             username: The username
             password: The password
         """
-        full_cmd = self.docker_cmd + ["login"]
+        full_cmd = self.docker_cmd + ["login", "--password-stdin"]
 
         full_cmd.add_simple_arg("--username", username)
-        full_cmd.add_simple_arg("--password", password)
         if server is not None:
             full_cmd.append(server)
 
-        run(full_cmd, capture_stderr=False, capture_stdout=False)
+        run(
+            full_cmd,
+            capture_stderr=False,
+            capture_stdout=False,
+            input=password.encode(),
+        )
 
     def logout(self, server: Optional[str] = None):
         """Logout from a Docker registry
 
-        # Arguments
+        Parameters:
             server: The server to logout from. For example, with a self-hosted registry
                 it might be something like `server="192.168.0.10:5000"`
         """

@@ -71,7 +71,7 @@ class SecretCLI(DockerCLICaller):
     def inspect(self, x: Union[str, List[str]]) -> Union[Secret, List[Secret]]:
         """Returns one or more `python_on_whales.Secret` based on an ID or name.
 
-        # Arguments
+        Parameters:
             x: One or more IDs/names.
         """
         if isinstance(x, list):
@@ -89,7 +89,7 @@ class SecretCLI(DockerCLICaller):
     def remove(self, x: Union[ValidSecret, List[ValidSecret]]) -> None:
         """Removes one or more secrets
 
-        # Arguments
+        Parameters:
             x: One or more secrets.
                 Name, ids or `python_on_whales.Secret` objects are valid inputs.
         """

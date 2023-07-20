@@ -1,4 +1,5 @@
 import json
+import signal
 import sys
 import tempfile
 import time
@@ -374,6 +375,16 @@ def test_methods():
     my_container.remove()
 
 
+def test_kill_signal():
+    my_container = docker.run(
+        "busybox:1", ["sleep", "infinity"], init=True, detach=True
+    )
+    my_container.kill(signal=signal.SIGINT)
+    assert not my_container.state.running
+    assert my_container.state.exit_code == 130
+    my_container.remove()
+
+
 def test_context_manager():
     container_name = random_name()
     with pytest.raises(ArithmeticError):
@@ -502,6 +513,52 @@ def test_docker_stats():
         assert stat.container_name == container.name
         assert stat.cpu_percentage <= 5
         assert stat.memory_used <= 100_000_000
+
+
+def test_docker_stats_container() -> None:
+    with docker.run("busybox", ["sleep", "infinity"], detach=True) as container:
+        with docker.run("busybox", ["sleep", "infinity"], detach=True) as _:
+            stats = docker.stats(containers=[container.id])
+            assert len(stats) == 1
+            assert stats[0].container_name == container.name
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_docker_stats_cli_default(run_mock: Mock) -> None:
+    docker.container.stats()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + [
+            "container",
+            "stats",
+            "--format",
+            "{{json .}}",
+            "--no-stream",
+            "--no-trunc",
+        ]
+    )
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_docker_stats_cli_container(run_mock: Mock) -> None:
+    test_containers = ["dummy_container_0", "dummy_container_1"]
+    docker.container.stats(containers=test_containers)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + [
+            "container",
+            "stats",
+            "--format",
+            "{{json .}}",
+            "--no-stream",
+            "--no-trunc",
+        ]
+        + test_containers
+    )
+
+
+def test_docker_stats_cli_empty_selection() -> None:
+    assert docker.container.stats(containers=[]) == []
 
 
 def test_remove_anonymous_volume_too():
