@@ -45,6 +45,7 @@ def with_container_driver():
         yield
     docker.buildx.use(current_builder)
 
+
 @pytest.fixture
 def with_oci_layout_compliant_dir(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
