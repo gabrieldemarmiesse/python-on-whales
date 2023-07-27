@@ -202,7 +202,7 @@ class SystemInfo(DockerCamelModel):
     https_proxy: Optional[str] = None
     no_proxy: Optional[str] = None
     name: Optional[str] = None
-    labels: Optional[Dict[str, str]] = None
+    labels: Optional[List[str]] = None
     experimental_build: Optional[bool] = None
     server_version: Optional[str] = None
     cluster_store: Optional[str] = None
