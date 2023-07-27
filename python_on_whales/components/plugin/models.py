@@ -1,47 +1,41 @@
 from typing import List, Optional
 
-from python_on_whales.utils import DockerCamelModel, all_fields_optional
+from python_on_whales.utils import DockerCamelModel
 
 
-@all_fields_optional
 class PluginMount(DockerCamelModel):
     pass
 
 
-@all_fields_optional
 class PluginDevice(DockerCamelModel):
     pass
 
 
-@all_fields_optional
 class PluginSettings(DockerCamelModel):
-    mounts: Optional[List[PluginMount]]
-    env: Optional[List[str]]
-    args: Optional[List[str]]
-    devices: Optional[List[PluginDevice]]
+    mounts: Optional[List[PluginMount]] = None
+    env: Optional[List[str]] = None
+    args: Optional[List[str]] = None
+    devices: Optional[List[PluginDevice]] = None
 
 
-@all_fields_optional
 class Interface(DockerCamelModel):
     pass
 
 
-@all_fields_optional
 class PluginConfig(DockerCamelModel):
-    docker_version: Optional[str]
-    description: Optional[str]
-    documentation: Optional[str]
-    interface: Optional[Interface]
-    entrypoint: Optional[List[str]]
-    work_dir: Optional[str]
+    docker_version: Optional[str] = None
+    description: Optional[str] = None
+    documentation: Optional[str] = None
+    interface: Optional[Interface] = None
+    entrypoint: Optional[List[str]] = None
+    work_dir: Optional[str] = None
     # TODO: add missing attributes
 
 
-@all_fields_optional
 class PluginInspectResult(DockerCamelModel):
-    id: Optional[str]
-    name: Optional[str]
-    enabled: Optional[bool]
-    settings: Optional[PluginSettings]
-    plugin_reference: Optional[str]
-    config: Optional[PluginConfig]
+    id: Optional[str] = None
+    name: Optional[str] = None
+    enabled: Optional[bool] = None
+    settings: Optional[PluginSettings] = None
+    plugin_reference: Optional[str] = None
+    config: Optional[PluginConfig] = None

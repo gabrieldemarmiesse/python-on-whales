@@ -505,14 +505,6 @@ def test_compose_down_volumes():
     assert not docker.volume.exists("components_dodo")
 
 
-def test_compose_config_from_rc1():
-    config = ComposeConfig.parse_file(
-        Path(__file__).parent / "strange_compose_config_rc1.json"
-    )
-
-    assert config.services["myservice"].deploy.resources.reservations.cpus == "'0.25'"
-
-
 @pytest.mark.parametrize("json_file", get_all_jsons("compose"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()

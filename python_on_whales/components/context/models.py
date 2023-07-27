@@ -1,23 +1,26 @@
 from typing import Dict, Optional
 
 import pydantic
+from typing_extensions import Annotated
 
 from python_on_whales.utils import DockerCamelModel
 
 
 class ContextEndpoint(DockerCamelModel):
-    host: Optional[str]
-    skip_tls_verify: Optional[bool] = pydantic.Field(alias="SkipTLSVerify")
+    host: Optional[str] = None
+    skip_tls_verify: Annotated[
+        Optional[bool], pydantic.Field(alias="SkipTLSVerify")
+    ] = None
 
 
 class ContextStorage(DockerCamelModel):
-    metadata_path: Optional[str]
-    tls_path: Optional[str] = pydantic.Field(None, alias="TLSPath")
+    metadata_path: Optional[str] = None
+    tls_path: Annotated[Optional[str], pydantic.Field(alias="TLSPath")] = None
 
 
 class ContextInspectResult(DockerCamelModel):
-    name: Optional[str]
-    metadata: Optional[Dict[str, str]]
-    endpoints: Optional[Dict[str, ContextEndpoint]]
-    tls_material: Optional[dict] = pydantic.Field(None, alias="TLSMaterial")
-    storage: Optional[ContextStorage]
+    name: Optional[str] = None
+    metadata: Optional[Dict[str, str]] = None
+    endpoints: Optional[Dict[str, ContextEndpoint]] = None
+    tls_material: Annotated[Optional[dict], pydantic.Field(alias="TLSMaterial")] = None
+    storage: Optional[ContextStorage] = None

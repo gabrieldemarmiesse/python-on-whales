@@ -61,6 +61,9 @@ jobs:
           - test_system.py
           - test_task.py
           - test_volume.py
+        pydantic-version:
+          - pydantic==1.*
+          - pydantic==2.*
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -70,6 +73,7 @@ jobs:
       - name: Run test
         run: |
           bash tests/ci-setup.sh
+          pip install --upgrade ${{ matrix.pydantic-version }}
           python -m pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
 
   build-linux-test-without-any-binary:

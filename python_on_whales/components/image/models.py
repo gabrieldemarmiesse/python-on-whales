@@ -2,51 +2,49 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import python_on_whales.components.container.models
-from python_on_whales.utils import DockerCamelModel, all_fields_optional
+from python_on_whales.utils import DockerCamelModel
 
 
-@all_fields_optional
 class ImageHealthcheck(DockerCamelModel):
-    test: Optional[List[str]]
-    interval: Optional[int]
-    timeout: Optional[int]
-    retries: Optional[int]
-    start_period: Optional[int]
+    test: Optional[List[str]] = None
+    interval: Optional[int] = None
+    timeout: Optional[int] = None
+    retries: Optional[int] = None
+    start_period: Optional[int] = None
 
 
-@all_fields_optional
 class ImageGraphDriver(DockerCamelModel):
-    name: Optional[str]
+    name: Optional[str] = None
     data: Any = None
 
 
-@all_fields_optional
 class ImageRootFS(DockerCamelModel):
-    type: Optional[str]
-    layers: Optional[List[str]]
-    base_layer: Optional[str]
+    type: Optional[str] = None
+    layers: Optional[List[str]] = None
+    base_layer: Optional[str] = None
 
 
-@all_fields_optional
 class ImageInspectResult(DockerCamelModel):
-    id: Optional[str]
-    repo_tags: Optional[List[str]]
-    repo_digests: Optional[List[str]]
-    parent: Optional[str]
-    comment: Optional[str]
-    created: Optional[datetime]
-    container: Optional[str]
+    id: Optional[str] = None
+    repo_tags: Optional[List[str]] = None
+    repo_digests: Optional[List[str]] = None
+    parent: Optional[str] = None
+    comment: Optional[str] = None
+    created: Optional[datetime] = None
+    container: Optional[str] = None
     container_config: Optional[
         python_on_whales.components.container.models.ContainerConfig
-    ]
-    docker_version: Optional[str]
-    author: Optional[str]
-    config: Optional[python_on_whales.components.container.models.ContainerConfig]
-    architecture: Optional[str]
-    os: Optional[str]
-    os_version: Optional[str]
-    size: Optional[int]
-    virtual_size: Optional[int]
-    graph_driver: Optional[ImageGraphDriver]
-    root_fs: Optional[ImageRootFS]
-    metadata: Optional[Dict[str, str]]
+    ] = None
+    docker_version: Optional[str] = None
+    author: Optional[str] = None
+    config: Optional[
+        python_on_whales.components.container.models.ContainerConfig
+    ] = None
+    architecture: Optional[str] = None
+    os: Optional[str] = None
+    os_version: Optional[str] = None
+    size: Optional[int] = None
+    virtual_size: Optional[int] = None
+    graph_driver: Optional[ImageGraphDriver] = None
+    root_fs: Optional[ImageRootFS] = None
+    metadata: Optional[Dict[str, str]] = None

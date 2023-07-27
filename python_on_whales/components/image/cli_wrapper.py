@@ -24,6 +24,7 @@ from python_on_whales.components.image.models import (
 )
 from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.utils import (
+    PYDANTIC_V2,
     ValidPath,
     format_dict_for_cli,
     run,
@@ -48,7 +49,10 @@ class Image(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["image", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> ImageInspectResult:
-        return ImageInspectResult.parse_obj(json_object)
+        if PYDANTIC_V2:
+            return ImageInspectResult.model_validate(json_object)
+        else:
+            return ImageInspectResult.parse_obj(json_object)
 
     def _get_inspect_result(self) -> ImageInspectResult:
         """Only there to allow tools to know the return type"""
