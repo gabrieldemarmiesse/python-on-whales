@@ -15,7 +15,7 @@ class ResourcesLimits(BaseModel):
 
 
 class ResourcesReservation(BaseModel):
-    cpus: Union[float, str, None] = None
+    cpus: Union[float, int, None] = None
     memory: Optional[int] = None
 
 
