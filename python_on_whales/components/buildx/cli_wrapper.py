@@ -208,7 +208,7 @@ class BuildxCLI(DockerCLICaller):
         allow: List[str] = [],
         attest: Optional[Dict[str, str]] = None,
         build_args: Dict[str, str] = {},
-        # TODO: build_context
+        build_contexts: Dict[str, Union[str, ValidPath]] = {},
         builder: Optional[ValidBuilder] = None,
         cache: bool = True,
         # TODO: cache_filters
@@ -254,6 +254,11 @@ class BuildxCLI(DockerCLICaller):
             attest: Attestation parameters. Eg `attest={"type": "sbom", "generator": "my_image"}`
             build_args: The build arguments.
                 ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
+            build_contexts: Additional build contexts.
+                `build_contexts={[name]: [value], ...}`
+                Supports local directories, git repositories, HTTP URL to a tarball, a docker
+                image defined with a `docker-image://` prefix, and the `oci-layout://` protocol.
+                ex `build_contexts={"project2": "../path/to/project2/src", "qumu-src": "https://github.com/qemu/qemu.git"}`.
             builder: Specify which builder to use.
             cache: Whether or not to use the cache
             cache_from: Works only with the container driver. Loads the cache
@@ -317,6 +322,7 @@ class BuildxCLI(DockerCLICaller):
         if isinstance(attest, dict):
             full_cmd.add_simple_arg("--attest", format_dict_for_buildx(attest))
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
+        full_cmd.add_args_list("--build-context", format_dict_for_cli(build_contexts))
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_args_list("--label", format_dict_for_cli(labels))
 
