@@ -1,4 +1,5 @@
 import os
+import tarfile
 
 import pytest
 
@@ -11,6 +12,21 @@ from python_on_whales.utils import PROJECT_ROOT
 dockerfile_content1 = """
 FROM busybox
 RUN touch /dada
+"""
+
+dockerfile_content2 = """
+FROM busybox
+COPY --from=test_context README.md /README.md
+"""
+
+dockerfile_content3 = """
+FROM test_context
+RUN touch /dada
+"""
+
+dockerfile_content4 = """
+FROM busybox
+COPY --from=test_context /dada /dada
 """
 
 
@@ -28,6 +44,24 @@ def with_container_driver():
     with docker.buildx.create(use=True):
         yield
     docker.buildx.use(current_builder)
+
+
+@pytest.fixture
+def with_oci_layout_compliant_dir(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+
+    # Build the oci layout compliant directory
+    tar_path = os.path.join(tmp_path, "oci-layout.tar")
+    oci_folder_path = os.path.join(tmp_path, "oci-layout")
+
+    current_builder = docker.buildx.inspect()
+    with docker.buildx.create(use=True):
+        docker.buildx.build(tmp_path, output={"type": "oci", "dest": tar_path})
+    docker.buildx.use(current_builder)
+
+    # Extract tar to directory
+    with tarfile.open(tar_path) as tar:
+        tar.extractall(oci_folder_path)
 
 
 @pytest.mark.usefixtures("with_docker_driver")
@@ -249,6 +283,63 @@ def test_multiarch_build(tmp_path, docker_registry):
 def test_buildx_build_attestations(tmp_path, kwargs):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
     docker.buildx.build(tmp_path, **kwargs)
+
+
+# Does the build work when passing extra contexts
+# without making use of them in the Dockerfile
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context1(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.buildx.build(tmp_path, build_contexts=dict(test_context="."))
+
+
+# Does the build work when passing extra contexts
+# when the Dockerfile does make use of them
+@pytest.mark.usefixtures("with_container_driver")
+@pytest.mark.parametrize(
+    "test_context",
+    [
+        # Test with local directory
+        PROJECT_ROOT,
+        # Test with git repo
+        "https://github.com/gabrieldemarmiesse/python-on-whales.git",
+    ],
+)
+def test_buildx_build_build_context2(tmp_path, test_context):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content2)
+    docker.buildx.build(tmp_path, build_contexts=dict(test_context=test_context))
+
+
+# Test with oci layout compliant directory
+@pytest.mark.usefixtures("with_oci_layout_compliant_dir")
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context_oci(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content4)
+    docker.buildx.build(
+        tmp_path,
+        build_contexts=dict(
+            test_context=f"oci-layout://{os.path.join(tmp_path, 'oci-layout')}"
+        ),
+    )
+
+
+# Test with docker image
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context_image(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content3)
+    docker.buildx.build(
+        tmp_path,
+        build_contexts=dict(test_context="docker-image://busybox:1.36.0"),
+    )
+
+
+# Does the build fail when NOT passing extra contexts
+# when the dockerfile does make use of them
+@pytest.mark.usefixtures("with_container_driver")
+def test_buildx_build_build_context_fail(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content2)
+    with pytest.raises(DockerException):
+        docker.buildx.build(tmp_path)
 
 
 def test_buildx_build_context_manager2(tmp_path):
