@@ -35,7 +35,7 @@ class ChangeConfig(DockerCamelModel):
     parallelism: Optional[int] = None
     failure_action: Optional[str] = None
     monitor: Optional[int] = None
-    max_failure_ratio: Optional[int] = None
+    max_failure_ratio: Optional[float] = None
     order: Optional[str] = None
 
 
