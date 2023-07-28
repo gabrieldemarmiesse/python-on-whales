@@ -26,6 +26,13 @@ PROJECT_ROOT = Path(__file__).parents[1]
 PYDANTIC_V2 = version("pydantic").startswith("2.")
 
 
+def custom_parse_object_as(type_, obj: Any):
+    if PYDANTIC_V2:
+        return pydantic.TypeAdapter(type_).validate_python(obj)
+    else:
+        return pydantic.parse_obj_as(type_, obj)
+
+
 def title_if_necessary(string: str):
     if string.isupper():
         return string

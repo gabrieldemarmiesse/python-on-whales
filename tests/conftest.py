@@ -2,6 +2,7 @@ import tempfile
 import time
 from pathlib import Path
 
+import pydantic
 import pytest
 
 from python_on_whales import docker
@@ -54,3 +55,12 @@ def swarm_mode():
     yield
     docker.swarm.leave(force=True)
     time.sleep(1)
+
+
+def pytest_collection_modifyitems(config, items):
+    if pydantic.__version__.startswith("1"):
+        return
+    for item in items:
+        item.add_marker(
+            pytest.mark.filterwarnings("error::pydantic.PydanticDeprecatedSince20")
+        )

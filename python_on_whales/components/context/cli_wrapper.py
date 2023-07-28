@@ -39,7 +39,7 @@ class Context(ReloadableObjectFromJson):
         return run(full_cmd)
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
-        return ContextInspectResult.parse_obj(json_object)
+        return ContextInspectResult(**json_object)
 
     def _get_inspect_result(self) -> ContextInspectResult:
         """Only there to allow tools to know the return type"""

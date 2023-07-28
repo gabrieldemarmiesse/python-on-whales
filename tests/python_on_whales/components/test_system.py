@@ -72,7 +72,7 @@ def test_events_no_arguments():
 @pytest.mark.parametrize("json_file", get_all_jsons("system_info"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
-    SystemInfo.parse_raw(json_as_txt)
+    SystemInfo(**json.loads(json_as_txt))
     # we could do more checks here if needed
 
 
@@ -80,7 +80,7 @@ def test_parsing_events():
     json_file = Path(__file__).parent / "jsons/events/0.json"
     events = json.loads(json_file.read_text())["events"]
     for event in events:
-        parsed: DockerEvent = DockerEvent.parse_obj(event)
+        parsed: DockerEvent = DockerEvent(**event)
         assert parsed.time.date() == date(2020, 12, 28)
 
 

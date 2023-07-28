@@ -31,7 +31,7 @@ class Plugin(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["plugin", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> PluginInspectResult:
-        return PluginInspectResult.parse_obj(json_object)
+        return PluginInspectResult(**json_object)
 
     def _get_inspect_result(self) -> PluginInspectResult:
         """Only there to allow tools to know the return type"""

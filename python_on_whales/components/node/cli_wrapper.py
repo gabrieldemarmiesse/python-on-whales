@@ -30,7 +30,7 @@ class Node(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["node", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> NodeInspectResult:
-        return NodeInspectResult.parse_obj(json_object)
+        return NodeInspectResult(**json_object)
 
     def _get_inspect_result(self) -> NodeInspectResult:
         """Only there to allow tools to know the return type"""

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import List, Optional, Union
 
@@ -12,7 +13,7 @@ class ImagetoolsCLI(DockerCLICaller):
         """Returns the manifest of a Docker image in a registry without pulling it"""
         full_cmd = self.docker_cmd + ["buildx", "imagetools", "inspect", "--raw", name]
         result = run(full_cmd)
-        return Manifest.parse_raw(result)
+        return Manifest(**json.loads(result))
 
     def create(
         self,
@@ -64,4 +65,4 @@ class ImagetoolsCLI(DockerCLICaller):
 
         result = run(full_cmd)
         if dry_run:
-            return Manifest.parse_raw(result)
+            return Manifest(**json.loads(result))

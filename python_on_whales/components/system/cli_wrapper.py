@@ -31,13 +31,13 @@ class DiskFreeResult:
             docker_items[docker_items_dict["Type"]] = docker_items_dict
 
         self.images: DockerItemsSummary
-        self.images = DockerItemsSummary.parse_obj(docker_items["Images"])
+        self.images = DockerItemsSummary(**docker_items["Images"])
         self.containers: DockerItemsSummary
-        self.containers = DockerItemsSummary.parse_obj(docker_items["Containers"])
+        self.containers = DockerItemsSummary(**docker_items["Containers"])
         self.volumes: DockerItemsSummary
-        self.volumes = DockerItemsSummary.parse_obj(docker_items["Local Volumes"])
+        self.volumes = DockerItemsSummary(**docker_items["Local Volumes"])
         self.build_cache: DockerItemsSummary
-        self.build_cache = DockerItemsSummary.parse_obj(docker_items["Build Cache"])
+        self.build_cache = DockerItemsSummary(**docker_items["Build Cache"])
 
 
 class SystemCLI(DockerCLICaller):
@@ -126,7 +126,7 @@ class SystemCLI(DockerCLICaller):
         iterator = stream_stdout_and_stderr(full_cmd)
         for stream_origin, stream_content in iterator:
             if stream_origin == "stdout":
-                yield DockerEvent.parse_raw(stream_content)
+                yield DockerEvent(**json.loads(stream_content))
 
     def info(self) -> SystemInfo:
         """Returns diverse information about the Docker client and daemon.
@@ -151,7 +151,7 @@ class SystemCLI(DockerCLICaller):
         system info](https://docs.docker.com/engine/api/v1.40/#operation/SystemInfo).
         """
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
-        return SystemInfo.parse_raw(run(full_cmd))
+        return SystemInfo(**json.loads(run(full_cmd)))
 
     def prune(
         self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}

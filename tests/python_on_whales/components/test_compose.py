@@ -1,3 +1,4 @@
+import json
 import signal
 import tempfile
 import time
@@ -508,7 +509,7 @@ def test_compose_down_volumes():
 @pytest.mark.parametrize("json_file", get_all_jsons("compose"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
-    config: ComposeConfig = ComposeConfig.parse_raw(json_as_txt)
+    config: ComposeConfig = ComposeConfig(**json.loads(json_as_txt))
     if json_file.name == "0.json":
         assert config.services["traefik"].labels["traefik.enable"] == "true"
 

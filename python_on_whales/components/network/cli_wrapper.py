@@ -33,7 +33,7 @@ class Network(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["network", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> NetworkInspectResult:
-        return NetworkInspectResult.parse_obj(json_object)
+        return NetworkInspectResult(**json_object)
 
     def _get_inspect_result(self) -> NetworkInspectResult:
         """Only there to allow tools to know the return type"""
