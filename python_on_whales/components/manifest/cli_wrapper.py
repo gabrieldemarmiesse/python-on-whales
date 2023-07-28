@@ -30,7 +30,7 @@ class ManifestList(ReloadableObjectFromJson):
         self, json_object: Dict[str, Any]
     ) -> ManifestListInspectResult:
         json_object["name"] = self.reference
-        return ManifestListInspectResult.parse_obj(json_object)
+        return ManifestListInspectResult(**json_object)
 
     def _get_inspect_result(self) -> ManifestListInspectResult:
         """Only there to allow tools to know the return type"""

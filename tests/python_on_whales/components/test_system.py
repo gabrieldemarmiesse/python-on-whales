@@ -80,7 +80,7 @@ def test_parsing_events():
     json_file = Path(__file__).parent / "jsons/events/0.json"
     events = json.loads(json_file.read_text())["events"]
     for event in events:
-        parsed: DockerEvent = DockerEvent.parse_obj(event)
+        parsed: DockerEvent = DockerEvent(**event)
         assert parsed.time.date() == date(2020, 12, 28)
 
 

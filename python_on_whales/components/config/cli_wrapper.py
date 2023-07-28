@@ -33,7 +33,7 @@ class Config(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["config", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
-        return ConfigInspectResult.parse_obj(json_object)
+        return ConfigInspectResult(**json_object)
 
     def _get_inspect_result(self) -> ConfigInspectResult:
         """Only there to allow tools to know the return type"""

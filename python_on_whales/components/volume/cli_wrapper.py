@@ -36,7 +36,7 @@ class Volume(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["volume", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
-        return VolumeInspectResult.parse_obj(json_object)
+        return VolumeInspectResult(**json_object)
 
     def _get_inspect_result(self) -> VolumeInspectResult:
         """Only there to allow tools to know the return type"""

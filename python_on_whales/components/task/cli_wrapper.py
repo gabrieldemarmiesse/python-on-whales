@@ -29,7 +29,7 @@ class Task(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> TaskInspectResult:
-        return TaskInspectResult.parse_obj(json_object)
+        return TaskInspectResult(**json_object)
 
     def _get_inspect_result(self) -> TaskInspectResult:
         """Only there to allow tools to know the return type"""

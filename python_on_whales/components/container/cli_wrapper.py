@@ -39,6 +39,7 @@ from python_on_whales.components.container.models import (
 from python_on_whales.exceptions import NoSuchContainer
 from python_on_whales.utils import (
     ValidPath,
+    custom_parse_object_as,
     format_dict_for_cli,
     format_signal_arg,
     format_time_arg,
@@ -93,7 +94,7 @@ class Container(ReloadableObjectFromJson):
         return run(self.docker_cmd + ["container", "inspect", reference])
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
-        return ContainerInspectResult.parse_obj(json_object)
+        return ContainerInspectResult(**json_object)
 
     def _get_inspect_result(self) -> ContainerInspectResult:
         """Only there to allow tools to know the return type"""
@@ -1975,27 +1976,27 @@ class ContainerStats:
         """Takes a json_dict with container stats from the CLI and
         parses it.
         """
-        self.block_read: int = pydantic.parse_obj_as(
+        self.block_read: int = custom_parse_object_as(
             pydantic.ByteSize, json_dict["BlockIO"].split("/")[0]
         )
-        self.block_write: int = pydantic.parse_obj_as(
+        self.block_write: int = custom_parse_object_as(
             pydantic.ByteSize, json_dict["BlockIO"].split("/")[1]
         )
         self.cpu_percentage: float = float(json_dict["CPUPerc"][:-1])
         self.container: str = json_dict["Container"]
         self.container_id: str = json_dict["ID"]
         self.memory_percentage: float = float(json_dict["MemPerc"][:-1])
-        self.memory_used: int = pydantic.parse_obj_as(
+        self.memory_used: int = custom_parse_object_as(
             pydantic.ByteSize, json_dict["MemUsage"].split("/")[0]
         )
-        self.memory_limit: int = pydantic.parse_obj_as(
+        self.memory_limit: int = custom_parse_object_as(
             pydantic.ByteSize, json_dict["MemUsage"].split("/")[1]
         )
         self.container_name: str = json_dict["Name"]
-        self.net_upload: int = pydantic.parse_obj_as(
+        self.net_upload: int = custom_parse_object_as(
             pydantic.ByteSize, json_dict["NetIO"].split("/")[0]
         )
-        self.net_download: int = pydantic.parse_obj_as(
+        self.net_download: int = custom_parse_object_as(
             pydantic.ByteSize, json_dict["NetIO"].split("/")[1]
         )
 
