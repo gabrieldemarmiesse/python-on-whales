@@ -126,7 +126,7 @@ class SystemCLI(DockerCLICaller):
         iterator = stream_stdout_and_stderr(full_cmd)
         for stream_origin, stream_content in iterator:
             if stream_origin == "stdout":
-                yield DockerEvent.parse_raw(stream_content)
+                yield DockerEvent(**json.loads(stream_content))
 
     def info(self) -> SystemInfo:
         """Returns diverse information about the Docker client and daemon.
@@ -151,7 +151,7 @@ class SystemCLI(DockerCLICaller):
         system info](https://docs.docker.com/engine/api/v1.40/#operation/SystemInfo).
         """
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
-        return SystemInfo.parse_raw(run(full_cmd))
+        return SystemInfo(**json.loads(run(full_cmd)))
 
     def prune(
         self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}

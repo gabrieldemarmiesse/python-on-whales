@@ -72,7 +72,7 @@ def test_events_no_arguments():
 @pytest.mark.parametrize("json_file", get_all_jsons("system_info"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
-    SystemInfo.parse_raw(json_as_txt)
+    SystemInfo(**json.loads(json_as_txt))
     # we could do more checks here if needed
 
 

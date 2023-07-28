@@ -88,7 +88,7 @@ class ComposeCLI(DockerCLICaller):
         if return_json:
             return json.loads(result)
         else:
-            return ComposeConfig.parse_raw(result)
+            return ComposeConfig(**json.loads(result))
 
     def create(
         self,
