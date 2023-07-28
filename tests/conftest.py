@@ -54,3 +54,10 @@ def swarm_mode():
     yield
     docker.swarm.leave(force=True)
     time.sleep(1)
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        item.add_marker(
+            pytest.mark.filterwarnings("error::pydantic.PydanticDeprecatedSince20")
+        )
