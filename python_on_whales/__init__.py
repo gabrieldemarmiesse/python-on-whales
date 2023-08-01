@@ -30,6 +30,7 @@ __all__ = [
     "Container",
     "ContainerStats",
     "Context",
+    "DockerClient",
     "DockerContextConfig",
     "DockerException",
     "Image",
