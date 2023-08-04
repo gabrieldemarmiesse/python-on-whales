@@ -81,9 +81,9 @@ class DockerCamelModel(pydantic.BaseModel):
         alias_generator = to_docker_camel
 
         if PYDANTIC_V2:
-            allow_population_by_field_name = True
-        else:
             populate_by_name = True
+        else:
+            allow_population_by_field_name = True
 
 
 @overload
