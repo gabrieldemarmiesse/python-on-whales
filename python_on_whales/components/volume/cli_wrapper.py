@@ -192,15 +192,19 @@ class VolumeCLI(DockerCLICaller):
             Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
         ]
 
-    def prune(self, filters: Dict[str, Union[str, int]] = {}) -> None:
+    def prune(
+        self, filters: Dict[str, Union[str, int]] = {}, all: bool = False
+    ) -> None:
         """Remove volumes
 
         Parameters:
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
                 An example `filters=dict(dangling=1, driver="local")`.
+            all: Remove all unused volumes, not just anonymous ones.
         """
         full_cmd = self.docker_cmd + ["volume", "prune", "--force"]
+        full_cmd.add_flag("--all", all)
 
         for key, value in filters.items():
             full_cmd += ["--filter", f"{key}={value}"]
