@@ -689,7 +689,7 @@ def test_rename_nosuchcontainer():
 
 def test_update_nosuchcontainer():
     with pytest.raises(NoSuchContainer):
-        docker.container.update("grueighuri", cpus=4)
+        docker.container.update("grueighuri", cpus=1)
 
 
 def test_prune():
