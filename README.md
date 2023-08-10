@@ -186,6 +186,25 @@ docker.run(
 ```
 
 
+Any Docker object can be used as a context manager to ensure it's removed even if an exception occurs:
+
+```python
+from python_on_whales import docker
+
+with docker.volume.create("random_name") as some_volume:
+    docker.run(
+        "postgres:9.6",
+        ["-c", "shared_buffers=256MB", "-c", "max_connections=200"],
+        name="some-postgres",
+        envs={"POSTGRES_PASSWORD": "mysecretpassword", "PGDATA": "/var/lib/postgresql/data/pgdata"},
+        volumes=[(some_volume, "/var/lib/postgresql/data"), ("myvolume", "/tmp/myvolume")],
+        detach=True,
+    )
+    # so some stuff here
+    
+# here we are out of the context manager, so the volume has been removed, even if there was an exception.
+```
+
 ## Main features
 
 * 1 to 1 mapping between the CLI interface and the Python API. No need to look in the docs
