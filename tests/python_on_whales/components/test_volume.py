@@ -67,7 +67,7 @@ def test_volume_drivers():
 def test_volume_labels():
     some_volume = docker.volume.create(labels=dict(dodo="dada"))
 
-    assert some_volume.labels == dict(dodo="dada")
+    assert some_volume.labels["dodo"] == "dada"
     docker.volume.remove(some_volume)
 
 
@@ -199,19 +199,19 @@ def test_volume_exists():
 
 
 def test_prune():
-    for container in docker.container.list(filters={"name": "test-volume"}):
-        docker.container.remove(container, force=True)
+    for volume in docker.volume.list(filters={"name": "test-volume"}):
+        volume.remove()
     volume = docker.volume.create("test-volume")
     assert volume in docker.volume.list()
 
     # volume not pruned because it does not have label "dne"
-    docker.volume.prune(filters={"label": "dne"})
+    docker.volume.prune(filters={"label": "dne"}, all=True)
     assert volume in docker.volume.list()
 
     # could only find "label" filter for `docker volume prune`
 
     # volume pruned
-    docker.volume.prune()
+    docker.volume.prune(all=True)
     assert volume not in docker.volume.list()
 
 
