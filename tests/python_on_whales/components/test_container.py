@@ -157,6 +157,26 @@ def test_container_create_with_cgroupns():
         assert container.host_config.cgroupns_mode == "host"
 
 
+@patch("python_on_whales.components.container.cli_wrapper.run")
+@patch("python_on_whales.components.container.cli_wrapper.Container", Mock())
+def test_container_create_with_systemd(run_mock: Mock):
+    docker.container.create(
+        "ubuntu", ["sleep", "infinity"], systemd="always", pull="never"
+    )
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + [
+            # fmt: off
+            "create",
+            "--pull", "never",
+            "--systemd", "always",
+            "ubuntu",
+            "sleep", "infinity",
+            # fmt: on
+        ]
+    )
+
+
 def test_fails_correctly_create_start():
     python_code = """
 import sys
