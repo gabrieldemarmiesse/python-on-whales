@@ -149,38 +149,38 @@ def run(
 
     if completed_process.returncode != 0:
         if completed_process.stderr is not None:
-            if "no such image" in completed_process.stderr.decode().lower():
+            decoded_stderr = completed_process.stderr.decode().lower()
+            if "no such image" in decoded_stderr:
                 raise NoSuchImage(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
                     completed_process.stderr,
                 )
-            if "no such service" in completed_process.stderr.decode().lower():
+            if "no such service" in decoded_stderr or (
+                "service" in decoded_stderr and "not found" in decoded_stderr
+            ):
                 raise NoSuchService(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
                     completed_process.stderr,
                 )
-            if "no such container" in completed_process.stderr.decode().lower():
+            if "no such container" in decoded_stderr:
                 raise NoSuchContainer(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
                     completed_process.stderr,
                 )
-            if (
-                "this node is not a swarm manager"
-                in completed_process.stderr.decode().lower()
-            ):
+            if "this node is not a swarm manager" in decoded_stderr:
                 raise NotASwarmManager(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
                     completed_process.stderr,
                 )
-            if "no such volume" in completed_process.stderr.decode().lower():
+            if "no such volume" in decoded_stderr:
                 raise NoSuchVolume(
                     args,
                     completed_process.returncode,
