@@ -50,10 +50,10 @@ The Docker command line has a `docker compose images` command. Python-on-whales 
 an equivalent because it's trivial to do so with existing functions.
 
 ```
-images = [docker.image.inspect(container.image) for container in docker.container.ps()]
+images = [docker.image.inspect(container.image) for container in docker.compose.ps()]
 ```
 
-* `docker.container.ps()` returns the list of all containers in the compose stack.
+* `docker.compose.ps()` returns the list of all containers in the compose stack.
 * `container.image` gives you the id of the Docker image of the container as a `str`.
 * `docker.image.inspect()` gives you a `python_on_whales.Image` from a `str`.
 
