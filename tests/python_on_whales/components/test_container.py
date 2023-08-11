@@ -5,6 +5,7 @@ import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Literal, Union
 from unittest.mock import Mock, patch
 
 import pytest
@@ -157,11 +158,14 @@ def test_container_create_with_cgroupns():
         assert container.host_config.cgroupns_mode == "host"
 
 
+@pytest.mark.parametrize("systemd_mode", [True, False, "always"])
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container", Mock())
-def test_container_create_with_systemd(run_mock: Mock):
+def test_container_create_with_systemd_mode(
+    run_mock: Mock, systemd_mode: Union[bool, Literal["always"]]
+):
     docker.container.create(
-        "ubuntu", ["sleep", "infinity"], systemd="always", pull="never"
+        "ubuntu", ["sleep", "infinity"], systemd=systemd_mode, pull="never"
     )
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd
@@ -169,7 +173,7 @@ def test_container_create_with_systemd(run_mock: Mock):
             # fmt: off
             "create",
             "--pull", "never",
-            "--systemd", "always",
+            "--systemd", systemd_mode,
             "ubuntu",
             "sleep", "infinity",
             # fmt: on
