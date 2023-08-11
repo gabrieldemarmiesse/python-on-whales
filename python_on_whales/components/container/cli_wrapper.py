@@ -607,6 +607,7 @@ class ContainerCLI(DockerCLICaller):
         stop_timeout: Optional[int] = None,
         storage_options: List[str] = [],
         sysctl: Dict[str, str] = {},
+        systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         ulimit: List[str] = [],
         user: Optional[str] = None,
@@ -769,6 +770,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_args_list("--storage-opt", storage_options)
         full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_args_list("--ulimit", ulimit)
 
@@ -1318,6 +1320,7 @@ class ContainerCLI(DockerCLICaller):
         storage_options: List[str] = [],
         stream: bool = False,
         sysctl: Dict[str, str] = {},
+        systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
         ulimit: List[str] = [],
@@ -1474,6 +1477,8 @@ class ContainerCLI(DockerCLICaller):
                 `"4g"` for example.
             stop_timeout: Signal to stop a container (default "SIGTERM")
             storage_options: Storage driver options for the container
+            systemd: Whether to run in systemd mode. Only known to apply to Podman, see
+                https://docs.podman.io/en/latest/markdown/podman-run.1.html#systemd-true-false-always
             tty: Allocate a pseudo-TTY. Allow the process to access your terminal
                 to write on it.
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
@@ -1641,6 +1646,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_args_list("--storage-opt", storage_options)
         full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_args_list("--ulimit", ulimit)
 
