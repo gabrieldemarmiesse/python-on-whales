@@ -77,12 +77,11 @@ def to_docker_camel(string):
 
 
 class DockerCamelModel(pydantic.BaseModel):
-    class Config:
-        alias_generator = to_docker_camel
-
-        if PYDANTIC_V2:
-            populate_by_name = True
-        else:
+    if PYDANTIC_V2:
+        model_config = pydantic.ConfigDict(populate_by_name=True, alias_generator=to_docker_camel)
+    else:
+        class Config:
+            alias_generator = to_docker_camel
             allow_population_by_field_name = True
 
 
