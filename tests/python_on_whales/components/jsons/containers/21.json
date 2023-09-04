@@ -1,0 +1,291 @@
+{
+    "Id": "a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8",
+    "Created": "2023-09-04T18:43:16.179002632+05:30",
+    "Path": "docker-entrypoint.sh",
+    "Args": [
+        "postgres"
+    ],
+    "State": {
+        "OciVersion": "1.1.0-rc.1",
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 148681,
+        "ConmonPid": 148679,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2023-09-04T18:43:16.460905814+05:30",
+        "FinishedAt": "0001-01-01T00:00:00Z",
+        "Health": {
+            "Status": "",
+            "FailingStreak": 0,
+            "Log": null
+        },
+        "CgroupPath": "/user.slice/user-1000.slice/user@1000.service/user.slice/libpod-a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8.scope",
+        "CheckpointedAt": "0001-01-01T00:00:00Z",
+        "RestoredAt": "0001-01-01T00:00:00Z"
+    },
+    "Image": "5433943ddb9f798bf503d52dbc4c881a17a5299833ca7ceacc6d3acf64ed99f5",
+    "ImageDigest": "sha256:d85cc162aab88d7e47eea36286036580d9c9479ff16aa8a550d4e0c26bc5f2b2",
+    "ImageName": "docker.io/library/postgres:9.6.10-alpine",
+    "Rootfs": "",
+    "Pod": "",
+    "ResolvConfPath": "/run/user/1000/containers/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata/resolv.conf",
+    "HostnamePath": "/run/user/1000/containers/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata/hostname",
+    "HostsPath": "/run/user/1000/containers/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata/hosts",
+    "StaticDir": "/home/amitprakash/.local/share/containers/storage/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata",
+    "OCIConfigPath": "/home/amitprakash/.local/share/containers/storage/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata/config.json",
+    "OCIRuntime": "crun",
+    "ConmonPidFile": "/run/user/1000/containers/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata/conmon.pid",
+    "PidFile": "/run/user/1000/containers/vfs-containers/a01be6c1b2df15dd1cf2958fe7d1666e393ab9731f6031a8184869bf349c92f8/userdata/pidfile",
+    "Name": "pmr_postgres_33265",
+    "RestartCount": 0,
+    "Driver": "vfs",
+    "MountLabel": "",
+    "ProcessLabel": "",
+    "AppArmorProfile": "",
+    "EffectiveCaps": [
+        "CAP_CHOWN",
+        "CAP_DAC_OVERRIDE",
+        "CAP_FOWNER",
+        "CAP_FSETID",
+        "CAP_KILL",
+        "CAP_NET_BIND_SERVICE",
+        "CAP_SETFCAP",
+        "CAP_SETGID",
+        "CAP_SETPCAP",
+        "CAP_SETUID",
+        "CAP_SYS_CHROOT"
+    ],
+    "BoundingCaps": [
+        "CAP_CHOWN",
+        "CAP_DAC_OVERRIDE",
+        "CAP_FOWNER",
+        "CAP_FSETID",
+        "CAP_KILL",
+        "CAP_NET_BIND_SERVICE",
+        "CAP_SETFCAP",
+        "CAP_SETGID",
+        "CAP_SETPCAP",
+        "CAP_SETUID",
+        "CAP_SYS_CHROOT"
+    ],
+    "ExecIDs": [],
+    "GraphDriver": {
+        "Name": "vfs",
+        "Data": null
+    },
+    "Mounts": [
+        {
+            "Type": "volume",
+            "Name": "0e6f794eab855ee21d26e8b4ecf78bff8e3b72fb8fd58da74116bdd7193f3b60",
+            "Source": "/home/amitprakash/.local/share/containers/storage/volumes/0e6f794eab855ee21d26e8b4ecf78bff8e3b72fb8fd58da74116bdd7193f3b60/_data",
+            "Destination": "/var/lib/postgresql/data",
+            "Driver": "local",
+            "Mode": "",
+            "Options": [
+                "nodev",
+                "exec",
+                "nosuid",
+                "rbind"
+            ],
+            "RW": true,
+            "Propagation": "rprivate"
+        }
+    ],
+    "Dependencies": [],
+    "NetworkSettings": {
+        "EndpointID": "",
+        "Gateway": "",
+        "IPAddress": "",
+        "IPPrefixLen": 0,
+        "IPv6Gateway": "",
+        "GlobalIPv6Address": "",
+        "GlobalIPv6PrefixLen": 0,
+        "MacAddress": "",
+        "Bridge": "",
+        "SandboxID": "",
+        "HairpinMode": false,
+        "LinkLocalIPv6Address": "",
+        "LinkLocalIPv6PrefixLen": 0,
+        "Ports": {
+            "5432/tcp": [
+                {
+                    "HostIp": "",
+                    "HostPort": "33265"
+                }
+            ]
+        },
+        "SandboxKey": "/run/user/1000/netns/netns-3a3ff7ae-348e-c27e-7ee9-48410b2e49c5"
+    },
+    "Namespace": "",
+    "IsInfra": false,
+    "IsService": false,
+    "Config": {
+        "Hostname": "a01be6c1b2df",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "TERM=xterm",
+            "container=podman",
+            "LANG=en_US.utf8",
+            "PG_MAJOR=9.6",
+            "PG_VERSION=9.6.10",
+            "PG_SHA256=8615acc56646401f0ede97a767dfd27ce07a8ae9c952afdb57163b7234fe8426",
+            "PGDATA=/var/lib/postgresql/data",
+            "POSTGRES_DB=dev",
+            "POSTGRES_USER=user",
+            "POSTGRES_PASSWORD=password",
+            "HOME=/root",
+            "HOSTNAME=a01be6c1b2df"
+        ],
+        "Cmd": [
+            "postgres"
+        ],
+        "Image": "docker.io/library/postgres:9.6.10-alpine",
+        "Volumes": null,
+        "WorkingDir": "/",
+        "Entrypoint": "docker-entrypoint.sh",
+        "OnBuild": null,
+        "Labels": null,
+        "Annotations": {
+            "io.container.manager": "libpod",
+            "io.podman.annotations.autoremove": "TRUE",
+            "org.opencontainers.image.stopSignal": "15"
+        },
+        "StopSignal": 15,
+        "HealthcheckOnFailureAction": "none",
+        "CreateCommand": [
+            "/usr/bin/podman",
+            "container",
+            "run",
+            "--detach",
+            "--env",
+            "POSTGRES_DB=dev",
+            "--env",
+            "POSTGRES_USER=user",
+            "--env",
+            "POSTGRES_PASSWORD=password",
+            "--name",
+            "pmr_postgres_33265",
+            "-p",
+            "33265:5432",
+            "--rm",
+            "postgres:9.6.10-alpine"
+        ],
+        "Umask": "0022",
+        "Timeout": 0,
+        "StopTimeout": 10,
+        "Passwd": true,
+        "sdNotifyMode": "container"
+    },
+    "HostConfig": {
+        "Binds": [
+            "0e6f794eab855ee21d26e8b4ecf78bff8e3b72fb8fd58da74116bdd7193f3b60:/var/lib/postgresql/data:rprivate,rw,nodev,exec,nosuid,rbind"
+        ],
+        "CgroupManager": "systemd",
+        "CgroupMode": "private",
+        "ContainerIDFile": "",
+        "LogConfig": {
+            "Type": "journald",
+            "Config": null,
+            "Path": "",
+            "Tag": "",
+            "Size": "0B"
+        },
+        "NetworkMode": "slirp4netns",
+        "PortBindings": {
+            "5432/tcp": [
+                {
+                    "HostIp": "",
+                    "HostPort": "33265"
+                }
+            ]
+        },
+        "RestartPolicy": {
+            "Name": "",
+            "MaximumRetryCount": 0
+        },
+        "AutoRemove": true,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "CapAdd": [],
+        "CapDrop": [],
+        "Dns": [],
+        "DnsOptions": [],
+        "DnsSearch": [],
+        "ExtraHosts": [],
+        "GroupAdd": [],
+        "IpcMode": "shareable",
+        "Cgroup": "",
+        "Cgroups": "default",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "private",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "SecurityOpt": [],
+        "Tmpfs": {},
+        "UTSMode": "private",
+        "UsernsMode": "",
+        "ShmSize": 65536000,
+        "Runtime": "oci",
+        "ConsoleSize": [
+            0,
+            0
+        ],
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 0,
+        "NanoCpus": 0,
+        "CgroupParent": "user.slice",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": [],
+        "DiskQuota": 0,
+        "KernelMemory": 0,
+        "MemoryReservation": 0,
+        "MemorySwap": 0,
+        "MemorySwappiness": 0,
+        "OomKillDisable": false,
+        "PidsLimit": 2048,
+        "Ulimits": [
+            {
+                "Name": "RLIMIT_NOFILE",
+                "Soft": 65536,
+                "Hard": 65536
+            },
+            {
+                "Name": "RLIMIT_NPROC",
+                "Soft": 124054,
+                "Hard": 124054
+            }
+        ],
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "CgroupConf": null
+    }
+}
