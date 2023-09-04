@@ -215,7 +215,7 @@ class ContainerConfig(DockerCamelModel):
     mac_address: Optional[str] = None
     on_build: Optional[List[str]] = None
     labels: Optional[Dict[str, str]] = None
-    stop_signal: Optional[str | int] = None
+    stop_signal: Optional[Union[str, int]] = None
     stop_timeout: Optional[int] = None
     shell: Optional[List[str]] = None
 
