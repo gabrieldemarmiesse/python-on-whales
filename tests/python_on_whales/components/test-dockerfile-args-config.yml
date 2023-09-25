@@ -7,7 +7,7 @@ services:
       dockerfile: docker/somefile.dockerfile
       args:
         python_version: "3.78"
-    image: some_random_image
+    image: "some_random_image"
     command: ping -c 7 www.google.com
     ports:
      - "5000:5000"
