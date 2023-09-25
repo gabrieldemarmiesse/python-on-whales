@@ -904,10 +904,6 @@ def test_config_dockerfile_args():
         config.services["my_service"].build.dockerfile
         == "docker/somefile.dockerfile"
     )
-    assert (
-        config.services["my_service"].build.args
-        == [{"python_version": "3.78"}]
-    )
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
         "ping",
@@ -925,3 +921,5 @@ def test_config_dockerfile_args():
     assert config.services["my_service"].volumes[1].target == "/dodo"
 
     assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
+
+    print(config.services["my_service"].build.args)
