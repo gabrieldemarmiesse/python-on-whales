@@ -889,9 +889,11 @@ def test_docker_compose_run_build():
     )
     docker.image.remove("some_random_image", force=True)
 
+
 def test_config_dockerfile_args():
     compose_file = (
-        PROJECT_ROOT / "tests/python_on_whales/components/test-dockerfile-args-config.yml"
+        PROJECT_ROOT
+        / "tests/python_on_whales/components/test-dockerfile-args-config.yml"
     )
     docker = DockerClient(compose_files=[compose_file])
     config = docker.compose.config()
@@ -901,9 +903,12 @@ def test_config_dockerfile_args():
         == (compose_file.parent / "my_service_build").absolute()
     )
     assert (
-        config.services["my_service"].build.dockerfile
-        == "docker/somefile.dockerfile"
+        config.services["my_service"].build.dockerfile == "docker/somefile.dockerfile"
     )
+    assert config.services["my_service"].build.args == {
+        "python_version": "3.78",
+        "python_version_1": "3.78",
+    }
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
         "ping",
@@ -921,5 +926,3 @@ def test_config_dockerfile_args():
     assert config.services["my_service"].volumes[1].target == "/dodo"
 
     assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
-
-    print(config.services["my_service"].build.args)
