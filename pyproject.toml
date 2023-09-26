@@ -25,7 +25,7 @@ test = [
 "Bug Tracker" = "https://github.com/gabrieldemarmiesse/python-on-whales/issues"
 
 [project.scripts]
-console_scripts = "python-on-whales=python_on_whales.command_line_entrypoint:main"
+python_on_whales = "python-on-whales=python_on_whales.command_line_entrypoint:main"
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "docs"]
