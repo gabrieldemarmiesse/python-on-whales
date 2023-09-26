@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-on-whales"
+version = "0.64.3"
+description = "A Docker client for Python, designed to be fun and intuitive!"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8, <4"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+]
+
+[project.urls]
+"Source" = "https://github.com/gabrieldemarmiesse/python-on-whales"
+"Documentation" = "https://gabrieldemarmiesse.github.io/python-on-whales/"
+"Bug Tracker" = "https://github.com/gabrieldemarmiesse/python-on-whales/issues"
+
+[project.scripts]
+console_scripts = "python-on-whales=python_on_whales.command_line_entrypoint:main"
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "docs"]
