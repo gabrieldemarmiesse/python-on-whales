@@ -893,7 +893,7 @@ def test_docker_compose_run_build():
 def test_build_args():
     compose_file = (
         PROJECT_ROOT
-        / "tests/python_on_whales/components/test-dockerfile-args-config.yml"
+        / "tests/python_on_whales/components/test-build-args.yml"
     )
     docker = DockerClient(compose_files=[compose_file])
     config = docker.compose.config()
@@ -909,7 +909,7 @@ def test_build_args():
         "python_version": "3.78",
         "python_version_1": "3.78",
     }
-    assert config.services["my_service"].build.args == {
+    assert config.services["my_service"].build.labels == {
         "com.example.description": "Accounting webapp",
         "com.example.department": "Finance",
     }
