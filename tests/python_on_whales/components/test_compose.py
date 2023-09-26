@@ -4,7 +4,7 @@ import tempfile
 import time
 from datetime import datetime, timedelta
 from os import makedirs, remove
-from pathlib import Path
+from pathlib import Path, PosixPath
 
 import pytest
 import pytz
@@ -902,8 +902,8 @@ def test_config_dockerfile_args():
         config.services["my_service"].build.context
         == (compose_file.parent / "my_service_build").absolute()
     )
-    assert (
-        config.services["my_service"].build.dockerfile == "docker/somefile.dockerfile"
+    assert config.services["my_service"].build.dockerfile == PosixPath(
+        "docker/somefile.dockerfile"
     )
     assert config.services["my_service"].build.args == {
         "python_version": "3.78",
