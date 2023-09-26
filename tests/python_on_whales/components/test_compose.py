@@ -892,8 +892,7 @@ def test_docker_compose_run_build():
 
 def test_build_args():
     compose_file = (
-        PROJECT_ROOT
-        / "tests/python_on_whales/components/test-build-args.yml"
+        PROJECT_ROOT / "tests/python_on_whales/components/test-build-args.yml"
     )
     docker = DockerClient(compose_files=[compose_file])
     config = docker.compose.config()
