@@ -38,7 +38,7 @@ class DependencyCondition(BaseModel):
 class ComposeServiceBuild(BaseModel):
     context: Optional[Path] = None
     dockerfile: Optional[Path] = None
-    args: Optional[dict[str, Any]] = None
+    args: Optional[Dict[str, Any]] = None
 
 
 class ComposeServicePort(BaseModel):
