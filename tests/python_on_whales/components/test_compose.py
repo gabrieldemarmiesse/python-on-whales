@@ -890,7 +890,7 @@ def test_docker_compose_run_build():
     docker.image.remove("some_random_image", force=True)
 
 
-def test_config_dockerfile_args():
+def test_build_args():
     compose_file = (
         PROJECT_ROOT
         / "tests/python_on_whales/components/test-dockerfile-args-config.yml"
@@ -908,6 +908,10 @@ def test_config_dockerfile_args():
     assert config.services["my_service"].build.args == {
         "python_version": "3.78",
         "python_version_1": "3.78",
+    }
+    assert config.services["my_service"].build.args == {
+        "com.example.description": "Accounting webapp",
+        "com.example.department": "Finance",
     }
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [

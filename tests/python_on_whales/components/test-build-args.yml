@@ -8,6 +8,9 @@ services:
       args:
         python_version: "3.78"
         python_version_1: "3.78"
+      labels:
+        com.example.description: "Accounting webapp"
+        com.example.department: "Finance"
     image: "some_random_image"
     command: ping -c 7 www.google.com
     ports:
