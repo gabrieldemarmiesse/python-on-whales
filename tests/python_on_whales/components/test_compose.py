@@ -888,3 +888,44 @@ def test_docker_compose_run_build():
         == docker.image.list("some_random_image")[0].repo_tags[0].split(":latest")[0]
     )
     docker.image.remove("some_random_image", force=True)
+
+
+def test_build_args():
+    compose_file = (
+        PROJECT_ROOT / "tests/python_on_whales/components/test-build-args.yml"
+    )
+    docker = DockerClient(compose_files=[compose_file])
+    config = docker.compose.config()
+
+    assert (
+        config.services["my_service"].build.context
+        == (compose_file.parent / "my_service_build").absolute()
+    )
+    assert config.services["my_service"].build.dockerfile == Path(
+        "docker/somefile.dockerfile"
+    )
+    assert config.services["my_service"].build.args == {
+        "python_version": "3.78",
+        "python_version_1": "3.78",
+    }
+    assert config.services["my_service"].build.labels == {
+        "com.example.description": "Accounting webapp",
+        "com.example.department": "Finance",
+    }
+    assert config.services["my_service"].image == "some_random_image"
+    assert config.services["my_service"].command == [
+        "ping",
+        "-c",
+        "7",
+        "www.google.com",
+    ]
+
+    assert config.services["my_service"].ports[0].published == 5000
+    assert config.services["my_service"].ports[0].target == 5000
+
+    assert config.services["my_service"].volumes[0].source == "/tmp"
+    assert config.services["my_service"].volumes[0].target == "/tmp"
+    assert config.services["my_service"].volumes[1].source == "dodo"
+    assert config.services["my_service"].volumes[1].target == "/dodo"
+
+    assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
