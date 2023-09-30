@@ -312,7 +312,6 @@ print(podman.ps())
 ...
 ```
 
-
 ## Contributing
 
 Any and all PRs are welcome. Please see [this documentation](./CONTRIBUTING.md).
