@@ -42,7 +42,6 @@ class ComposeServiceBuild(BaseModel):
     cache_from: Optional[List[str]] = None
     labels: Optional[Dict[str, Any]] = None
     network: Optional[str] = None
-    shm_size: Optional[str] = None
     target: Optional[str] = None
 
 
@@ -106,17 +105,17 @@ class ComposeConfigService(BaseModel):
     healthcheck: Optional[ComposeServiceHealthcheck] = None
     image: Optional[str] = None
     init: Optional[bool] = False
-    isolation: Optional[str] = "default"
+    isolation: str = Field(default="default")
     labels: Annotated[Optional[Dict[str, str]], Field(default_factory=dict)]
     network_mode: Optional[str] = None
-    networks: Optional[Union[Dict[str, Dict[str, Any]], List[str]]] = None
+    networks: Optional[Any] = None
     pid: Optional[str] = None
     ports: Optional[List[ComposeServicePort]] = None
     profiles: Optional[List[str]] = None
     restart: str = "no"
     secrets: Optional[List[str]] = None
-    stop_grace_period: str = "10s"
-    stop_signal: str = "SIGTERM"
+    stop_grace_period: str = Field(default="10s")
+    stop_signal: str = Field(default="SIGTERM")
     tmpfs: Optional[List[str]] = None
     ulimits: Optional[ComposeServiceULimits] = None
     userns_mode: Optional[str] = None
