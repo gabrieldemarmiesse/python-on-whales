@@ -918,3 +918,21 @@ def test_build_args():
     }
     assert config.services["my_service"].build.network == "host"
     assert config.services["my_service"].build.target == "prod"
+
+    assert config.services["my_service"].image == "some_random_image"
+    assert config.services["my_service"].command == [
+        "ping",
+        "-c",
+        "7",
+        "www.google.com",
+    ]
+
+    assert config.services["my_service"].ports[0].published == 5000
+    assert config.services["my_service"].ports[0].target == 5000
+
+    assert config.services["my_service"].volumes[0].source == "/tmp"
+    assert config.services["my_service"].volumes[0].target == "/tmp"
+    assert config.services["my_service"].volumes[1].source == "dodo"
+    assert config.services["my_service"].volumes[1].target == "/dodo"
+
+    assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
