@@ -46,6 +46,7 @@ class ComposeServiceBuild(BaseModel):
 
 
 class ComposeServiceHealthcheck(BaseModel):
+    disable: Optional[bool] = None
     interval: Optional[str] = None
     start_period: Optional[str] = None
     start_interval: Optional[str] = None
@@ -97,7 +98,6 @@ class ComposeConfigService(BaseModel):
     dns: Optional[List[str]] = None
     dns_search: Optional[List[str]] = None
     entrypoint: Optional[List[str]] = None
-    env_file: Optional[List[str]] = None
     environment: Optional[Dict[str, Optional[str]]] = None
     expose: Optional[List[str]] = None
     external_links: Optional[List[str]] = None
@@ -113,7 +113,7 @@ class ComposeConfigService(BaseModel):
     ports: Optional[List[ComposeServicePort]] = None
     profiles: Optional[List[str]] = None
     restart: str = "no"
-    secrets: Optional[List[str]] = None
+    secrets: Optional[List[Dict[str, Any]]] = None
     stop_grace_period: str = Field(default="10s")
     stop_signal: str = Field(default="SIGTERM")
     tmpfs: Optional[List[str]] = None
