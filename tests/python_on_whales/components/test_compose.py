@@ -457,10 +457,7 @@ def test_config_complex_compose():
     docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     config = docker.compose.config()
 
-    assert (
-        config.services["my_service"].build.context
-        == (compose_file.parent / "my_service_build").absolute()
-    )
+    assert config.services["my_service"].build.context == Path("my_service_build")
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
         "ping",
