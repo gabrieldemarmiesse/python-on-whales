@@ -669,6 +669,7 @@ class ComposeCLI(DockerCLICaller):
         recreate: bool = True,
         no_build: bool = False,
         remove_orphans: bool = False,
+        renew_anon_volumes: bool = False,
         color: bool = True,
         log_prefix: bool = True,
         start: bool = True,
@@ -733,6 +734,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--no-log-prefix", not log_prefix)
         full_cmd.add_flag("--no-start", not start)
         full_cmd.add_flag("--remove-orphans", remove_orphans)
+        full_cmd.add_flag("--renew-anon-volumes", renew_anon_volumes)
         full_cmd.add_simple_arg("--pull", pull)
 
         if no_attach_services is not None:
