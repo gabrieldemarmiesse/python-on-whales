@@ -449,6 +449,48 @@ def test_entrypoint_loaded_in_config():
     assert docker.compose.config().services["dodo"].entrypoint == ["/bin/sh"]
 
 
+def test_config_complexe_compose():
+    """Checking that the pydantic model does its job"""
+    compose_file = (
+        PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
+    )
+    docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
+    config = docker.compose.config()
+
+    assert config.services["my_service"].build.context == Path("my_service_build")
+    assert config.services["my_service"].image == "some_random_image"
+    assert config.services["my_service"].command == [
+        "ping",
+        "-c",
+        "2",
+        "www.google.com",
+    ]
+
+    assert config.services["my_service"].ports[0].published == 5000
+    assert config.services["my_service"].ports[0].target == 5000
+
+    assert config.services["my_service"].volumes[0].source == "/tmp"
+    assert config.services["my_service"].volumes[0].target == "/tmp"
+    assert config.services["my_service"].volumes[1].source == "dodo"
+    assert config.services["my_service"].volumes[1].target == "/dodo"
+
+    assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
+    assert config.services["my_service"].deploy.placement.constraints == [
+        "node.labels.hello-world == yes"
+    ]
+    assert config.services["my_service"].deploy.resources.limits.cpus == 2
+    assert config.services["my_service"].deploy.resources.limits.memory == 41943040
+
+    assert config.services["my_service"].deploy.resources.reservations.cpus == 1
+    assert (
+        config.services["my_service"].deploy.resources.reservations.memory == 20971520
+    )
+
+    assert config.services["my_service"].deploy.replicas == 4
+
+    assert not config.volumes["dodo"].external
+
+
 def test_config_complex_compose():
     """Checking that the pydantic model does its job"""
     compose_file = (
