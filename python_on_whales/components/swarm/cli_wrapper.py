@@ -82,6 +82,8 @@ class SwarmCLI(DockerCLICaller):
             availability: Availability of the node ("active"|"pause"|"drain")
             data_path_address: Address or interface to use for data path
                 traffic (format is `<ip|interface>`)
+            listen_address: address upon which the node listens for inbound
+                swarm manager traffic (format: `<ip|interface>[:port]`)
         """
         full_cmd = self.docker_cmd + ["swarm", "init"]
         full_cmd.add_simple_arg("--advertise-addr", advertise_address)
@@ -110,7 +112,7 @@ class SwarmCLI(DockerCLICaller):
                 (`"active"`|`"pause"`|`"drain"`)
             data_path_address: Address or interface to use for data
                 path traffic (format: <ip|interface>)
-            listen-address: Listen address (format: <ip|interface>[:port])
+            listen_address: Listen address (format: <ip|interface>[:port])
                 (default 0.0.0.0:2377)
             token: Token for entry into the swarm, will determine if
                 the node enters the swarm as a manager or a worker.

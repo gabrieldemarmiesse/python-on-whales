@@ -37,7 +37,7 @@ class ComposeCLI(DockerCLICaller):
             services: The services to build (as list of strings).
                 If `None` (default), all services are built.
                 An empty list means that nothing will be built.
-            build_arguments: Set build-time variables for services. For example
+            build_args: Set build-time variables for services. For example
                  `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
             cache: Set to `False` if you don't want to use the cache to build your images
             progress: Set type of progress output (auto, tty, plain, quiet) (default "auto")
@@ -96,7 +96,7 @@ class ComposeCLI(DockerCLICaller):
         build: bool = False,
         force_recreate: bool = False,
         no_build: bool = False,
-        no_recreate=False,
+        no_recreate: bool =False,
     ):
         """Creates containers for a service.
 
@@ -361,8 +361,8 @@ class ComposeCLI(DockerCLICaller):
         """Returns a list of docker compose projects
 
         Parameters:
-            all_stopped: Results include all stopped compose projects.
-            project_filters: Filter results based on conditions provided.
+            all: Results include all stopped compose projects.
+            filters: Filter results based on conditions provided.
 
         # Returns
             A `List[python_on_whales.ComposeProject]`
