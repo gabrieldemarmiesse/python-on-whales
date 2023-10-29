@@ -96,7 +96,7 @@ class ComposeCLI(DockerCLICaller):
         build: bool = False,
         force_recreate: bool = False,
         no_build: bool = False,
-        no_recreate: bool =False,
+        no_recreate: bool = False,
     ):
         """Creates containers for a service.
 
