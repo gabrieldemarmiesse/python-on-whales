@@ -705,6 +705,8 @@ class ComposeCLI(DockerCLICaller):
                 `recreate=False` and `force_recreate=True` are incompatible.
             no_build: Don't build an image, even if it's missing.
             remove_orphans: Remove containers for services not defined in the Compose file.
+            renew_anon_volumes: Recreate anonymous volumes instead of retrieving
+                data from the previous containers.
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
             start: Start the service after creating them.

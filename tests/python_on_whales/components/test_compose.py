@@ -740,6 +740,42 @@ def test_compose_multiple_profiles():
     docker.compose.down(timeout=1)
 
 
+def test_compose_anon_volumes_recreate_not_enabled():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_anon_volumes.yml"
+        ],
+    )
+    docker.compose.up(detach=True)
+
+    volume_name_before_recreate = docker.compose.ps()[0].mounts[0].name
+
+    docker.compose.up(detach=True, force_recreate=True)
+    volumes_name_after_recreate = docker.compose.ps()[0].mounts[0].name
+
+    assert volume_name_before_recreate == volumes_name_after_recreate
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_anon_volumes_recreate_enabled():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_anon_volumes.yml"
+        ],
+    )
+    docker.compose.up(detach=True)
+
+    volume_name_before_recreate = docker.compose.ps()[0].mounts[0].name
+
+    docker.compose.up(detach=True, force_recreate=True, renew_anon_volumes=True)
+    volumes_name_after_recreate = docker.compose.ps()[0].mounts[0].name
+
+    assert volume_name_before_recreate != volumes_name_after_recreate
+
+    docker.compose.down(timeout=1)
+
+
 def test_compose_port():
     d = DockerClient(
         compose_files=[
