@@ -234,7 +234,7 @@ class PluginCLI(DockerCLICaller):
         """Removes one or more plugins
 
         Parameters:
-            plugin: One or more plugins to remove.
+            x: One or more plugins to remove.
             force: Force the removal of this plugin.
         """
         full_cmd = self.docker_cmd + ["plugin", "remove"]
