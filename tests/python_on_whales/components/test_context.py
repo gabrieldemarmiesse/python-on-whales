@@ -48,6 +48,10 @@ def test_use_context():
     docker.context.use("default")
 
 
+def test_use_context_returns():
+    assert docker.context.use("default") == docker.context.inspect("default")
+
+
 def test_remove_empty_context_list():
     all_contexts = set(docker.context.list())
     docker.context.remove([])

@@ -231,3 +231,4 @@ class ContextCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["context", "use", context]
         run(full_cmd)
+        return self.inspect(context)
