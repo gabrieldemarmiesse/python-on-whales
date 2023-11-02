@@ -146,7 +146,7 @@ class ContextCLI(DockerCLICaller):
         """Creates a new context
 
         Parameters:
-            context: name of the context to create
+            context_name: name of the context to create
             default_stack_orchestrator: Default orchestrator for stack operations to use with this context (swarm|kubernetes|all)
             description: Description of the context
             docker: Set the docker endpoint, you can use a dict of a class to
