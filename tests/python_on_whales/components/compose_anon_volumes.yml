@@ -1,0 +1,8 @@
+version: "3.9"
+
+services:
+  busybox:
+    image: busybox:latest
+    command: sleep infinity
+    volumes:
+      - /hello-volume
