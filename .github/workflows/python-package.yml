@@ -62,7 +62,7 @@ jobs:
           - test_task.py
           - test_volume.py
         pydantic-version:
-          - pydantic==1.*
+          - pydantic==1.8
           - pydantic==2.*
     runs-on: ubuntu-latest
     steps:
