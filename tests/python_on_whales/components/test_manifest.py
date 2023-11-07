@@ -28,8 +28,8 @@ def with_platform_variant_manifest(request):
 
     def remove_docker_image():
         docker.image.remove(image_with_platform_variant)
-    request.addfinalizer(remove_docker_image)
 
+    request.addfinalizer(remove_docker_image)
     docker.image.pull(image_with_platform_variant, quiet=True)
     return docker.image.inspect(image_with_platform_variant)
 
