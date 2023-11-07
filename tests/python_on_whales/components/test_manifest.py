@@ -22,6 +22,18 @@ def with_manifest():
     docker.image.remove(images)
 
 
+@pytest.fixture
+def with_platform_variant_manifest(request):
+    image_with_platform_variant = "arm64v8/busybox:1.35"
+
+    def remove_docker_image():
+        docker.image.remove(image_with_platform_variant)
+    request.addfinalizer(remove_docker_image)
+
+    docker.image.pull(image_with_platform_variant, quiet=True)
+    return docker.image.inspect(image_with_platform_variant)
+
+
 @pytest.mark.parametrize("json_file", get_all_jsons("manifests"))
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
@@ -47,3 +59,9 @@ def test_manifest_annotate(with_manifest):
     )
     assert with_manifest.manifests[0].platform.os == "linux"
     assert with_manifest.manifests[0].platform.architecture == "arm64"
+
+
+def test_manifest_platform_variant(with_platform_variant_manifest):
+    assert "linux" in repr(with_platform_variant_manifest.os)
+    assert "arm64" in repr(with_platform_variant_manifest.architecture)
+    assert "v8" in repr(with_platform_variant_manifest.variant)

@@ -115,6 +115,10 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().os_version
 
     @property
+    def variant(self) -> str:
+        return self._get_inspect_result().variant
+
+    @property
     def size(self) -> int:
         return self._get_inspect_result().size
 
