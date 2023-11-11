@@ -159,7 +159,30 @@ def test_docker_compose_up_down():
         compose_compatibility=True,
     )
     docker.compose.up(["busybox", "alpine"])
-    docker.compose.down(timeout=1)
+    output_of_down = docker.compose.down(timeout=1)
+    assert output_of_down is None
+    assert docker.compose.ps() == []
+
+
+def test_docker_compose_up_down_streaming():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+    )
+    docker.compose.up(["busybox", "alpine"])
+    logs = list(docker.compose.down(timeout=1, stream_logs=True))
+
+    assert len(logs) >= 3
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    assert b"Removed" in logs_as_big_binary
+    assert b"Container components_alpine_1" in logs_as_big_binary
 
 
 def test_no_containers():
