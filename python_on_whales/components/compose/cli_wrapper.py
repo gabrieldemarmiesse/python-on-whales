@@ -169,6 +169,30 @@ class ComposeCLI(DockerCLICaller):
             full_cmd += to_list(services)
         run(full_cmd, capture_stdout=False)
 
+    @overload
+    def down(
+        self,
+        remove_orphans: bool = ...,
+        remove_images: Optional[str] = ...,
+        timeout: Optional[int] = ...,
+        volumes: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def down(
+        self,
+        remove_orphans: bool = ...,
+        remove_images: Optional[str] = ...,
+        timeout: Optional[int] = ...,
+        volumes: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def down(
         self,
         remove_orphans: bool = False,
@@ -176,6 +200,7 @@ class ComposeCLI(DockerCLICaller):
         timeout: Optional[int] = None,
         volumes: bool = False,
         quiet: bool = False,
+        stream_logs: bool = False,
     ):
         """Stops and removes the containers
 
@@ -192,17 +217,22 @@ class ComposeCLI(DockerCLICaller):
             quiet: If `False`, send to stderr and stdout the progress spinners with
                 the messages. If `True`, do not display anything.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
+
         full_cmd = self.docker_compose_cmd + ["down"]
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_simple_arg("--rmi", remove_images)
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
 
-        run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
-
-    def events(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
 
     def execute(
         self,
