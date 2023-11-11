@@ -434,13 +434,36 @@ class ComposeCLI(DockerCLICaller):
             for proj in json.loads(run(full_cmd))
         ]
 
+    @overload
+    def pull(
+        self,
+        services: Union[List[str], str, None] = ...,
+        ignore_pull_failures: bool = ...,
+        include_deps: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def pull(
+        self,
+        services: Union[List[str], str, None] = ...,
+        ignore_pull_failures: bool = ...,
+        include_deps: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def pull(
         self,
         services: Union[List[str], str, None] = None,
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
         quiet: bool = False,
-    ):
+        stream_logs: bool = False,
+    ) -> Union[Iterable[Tuple[str, bytes]], None]:
         """Pull service images
 
         Parameters:
@@ -452,8 +475,19 @@ class ComposeCLI(DockerCLICaller):
             include_deps: Also pull services declared as dependencies
             quiet: By default, the progress bars are printed in stdout and stderr (both).
                 To disable all output, use `quiet=True`
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
 
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
         full_cmd = self.docker_compose_cmd + ["pull"]
         full_cmd.add_flag("--ignore-pull-failures", ignore_pull_failures)
         full_cmd.add_flag("--include-deps", include_deps)
@@ -463,7 +497,10 @@ class ComposeCLI(DockerCLICaller):
         elif services is not None:
             services = to_list(services)
             full_cmd += services
-        run(full_cmd, capture_stdout=False, capture_stderr=False)
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stdout=False, capture_stderr=False)
 
     def push(self, services: Optional[List[str]] = None):
         """Push service images
