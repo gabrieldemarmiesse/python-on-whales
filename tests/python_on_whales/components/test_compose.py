@@ -384,6 +384,21 @@ def test_docker_compose_pull():
     docker.compose.pull(["busybox", "alpine"], quiet=True)
 
 
+def test_docker_compose_pull_stream():
+    try:
+        docker.image.remove("busybox")
+    except NoSuchImage:
+        pass
+    logs = list(docker.compose.pull("busybox", stream_logs=True))
+    assert len(logs) >= 3
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+    assert b"busybox Pulled" in logs_as_big_binary
+    assert b"Pull complete" in logs_as_big_binary
+
+
 def test_docker_compose_pull_ignore_pull_failures():
     docker = DockerClient(
         compose_files=[
