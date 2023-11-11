@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 from typing_extensions import Literal
 
@@ -21,6 +21,34 @@ from python_on_whales.utils import (
 
 
 class ComposeCLI(DockerCLICaller):
+    @overload
+    def build(
+        self,
+        services: Optional[List[str]] = ...,
+        build_args: Dict[str, str] = ...,
+        cache: bool = ...,
+        progress: Optional[str] = ...,
+        pull: bool = ...,
+        quiet: bool = ...,
+        ssh: Optional[str] = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def build(
+        self,
+        services: Optional[List[str]] = ...,
+        build_args: Dict[str, str] = ...,
+        cache: bool = ...,
+        progress: Optional[str] = ...,
+        pull: bool = ...,
+        quiet: bool = ...,
+        ssh: Optional[str] = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def build(
         self,
         services: Optional[List[str]] = None,
@@ -30,7 +58,8 @@ class ComposeCLI(DockerCLICaller):
         pull: bool = False,
         quiet: bool = False,
         ssh: Optional[str] = None,
-    ):
+        stream_logs: bool = False,
+    ) -> Union[Iterable[Tuple[str, bytes]], None]:
         """Build services declared in a yaml compose file.
 
         Parameters:
@@ -46,7 +75,19 @@ class ComposeCLI(DockerCLICaller):
             quiet: Don't print anything
             ssh: Set SSH authentications used when building service images.
                 (use `'default'` for using your default SSH Agent)
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
+
         full_cmd = self.docker_compose_cmd + ["build"]
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
         full_cmd.add_flag("--no-cache", not cache)
@@ -59,7 +100,10 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += services
-        run(full_cmd, capture_stdout=False)
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stdout=False)
 
     def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the configuration of the compose stack for further inspection.

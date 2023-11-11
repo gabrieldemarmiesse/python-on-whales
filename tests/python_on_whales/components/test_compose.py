@@ -125,6 +125,20 @@ def test_docker_compose_build():
     docker.image.remove("some_random_image")
 
 
+def test_docker_compose_build_stream():
+    logs = list(docker.compose.build(["my_service"], stream_logs=True))
+    assert len(logs) >= 3
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    assert b"load .dockerignore" in logs_as_big_binary
+    assert b"DONE" in logs_as_big_binary
+
+    docker.image.remove("some_random_image")
+
+
 def test_docker_compose_build_with_arguments():
     docker.compose.build(
         build_args={"PYTHON_VERSION": "3.7"},
