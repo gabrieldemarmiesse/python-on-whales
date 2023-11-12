@@ -231,7 +231,20 @@ def test_docker_compose_pause_unpause():
 
 
 def test_docker_compose_create_down():
-    docker.compose.create()
+    create_result = docker.compose.create()
+    assert create_result is None
+    docker.compose.down()
+
+
+def test_docker_compose_create_stream_down():
+    docker.compose.down()
+    logs = list(
+        docker.compose.create(["my_service", "busybox", "alpine"], stream_logs=True)
+    )
+    assert len(logs) >= 2
+    full_logs_as_binary = b"".join(log for _, log in logs)
+    assert b"Creating" in full_logs_as_binary
+    assert b"components_busybox_1" in full_logs_as_binary
     docker.compose.down()
 
 
