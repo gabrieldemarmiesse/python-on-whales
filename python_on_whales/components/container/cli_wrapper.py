@@ -309,6 +309,7 @@ class Container(ReloadableObjectFromJson):
 
     def logs(
         self,
+        *,
         details: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -321,7 +322,12 @@ class Container(ReloadableObjectFromJson):
         information about the arguments.
         """
         return ContainerCLI(self.client_config).logs(
-            self, details, since, tail, timestamps, until
+            self,
+            details=details,
+            since=since,
+            tail=tail,
+            timestamps=timestamps,
+            until=until,
         )
 
     def pause(self) -> None:
