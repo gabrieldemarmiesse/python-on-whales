@@ -362,7 +362,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.remove`](../sub-commands/container.md#remove) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).remove(self, force, volumes)
+        return ContainerCLI(self.client_config).remove(
+            self, force=force, volumes=volumes
+        )
 
     def start(
         self, attach: bool = False, stream: bool = False
