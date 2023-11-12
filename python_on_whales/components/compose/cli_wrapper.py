@@ -134,6 +134,30 @@ class ComposeCLI(DockerCLICaller):
         else:
             return ComposeConfig(**json.loads(result))
 
+    @overload
+    def create(
+        self,
+        services: Union[str, List[str], None] = ...,
+        build: bool = ...,
+        force_recreate: bool = ...,
+        no_build: bool = ...,
+        no_recreate: bool = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def create(
+        self,
+        services: Union[str, List[str], None] = ...,
+        build: bool = ...,
+        force_recreate: bool = ...,
+        no_build: bool = ...,
+        no_recreate: bool = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def create(
         self,
         services: Union[str, List[str], None] = None,
@@ -141,7 +165,8 @@ class ComposeCLI(DockerCLICaller):
         force_recreate: bool = False,
         no_build: bool = False,
         no_recreate: bool = False,
-    ):
+        stream_logs: bool = False,
+    ) -> Union[Iterable[Tuple[str, bytes]], None]:
         """Creates containers for a service.
 
         Parameters:
@@ -157,6 +182,12 @@ class ComposeCLI(DockerCLICaller):
             no_build: Don't build an image, even if it's missing.
             no_recreate: If containers already exist, don't recreate them.
                 Incompatible with `force_recreate=True`.
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
         full_cmd = self.docker_compose_cmd + ["create"]
         full_cmd.add_flag("--build", build)
@@ -167,7 +198,11 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd, capture_stdout=False)
+        if stream_logs:
+            print(full_cmd)
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stdout=False)
 
     @overload
     def down(
