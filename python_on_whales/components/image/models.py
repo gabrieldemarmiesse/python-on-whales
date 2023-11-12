@@ -43,6 +43,7 @@ class ImageInspectResult(DockerCamelModel):
     architecture: Optional[str] = None
     os: Optional[str] = None
     os_version: Optional[str] = None
+    variant: Optional[str] = None
     size: Optional[int] = None
     virtual_size: Optional[int] = None
     graph_driver: Optional[ImageGraphDriver] = None

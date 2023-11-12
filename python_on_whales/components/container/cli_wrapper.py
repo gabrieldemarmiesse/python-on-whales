@@ -972,7 +972,7 @@ class ContainerCLI(DockerCLICaller):
         """Returns a container object from a name or ID.
 
         Parameters:
-            reference: A container name or ID, or a list of container names
+            x: A container name or ID, or a list of container names
                 and/or IDs
 
         Returns:

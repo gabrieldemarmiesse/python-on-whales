@@ -125,6 +125,20 @@ def test_docker_compose_build():
     docker.image.remove("some_random_image")
 
 
+def test_docker_compose_build_stream():
+    logs = list(docker.compose.build(["my_service"], stream_logs=True))
+    assert len(logs) >= 3
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    assert b"load .dockerignore" in logs_as_big_binary
+    assert b"DONE" in logs_as_big_binary
+
+    docker.image.remove("some_random_image")
+
+
 def test_docker_compose_build_with_arguments():
     docker.compose.build(
         build_args={"PYTHON_VERSION": "3.7"},
@@ -145,7 +159,30 @@ def test_docker_compose_up_down():
         compose_compatibility=True,
     )
     docker.compose.up(["busybox", "alpine"])
-    docker.compose.down(timeout=1)
+    output_of_down = docker.compose.down(timeout=1)
+    assert output_of_down is None
+    assert docker.compose.ps() == []
+
+
+def test_docker_compose_up_down_streaming():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_ends_quickly.yml"
+        ],
+        compose_compatibility=True,
+    )
+    docker.compose.up(["busybox", "alpine"])
+    logs = list(docker.compose.down(timeout=1, stream_logs=True))
+
+    assert len(logs) >= 3
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    assert b"Removed" in logs_as_big_binary
+    assert b"Container components_alpine_1" in logs_as_big_binary
 
 
 def test_no_containers():
@@ -194,7 +231,20 @@ def test_docker_compose_pause_unpause():
 
 
 def test_docker_compose_create_down():
-    docker.compose.create()
+    create_result = docker.compose.create()
+    assert create_result is None
+    docker.compose.down()
+
+
+def test_docker_compose_create_stream_down():
+    docker.compose.down()
+    logs = list(
+        docker.compose.create(["my_service", "busybox", "alpine"], stream_logs=True)
+    )
+    assert len(logs) >= 2
+    full_logs_as_binary = b"".join(log for _, log in logs)
+    assert b"Creating" in full_logs_as_binary
+    assert b"components_busybox_1" in full_logs_as_binary
     docker.compose.down()
 
 
@@ -345,6 +395,21 @@ def test_docker_compose_pull():
 
     # pull with quiet should work too
     docker.compose.pull(["busybox", "alpine"], quiet=True)
+
+
+def test_docker_compose_pull_stream():
+    try:
+        docker.image.remove("busybox")
+    except NoSuchImage:
+        pass
+    logs = list(docker.compose.pull("busybox", stream_logs=True))
+    assert len(logs) >= 3
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+    assert b"busybox Pulled" in logs_as_big_binary
+    assert b"Pull complete" in logs_as_big_binary
 
 
 def test_docker_compose_pull_ignore_pull_failures():
@@ -779,6 +844,42 @@ def test_compose_multiple_profiles():
     container_names = [x.name for x in docker.compose.ps()]
     assert "components_profile_test_service_1" in container_names
     assert "components_second_profile_test_service_1" in container_names
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_anon_volumes_recreate_not_enabled():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_anon_volumes.yml"
+        ],
+    )
+    docker.compose.up(detach=True)
+
+    volume_name_before_recreate = docker.compose.ps()[0].mounts[0].name
+
+    docker.compose.up(detach=True, force_recreate=True)
+    volumes_name_after_recreate = docker.compose.ps()[0].mounts[0].name
+
+    assert volume_name_before_recreate == volumes_name_after_recreate
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_anon_volumes_recreate_enabled():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/compose_anon_volumes.yml"
+        ],
+    )
+    docker.compose.up(detach=True)
+
+    volume_name_before_recreate = docker.compose.ps()[0].mounts[0].name
+
+    docker.compose.up(detach=True, force_recreate=True, renew_anon_volumes=True)
+    volumes_name_after_recreate = docker.compose.ps()[0].mounts[0].name
+
+    assert volume_name_before_recreate != volumes_name_after_recreate
 
     docker.compose.down(timeout=1)
 

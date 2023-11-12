@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 from typing_extensions import Literal
 
@@ -21,6 +21,34 @@ from python_on_whales.utils import (
 
 
 class ComposeCLI(DockerCLICaller):
+    @overload
+    def build(
+        self,
+        services: Optional[List[str]] = ...,
+        build_args: Dict[str, str] = ...,
+        cache: bool = ...,
+        progress: Optional[str] = ...,
+        pull: bool = ...,
+        quiet: bool = ...,
+        ssh: Optional[str] = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def build(
+        self,
+        services: Optional[List[str]] = ...,
+        build_args: Dict[str, str] = ...,
+        cache: bool = ...,
+        progress: Optional[str] = ...,
+        pull: bool = ...,
+        quiet: bool = ...,
+        ssh: Optional[str] = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def build(
         self,
         services: Optional[List[str]] = None,
@@ -30,14 +58,15 @@ class ComposeCLI(DockerCLICaller):
         pull: bool = False,
         quiet: bool = False,
         ssh: Optional[str] = None,
-    ):
+        stream_logs: bool = False,
+    ) -> Union[Iterable[Tuple[str, bytes]], None]:
         """Build services declared in a yaml compose file.
 
         Parameters:
             services: The services to build (as list of strings).
                 If `None` (default), all services are built.
                 An empty list means that nothing will be built.
-            build_arguments: Set build-time variables for services. For example
+            build_args: Set build-time variables for services. For example
                  `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
             cache: Set to `False` if you don't want to use the cache to build your images
             progress: Set type of progress output (auto, tty, plain, quiet) (default "auto")
@@ -46,7 +75,19 @@ class ComposeCLI(DockerCLICaller):
             quiet: Don't print anything
             ssh: Set SSH authentications used when building service images.
                 (use `'default'` for using your default SSH Agent)
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
+
         full_cmd = self.docker_compose_cmd + ["build"]
         full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
         full_cmd.add_flag("--no-cache", not cache)
@@ -59,7 +100,10 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += services
-        run(full_cmd, capture_stdout=False)
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stdout=False)
 
     def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the configuration of the compose stack for further inspection.
@@ -91,14 +135,39 @@ class ComposeCLI(DockerCLICaller):
             raw_compose_config = json.loads(result)
             return ComposeConfig(**raw_compose_config)
 
+    @overload
+    def create(
+        self,
+        services: Union[str, List[str], None] = ...,
+        build: bool = ...,
+        force_recreate: bool = ...,
+        no_build: bool = ...,
+        no_recreate: bool = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def create(
+        self,
+        services: Union[str, List[str], None] = ...,
+        build: bool = ...,
+        force_recreate: bool = ...,
+        no_build: bool = ...,
+        no_recreate: bool = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def create(
         self,
         services: Union[str, List[str], None] = None,
         build: bool = False,
         force_recreate: bool = False,
         no_build: bool = False,
-        no_recreate=False,
-    ):
+        no_recreate: bool = False,
+        stream_logs: bool = False,
+    ) -> Union[Iterable[Tuple[str, bytes]], None]:
         """Creates containers for a service.
 
         Parameters:
@@ -114,6 +183,12 @@ class ComposeCLI(DockerCLICaller):
             no_build: Don't build an image, even if it's missing.
             no_recreate: If containers already exist, don't recreate them.
                 Incompatible with `force_recreate=True`.
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
         full_cmd = self.docker_compose_cmd + ["create"]
         full_cmd.add_flag("--build", build)
@@ -124,7 +199,35 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd, capture_stdout=False)
+        if stream_logs:
+            print(full_cmd)
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stdout=False)
+
+    @overload
+    def down(
+        self,
+        remove_orphans: bool = ...,
+        remove_images: Optional[str] = ...,
+        timeout: Optional[int] = ...,
+        volumes: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def down(
+        self,
+        remove_orphans: bool = ...,
+        remove_images: Optional[str] = ...,
+        timeout: Optional[int] = ...,
+        volumes: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
 
     def down(
         self,
@@ -133,6 +236,7 @@ class ComposeCLI(DockerCLICaller):
         timeout: Optional[int] = None,
         volumes: bool = False,
         quiet: bool = False,
+        stream_logs: bool = False,
     ):
         """Stops and removes the containers
 
@@ -149,17 +253,22 @@ class ComposeCLI(DockerCLICaller):
             quiet: If `False`, send to stderr and stdout the progress spinners with
                 the messages. If `True`, do not display anything.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
+
         full_cmd = self.docker_compose_cmd + ["down"]
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_simple_arg("--rmi", remove_images)
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
 
-        run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
-
-    def events(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stderr=quiet, capture_stdout=quiet)
 
     def execute(
         self,
@@ -362,8 +471,8 @@ class ComposeCLI(DockerCLICaller):
         """Returns a list of docker compose projects
 
         Parameters:
-            all_stopped: Results include all stopped compose projects.
-            project_filters: Filter results based on conditions provided.
+            all: Results include all stopped compose projects.
+            filters: Filter results based on conditions provided.
 
         # Returns
             A `List[python_on_whales.ComposeProject]`
@@ -391,13 +500,36 @@ class ComposeCLI(DockerCLICaller):
             for proj in json.loads(run(full_cmd))
         ]
 
+    @overload
+    def pull(
+        self,
+        services: Union[List[str], str, None] = ...,
+        ignore_pull_failures: bool = ...,
+        include_deps: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def pull(
+        self,
+        services: Union[List[str], str, None] = ...,
+        ignore_pull_failures: bool = ...,
+        include_deps: bool = ...,
+        quiet: bool = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def pull(
         self,
         services: Union[List[str], str, None] = None,
         ignore_pull_failures: bool = False,
         include_deps: bool = False,
         quiet: bool = False,
-    ):
+        stream_logs: bool = False,
+    ) -> Union[Iterable[Tuple[str, bytes]], None]:
         """Pull service images
 
         Parameters:
@@ -409,8 +541,19 @@ class ComposeCLI(DockerCLICaller):
             include_deps: Also pull services declared as dependencies
             quiet: By default, the progress bars are printed in stdout and stderr (both).
                 To disable all output, use `quiet=True`
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
 
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
         full_cmd = self.docker_compose_cmd + ["pull"]
         full_cmd.add_flag("--ignore-pull-failures", ignore_pull_failures)
         full_cmd.add_flag("--include-deps", include_deps)
@@ -420,7 +563,10 @@ class ComposeCLI(DockerCLICaller):
         elif services is not None:
             services = to_list(services)
             full_cmd += services
-        run(full_cmd, capture_stdout=False, capture_stderr=False)
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd, capture_stdout=False, capture_stderr=False)
 
     def push(self, services: Optional[List[str]] = None):
         """Push service images
@@ -670,6 +816,7 @@ class ComposeCLI(DockerCLICaller):
         recreate: bool = True,
         no_build: bool = False,
         remove_orphans: bool = False,
+        renew_anon_volumes: bool = False,
         color: bool = True,
         log_prefix: bool = True,
         start: bool = True,
@@ -705,6 +852,8 @@ class ComposeCLI(DockerCLICaller):
                 `recreate=False` and `force_recreate=True` are incompatible.
             no_build: Don't build an image, even if it's missing.
             remove_orphans: Remove containers for services not defined in the Compose file.
+            renew_anon_volumes: Recreate anonymous volumes instead of retrieving
+                data from the previous containers.
             color: If `False`, it will produce monochrome output.
             log_prefix: If `False`, will not display the prefix in the logs.
             start: Start the service after creating them.
@@ -734,6 +883,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--no-log-prefix", not log_prefix)
         full_cmd.add_flag("--no-start", not start)
         full_cmd.add_flag("--remove-orphans", remove_orphans)
+        full_cmd.add_flag("--renew-anon-volumes", renew_anon_volumes)
         full_cmd.add_simple_arg("--pull", pull)
 
         if no_attach_services is not None:

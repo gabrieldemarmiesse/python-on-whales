@@ -48,7 +48,7 @@ class DockerClient(DockerCLICaller):
         debug: Enable debug mode
         host: Daemon socket(s) to connect to
         log_level: Set the logging level ("debug"|"info"|"warn"|"error"|"fatal")
-           (default "info")
+            (default "info")
         tls:  Use TLS; implied by `tlsverify`
         tlscacert: Trust certs signed only by this CA (default "~/.docker/ca.pem")
         compose_files: Docker compose yaml file
