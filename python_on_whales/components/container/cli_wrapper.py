@@ -309,6 +309,7 @@ class Container(ReloadableObjectFromJson):
 
     def logs(
         self,
+        *,
         details: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -321,7 +322,12 @@ class Container(ReloadableObjectFromJson):
         information about the arguments.
         """
         return ContainerCLI(self.client_config).logs(
-            self, details, since, tail, timestamps, until
+            self,
+            details=details,
+            since=since,
+            tail=tail,
+            timestamps=timestamps,
+            until=until,
         )
 
     def pause(self) -> None:
@@ -362,7 +368,9 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.remove`](../sub-commands/container.md#remove) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).remove(self, force, volumes)
+        return ContainerCLI(self.client_config).remove(
+            self, force=force, volumes=volumes
+        )
 
     def start(
         self, attach: bool = False, stream: bool = False
@@ -961,14 +969,14 @@ class ContainerCLI(DockerCLICaller):
             run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Container:
+    def inspect(self, x: str, /) -> Container:
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Container]:
+    def inspect(self, x: List[str], /) -> List[Container]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Container, List[Container]]:
+    def inspect(self, x: Union[str, List[str]], /) -> Union[Container, List[Container]]:
         """Returns a container object from a name or ID.
 
         Parameters:
@@ -1019,6 +1027,7 @@ class ContainerCLI(DockerCLICaller):
     def logs(
         self,
         container: Union[Container, str],
+        *,
         details: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -1201,6 +1210,7 @@ class ContainerCLI(DockerCLICaller):
     def remove(
         self,
         containers: Union[Container, str, List[Union[Container, str]]],
+        *,
         force: bool = False,
         volumes: bool = False,
     ) -> None:
@@ -1810,7 +1820,7 @@ class ContainerCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, x: Union[ValidContainer, List[ValidContainer]]):
+    def unpause(self, x: Union[ValidContainer, List[ValidContainer]], /):
         """Unpause all processes within one or more containers
 
         Alias: `docker.unpause(...)`
@@ -1832,6 +1842,8 @@ class ContainerCLI(DockerCLICaller):
     def update(
         self,
         x: Union[ValidContainer, List[ValidContainer]],
+        /,
+        *,
         blkio_weight: Optional[int] = None,
         cpu_period: Optional[int] = None,
         cpu_quota: Optional[int] = None,
