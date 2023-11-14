@@ -144,7 +144,7 @@ class ServiceCLI(DockerCLICaller):
     def create(
         self,
         image: str,
-        command: Union[str, List[str], None],
+        command: Optional[List[str]],
         cap_add: List[str] = [],
         cap_drop: List[str] = [],
         constraints: List[str] = [],
