@@ -261,7 +261,7 @@ class Container(ReloadableObjectFromJson):
 
     def execute(
         self,
-        command: Union[str, List[str]],
+        command: List[str],
         detach: bool = False,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
@@ -838,7 +838,7 @@ class ContainerCLI(DockerCLICaller):
     def execute(
         self,
         container: ValidContainer,
-        command: Union[str, List[str]],
+        command: List[str],
         detach: bool = False,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
