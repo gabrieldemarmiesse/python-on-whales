@@ -274,6 +274,24 @@ def test_docker_compose_up_build():
         docker.compose.down()
 
 
+def test_docker_compose_up_stream():
+    logs = list(
+        docker.compose.up(
+            ["my_service", "busybox", "alpine"],
+            build=True,
+            stream_logs=True,
+            detach=True,
+            recreate=True,
+        )
+    )
+    assert len(logs) >= 2
+    full_logs_as_binary = b"".join(log for _, log in logs)
+    assert b"components_alpine_1" in full_logs_as_binary
+    assert b"components_my_service_1" in full_logs_as_binary
+    assert b"components_busybox_1" in full_logs_as_binary
+    docker.compose.down()
+
+
 def test_docker_compose_up_stop_rm():
     docker.compose.up(["my_service", "busybox", "alpine"], build=True, detach=True)
     docker.compose.stop(timeout=timedelta(seconds=3))
