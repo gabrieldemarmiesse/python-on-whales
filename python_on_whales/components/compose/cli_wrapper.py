@@ -803,6 +803,56 @@ class ComposeCLI(DockerCLICaller):
             full_cmd += to_list(services)
         run(full_cmd)
 
+    @overload
+    def up(
+        self,
+        services: Union[List[str], str, None] = ...,
+        build: bool = ...,
+        detach: bool = ...,
+        abort_on_container_exit: bool = ...,
+        scales: Dict[str, int] = ...,
+        attach_dependencies: bool = ...,
+        force_recreate: bool = ...,
+        recreate: bool = ...,
+        no_build: bool = ...,
+        remove_orphans: bool = ...,
+        renew_anon_volumes: bool = ...,
+        color: bool = ...,
+        log_prefix: bool = ...,
+        start: bool = ...,
+        quiet: bool = ...,
+        wait: bool = ...,
+        no_attach_services: Union[List[str], str, None] = ...,
+        pull: Literal["always", "missing", "never", None] = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def up(
+        self,
+        services: Union[List[str], str, None] = ...,
+        build: bool = ...,
+        detach: bool = ...,
+        abort_on_container_exit: bool = ...,
+        scales: Dict[str, int] = ...,
+        attach_dependencies: bool = ...,
+        force_recreate: bool = ...,
+        recreate: bool = ...,
+        no_build: bool = ...,
+        remove_orphans: bool = ...,
+        renew_anon_volumes: bool = ...,
+        color: bool = ...,
+        log_prefix: bool = ...,
+        start: bool = ...,
+        quiet: bool = ...,
+        wait: bool = ...,
+        no_attach_services: Union[List[str], str, None] = ...,
+        pull: Literal["always", "missing", "never", None] = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def up(
         self,
         services: Union[List[str], str, None] = None,
@@ -823,6 +873,7 @@ class ComposeCLI(DockerCLICaller):
         wait: bool = False,
         no_attach_services: Union[List[str], str, None] = None,
         pull: Literal["always", "missing", "never", None] = None,
+        stream_logs: bool = False,
     ):
         """Start the containers.
 
@@ -861,12 +912,18 @@ class ComposeCLI(DockerCLICaller):
             wait: Wait for services to be running|healthy. Implies detached mode.
             no_attach_services: The services not to attach to.
             pull: Pull image before running (“always”|”missing”|”never”).
-
-        # Returns
-            `None` at the moment. The plan is to be able to capture and stream the logs later.
-            It's not yet implemented.
-
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
         full_cmd = self.docker_compose_cmd + ["up"]
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
@@ -895,8 +952,12 @@ class ComposeCLI(DockerCLICaller):
         elif services is not None:
             services = to_list(services)
             full_cmd += services
-        # important information is written to both stdout AND stderr.
-        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            # important information is written to both stdout AND stderr.
+            run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     def version(self) -> str:
         """Returns the version of docker compose as a `str`."""
