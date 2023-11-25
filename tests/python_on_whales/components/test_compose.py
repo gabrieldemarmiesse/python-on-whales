@@ -347,6 +347,19 @@ def test_docker_compose_start():
     docker.compose.down(timeout=1)
 
 
+def test_docker_compose_start_stream():
+    docker.compose.create(["busybox"])
+    assert not docker.compose.ps(all=True)[0].state.running
+    assert docker.compose.ps() == []
+    logs = list(docker.compose.start(["busybox"], stream_logs=True))
+    assert len(logs) >= 2
+    full_logs_as_binary = b"".join(log for _, log in logs)
+    assert b"Container components_busybox_1  Starting" in full_logs_as_binary
+    assert b"Container components_busybox_1  Started" in full_logs_as_binary
+    assert docker.compose.ps()[0].state.running
+    docker.compose.down(timeout=1)
+
+
 def test_docker_compose_restart():
     docker.compose.up(["my_service"], detach=True)
     time.sleep(2)

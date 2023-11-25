@@ -743,20 +743,47 @@ class ComposeCLI(DockerCLICaller):
             else:
                 return result
 
-    def start(self, services: Union[str, List[str], None] = None):
+    @overload
+    def start(
+        self,
+        services: Union[str, List[str], None] = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def start(
+        self,
+        services: Union[str, List[str], None] = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
+    def start(
+        self, services: Union[str, List[str], None] = None, stream_logs: bool = False
+    ):
         """Start the specified services.
 
         Parameters:
             services: The names of one or more services to start.
                 If `None` (the default), it means all services will start.
                 If an empty list is provided, this function call is a no-op.
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
         full_cmd = self.docker_compose_cmd + ["start"]
         if services == []:
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd)
 
     def stop(
         self,
