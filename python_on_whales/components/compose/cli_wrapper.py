@@ -758,10 +758,29 @@ class ComposeCLI(DockerCLICaller):
             full_cmd += to_list(services)
         run(full_cmd)
 
+    @overload
+    def stop(
+        self,
+        services: Union[str, List[str], None] = ...,
+        timeout: Union[int, timedelta, None] = ...,
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def stop(
+        self,
+        services: Union[str, List[str], None] = ...,
+        timeout: Union[int, timedelta, None] = ...,
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
     def stop(
         self,
         services: Union[str, List[str], None] = None,
         timeout: Union[int, timedelta, None] = None,
+        stream_logs: bool = False,
     ):
         """Stop services
 
@@ -771,6 +790,12 @@ class ComposeCLI(DockerCLICaller):
                 If an empty list is provided, this function call is a no-op.
             timeout: Number of seconds or timedelta (will be converted to seconds).
                 Specify a shutdown timeout. Default is 10s.
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an Iterable of `Tuple[str, bytes]` where the first element
+                is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
+                as bytes, you'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
+                not familiar with the streaming of logs in Python-on-whales.
         """
         if isinstance(timeout, timedelta):
             timeout = int(timeout.total_seconds())
@@ -781,7 +806,10 @@ class ComposeCLI(DockerCLICaller):
             return
         elif services is not None:
             full_cmd += to_list(services)
-        run(full_cmd)
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
+        else:
+            run(full_cmd)
 
     def top(self):
         """Not yet implemented"""
