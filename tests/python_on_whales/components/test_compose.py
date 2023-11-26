@@ -298,6 +298,15 @@ def test_docker_compose_up_stop_rm():
     docker.compose.rm(volumes=True)
 
 
+def test_docker_compose_stop_stream():
+    docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
+    logs = list(docker.compose.stop(stream_logs=True))
+    assert len(logs) >= 2
+    full_logs_as_binary = b"".join(log for _, log in logs)
+    assert b"Container components_busybox_1  Stopping" in full_logs_as_binary
+    assert b"Container components_busybox_1  Stopped" in full_logs_as_binary
+
+
 def test_docker_compose_up_rm():
     docker.compose.up(["my_service", "busybox", "alpine"], build=True, detach=True)
     docker.compose.rm(stop=True, volumes=True)
