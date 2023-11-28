@@ -158,7 +158,7 @@ def test_stack_config_variables():
 
     agent_service = config.services["agent"]
     expected = "hello-world"
-    assert agent_service.environment['SOME_OTHER_VARIABLE'] == expected
+    assert agent_service.environment["SOME_OTHER_VARIABLE"] == expected
 
 
 def test_stack_config_variables_return_json():
@@ -170,7 +170,7 @@ def test_stack_config_variables_return_json():
 
     agent_service = config["services"]["agent"]
     expected = "hello-world"
-    assert agent_service["environment"]['SOME_OTHER_VARIABLE'] == expected
+    assert agent_service["environment"]["SOME_OTHER_VARIABLE"] == expected
 
 
 def test_stack_config_envfiles(tmp_path: Path):
@@ -183,7 +183,7 @@ def test_stack_config_envfiles(tmp_path: Path):
 
     agent_service = config.services["agent"]
     expected = '"--tls=true"'
-    assert agent_service.environment['SOME_OTHER_VARIABLE'] == expected
+    assert agent_service.environment["SOME_OTHER_VARIABLE"] == expected
 
 
 def test_stack_config_envfiles_return_json(tmp_path: Path):
@@ -197,4 +197,4 @@ def test_stack_config_envfiles_return_json(tmp_path: Path):
 
     agent_service = config["services"]["agent"]
     expected = '"--tls=true"'
-    assert agent_service["environment"]['SOME_OTHER_VARIABLE'] == expected
+    assert agent_service["environment"]["SOME_OTHER_VARIABLE"] == expected

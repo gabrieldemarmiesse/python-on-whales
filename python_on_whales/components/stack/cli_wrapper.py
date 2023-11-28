@@ -100,9 +100,8 @@ class StackCLI(DockerCLICaller):
         compose_files: Union[ValidPath, List[ValidPath]],
         env_files: Optional[List[ValidPath]] = None,
         variables: Optional[Dict[str, str]] = None,
-        return_json: bool = False
+        return_json: bool = False,
     ) -> Union[ComposeConfig, Dict[str, Any]]:
-
         env_files = [] if env_files is None else env_files
         variables = {} if variables is None else variables
 
@@ -112,7 +111,9 @@ class StackCLI(DockerCLICaller):
         env = read_env_files([Path(x) for x in env_files])
         env.update(variables)
 
-        result = yaml.safe_load(run(full_cmd, capture_stdout=True, return_stderr=False, env=env))
+        result = yaml.safe_load(
+            run(full_cmd, capture_stdout=True, return_stderr=False, env=env)
+        )
 
         if return_json:
             return result
