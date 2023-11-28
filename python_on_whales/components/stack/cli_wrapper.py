@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -117,7 +116,7 @@ class StackCLI(DockerCLICaller):
 
         if return_json:
             return result
-        return ComposeConfig.model_validate(result)
+        return ComposeConfig(**result)
 
     def list(self) -> List[Stack]:
         """Returns a list of `python_on_whales.Stack`
