@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+
+import yaml
 
 import python_on_whales.components.service.cli_wrapper
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.utils import ValidPath, read_env_files, run, to_list
 
 
@@ -91,6 +95,29 @@ class StackCLI(DockerCLICaller):
 
         run(full_cmd, capture_stdout=False, env=env)
         return Stack(self.client_config, name)
+
+    def config(
+        self,
+        compose_files: Union[ValidPath, List[ValidPath]],
+        env_files: Optional[List[ValidPath]] = None,
+        variables: Optional[Dict[str, str]] = None,
+        return_json: bool = False
+    ) -> Union[ComposeConfig, Dict[str, Any]]:
+
+        env_files = [] if env_files is None else env_files
+        variables = {} if variables is None else variables
+
+        full_cmd = self.docker_cmd + ["stack", "config"]
+        full_cmd.add_args_list("--compose-file", compose_files)
+
+        env = read_env_files([Path(x) for x in env_files])
+        env.update(variables)
+
+        result = yaml.safe_load(run(full_cmd, capture_stdout=True, return_stderr=False, env=env))
+
+        if return_json:
+            return result
+        return ComposeConfig.model_validate(result)
 
     def list(self) -> List[Stack]:
         """Returns a list of `python_on_whales.Stack`

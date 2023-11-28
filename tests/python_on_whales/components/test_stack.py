@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.exceptions import NotASwarmManager
+from python_on_whales.exceptions import DockerException, NotASwarmManager
 from python_on_whales.utils import PROJECT_ROOT
 
 
@@ -122,3 +122,79 @@ def test_services_not_swarm_manager():
         docker.stack.services("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
+
+
+def test_stack_config_missing_compose_file():
+    with pytest.raises(DockerException) as e:
+        docker.stack.config(compose_files=[])
+
+    assert "Please specify a Compose file (with --compose-file)" in str(e.value)
+
+
+def test_stack_config():
+    config = docker.stack.config(
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+    )
+
+    assert "app" in config.services
+    assert config.services["app"].image == "swarmpit/swarmpit:latest"
+
+
+def test_stack_config_return_json():
+    config = docker.stack.config(
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        return_json=True,
+    )
+
+    assert "app" in config["services"]
+    assert config["services"]["app"]["image"] == "swarmpit/swarmpit:latest"
+
+
+def test_stack_config_variables():
+    config = docker.stack.config(
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        variables={"SOME_VARIABLE": "hello-world"},
+    )
+
+    agent_service = config.services["agent"]
+    expected = "hello-world"
+    assert agent_service.environment['SOME_OTHER_VARIABLE'] == expected
+
+
+def test_stack_config_variables_return_json():
+    config = docker.stack.config(
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        variables={"SOME_VARIABLE": "hello-world"},
+        return_json=True,
+    )
+
+    agent_service = config["services"]["agent"]
+    expected = "hello-world"
+    assert agent_service["environment"]['SOME_OTHER_VARIABLE'] == expected
+
+
+def test_stack_config_envfiles(tmp_path: Path):
+    env_file = tmp_path / "some.env"
+    env_file.write_text('SOME_VARIABLE="--tls=true" # some var \n # some comment')
+    config = docker.stack.config(
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        env_files=[env_file],
+    )
+
+    agent_service = config.services["agent"]
+    expected = '"--tls=true"'
+    assert agent_service.environment['SOME_OTHER_VARIABLE'] == expected
+
+
+def test_stack_config_envfiles_return_json(tmp_path: Path):
+    env_file = tmp_path / "some.env"
+    env_file.write_text('SOME_VARIABLE="--tls=true" # some var \n # some comment')
+    config = docker.stack.config(
+        [PROJECT_ROOT / "tests/python_on_whales/components/test-stack-file.yml"],
+        env_files=[env_file],
+        return_json=True,
+    )
+
+    agent_service = config["services"]["agent"]
+    expected = '"--tls=true"'
+    assert agent_service["environment"]['SOME_OTHER_VARIABLE'] == expected

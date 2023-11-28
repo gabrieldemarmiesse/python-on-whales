@@ -3,3 +3,4 @@ requests
 tqdm
 typer>=0.4.1
 typing_extensions
+pyyaml >= 6.0.1
