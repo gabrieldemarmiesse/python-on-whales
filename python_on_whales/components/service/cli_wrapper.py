@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import Any, Dict, List, Literal, Optional, Union, overload
 
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
@@ -173,6 +173,10 @@ class ServiceCLI(DockerCLICaller):
         limit_memory: Optional[str] = None,
         limit_pids: Optional[int] = None,
         log_driver: Optional[str] = None,
+        network: Optional[str] = None,
+        restart_condition: Optional[Literal["none", "on-failure", "any"]] = None,
+        restart_max_attempts: Optional[int] = None,
+        secrets: Optional[List[Dict[str, str]]] = [],
     ):
         """Creates a Docker swarm service.
 
@@ -223,6 +227,12 @@ class ServiceCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--limit-memory", limit_memory)
         full_cmd.add_simple_arg("--limit-pids", limit_pids)
         full_cmd.add_simple_arg("--log-driver", log_driver)
+        full_cmd.add_simple_arg("--restart-condition", restart_condition)
+        full_cmd.add_simple_arg("--restart-max-attempts", restart_max_attempts)
+        full_cmd.add_simple_arg("--network", network)
+        full_cmd.add_args_list(
+            "--secret", [",".join(format_dict_for_cli(s)) for s in secrets or []]
+        )
 
         full_cmd.append(image)
         if command is not None:
