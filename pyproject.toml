@@ -18,6 +18,9 @@ dependencies = { file = ["requirements.txt"] }
 test = [
   "pytest",
 ]
+yaml = [
+  "pyyaml>=6.0.1",
+]
 
 [project.urls]
 "Source" = "https://github.com/gabrieldemarmiesse/python-on-whales"

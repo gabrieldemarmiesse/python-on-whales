@@ -3,13 +3,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import yaml
-
 import python_on_whales.components.service.cli_wrapper
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.utils import ValidPath, read_env_files, run, to_list
+
+try:
+    import yaml
+
+    _HAS_YAML = True
+except ImportError:
+    yaml = None
+    _HAS_YAML = False
 
 
 class Stack:
@@ -102,6 +108,10 @@ class StackCLI(DockerCLICaller):
         variables: Optional[Dict[str, str]] = None,
         return_json: bool = False,
     ) -> Union[ComposeConfig, Dict[str, Any]]:
+        if not _HAS_YAML:
+            raise ImportError(
+                "Install yaml dependencies for this function (ex: pip install python_on_whales[yaml])"
+            )
         env_files = [] if env_files is None else env_files
         variables = {} if variables is None else variables
 
