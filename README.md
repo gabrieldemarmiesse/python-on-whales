@@ -185,6 +185,28 @@ docker.run(
 )
 ```
 
+----------
+
+
+```bash
+export MYVAR=somevar
+source ./.env
+docker stack config --compose-file docker-compose.yml,docker-compose.overrides.yml
+```
+
+becomes
+```python
+from python_on_whales import docker
+
+config = docker.stack.config(
+    ["docker-compose.yml", "docker-compose.overrides.yml"],
+    env_files=[".env"],
+    variables={"MYVAR": "somevar"}
+)
+
+for service in config.services.values():
+    docker.image.pull(service.image)
+```
 
 Any Docker object can be used as a context manager to ensure it's removed even if an exception occurs:
 

@@ -108,6 +108,29 @@ class StackCLI(DockerCLICaller):
         variables: Optional[Dict[str, str]] = None,
         return_json: bool = False,
     ) -> Union[ComposeConfig, Dict[str, Any]]:
+        """Returns the final config file, after doing merges and interpolations.
+
+        Parameters:
+            compose_files: One or more docker-compose files.
+                If there is more than one, they will be merged.
+            env_files: Similar to `.env` files in docker-compose, load `variables` from `.env` files.
+                If both `env_files` and `variables` are used, `variables` have priority.
+            variables: A dict dictating by what to replace the variables declared in the
+                docker-compose files.
+                In the docker CLI, you would use environment variables for this.
+            return_json: If `False`, a `ComposeConfig` object will be returned, and you'll be able
+                to take advantage of your IDE autocompletion. If you want the full json output, you
+                may use `return_json`. In this case, you'll get lists and dicts corresponding to the
+                json response, unmodified. It may be useful if you just want to print the config or
+                want to access a field that was not in the `ComposeConfig` class.
+
+        # Returns
+            A `ComposeConfig` object if `return_json` is `False`, and a `dict` otherwise.
+
+        # Raises
+            DockerException: if there's an error in one of the compose_files.
+            ImportError: if module `pyyaml` is not installed.
+        """
         if not _HAS_YAML:
             raise ImportError(
                 "Install yaml dependencies for this function (ex: pip install python_on_whales[yaml])"
