@@ -1,4 +1,5 @@
 import json
+import tempfile
 import time
 
 import pytest
@@ -79,6 +80,54 @@ def test_context_manager():
             raise RuntimeError
 
     assert not my_service.exists()
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_service_restart():
+    my_service = docker.service.create(
+        "busybox",
+        ["echo", "Hello"],
+        detach=True,
+        restart_condition="none",
+        restart_max_attempts=0,
+    )
+    time.sleep(2)
+    assert my_service.ps()[0].desired_state == "shutdown"
+    my_service.remove()
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_service_secrets():
+    secret_user = None
+    secret_pass = None
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b"supersecretuser")
+        f.seek(0)
+        secret_user = docker.secret.create("dbuser", f.name)
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b"supersecretpass")
+        f.seek(0)
+        secret_pass = docker.secret.create("dbpass", f.name)
+
+    with docker.service.create(
+        "ubuntu",
+        ["bash", "-c", "cat /run/secrets/{dbuser,dbpass} && sleep infinity"],
+        secrets=[
+            {
+                "source": "dbuser",
+            },
+            {
+                "source": "dbpass",
+                "source": "dbpass",
+                "uid": "1000",
+                "gid": "1000",
+                "mode": "0400",
+            },
+        ],
+    ) as my_service:
+        assert my_service.ps()[0].desired_state == "running"
+    secret_user.remove()
+    secret_pass.remove()
 
 
 @pytest.mark.parametrize(
