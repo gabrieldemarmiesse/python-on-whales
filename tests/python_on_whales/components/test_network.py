@@ -58,3 +58,14 @@ def test_remove_nothing():
     all_neworks = set(docker.network.list())
     docker.network.remove([])
     assert all_neworks == set(docker.network.list())
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_swarm_service_create():
+    with docker.network.create(
+        random_name(), attachable=True, driver="overlay"
+    ) as my_net:
+        with docker.service.create(
+            "busybox", ["sleep", "infinity"], network=my_net.name
+        ):
+            assert len(my_net.containers) == 2  # 1 container + 1 endpoint
