@@ -1,6 +1,11 @@
 from typing import Optional
 
-import typer
+try:
+    import typer
+except ImportError as exc:
+    raise ImportError(
+        "The `python-on-whales` CLI, requires the 'cli' extra. `pip install python-on-whales[cli]`."
+    ) from exc
 
 from python_on_whales import docker
 from python_on_whales.download_binaries import download_docker_cli

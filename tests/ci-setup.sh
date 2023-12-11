@@ -5,7 +5,7 @@ echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/dae
 sudo service docker restart
 sleep 2
 docker info
-python -m pip install -e .
+python -m pip install -e '.[cli]'
 python -m pip install -r ./tests/test-requirements.txt
 
 mkdir -p ~/.docker/cli-plugins/
