@@ -104,8 +104,8 @@ class StackCLI(DockerCLICaller):
     def config(
         self,
         compose_files: Union[ValidPath, List[ValidPath]],
-        env_files: Optional[List[ValidPath]] = None,
-        variables: Optional[Dict[str, str]] = None,
+        env_files: List[ValidPath] = [],
+        variables: Dict[str, str] = {},
         return_json: bool = False,
     ) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the final config file, after doing merges and interpolations.
@@ -135,8 +135,6 @@ class StackCLI(DockerCLICaller):
             raise ImportError(
                 "Install yaml dependencies for this function (ex: pip install python_on_whales[yaml])"
             )
-        env_files = [] if env_files is None else env_files
-        variables = {} if variables is None else variables
 
         full_cmd = self.docker_cmd + ["stack", "config"]
         full_cmd.add_args_list("--compose-file", compose_files)
