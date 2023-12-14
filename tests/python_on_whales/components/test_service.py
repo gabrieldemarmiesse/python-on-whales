@@ -67,6 +67,9 @@ def test_service_scale():
     service.scale(3)
     time.sleep(0.4)
     assert service.spec.mode["Replicated"] == {"Replicas": 3}
+    service.update(replicas=1)
+    time.sleep(0.4)
+    assert service.spec.mode["Replicated"] == {"Replicas": 1}
 
 
 @pytest.mark.usefixtures("swarm_mode")
@@ -128,6 +131,25 @@ def test_service_secrets():
         assert my_service.ps()[0].desired_state == "running"
     secret_user.remove()
     secret_pass.remove()
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_service_mounts():
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(b"config")
+        f.seek(0)
+        with docker.service.create(
+            "ubuntu",
+            ["bash", "-c", f"cat {f.name} && sleep infinity"],
+            mounts=[
+                {
+                    "type": "bind",
+                    "source": f.name,
+                    "destination": f.name,
+                },
+            ],
+        ) as my_service:
+            assert my_service.ps()[0].desired_state == "running"
 
 
 @pytest.mark.parametrize(

@@ -120,6 +120,8 @@ class Service(ReloadableObjectFromJson):
         force: bool = False,
         image: Optional[str] = None,
         with_registry_authentication: bool = False,
+        quiet: bool = False,
+        replicas: Optional[int] = None,
     ):
         """Updates a service
 
@@ -127,7 +129,7 @@ class Service(ReloadableObjectFromJson):
         information about the arguments.
         """
         ServiceCLI(self.client_config).update(
-            self, detach, force, image, with_registry_authentication
+            self, detach, force, image, with_registry_authentication, quiet, replicas
         )
 
     def exists(self) -> bool:
@@ -177,6 +179,7 @@ class ServiceCLI(DockerCLICaller):
         restart_condition: Optional[Literal["none", "on-failure", "any"]] = None,
         restart_max_attempts: Optional[int] = None,
         secrets: Optional[List[Dict[str, str]]] = [],
+        mounts: Optional[List[Dict[str, str]]] = [],
     ):
         """Creates a Docker swarm service.
 
@@ -229,6 +232,9 @@ class ServiceCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--log-driver", log_driver)
         full_cmd.add_simple_arg("--restart-condition", restart_condition)
         full_cmd.add_simple_arg("--restart-max-attempts", restart_max_attempts)
+        full_cmd.add_args_list(
+            "--mount", [",".join(format_dict_for_cli(s)) for s in mounts or []]
+        )
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_args_list(
             "--secret", [",".join(format_dict_for_cli(s)) for s in secrets or []]
@@ -464,6 +470,8 @@ class ServiceCLI(DockerCLICaller):
         force: bool = False,
         image: Optional[str] = None,
         with_registry_authentication: bool = False,
+        quiet: bool = False,
+        replicas: Optional[int] = None,
     ):
         """Update a service
 
@@ -485,5 +493,7 @@ class ServiceCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--image", image)
         full_cmd.add_flag("--with-registry-auth", with_registry_authentication)
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_flag("--quiet", quiet)
+        full_cmd.add_simple_arg("--replicas", replicas)
         full_cmd.append(service)
         run(full_cmd, capture_stdout=False)
