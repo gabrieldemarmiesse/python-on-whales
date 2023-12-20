@@ -22,7 +22,7 @@ jobs:
         sudo service docker restart
         sleep 2
         docker info
-        pip install -e .
+        pip install -e '.[cli]'
         pip install -r ./lint-requirements.txt
         flake8
         isort --check ./
@@ -90,7 +90,7 @@ jobs:
         sudo service docker restart
         sleep 2
         docker info
-        python -m pip install -e .
+        python -m pip install -e '.[cli]'
         python -m pip install -r ./tests/test-requirements.txt
         python -m pytest -v --durations=10 ./tests/python_on_whales/components/buildx
 
@@ -104,7 +104,7 @@ jobs:
     - name: prepare
       run: |
         python -m pip install -r tests/test-requirements.txt
-        python -m pip install -e .
+        python -m pip install -e '.[cli]'
     - name: Run all tests
       run: |
         docker run hello-world
@@ -128,7 +128,7 @@ jobs:
 #    - name: prepare
 #      run: |
 #        pip install -r tests/test-requirements.txt
-#        pip install -e .
+#        pip install -e '.[cli]'
 #    - name: Run all tests
 #      run: |
 #        eval "$(docker-machine env default)"
