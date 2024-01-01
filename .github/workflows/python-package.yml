@@ -10,20 +10,20 @@ jobs:
   build-linux-lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: actions/setup-python@master
-      with:
-        python-version: '3.8'
-    - name: Setup
-      run: |
-        pip install -U pip wheel
-        pip install -e ./
-        pip install -r lint-requirements.txt
-    - name: Run all checks
-      run: |
-        flake8
-        isort --check ./
-        black --check ./
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: '3.8'
+      - name: Setup
+        run: |
+          pip install -U pip wheel
+          pip install -e ./
+          pip install -r lint-requirements.txt
+      - name: Run all checks
+        run: |
+          flake8
+          isort --check ./
+          black --check ./
 
   build-linux-test-component:
     strategy:
@@ -69,77 +69,77 @@ jobs:
   build-linux-test-other:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: actions/setup-python@master
-      with:
-        python-version: '3.8'
-    - name: Setup
-      run: |
-        ./scripts/ci-setup.sh
-        pip install -U pip wheel
-        pip install -e ./
-        pip install -r tests/test-requirements.txt
-    - name: Run tests
-      run: |
-        python -m pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: '3.8'
+      - name: Setup
+        run: |
+          ./scripts/ci-setup.sh
+          pip install -U pip wheel
+          pip install -e ./
+          pip install -r tests/test-requirements.txt
+      - name: Run tests
+        run: |
+          python -m pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
 
 #  build-linux-test-without-any-binary:
 #    runs-on: ubuntu-latest
 #    steps:
-#    - uses: actions/checkout@master
-#    - uses: actions/setup-python@master
-#      with:
-#        python-version: '3.8'
-#    - name: Setup
-#      run: |
-#        bash -x scripts/add-local-docker-registry.sh
-#        docker info
-#        pip install -U pip wheel
-#        pip install -e ./
-#        pip install -r tests/test-requirements.txt
-#    - name: Run buildx tests
-#      run: |
-#        python -m pytest -vv --durations=10 tests/python_on_whales/components/buildx/
+#      - uses: actions/checkout@master
+#      - uses: actions/setup-python@master
+#        with:
+#          python-version: '3.8'
+#      - name: Setup
+#        run: |
+#          bash -x scripts/add-local-docker-registry.sh
+#          docker info
+#          pip install -U pip wheel
+#          pip install -e ./
+#          pip install -r tests/test-requirements.txt
+#      - name: Run buildx tests
+#        run: |
+#          python -m pytest -vv --durations=10 tests/python_on_whales/components/buildx/
 
   build-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: actions/setup-python@master
-      with:
-        python-version: 3.8
-    - name: Setup
-      run: |
-        docker info
-        docker run hello-world
-        pip install -U pip wheel
-        pip install -e ./
-        pip install -r tests/test-requirements.txt
-    - name: Run single test
-      run: |
-        python -m pytest -vv tests/python_on_whales/components/test_volume.py::test_simple_volume
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
+        with:
+          python-version: 3.8
+      - name: Setup
+        run: |
+          docker info
+          docker run hello-world
+          pip install -U pip wheel
+          pip install -e ./
+          pip install -r tests/test-requirements.txt
+      - name: Run single test
+        run: |
+          python -m pytest -vv tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:
 #    runs-on: macos-latest
 #    steps:
-#    - uses: actions/checkout@master
-#    - uses: actions/setup-python@master
-#      with:
-#        python-version: 3.8
-#    - name: Setup
-#      run: |
-#        mkdir -p ~/.docker/machine/cache
-#        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
-#        brew install docker docker-machine
-#        docker-machine create --driver virtualbox default
-#        docker-machine env default
-#        eval "$(docker-machine env default)"
-#        docker info
-#        docker run hello-world
-#        pip install -U pip wheel
-#        pip install -e ./
-#        pip install -r tests/test-requirements.txt
-#    - name: Run all tests
-#      run: |
-#        python -m pytest -vv tests/
+#      - uses: actions/checkout@master
+#      - uses: actions/setup-python@master
+#        with:
+#          python-version: 3.8
+#      - name: Setup
+#        run: |
+#          mkdir -p ~/.docker/machine/cache
+#          curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
+#          brew install docker docker-machine
+#          docker-machine create --driver virtualbox default
+#          docker-machine env default
+#          eval "$(docker-machine env default)"
+#          docker info
+#          docker run hello-world
+#          pip install -U pip wheel
+#          pip install -e ./
+#          pip install -r tests/test-requirements.txt
+#      - name: Run all tests
+#        run: |
+#          python -m pytest -vv tests/
