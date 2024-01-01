@@ -1,12 +1,6 @@
-set -ex
+#!/usr/bin/env bash
 
-cat /etc/docker/daemon.json
-echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/daemon.json
-sudo service docker restart
-sleep 2
-docker info
-python -m pip install -e .
-python -m pip install -r ./tests/test-requirements.txt
+set -e
 
 mkdir -p ~/.docker/cli-plugins/
 wget -q https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-x86_64 -O ~/.docker/cli-plugins/docker-compose

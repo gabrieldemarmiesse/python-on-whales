@@ -1,6 +1,5 @@
 name: Run tests
 
-
 on:
   push:
     branches:
@@ -11,41 +10,26 @@ jobs:
   build-linux-lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@master
+    - uses: actions/setup-python@master
       with:
         python-version: '3.8'
-    - name: Run all tests
+    - name: Setup
       run: |
-        cat /etc/docker/daemon.json
-        echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/daemon.json
-        sudo service docker restart
-        sleep 2
-        docker info
-        pip install -e .
-        pip install -r ./lint-requirements.txt
+        pip install -U pip wheel
+        pip install -e ./
+        pip install -r lint-requirements.txt
+    - name: Run all checks
+      run: |
         flake8
         isort --check ./
         black --check ./
 
-  build-linux-test-with-binaries-other-tests:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Run all tests
-      run: |
-        bash tests/ci-setup.sh
-        python -m pytest -v --durations=10 --ignore=tests/python_on_whales/components
-
-
-  build-linux-test-component:
+  build-linux-test:
     strategy:
       matrix:
         component:
-          - buildx
+          - buildx/
           - test_compose.py
           - test_config.py
           - test_container.py
@@ -66,71 +50,81 @@ jobs:
           - pydantic==2.*
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@master
         with:
           python-version: '3.8'
-      - name: Run test
+      - name: Setup
         run: |
-          bash tests/ci-setup.sh
+          ./scripts/ci-setup.sh
+          pip install -U pip wheel
+          pip install -e ./
+          pip install -r tests/test-requirements.txt
           pip install --upgrade ${{ matrix.pydantic-version }}
-          python -m pytest -v --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+      - name: Run component tests
+        run: |
+          pytest -vv --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+      - name: Run other tests
+        run: |
+          pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
 
-  build-linux-test-without-any-binary:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Run all tests
-      run: |
-        cat /etc/docker/daemon.json
-        echo '{"insecure-registries" : [ "localhost:5000" ]}' | sudo tee /etc/docker/daemon.json
-        sudo service docker restart
-        sleep 2
-        docker info
-        python -m pip install -e .
-        python -m pip install -r ./tests/test-requirements.txt
-        python -m pytest -v --durations=10 ./tests/python_on_whales/components/buildx
+#  build-linux-test-without-any-binary:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@master
+#    - uses: actions/setup-python@master
+#      with:
+#        python-version: '3.8'
+#    - name: Setup
+#      run: |
+#        bash -x scripts/add-local-docker-registry.sh
+#        docker info
+#        pip install -U pip wheel
+#        pip install -e ./
+#        pip install -r tests/test-requirements.txt
+#    - name: Run buildx tests
+#      run: |
+#        pytest -vv --durations=10 tests/python_on_whales/components/buildx/
 
   build-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@master
+    - uses: actions/setup-python@master
       with:
         python-version: 3.8
-    - name: prepare
+    - name: Setup
       run: |
-        python -m pip install -r tests/test-requirements.txt
-        python -m pip install -e .
-    - name: Run all tests
-      run: |
+        docker info
         docker run hello-world
-        python -m pytest -v ./tests/python_on_whales/components/test_volume.py::test_simple_volume
+        pip install -U pip wheel
+        pip install -e ./
+        pip install -r tests/test-requirements.txt
+    - name: Run single test
+      run: |
+        pytest -vv tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:
 #    runs-on: macos-latest
 #    steps:
-#    - uses: actions/checkout@v2
-#    - name: Install docker
+#    - uses: actions/checkout@master
+#    - uses: actions/setup-python@master
+#      with:
+#        python-version: 3.8
+#    - name: Setup
 #      run: |
 #        mkdir -p ~/.docker/machine/cache
 #        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
 #        brew install docker docker-machine
 #        docker-machine create --driver virtualbox default
 #        docker-machine env default
-#    - uses: actions/setup-python@v2
-#      with:
-#        python-version: 3.8
-#    - name: prepare
-#      run: |
+#        eval "$(docker-machine env default)"
+#        docker info
+#        docker run hello-world
+#        pip install -U pip wheel
+#        pip install -e ./
 #        pip install -r tests/test-requirements.txt
-#        pip install -e .
 #    - name: Run all tests
 #      run: |
-#        eval "$(docker-machine env default)"
-#        docker run hello-world
-#        pytest -v ./tests
+#        pytest -vv tests/
