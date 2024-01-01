@@ -58,9 +58,6 @@ jobs:
       - name: Setup
         run: |
           ./scripts/ci-setup.sh
-          pip install -U pip wheel
-          pip install -e ./
-          pip install -r tests/test-requirements.txt
           pip install --upgrade ${{ matrix.pydantic-version }}
       - name: Run tests
         run: |
@@ -76,9 +73,6 @@ jobs:
       - name: Setup
         run: |
           ./scripts/ci-setup.sh
-          pip install -U pip wheel
-          pip install -e ./
-          pip install -r tests/test-requirements.txt
       - name: Run tests
         run: |
           python -m pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
