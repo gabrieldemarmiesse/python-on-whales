@@ -25,11 +25,12 @@ jobs:
         isort --check ./
         black --check ./
 
-  build-linux-test:
+  build-linux-test-component:
     strategy:
+      fail-fast: false
       matrix:
         component:
-          - buildx/
+          - buildx
           - test_compose.py
           - test_config.py
           - test_container.py
@@ -61,12 +62,26 @@ jobs:
           pip install -e ./
           pip install -r tests/test-requirements.txt
           pip install --upgrade ${{ matrix.pydantic-version }}
-      - name: Run component tests
+      - name: Run tests
         run: |
-          pytest -vv --durations=10 tests/python_on_whales/components/${{ matrix.component }}
-      - name: Run other tests
-        run: |
-          pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
+          python -m pytest -vv --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+
+  build-linux-test-other:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-python@master
+      with:
+        python-version: '3.8'
+    - name: Setup
+      run: |
+        ./scripts/ci-setup.sh
+        pip install -U pip wheel
+        pip install -e ./
+        pip install -r tests/test-requirements.txt
+    - name: Run tests
+      run: |
+        python -m pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
 
 #  build-linux-test-without-any-binary:
 #    runs-on: ubuntu-latest
@@ -84,7 +99,7 @@ jobs:
 #        pip install -r tests/test-requirements.txt
 #    - name: Run buildx tests
 #      run: |
-#        pytest -vv --durations=10 tests/python_on_whales/components/buildx/
+#        python -m pytest -vv --durations=10 tests/python_on_whales/components/buildx/
 
   build-windows:
     runs-on: windows-latest
@@ -102,7 +117,7 @@ jobs:
         pip install -r tests/test-requirements.txt
     - name: Run single test
       run: |
-        pytest -vv tests/python_on_whales/components/test_volume.py::test_simple_volume
+        python -m pytest -vv tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:
@@ -127,4 +142,4 @@ jobs:
 #        pip install -r tests/test-requirements.txt
 #    - name: Run all tests
 #      run: |
-#        pytest -vv tests/
+#        python -m pytest -vv tests/
