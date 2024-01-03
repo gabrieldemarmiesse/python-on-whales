@@ -476,7 +476,10 @@ class ImageCLI(DockerCLICaller):
         return run(full_cmd)
 
     def pull(
-        self, x: Union[str, List[str]], quiet: bool = False
+        self,
+        x: Union[str, List[str]],
+        quiet: bool = False,
+        platform: Optional[str] = None,
     ) -> Union[Image, List[Image]]:
         """Pull one or more docker image(s)
 
@@ -488,6 +491,7 @@ class ImageCLI(DockerCLICaller):
                 The progress bars might look strange as multiple
                 processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
+            platform: If you want to enforce a platform.
 
         Returns:
             The Docker image loaded (`python_on_whales.Image` object).
@@ -498,22 +502,33 @@ class ImageCLI(DockerCLICaller):
         if x == []:
             return []
         elif isinstance(x, str):
-            return self._pull_single_tag(x, quiet=quiet)
+            return self._pull_single_tag(x, quiet=quiet, platform=platform)
         elif isinstance(x, list) and len(x) == 1:
-            return [self._pull_single_tag(x[0], quiet=quiet)]
+            return [self._pull_single_tag(x[0], quiet=quiet, platform=platform)]
         elif len(x) >= 2:
             pool = ThreadPool(4)
-            generator = self._generate_args_push_pull(x, quiet)
+            generator = self._generate_args_pull(x, quiet, platform)
             all_images = pool.starmap(self._pull_single_tag, generator)
             pool.close()
             pool.join()
             return all_images
 
-    def _pull_single_tag(self, image_name: str, quiet: bool):
+    def _generate_args_pull(
+        self, _list: List[str], quiet: bool, platform: Optional[str] = None
+    ):
+        for tag in _list:
+            yield tag, quiet, platform
+
+    def _pull_single_tag(
+        self, image_name: str, quiet: bool, platform: Optional[str] = None
+    ):
         full_cmd = self.docker_cmd + ["image", "pull"]
 
         if quiet:
             full_cmd.append("--quiet")
+
+        if platform:
+            full_cmd.append(f"--platform={platform}")
 
         full_cmd.append(image_name)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
@@ -545,17 +560,20 @@ class ImageCLI(DockerCLICaller):
             self._push_single_tag(x[0], quiet=quiet)
         elif len(x) >= 2:
             pool = ThreadPool(4)
-            generator = self._generate_args_push_pull(x, quiet)
+            generator = self._generate_args_push(x, quiet)
             pool.starmap(self._push_single_tag, generator)
             pool.close()
             pool.join()
 
-    def _generate_args_push_pull(self, _list: List[str], quiet: bool):
+    def _generate_args_push(self, _list: List[str], quiet: bool):
         for tag in _list:
             yield tag, quiet
 
     def _push_single_tag(self, tag_or_repo: str, quiet: bool):
         full_cmd = self.docker_cmd + ["image", "push"]
+
+        if quiet:
+            full_cmd.append("--quiet")
 
         full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
