@@ -24,13 +24,13 @@ def with_manifest():
 
 @pytest.fixture
 def with_platform_variant_manifest(request):
-    image_with_platform_variant = "arm64v8/busybox:1.35"
+    image_with_platform_variant = "arm32v7/busybox:1.35"
 
     def remove_docker_image():
         docker.image.remove(image_with_platform_variant)
 
     request.addfinalizer(remove_docker_image)
-    docker.image.pull(image_with_platform_variant, quiet=True)
+    docker.image.pull(image_with_platform_variant, quiet=True, platform="linux/arm/v7")
     return docker.image.inspect(image_with_platform_variant)
 
 
@@ -63,5 +63,5 @@ def test_manifest_annotate(with_manifest):
 
 def test_manifest_platform_variant(with_platform_variant_manifest):
     assert "linux" in repr(with_platform_variant_manifest.os)
-    assert "arm64" in repr(with_platform_variant_manifest.architecture)
-    assert "v8" in repr(with_platform_variant_manifest.variant)
+    assert "arm" in repr(with_platform_variant_manifest.architecture)
+    assert "v7" in repr(with_platform_variant_manifest.variant)
