@@ -77,24 +77,6 @@ jobs:
         run: |
           python -m pytest -vv --durations=10 --ignore=tests/python_on_whales/components/
 
-#  build-linux-test-without-any-binary:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@master
-#      - uses: actions/setup-python@master
-#        with:
-#          python-version: '3.8'
-#      - name: Setup
-#        run: |
-#          bash -x scripts/add-local-docker-registry.sh
-#          docker info
-#          pip install -U pip wheel
-#          pip install -e ./
-#          pip install -r tests/test-requirements.txt
-#      - name: Run buildx tests
-#        run: |
-#          python -m pytest -vv --durations=10 tests/python_on_whales/components/buildx/
-
   build-windows:
     runs-on: windows-latest
     steps:
