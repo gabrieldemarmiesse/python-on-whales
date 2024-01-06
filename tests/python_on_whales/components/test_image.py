@@ -70,9 +70,7 @@ def test_filter_when_listing_old_signature(ctr_client: DockerClient):
 
     warning_message = str(warnings_emmitted.list[0].message)
     assert "docker.image.list({'reference': 'hello-world'}" in warning_message
-    assert (
-        "docker.image.list(filters={'reference': 'hello-world'}" in warning_message
-    )
+    assert "docker.image.list(filters={'reference': 'hello-world'}" in warning_message
     tags = set()
     for image in images_listed:
         for tag in image.repo_tags:
