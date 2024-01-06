@@ -61,7 +61,8 @@ jobs:
           pip install --upgrade ${{ matrix.pydantic-version }}
       - name: Run tests
         run: |
-          python -m pytest -vv --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+          python -m pytest -vv --durations=10 --ctr-exe docker,podman \
+              tests/python_on_whales/components/${{ matrix.component }}
 
   build-linux-test-other:
     runs-on: ubuntu-latest
