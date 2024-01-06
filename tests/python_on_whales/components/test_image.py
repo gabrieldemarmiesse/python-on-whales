@@ -31,7 +31,7 @@ def test_image_remove(ctr_client: DockerClient):
     ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_image_save_load(ctr_client: DockerClient, tmp_path: Path):
     tar_file = tmp_path / "dodo.tar"
     ctr_client.image.pull("busybox:1", quiet=True)
@@ -51,7 +51,7 @@ def test_save_iterator_bytes(ctr_client: DockerClient):
     assert i != 0
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_filter_when_listing(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list(filters=dict(reference="hello-world"))
@@ -62,7 +62,7 @@ def test_filter_when_listing(ctr_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_filter_when_listing_old_signature(ctr_client: DockerClient):
     """Check backward compatibility"""
     ctr_client.pull(["hello-world", "busybox"])
@@ -79,7 +79,7 @@ def test_filter_when_listing_old_signature(ctr_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_use_first_argument_to_filter(ctr_client: DockerClient):
     """Check backward compatibility"""
     ctr_client.pull(["hello-world", "busybox"])
@@ -91,7 +91,7 @@ def test_use_first_argument_to_filter(ctr_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     image_name = "busybox:1"
     ctr_client.image.pull(image_name, quiet=True)
@@ -106,7 +106,7 @@ def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     ctr_client.image.inspect(image_name)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     image_name = "busybox:1"
     ctr_client.image.pull(image_name, quiet=True)
@@ -116,7 +116,7 @@ def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     ctr_client.image.inspect(image_name)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
     ctr_client: DockerClient,
 ):
@@ -137,7 +137,7 @@ def test_image_list(ctr_client: DockerClient):
     assert len(set(all_ids_uniquified)) == len(image_list)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_image_list_tags(ctr_client: DockerClient):
     image_name = "busybox:1"
     ctr_client.image.pull(image_name, quiet=True)
@@ -149,7 +149,7 @@ def test_image_list_tags(ctr_client: DockerClient):
         raise ValueError("Tag not found in images.")
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_pull_not_quiet(ctr_client: DockerClient):
     try:
         ctr_client.image.remove("busybox:1")
@@ -159,7 +159,7 @@ def test_pull_not_quiet(ctr_client: DockerClient):
     assert "busybox:1" in image.repo_tags
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
     images_names = ["busybox:1", "hello-world:latest"]
     try:
@@ -171,7 +171,7 @@ def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
         assert image_name in image.repo_tags
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_pull_not_quiet_multiple_images_break(ctr_client: DockerClient):
     images_names = ["busybox:1", "hellstuff"]
     try:
@@ -209,7 +209,7 @@ def test_copy_from_and_to_directory(ctr_client: DockerClient, tmp_path: Path):
     assert "Hello world!" == (tmp_path / "some_path" / "dodo.txt").read_text()
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_prune(ctr_client: DockerClient):
     ctr_client.pull("busybox")
     ctr_client.image.prune(all=True)
@@ -217,7 +217,7 @@ def test_prune(ctr_client: DockerClient):
         ctr_client.image.inspect("busybox")
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_remove_nothing(ctr_client: DockerClient):
     with ctr_client.pull("hello-world"):
         all_images = set(ctr_client.image.list())
@@ -225,7 +225,7 @@ def test_remove_nothing(ctr_client: DockerClient):
         assert all_images == set(ctr_client.image.list())
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_no_such_image_inspect(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -234,7 +234,7 @@ def test_no_such_image_inspect(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_no_such_image_remove(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -243,7 +243,7 @@ def test_no_such_image_remove(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_no_such_image_push(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -252,7 +252,7 @@ def test_no_such_image_push(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_no_such_image_save(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -261,7 +261,7 @@ def test_no_such_image_save(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_no_such_image_save_generator(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -271,7 +271,7 @@ def test_no_such_image_save_generator(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_no_such_image_tag(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
@@ -280,7 +280,7 @@ def test_no_such_image_tag(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.ctr_mgr("docker")
+@pytest.mark.ctr_mgr("docker", skip=True)
 def test_exists(ctr_client: DockerClient):
     my_image = ctr_client.pull("busybox")
     assert my_image.exists()

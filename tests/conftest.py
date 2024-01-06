@@ -187,10 +187,19 @@ def pytest_collection_modifyitems(
         if not hasattr(item, "callspec"):
             continue
         test_params: Mapping[str, Any] = item.callspec.params
-        if "ctr_client" in test_params and (
-            marker := item.get_closest_marker("ctr_mgr")
+        if "ctr_client" not in test_params:
+            continue
+        test_ctr_mgr: str = test_params["ctr_client"].ctr_mgr
+        test_supported_ctr_mgrs_marker = item.get_closest_marker("ctr_mgr")
+        if (
+            test_supported_ctr_mgrs_marker is not None
+            and test_ctr_mgr not in test_supported_ctr_mgrs_marker.args
         ):
-            if test_params["ctr_client"].ctr_mgr not in marker.args[0]:
+            if test_supported_ctr_mgrs_marker.kwargs.get("skip"):
+                item.add_marker(
+                    pytest.mark.skip("Not supported with {}".format(test_ctr_mgr))
+                )
+            else:
                 remove_tests.append(item)
     logger.debug("Removing %d parameterised tests", len(remove_tests))
     items[:] = [x for x in items if x not in remove_tests]
