@@ -97,19 +97,18 @@ def _get_ctr_clients(ctr_exes: List[str]) -> List[DockerClient]:
         docker_client = DockerClient()
         docker_client.ctr_mgr = "docker"
         ctr_clients.append(docker_client)
-        if (
-            subprocess.run(
+        try:
+            subprocess.check_call(
                 ["podman", "--version"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
-            ).returncode
-            == 0
-        ):
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            logger.warning("Unable to parameterise the tests with podman")
+        else:
             podman_client = DockerClient(client_call=["podman"])
             podman_client.ctr_mgr = "podman"
             ctr_clients.append(podman_client)
-        else:
-            logger.warning("Unable to parameterise the tests with podman")
     else:
         unsupported_ctr_exes: List[str] = []
         for exe in ctr_exes:
@@ -117,7 +116,7 @@ def _get_ctr_clients(ctr_exes: List[str]) -> List[DockerClient]:
             # Check the client is available by running '<client> --version'.
             try:
                 version_output = subprocess.check_output([exe, "--version"], text=True)
-            except subprocess.CalledProcessError:
+            except (subprocess.CalledProcessError, FileNotFoundError):
                 unsupported_ctr_exes.append(exe)
                 continue
             # Check the daemon is running (if required) with '<client> version'.
