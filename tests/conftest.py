@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Mapping
+from typing import Any, List, Mapping
 
 import pydantic
 import pytest
@@ -80,58 +80,72 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     pow_group.addoption(
         "--ctr-exe",
         metavar="EXE",
+        type=lambda x: x.split(","),
+        default=[],
         help=(
             "Comma-separated list of executables to run the tests with, "
-            "defaults to one/both of 'docker' and 'podman' (depending on which "
-            "is available)"
+            "defaults to using docker, and parameterising with podman if "
+            "available"
         ),
     )
 
 
-def _get_ctr_clients(ctr_exes: List[str], *, all_required: bool) -> List[DockerClient]:
+def _get_ctr_clients(ctr_exes: List[str]) -> List[DockerClient]:
     ctr_clients: List[DockerClient] = []
-    unsupported_ctr_clients: Dict[str, DockerClient] = {}
-    for exe in ctr_exes:
-        client = DockerClient(client_call=[exe])
-        # Check the client is available by running '<client> --version'.
-        try:
-            version_output = subprocess.check_output([exe, "--version"], text=True)
-        except subprocess.CalledProcessError:
-            unsupported_ctr_clients[exe] = client
-            continue
-        # Check the daemon is running with '<client> version'.
-        try:
-            subprocess.check_call([exe, "version"], stdout=subprocess.DEVNULL)
-        except subprocess.CalledProcessError:
-            unsupported_ctr_clients[exe] = client
-            continue
-
-        ctr_clients.append(client)
-
-        # Deduce whether docker or podman from version output.
-        if "docker" in version_output.lower():
-            client.ctr_mgr = "docker"
-        elif "podman" in version_output.lower():
-            client.ctr_mgr = "podman"
+    if not ctr_exes:
+        # Default to using docker, plus podman if available.
+        docker_client = DockerClient()
+        docker_client.ctr_mgr = "docker"
+        ctr_clients.append(docker_client)
+        if (
+            subprocess.run(
+                ["podman", "--version"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            ).returncode
+            == 0
+        ):
+            podman_client = DockerClient(client_call=["podman"])
+            podman_client.ctr_mgr = "podman"
+            ctr_clients.append(podman_client)
         else:
-            logger.warning(
-                f"Unrecognised container manager from '{exe} --version', "
-                "assuming docker"
-            )
-            client.ctr_mgr = "docker"
+            logger.warning("Unable to parameterise the tests with podman")
+    else:
+        unsupported_ctr_exes: List[str] = []
+        for exe in ctr_exes:
+            client = DockerClient(client_call=[exe])
+            # Check the client is available by running '<client> --version'.
+            try:
+                version_output = subprocess.check_output([exe, "--version"], text=True)
+            except subprocess.CalledProcessError:
+                unsupported_ctr_exes.append(exe)
+                continue
+            # Check the daemon is running (if required) with '<client> version'.
+            try:
+                subprocess.check_call([exe, "version"], stdout=subprocess.DEVNULL)
+            except subprocess.CalledProcessError:
+                unsupported_ctr_exes.append(exe)
+                continue
 
-    if unsupported_ctr_clients:
-        if all_required:
+            ctr_clients.append(client)
+
+            # Deduce whether docker or podman from version output.
+            if "docker" in version_output.lower():
+                client.ctr_mgr = "docker"
+            elif "podman" in version_output.lower():
+                client.ctr_mgr = "podman"
+            else:
+                logger.warning(
+                    f"Unrecognised container manager from '{exe} --version', "
+                    "assuming docker"
+                )
+                client.ctr_mgr = "docker"
+
+        if unsupported_ctr_exes:
             raise Exception(
-                "'<ctr_exe> --version' failed for the following required exes: "
-                + ",".join(unsupported_ctr_clients)
+                "'<ctr_exe> --version' failed for the following specified exes: "
+                + ",".join(unsupported_ctr_exes)
             )
-        else:
-            logger.warning(
-                "Unable to run with ctr exes: %s", ",".join(unsupported_ctr_clients)
-            )
-        if len(ctr_clients) == 0:
-            raise Exception("No supported ctr exes found")
 
     return ctr_clients
 
@@ -148,16 +162,7 @@ def pytest_configure(config: pytest.Config) -> None:
         "ctr_mgr(MGR, MGR, ...): Container managers supported by the test",
     )
     # Determine supported container managers.
-    if config.getoption("--ctr-exe") is None:
-        config.ctr_clients = _get_ctr_clients(
-            ["docker", "podman"],
-            all_required=False,
-        )
-    else:
-        config.ctr_clients = _get_ctr_clients(
-            config.getoption("--ctr-exe").split(","),
-            all_required=True,
-        )
+    config.ctr_clients = _get_ctr_clients(config.getoption("--ctr-exe"))
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
