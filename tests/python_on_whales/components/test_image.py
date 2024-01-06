@@ -62,6 +62,7 @@ def test_filter_when_listing(ctr_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
+@pytest.mark.ctr_mgr("docker")
 def test_filter_when_listing_old_signature(ctr_client: DockerClient):
     """Check backward compatibility"""
     ctr_client.pull(["hello-world", "busybox"])
