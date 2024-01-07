@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
+from typing import Generator
 
 import pydantic
 import pytest
@@ -46,12 +47,12 @@ def ctr_client(pytestconfig: pytest.Config) -> DockerClient:
     return client
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def docker_registry(ctr_client: DockerClient):
     yield from _docker_registry(ctr_client)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def docker_registry_without_login(ctr_client: DockerClient):
     yield from _docker_registry(ctr_client, login=False)
 
@@ -87,8 +88,8 @@ def _docker_registry(ctr_client: DockerClient, login=True):
             yield "localhost:5000"
 
 
-@pytest.fixture(scope="session")
-def swarm_mode(ctr_client: DockerClient):
+@pytest.fixture(scope="function")
+def swarm_mode(ctr_client: DockerClient) -> Generator[None, None, None]:
     ctr_client.swarm.init()
     yield
     ctr_client.swarm.leave(force=True)
