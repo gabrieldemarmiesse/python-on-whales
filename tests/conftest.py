@@ -38,7 +38,7 @@ def ctr_client(pytestconfig: pytest.Config) -> DockerClient:
         elif isinstance(exc, subprocess.TimeoutExpired):
             reason = f"timed out after {exc.timeout} seconds"
         elif isinstance(exc, FileNotFoundError):
-            reason = f"executable not found"
+            reason = "executable not found"
         raise RuntimeError(
             f"Unable to run with container exe {ctr_exe!r}.\n"
             f"'{ctr_exe} version' command failed: {reason}"
