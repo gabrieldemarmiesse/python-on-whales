@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient
 from python_on_whales.components.node.models import NodeInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
@@ -24,40 +24,40 @@ def test_load_json(json_file):
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_list_nodes():
-    nodes = docker.node.list()
+def test_list_nodes(ctr_client: DockerClient):
+    nodes = ctr_client.node.list()
     assert nodes[0].id[:12] in repr(nodes)
     assert len(nodes) == 1
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_add_label():
-    nodes = docker.node.list()
+def test_add_label(ctr_client: DockerClient):
+    nodes = ctr_client.node.list()
     nodes[0].update(labels_add={"foo": "bar"})
     assert nodes[0].spec.labels["foo"] == "bar"
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_remove_label():
-    nodes = docker.node.list()
+def test_remove_label(ctr_client: DockerClient):
+    nodes = ctr_client.node.list()
     nodes[0].update(labels_add={"foo": "bar"})
     nodes[0].update(rm_labels=["foo"])
     assert "foo" not in nodes[0].spec.labels
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_tasks():
-    service = docker.service.create("busybox", ["sleep", "infinity"])
+def test_tasks(ctr_client: DockerClient):
+    service = ctr_client.service.create("busybox", ["sleep", "infinity"])
 
-    current_node = docker.node.list()[0]
+    current_node = ctr_client.node.list()[0]
     tasks = current_node.ps()
     assert len(tasks) > 0
     assert tasks[0].desired_state == "running"
-    docker.service.remove(service)
+    ctr_client.service.remove(service)
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_list_tasks_node():
-    with docker.service.create("busybox", ["sleep", "infinity"]) as my_service:
-        assert docker.node.ps([]) == []
-        assert set(docker.node.ps()) == set(docker.service.ps(my_service))
+def test_list_tasks_node(ctr_client: DockerClient):
+    with ctr_client.service.create("busybox", ["sleep", "infinity"]) as my_service:
+        assert ctr_client.node.ps([]) == []
+        assert set(ctr_client.node.ps()) == set(ctr_client.service.ps(my_service))

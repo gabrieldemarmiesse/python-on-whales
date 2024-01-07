@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient
 from python_on_whales.components.service.models import ServiceInspectResult
 from python_on_whales.exceptions import NoSuchService, NotASwarmManager
 from python_on_whales.test_utils import get_all_jsons
@@ -18,52 +18,52 @@ def test_load_json(json_file):
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_tasks():
-    service = docker.service.create("busybox", ["sleep", "infinity"])
+def test_tasks(ctr_client: DockerClient):
+    service = ctr_client.service.create("busybox", ["sleep", "infinity"])
 
     tasks = service.ps()
     assert len(tasks) > 0
     assert tasks[0].desired_state == "running"
-    docker.service.remove(service)
+    ctr_client.service.remove(service)
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_get_logs():
-    with docker.service.create(
+def test_get_logs(ctr_client: DockerClient):
+    with ctr_client.service.create(
         "busybox", ["sh", "-c", "echo dodo && sleep infinity"]
     ) as my_service:
         assert my_service.ps()[0].desired_state == "running"
-        assert docker.service.logs(my_service).split("|")[-1].strip() == "dodo"
+        assert ctr_client.service.logs(my_service).split("|")[-1].strip() == "dodo"
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_get_list_of_services():
-    with docker.service.create(
+def test_get_list_of_services(ctr_client: DockerClient):
+    with ctr_client.service.create(
         "busybox", ["sh", "-c", "echo dodo && sleep infinity"]
     ) as my_service:
-        list_of_services = docker.service.list()
+        list_of_services = ctr_client.service.list()
         assert [my_service] == list_of_services
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_get_list_of_services_no_services():
-    assert docker.service.list() == []
+def test_get_list_of_services_no_services(ctr_client: DockerClient):
+    assert ctr_client.service.list() == []
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_remove_empty_services_list():
-    with docker.service.create(
+def test_remove_empty_services_list(ctr_client: DockerClient):
+    with ctr_client.service.create(
         "busybox", ["sh", "-c", "echo dodo && sleep infinity"]
     ) as my_service:
-        assert my_service in docker.service.list()
-        set_services = set(docker.service.list())
-        docker.service.remove([])
-        assert set(docker.service.list()) == set_services
+        assert my_service in ctr_client.service.list()
+        set_services = set(ctr_client.service.list())
+        ctr_client.service.remove([])
+        assert set(ctr_client.service.list()) == set_services
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_service_scale():
-    service = docker.service.create("busybox", ["sleep", "infinity"])
+def test_service_scale(ctr_client: DockerClient):
+    service = ctr_client.service.create("busybox", ["sleep", "infinity"])
     service.scale(3)
     time.sleep(0.4)
     assert service.spec.mode["Replicated"] == {"Replicas": 3}
@@ -73,9 +73,9 @@ def test_service_scale():
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_context_manager():
+def test_context_manager(ctr_client: DockerClient):
     with pytest.raises(RuntimeError):
-        with docker.service.create("busybox", ["sleep", "infinity"]) as my_service:
+        with ctr_client.service.create("busybox", ["sleep", "infinity"]) as my_service:
             assert my_service.spec.task_template.container_spec.image.startswith(
                 "busybox"
             )
@@ -86,8 +86,8 @@ def test_context_manager():
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_service_restart():
-    my_service = docker.service.create(
+def test_service_restart(ctr_client: DockerClient):
+    my_service = ctr_client.service.create(
         "busybox",
         ["echo", "Hello"],
         detach=True,
@@ -100,19 +100,19 @@ def test_service_restart():
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_service_secrets():
+def test_service_secrets(ctr_client: DockerClient):
     secret_user = None
     secret_pass = None
     with tempfile.NamedTemporaryFile() as f:
         f.write(b"supersecretuser")
         f.seek(0)
-        secret_user = docker.secret.create("dbuser", f.name)
+        secret_user = ctr_client.secret.create("dbuser", f.name)
     with tempfile.NamedTemporaryFile() as f:
         f.write(b"supersecretpass")
         f.seek(0)
-        secret_pass = docker.secret.create("dbpass", f.name)
+        secret_pass = ctr_client.secret.create("dbpass", f.name)
 
-    with docker.service.create(
+    with ctr_client.service.create(
         "ubuntu",
         ["bash", "-c", "cat /run/secrets/{dbuser,dbpass} && sleep infinity"],
         secrets=[
@@ -120,7 +120,6 @@ def test_service_secrets():
                 "source": "dbuser",
             },
             {
-                "source": "dbpass",
                 "source": "dbpass",
                 "uid": "1000",
                 "gid": "1000",
@@ -134,11 +133,11 @@ def test_service_secrets():
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_service_mounts():
+def test_service_mounts(ctr_client: DockerClient):
     with tempfile.NamedTemporaryFile() as f:
         f.write(b"config")
         f.seek(0)
-        with docker.service.create(
+        with ctr_client.service.create(
             "ubuntu",
             ["bash", "-c", f"cat {f.name} && sleep infinity"],
             mounts=[
@@ -152,73 +151,81 @@ def test_service_mounts():
             assert my_service.ps()[0].desired_state == "running"
 
 
-@pytest.mark.parametrize(
-    "docker_function",
-    [docker.service.inspect, docker.service.remove, docker.service.ps],
-)
 @pytest.mark.usefixtures("swarm_mode")
-def test_some_functions_no_such_service(docker_function):
+def test_inspect_no_such_service(ctr_client: DockerClient):
     with pytest.raises(NoSuchService):
-        docker_function("DOODODGOIHURHURI")
+        ctr_client.service.inspect("DOODODGOIHURHURI")
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_scale_no_such_service():
+def test_remove_no_such_service(ctr_client: DockerClient):
     with pytest.raises(NoSuchService):
-        docker.service.scale({"DOODODGOIHURHURI": 14})
+        ctr_client.service.remove("DOODODGOIHURHURI")
 
 
-def test_create_not_swarm_manager():
+@pytest.mark.usefixtures("swarm_mode")
+def test_ps_no_such_service(ctr_client: DockerClient):
+    with pytest.raises(NoSuchService):
+        ctr_client.service.ps("DOODODGOIHURHURI")
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_scale_no_such_service(ctr_client: DockerClient):
+    with pytest.raises(NoSuchService):
+        ctr_client.service.scale({"DOODODGOIHURHURI": 14})
+
+
+def test_create_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.create("busybox", ["sleep", "infinity"])
+        ctr_client.service.create("busybox", ["sleep", "infinity"])
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_inspect_not_swarm_manager():
+def test_inspect_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.inspect("dodo")
+        ctr_client.service.inspect("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_exists_not_swarm_manager():
+def test_exists_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.exists("dodo")
+        ctr_client.service.exists("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_list_not_swarm_manager():
+def test_list_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.list()
+        ctr_client.service.list()
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_ps_not_swarm_manager():
+def test_ps_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.ps("dodo")
+        ctr_client.service.ps("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_remove_not_swarm_manager():
+def test_remove_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.remove("dodo")
+        ctr_client.service.remove("dodo")
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_scale_not_swarm_manager():
+def test_scale_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.scale({"dodo": 8})
+        ctr_client.service.scale({"dodo": 8})
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_update_not_swarm_manager():
+def test_update_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.service.update("dodo", image="busybox")
+        ctr_client.service.update("dodo", image="busybox")
 
     assert "not a swarm manager" in str(e.value).lower()

@@ -2,23 +2,23 @@ from datetime import timedelta
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient
 from python_on_whales.exceptions import NotASwarmManager
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_swarm_update_retention_limit():
-    docker.swarm.update(task_history_limit=4)
+def test_swarm_update_retention_limit(ctr_client: DockerClient):
+    ctr_client.swarm.update(task_history_limit=4)
     assert (
-        docker.system.info().swarm.cluster.spec.orchestration.task_history_retention_limit
+        ctr_client.system.info().swarm.cluster.spec.orchestration.task_history_retention_limit
         == 4
     )
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_swarm_change_certificate_expiry():
-    ca = docker.swarm.ca(certificate_expiry=timedelta(days=1), rotate=True)
-    info = docker.system.info()
+def test_swarm_change_certificate_expiry(ctr_client: DockerClient):
+    ca = ctr_client.swarm.ca(certificate_expiry=timedelta(days=1), rotate=True)
+    info = ctr_client.system.info()
     node_cert_expiry = timedelta(
         microseconds=info.swarm.cluster.spec.ca_config.node_cert_expiry / 1000
     )
@@ -27,41 +27,43 @@ def test_swarm_change_certificate_expiry():
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_swarm_update_auto_lock_managers():
+def test_swarm_update_auto_lock_managers(ctr_client: DockerClient):
     assert (
-        not docker.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
+        not ctr_client.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
     )
-    docker.swarm.update(autolock=True)
-    assert docker.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
+    ctr_client.swarm.update(autolock=True)
+    assert (
+        ctr_client.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
+    )
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_swarm_unlock_key():
-    docker.swarm.update(autolock=True)
-    first_key = docker.swarm.unlock_key()
+def test_swarm_unlock_key(ctr_client: DockerClient):
+    ctr_client.swarm.update(autolock=True)
+    first_key = ctr_client.swarm.unlock_key()
     # make sure is doesn't change
-    assert first_key == docker.swarm.unlock_key()
+    assert first_key == ctr_client.swarm.unlock_key()
 
     # make sure it changes:
-    assert first_key != docker.swarm.unlock_key(rotate=True)
+    assert first_key != ctr_client.swarm.unlock_key(rotate=True)
 
 
-def test_swarm_join_token_not_swarm_manager():
+def test_swarm_join_token_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.swarm.join_token("manager")
+        ctr_client.swarm.join_token("manager")
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_update_not_swarm_manager():
+def test_update_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.swarm.update(autolock=True)
+        ctr_client.swarm.update(autolock=True)
 
     assert "not a swarm manager" in str(e.value).lower()
 
 
-def test_unlock_key_not_swarm_manager():
+def test_unlock_key_not_swarm_manager(ctr_client: DockerClient):
     with pytest.raises(NotASwarmManager) as e:
-        docker.swarm.unlock_key()
+        ctr_client.swarm.unlock_key()
 
     assert "not a swarm manager" in str(e.value).lower()
