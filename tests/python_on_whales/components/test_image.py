@@ -1,9 +1,10 @@
 import json
+from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient, docker
 from python_on_whales.components.image.models import ImageInspectResult
 from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.test_utils import get_all_jsons, random_name
@@ -16,31 +17,31 @@ def test_load_json(json_file):
     # we could do more checks here if needed
 
 
-def test_image_repr():
-    docker.image.pull("busybox:1", quiet=True)
-    docker.image.pull("busybox:1.32", quiet=True)
-    assert "busybox:1" in repr(docker.image.list())
-    assert "busybox:1.32" in repr(docker.image.list())
-    docker.image.remove(["busybox:1", "busybox:1.32"])
+def test_image_repr(ctr_client: DockerClient):
+    ctr_client.image.pull("busybox:1", quiet=True)
+    ctr_client.image.pull("busybox:1.32", quiet=True)
+    assert "busybox:1" in repr(ctr_client.image.list())
+    assert "busybox:1.32" in repr(ctr_client.image.list())
+    ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-def test_image_remove():
-    docker.image.pull("busybox:1", quiet=True)
-    docker.image.pull("busybox:1.32", quiet=True)
-    docker.image.remove(["busybox:1", "busybox:1.32"])
+def test_image_remove(ctr_client: DockerClient):
+    ctr_client.image.pull("busybox:1", quiet=True)
+    ctr_client.image.pull("busybox:1.32", quiet=True)
+    ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-def test_image_save_load(tmp_path):
+def test_image_save_load(ctr_client: DockerClient, tmp_path: Path):
     tar_file = tmp_path / "dodo.tar"
-    docker.image.pull("busybox:1", quiet=True)
-    docker.image.save("busybox:1", output=tar_file)
-    docker.image.remove("busybox:1")
-    assert docker.image.load(input=tar_file) == ["busybox:1"]
+    ctr_client.image.pull("busybox:1", quiet=True)
+    ctr_client.image.save("busybox:1", output=tar_file)
+    ctr_client.image.remove("busybox:1")
+    assert ctr_client.image.load(input=tar_file) == ["busybox:1"]
 
 
-def test_save_iterator_bytes():
-    docker.image.pull("busybox:1", quiet=True)
-    iterator = docker.image.save("busybox:1")
+def test_save_iterator_bytes(ctr_client: DockerClient):
+    ctr_client.image.pull("busybox:1", quiet=True)
+    iterator = ctr_client.image.save("busybox:1")
 
     for i, my_bytes in enumerate(iterator):
         if i == 0:
@@ -49,9 +50,9 @@ def test_save_iterator_bytes():
     assert i != 0
 
 
-def test_filter_when_listing():
-    docker.pull(["hello-world", "busybox"])
-    images_listed = docker.image.list(filters=dict(reference="hello-world"))
+def test_filter_when_listing(ctr_client: DockerClient):
+    ctr_client.pull(["hello-world", "busybox"])
+    images_listed = ctr_client.image.list(filters=dict(reference="hello-world"))
     tags = set()
     for image in images_listed:
         for tag in image.repo_tags:
@@ -59,11 +60,11 @@ def test_filter_when_listing():
     assert tags == {"hello-world:latest"}
 
 
-def test_filter_when_listing_old_signature():
+def test_filter_when_listing_old_signature(ctr_client: DockerClient):
     """Check backward compatibility"""
-    docker.pull(["hello-world", "busybox"])
+    ctr_client.pull(["hello-world", "busybox"])
     with pytest.warns(DeprecationWarning) as warnings_emmitted:
-        images_listed = docker.image.list({"reference": "hello-world"})
+        images_listed = ctr_client.image.list({"reference": "hello-world"})
 
     warning_message = str(warnings_emmitted.list[0].message)
     assert "docker.image.list({'reference': 'hello-world'}" in warning_message
@@ -75,10 +76,10 @@ def test_filter_when_listing_old_signature():
     assert tags == {"hello-world:latest"}
 
 
-def test_use_first_argument_to_filter():
+def test_use_first_argument_to_filter(ctr_client: DockerClient):
     """Check backward compatibility"""
-    docker.pull(["hello-world", "busybox"])
-    images_listed = docker.image.list("hello-world")
+    ctr_client.pull(["hello-world", "busybox"])
+    images_listed = ctr_client.image.list("hello-world")
     tags = set()
     for image in images_listed:
         for tag in image.repo_tags:
@@ -86,55 +87,53 @@ def test_use_first_argument_to_filter():
     assert tags == {"hello-world:latest"}
 
 
-def test_save_iterator_bytes_and_load():
+def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     image_name = "busybox:1"
-    docker.image.pull(image_name, quiet=True)
-    iterator = docker.image.save(image_name)
+    ctr_client.image.pull(image_name, quiet=True)
+    iterator = ctr_client.image.save(image_name)
 
     my_tar_as_bytes = b"".join(iterator)
 
-    docker.image.remove(image_name)
+    ctr_client.image.remove(image_name)
 
-    loaded = docker.image.load(my_tar_as_bytes)
+    loaded = ctr_client.image.load(my_tar_as_bytes)
     assert loaded == [image_name]
-    docker.image.inspect(image_name)
+    ctr_client.image.inspect(image_name)
 
 
-def test_save_iterator_bytes_and_load_from_iterator():
+def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     image_name = "busybox:1"
-    docker.image.pull(image_name, quiet=True)
-    iterator = docker.image.save(image_name)
+    ctr_client.image.pull(image_name, quiet=True)
+    iterator = ctr_client.image.save(image_name)
 
-    assert docker.image.load(iterator) == [image_name]
-    docker.image.inspect(image_name)
+    assert ctr_client.image.load(iterator) == [image_name]
+    ctr_client.image.inspect(image_name)
 
 
-def test_save_iterator_bytes_and_load_from_iterator_list_of_images():
+def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
+    ctr_client: DockerClient,
+):
     images = ["busybox:1", "hello-world:latest"]
-    docker.image.pull(images[0], quiet=True)
-    docker.image.pull(images[1], quiet=True)
-    iterator = docker.image.save(images)
+    ctr_client.image.pull(images[0], quiet=True)
+    ctr_client.image.pull(images[1], quiet=True)
+    iterator = ctr_client.image.save(images)
 
-    assert set(docker.image.load(iterator)) == set(images)
-    docker.image.inspect(images[0])
-    docker.image.inspect(images[1])
+    assert set(ctr_client.image.load(iterator)) == set(images)
+    ctr_client.image.inspect(images[0])
+    ctr_client.image.inspect(images[1])
 
 
-def test_image_list():
-    image_list = docker.image.list()
+def test_image_list(ctr_client: DockerClient):
+    image_list = ctr_client.image.list()
     all_ids = [x.id for x in image_list]
     all_ids_uniquified = set(all_ids)
     assert len(set(all_ids_uniquified)) == len(image_list)
 
 
-def test_image_bulk_reload():
-    pass
-
-
-def test_image_list_tags():
+def test_image_list_tags(ctr_client: DockerClient):
     image_name = "busybox:1"
-    docker.image.pull(image_name, quiet=True)
-    all_images = docker.image.list()
+    ctr_client.image.pull(image_name, quiet=True)
+    all_images = ctr_client.image.list()
     for image in all_images:
         if image_name in image.repo_tags:
             return
@@ -142,119 +141,132 @@ def test_image_list_tags():
         raise ValueError("Tag not found in images.")
 
 
-def test_pull_not_quiet():
+def test_pull_not_quiet(ctr_client: DockerClient):
     try:
-        docker.image.remove("busybox:1")
+        ctr_client.image.remove("busybox:1")
     except DockerException:
         pass
-    image = docker.image.pull("busybox:1")
+    image = ctr_client.image.pull("busybox:1")
     assert "busybox:1" in image.repo_tags
 
 
-def test_pull_not_quiet_multiple_images():
+def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
     images_names = ["busybox:1", "hello-world:latest"]
     try:
-        docker.image.remove(images_names)
+        ctr_client.image.remove(images_names)
     except DockerException:
         pass
-    images = docker.pull(images_names)
+    images = ctr_client.pull(images_names)
     for image_name, image in zip(images_names, images):
         assert image_name in image.repo_tags
 
 
-def test_pull_not_quiet_multiple_images_break():
+def test_pull_not_quiet_multiple_images_break(ctr_client: DockerClient):
     images_names = ["busybox:1", "hellstuff"]
     try:
-        docker.image.remove(images_names)
+        ctr_client.image.remove(images_names)
     except DockerException:
         pass
 
     with pytest.raises(DockerException) as err:
-        docker.pull(images_names)
+        ctr_client.pull(images_names)
 
     assert "docker image pull hellstuff" in str(err.value)
 
 
-def test_copy_from_and_to(tmp_path):
-    my_image = docker.pull("busybox:1")
+def test_copy_from_and_to(ctr_client: DockerClient, tmp_path: Path):
+    my_image = ctr_client.pull("busybox:1")
     (tmp_path / "dodo.txt").write_text("Hello world!")
 
     new_image_name = random_name()
     my_image.copy_to(tmp_path / "dodo.txt", "/dada.txt", new_tag=new_image_name)
 
-    new_image_name = docker.image.inspect(new_image_name)
+    new_image_name = ctr_client.image.inspect(new_image_name)
     new_image_name.copy_from("/dada.txt", tmp_path / "dudu.txt")
     assert (tmp_path / "dodo.txt").read_text() == (tmp_path / "dudu.txt").read_text()
 
 
-def test_copy_from_and_to_directory(tmp_path):
-    my_image = docker.pull("busybox:1")
+def test_copy_from_and_to_directory(ctr_client: DockerClient, tmp_path: Path):
+    my_image = ctr_client.pull("busybox:1")
     (tmp_path / "dodo.txt").write_text("Hello world!")
 
     new_image_name = random_name()
     my_image.copy_to(tmp_path, "/some_path", new_tag=new_image_name)
 
-    new_image_name = docker.image.inspect(new_image_name)
+    new_image_name = ctr_client.image.inspect(new_image_name)
     new_image_name.copy_from("/some_path", tmp_path / "some_path")
     assert "Hello world!" == (tmp_path / "some_path" / "dodo.txt").read_text()
 
 
-def test_prune():
-    docker.pull("busybox")
-    docker.image.prune(all=True)
+def test_prune(ctr_client: DockerClient):
+    ctr_client.pull("busybox")
+    ctr_client.image.prune(all=True)
     with pytest.raises(DockerException):
-        docker.image.inspect("busybox")
+        ctr_client.image.inspect("busybox")
 
 
-def test_remove_nothing():
-    with docker.pull("hello-world"):
-        all_images = set(docker.image.list())
-        docker.image.remove([])
-        assert all_images == set(docker.image.list())
+def test_remove_nothing(ctr_client: DockerClient):
+    with ctr_client.pull("hello-world"):
+        all_images = set(ctr_client.image.list())
+        ctr_client.image.remove([])
+        assert all_images == set(ctr_client.image.list())
 
 
-@pytest.mark.parametrize(
-    "docker_function", [docker.image.inspect, docker.image.remove, docker.push]
-)
-def test_no_such_image_with_multiple_functions(docker_function):
+def test_no_such_image_inspect(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
-        docker_function(image_name_that_does_not_exists)
+        ctr_client.image.inspect(image_name_that_does_not_exists)
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-def test_no_such_image_save():
+def test_no_such_image_remove(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
-        docker.image.save(image_name_that_does_not_exists, output="/tmp/dada")
+        ctr_client.image.remove(image_name_that_does_not_exists)
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-def test_no_such_image_save_generator():
+def test_no_such_image_push(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
-        for _ in docker.image.save(image_name_that_does_not_exists):
+        ctr_client.push(image_name_that_does_not_exists)
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+def test_no_such_image_save(ctr_client: DockerClient):
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        ctr_client.image.save(image_name_that_does_not_exists, output="/tmp/dada")
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+def test_no_such_image_save_generator(ctr_client: DockerClient):
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        for _ in ctr_client.image.save(image_name_that_does_not_exists):
             pass
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-def test_no_such_image_tag():
+def test_no_such_image_tag(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
-        docker.image.tag(image_name_that_does_not_exists, "something")
+        ctr_client.image.tag(image_name_that_does_not_exists, "something")
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-def test_exists():
-    my_image = docker.pull("busybox")
+def test_exists(ctr_client: DockerClient):
+    my_image = ctr_client.pull("busybox")
     assert my_image.exists()
-    assert docker.image.exists("busybox")
+    assert ctr_client.image.exists("busybox")
 
-    assert not docker.image.exists("dudurghurozgiozpfezjigfoeioengizeonig")
+    assert not ctr_client.image.exists("dudurghurozgiozpfezjigfoeioengizeonig")
 
 
 @patch("python_on_whales.components.image.cli_wrapper.ContainerCLI")
