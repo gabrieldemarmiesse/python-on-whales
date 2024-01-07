@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import tempfile
 import time
@@ -8,10 +9,13 @@ import pytest
 
 from python_on_whales import DockerClient
 
+logger = logging.getLogger(__name__)
+
 
 @pytest.fixture(scope="session")
 def ctr_client(pytestconfig: pytest.Config) -> DockerClient:
     ctr_exe = pytestconfig.getoption("--ctr-exe")
+    logger.info("Running tests with container exe: %s", ctr_exe)
     client = DockerClient(client_call=[ctr_exe])
     # Check the client is available.
     try:
