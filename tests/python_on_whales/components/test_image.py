@@ -1,12 +1,18 @@
 import json
+from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient, docker
 from python_on_whales.components.image.models import ImageInspectResult
 from python_on_whales.exceptions import DockerException, NoSuchImage
-from python_on_whales.test_utils import get_all_jsons, random_name
+from python_on_whales.test_utils import (
+    docker_client,
+    get_all_jsons,
+    podman_client,
+    random_name,
+)
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("images"))
@@ -24,18 +30,20 @@ def test_image_repr():
     docker.image.remove(["busybox:1", "busybox:1.32"])
 
 
-def test_image_remove():
-    docker.image.pull("busybox:1", quiet=True)
-    docker.image.pull("busybox:1.32", quiet=True)
-    docker.image.remove(["busybox:1", "busybox:1.32"])
+@pytest.mark.parametrize("ctr_client", [docker_client, podman_client], indirect=True)
+def test_image_remove(ctr_client: DockerClient):
+    ctr_client.image.pull("busybox:1", quiet=True)
+    ctr_client.image.pull("busybox:1.32", quiet=True)
+    ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-def test_image_save_load(tmp_path):
+@pytest.mark.parametrize("ctr_client", [docker_client], indirect=True)
+def test_image_save_load(ctr_client: DockerClient, tmp_path: Path):
     tar_file = tmp_path / "dodo.tar"
-    docker.image.pull("busybox:1", quiet=True)
-    docker.image.save("busybox:1", output=tar_file)
-    docker.image.remove("busybox:1")
-    assert docker.image.load(input=tar_file) == ["busybox:1"]
+    ctr_client.image.pull("busybox:1", quiet=True)
+    ctr_client.image.save("busybox:1", output=tar_file)
+    ctr_client.image.remove("busybox:1")
+    assert ctr_client.image.load(input=tar_file) == ["busybox:1"]
 
 
 def test_save_iterator_bytes():

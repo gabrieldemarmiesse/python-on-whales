@@ -29,3 +29,10 @@ python-on-whales = "python_on_whales.command_line_entrypoint:main"
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "docs"]
+
+
+[tool.pytest.ini_options]
+markers = [
+    "docker: marks tests as needing a docker engine to run",
+    "podman: marks tests as needing a podman engine to run"
+]
