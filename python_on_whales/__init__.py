@@ -21,7 +21,7 @@ from .docker_client import DockerClient
 from .exceptions import DockerException
 
 # alias
-docker = DockerClient()
+docker = DockerClient(client_type="docker")
 
 __all__ = [
     "Builder",
