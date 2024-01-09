@@ -37,8 +37,10 @@ def test_image_remove(ctr_client: DockerClient):
     ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@pytest.mark.parametrize("ctr_client", [docker_client], indirect=True)
+@pytest.mark.parametrize("ctr_client", [docker_client, podman_client], indirect=True)
 def test_image_save_load(ctr_client: DockerClient, tmp_path: Path):
+    if ctr_client.client_config.client_type == "podman":
+        pytest.xfail("podman save/load is not implemented yet")
     tar_file = tmp_path / "dodo.tar"
     ctr_client.image.pull("busybox:1", quiet=True)
     ctr_client.image.save("busybox:1", output=tar_file)

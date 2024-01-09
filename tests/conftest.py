@@ -133,13 +133,17 @@ class TestSessionClient:
 
 @pytest.fixture(scope="session")
 def docker_client_fixture(pytestconfig):
-    client = DockerClient(client_call=[pytestconfig.getoption("--docker-exe")])
+    client = DockerClient(
+        client_call=[pytestconfig.getoption("--docker-exe")], client_type="docker"
+    )
     yield TestSessionClient(client)
 
 
 @pytest.fixture(scope="session")
 def podman_client_fixture(pytestconfig):
-    client = DockerClient(client_call=[pytestconfig.getoption("--podman-exe")])
+    client = DockerClient(
+        client_call=[pytestconfig.getoption("--podman-exe")], client_type="podman"
+    )
     yield TestSessionClient(client)
 
 
