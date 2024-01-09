@@ -1,6 +1,6 @@
 import base64
 import warnings
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
@@ -79,6 +79,13 @@ class DockerClient(DockerCLICaller):
             program execution).
         client_binary: Deprecated, use `client_call`. If you used before `client_binary="podman"`, now use
             `client_call=["podman"]`.
+        client_type: The kind of client that is called by the Python process. It allows Python-on-whales to
+            adapt to the client's behavior if two client have a different behavior. The `client_call` is not
+            enough for Python-on-whales to know what kind of client you're using. For example, if you use
+            a symlink to call Docker, Python-on-whales will not know that you're using Docker.
+            Default is "unknown". If at some point, Python-on-whales has to choose
+            a behavior and `client_type` is `"unknown"`, it will raise an exception and ask you to specify
+            what kind of client you're working with. Valid values are `"docker"`, `"podman"`, "`nerdctl"` and `"unknown"`.
     """
 
     def __init__(
@@ -102,6 +109,7 @@ class DockerClient(DockerCLICaller):
         compose_compatibility: Optional[bool] = None,
         client_binary: str = "docker",
         client_call: List[str] = ["docker"],
+        client_type: Literal["docker", "podman", "nerdctl", "unknown"] = "unknown",
     ):
         if client_binary != "docker":
             warnings.warn(
@@ -129,6 +137,7 @@ class DockerClient(DockerCLICaller):
                 compose_project_directory=compose_project_directory,
                 compose_compatibility=compose_compatibility,
                 client_call=client_call,
+                client_type=client_type,
             )
         super().__init__(client_config)
 

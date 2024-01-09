@@ -5,7 +5,7 @@ import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import pydantic
 
@@ -65,6 +65,7 @@ class ClientConfig:
     compose_project_directory: Optional[ValidPath] = None
     compose_compatibility: Optional[bool] = None
     client_call: List[str] = field(default_factory=lambda: ["docker"])
+    client_type: Literal["docker", "podman", "nerdctl", "unknown"] = "unknown"
     _client_call_with_path: Optional[List[Union[Path, str]]] = None
 
     def get_client_call_with_path(self) -> List[Union[Path, str]]:
