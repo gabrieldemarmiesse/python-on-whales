@@ -29,12 +29,12 @@ def get_all_jsons(object_types: str) -> List[Path]:
     return sorted(list(jsons_directory.iterdir()), key=lambda x: int(x.stem))
 
 
-DOCKER_TEST_FLAG = "DOCKER_TEST_FLAG"
-PODMAN_TEST_FLAG = "PODMAN_TEST_FLAG"
-
-docker_client = pytest.param(
-    DOCKER_TEST_FLAG, marks=pytest.mark.docker, id="docker client"
-)
-podman_client = pytest.param(
-    PODMAN_TEST_FLAG, marks=pytest.mark.podman, id="podman client"
-)
+def parametrize_ctr_client(*args) -> pytest.MarkDecorator:
+    return pytest.mark.parametrize(
+        "ctr_client",
+        [
+            pytest.param(runtime, marks=getattr(pytest.mark, runtime))
+            for runtime in args
+        ],
+        indirect=True,
+    )
