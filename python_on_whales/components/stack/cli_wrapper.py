@@ -6,7 +6,16 @@ from typing import Any, Dict, List, Optional, Union
 import python_on_whales.components.service.cli_wrapper
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.components.compose.models import ComposeConfig
 from python_on_whales.utils import ValidPath, read_env_files, run, to_list
+
+try:
+    import yaml
+
+    _HAS_YAML = True
+except ImportError:
+    yaml = None
+    _HAS_YAML = False
 
 
 class Stack:
@@ -91,6 +100,55 @@ class StackCLI(DockerCLICaller):
 
         run(full_cmd, capture_stdout=False, env=env)
         return Stack(self.client_config, name)
+
+    def config(
+        self,
+        compose_files: Union[ValidPath, List[ValidPath]],
+        env_files: List[ValidPath] = [],
+        variables: Dict[str, str] = {},
+        return_json: bool = False,
+    ) -> Union[ComposeConfig, Dict[str, Any]]:
+        """Returns the final config file, after doing merges and interpolations.
+
+        Parameters:
+            compose_files: One or more docker-compose files.
+                If there is more than one, they will be merged.
+            env_files: Similar to `.env` files in docker-compose, load `variables` from `.env` files.
+                If both `env_files` and `variables` are used, `variables` have priority.
+            variables: A dict dictating by what to replace the variables declared in the
+                docker-compose files.
+                In the docker CLI, you would use environment variables for this.
+            return_json: If `False`, a `ComposeConfig` object will be returned, and you'll be able
+                to take advantage of your IDE autocompletion. If you want the full json output, you
+                may use `return_json`. In this case, you'll get lists and dicts corresponding to the
+                json response, unmodified. It may be useful if you just want to print the config or
+                want to access a field that was not in the `ComposeConfig` class.
+
+        # Returns
+            A `ComposeConfig` object if `return_json` is `False`, and a `dict` otherwise.
+
+        # Raises
+            DockerException: if there's an error in one of the compose_files.
+            ImportError: if module `pyyaml` is not installed.
+        """
+        if not _HAS_YAML:
+            raise ImportError(
+                "Install yaml dependencies for this function (ex: pip install python_on_whales[yaml])"
+            )
+
+        full_cmd = self.docker_cmd + ["stack", "config"]
+        full_cmd.add_args_list("--compose-file", compose_files)
+
+        env = read_env_files([Path(x) for x in env_files])
+        env.update(variables)
+
+        result = yaml.safe_load(
+            run(full_cmd, capture_stdout=True, return_stderr=False, env=env)
+        )
+
+        if return_json:
+            return result
+        return ComposeConfig(**result)
 
     def list(self) -> List[Stack]:
         """Returns a list of `python_on_whales.Stack`
