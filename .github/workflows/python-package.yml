@@ -93,7 +93,7 @@ jobs:
           pip install -r tests/test-requirements.txt
       - name: Run single test
         run: |
-          python -m pytest -vv tests/python_on_whales/components/test_volume.py::test_simple_volume
+          python -m pytest -vv -m "not podman" tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:
@@ -118,4 +118,4 @@ jobs:
 #          pip install -r tests/test-requirements.txt
 #      - name: Run all tests
 #        run: |
-#          python -m pytest -vv tests/
+#          python -m pytest -vv -m "not podman" tests/
