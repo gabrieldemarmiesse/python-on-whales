@@ -47,7 +47,10 @@ def _get_ctr_client(client_type: str, pytestconfig: pytest.Config) -> DockerClie
             ctr_exe,
             reason,
         )
-        pytest.skip(f"{client_type} unavailable")
+        if pytestconfig.getoption("--no-runtime-skip"):
+            pytest.fail(f"{client_type} unavailable")
+        else:
+            pytest.skip(f"{client_type} unavailable")
 
     return client
 
@@ -140,6 +143,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             help=f"Path to the {name} executable to use in the unit tests."
             f"Defaults to {name}.",
         )
+    pow_group.addoption(
+        "--no-runtime-skip",
+        action="store_true",
+        help="Do not skip tests corresponding to a container runtime that is not available",
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:
