@@ -64,7 +64,9 @@ def podman_client(
     return _get_ctr_client("podman", pytestconfig)
 
 
-@pytest.fixture
+# This is function-scoped so that all of a testcase's parameterisations run
+# in a row, before running other testcases.
+@pytest.fixture(scope="function")
 def ctr_client(request: pytest.FixtureRequest) -> DockerClient:
     """Allows to parametrize a test with the container runtime as a string."""
     return request.getfixturevalue(f"{request.param}_client")
