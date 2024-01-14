@@ -34,19 +34,7 @@ def test_image_remove(ctr_client: DockerClient):
     ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.load() gives SHA instead of image tag"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_load(ctr_client: DockerClient, tmp_path: Path):
     tar_file = tmp_path / "dodo.tar"
     image = ctr_client.image.pull("busybox:1", quiet=True)
@@ -68,19 +56,7 @@ def test_save_iterator_bytes(ctr_client: DockerClient):
     assert i != 0
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.load() gives SHA instead of image tag"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     image = ctr_client.image.pull("busybox:1", quiet=True)
     image_tags = image.repo_tags
@@ -91,19 +67,7 @@ def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     ctr_client.image.inspect("busybox:1")
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.load() gives SHA instead of image tag"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     image = ctr_client.image.pull("busybox:1", quiet=True)
     image_tags = image.repo_tags
@@ -114,15 +78,7 @@ def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.load() gives SHA instead of image tag"
-            ),
-        ),
-    ],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
