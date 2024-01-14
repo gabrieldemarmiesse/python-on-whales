@@ -40,9 +40,9 @@ def test_image_remove(ctr_client: DockerClient):
         "docker",
         pytest.param(
             "podman",
-            marks=[
-                pytest.mark.xfail("podman.image.load() gives SHA instead of image tag")
-            ],
+            marks=pytest.mark.xfail(
+                reason="podman.image.load() gives SHA instead of image tag"
+            ),
         ),
     ],
     indirect=True,
@@ -74,9 +74,9 @@ def test_save_iterator_bytes(ctr_client: DockerClient):
         "docker",
         pytest.param(
             "podman",
-            marks=[
-                pytest.mark.xfail("podman.image.load() gives SHA instead of image tag")
-            ],
+            marks=pytest.mark.xfail(
+                reason="podman.image.load() gives SHA instead of image tag"
+            ),
         ),
     ],
     indirect=True,
@@ -97,9 +97,9 @@ def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
         "docker",
         pytest.param(
             "podman",
-            marks=[
-                pytest.mark.xfail("podman.image.load() gives SHA instead of image tag")
-            ],
+            marks=pytest.mark.xfail(
+                reason="podman.image.load() gives SHA instead of image tag"
+            ),
         ),
     ],
     indirect=True,
@@ -112,10 +112,21 @@ def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     ctr_client.image.inspect("busybox:1")
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman.image.load() gives SHA instead of image tag"
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
     ctr_client: DockerClient,
-    xfail={"podman": "podman.image.load() gives SHA instead of image tag"},
 ):
     images = ctr_client.image.pull(["busybox:1", "hello-world:latest"], quiet=True)
     image_tags = {tag for image in images for tag in image.repo_tags}
@@ -183,7 +194,7 @@ def test_pull_not_quiet(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
@@ -252,7 +263,7 @@ def test_remove_nothing(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_no_such_image_inspect(ctr_client: DockerClient):
@@ -265,7 +276,7 @@ def test_no_such_image_inspect(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_no_such_image_remove(ctr_client: DockerClient):
@@ -278,7 +289,7 @@ def test_no_such_image_remove(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_no_such_image_push(ctr_client: DockerClient):
@@ -291,7 +302,7 @@ def test_no_such_image_push(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_no_such_image_save(ctr_client: DockerClient):
@@ -304,7 +315,7 @@ def test_no_such_image_save(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_no_such_image_save_generator(ctr_client: DockerClient):
@@ -318,7 +329,7 @@ def test_no_such_image_save_generator(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_no_such_image_tag(ctr_client: DockerClient):
@@ -331,7 +342,7 @@ def test_no_such_image_tag(ctr_client: DockerClient):
 
 @pytest.mark.parametrize(
     "ctr_client",
-    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
     indirect=True,
 )
 def test_exists(ctr_client: DockerClient):
