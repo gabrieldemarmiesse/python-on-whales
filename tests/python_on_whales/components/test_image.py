@@ -1,3 +1,4 @@
+import contextlib
 import json
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
@@ -38,14 +39,15 @@ def test_image_remove(ctr_client: DockerClient):
 
 
 @parametrize_ctr_client("docker", "podman")
-def test_image_save_load(ctr_client: DockerClient, tmp_path: Path):
+def test_save_load(ctr_client: DockerClient, tmp_path: Path):
     if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
+        pytest.xfail("podman.image.load() gives SHA instead of image tag")
     tar_file = tmp_path / "dodo.tar"
-    ctr_client.image.pull("busybox:1", quiet=True)
-    ctr_client.image.save("busybox:1", output=tar_file)
-    ctr_client.image.remove("busybox:1")
-    assert ctr_client.image.load(input=tar_file) == ["busybox:1"]
+    image = ctr_client.image.pull("busybox:1", quiet=True)
+    image_tags = image.repo_tags
+    image.save(output=tar_file)
+    image.remove(force=True)
+    assert ctr_client.image.load(input=tar_file) == image_tags
 
 
 @parametrize_ctr_client("docker", "podman")
@@ -61,15 +63,47 @@ def test_save_iterator_bytes(ctr_client: DockerClient):
 
 
 @parametrize_ctr_client("docker", "podman")
-def test_filter_when_listing(ctr_client: DockerClient):
+def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
+        pytest.xfail("podman.image.load() gives SHA instead of image tag")
+    image = ctr_client.image.pull("busybox:1", quiet=True)
+    image_tags = image.repo_tags
+    iterator = image.save()
+    my_tar_as_bytes = b"".join(iterator)
+    image.remove(force=True)
+    assert ctr_client.image.load(my_tar_as_bytes) == image_tags
+    ctr_client.image.inspect("busybox:1")
+
+
+@parametrize_ctr_client("docker", "podman")
+def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
+    if ctr_client.client_config.client_type == "podman":
+        pytest.xfail("podman.image.load() gives SHA instead of image tag")
+    image = ctr_client.image.pull("busybox:1", quiet=True)
+    image_tags = image.repo_tags
+    iterator = image.save()
+    assert ctr_client.image.load(iterator) == image_tags
+    ctr_client.image.inspect("busybox:1")
+
+
+@parametrize_ctr_client("docker", "podman")
+def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
+        ctr_client: DockerClient,
+):
+    if ctr_client.client_config.client_type == "podman":
+        pytest.xfail("podman.image.load() gives SHA instead of image tag")
+    images = ctr_client.image.pull(["busybox:1", "hello-world:latest"], quiet=True)
+    image_tags = {tag for image in images for tag in image.repo_tags}
+    iterator = ctr_client.image.save(images)
+    assert set(ctr_client.image.load(iterator)) == image_tags
+    ctr_client.image.inspect(["busybox:1", "hello-world:latest"])
+
+
+@parametrize_ctr_client("docker", "podman")
+def test_filter_when_listing(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list(filters=dict(reference="hello-world"))
-    tags = set()
-    for image in images_listed:
-        for tag in image.repo_tags:
-            tags.add(tag)
+    tags = {tag.split("/")[-1] for image in images_listed for tag in image.repo_tags}
     assert tags == {"hello-world:latest"}
 
 
@@ -91,60 +125,10 @@ def test_filter_when_listing_old_signature(docker_client: DockerClient):
 
 @parametrize_ctr_client("docker", "podman")
 def test_use_first_argument_to_filter(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list("hello-world")
-    tags = set()
-    for image in images_listed:
-        for tag in image.repo_tags:
-            tags.add(tag)
+    tags = {tag.split("/")[-1] for image in images_listed for tag in image.repo_tags}
     assert tags == {"hello-world:latest"}
-
-
-@parametrize_ctr_client("docker", "podman")
-def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
-    image_name = "busybox:1"
-    ctr_client.image.pull(image_name, quiet=True)
-    iterator = ctr_client.image.save(image_name)
-
-    my_tar_as_bytes = b"".join(iterator)
-
-    ctr_client.image.remove(image_name)
-
-    loaded = ctr_client.image.load(my_tar_as_bytes)
-    assert loaded == [image_name]
-    ctr_client.image.inspect(image_name)
-
-
-@parametrize_ctr_client("docker", "podman")
-def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
-    image_name = "busybox:1"
-    ctr_client.image.pull(image_name, quiet=True)
-    iterator = ctr_client.image.save(image_name)
-
-    assert ctr_client.image.load(iterator) == [image_name]
-    ctr_client.image.inspect(image_name)
-
-
-@parametrize_ctr_client("docker", "podman")
-def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
-    ctr_client: DockerClient,
-):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
-    images = ["busybox:1", "hello-world:latest"]
-    ctr_client.image.pull(images[0], quiet=True)
-    ctr_client.image.pull(images[1], quiet=True)
-    iterator = ctr_client.image.save(images)
-
-    assert set(ctr_client.image.load(iterator)) == set(images)
-    ctr_client.image.inspect(images[0])
-    ctr_client.image.inspect(images[1])
 
 
 @parametrize_ctr_client("docker", "podman")
@@ -156,34 +140,18 @@ def test_image_list(ctr_client: DockerClient):
 
 
 @parametrize_ctr_client("docker", "podman")
-def test_image_bulk_reload(ctr_client: DockerClient):
-    pass
-
-
-@parametrize_ctr_client("docker", "podman")
 def test_image_list_tags(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
-    image_name = "busybox:1"
-    ctr_client.image.pull(image_name, quiet=True)
+    ctr_client.image.pull("busybox:1", quiet=True)
     all_images = ctr_client.image.list()
-    for image in all_images:
-        if image_name in image.repo_tags:
-            return
-    else:
-        raise ValueError("Tag not found in images.")
+    assert "busybox:1" in {tag.split("/")[-1] for image in all_images for tag in image.repo_tags}
 
 
 @parametrize_ctr_client("docker", "podman")
 def test_pull_not_quiet(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
-    try:
-        ctr_client.image.remove("busybox:1")
-    except DockerException:
-        pass
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove("busybox:1", force=True)
     image = ctr_client.image.pull("busybox:1")
-    assert "busybox:1" in image.repo_tags
+    assert "busybox:1" in {tag.split("/")[-1] for tag in image.repo_tags}
 
 
 @parametrize_ctr_client("docker", "podman")
@@ -191,10 +159,8 @@ def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
     if ctr_client.client_config.client_type == "podman":
         pytest.xfail()
     images_names = ["busybox:1", "hello-world:latest"]
-    try:
-        ctr_client.image.remove(images_names)
-    except DockerException:
-        pass
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove(images_names, force=True)
     images = ctr_client.pull(images_names)
     for image_name, image in zip(images_names, images):
         assert image_name in image.repo_tags
@@ -202,18 +168,13 @@ def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
 
 @parametrize_ctr_client("docker", "podman")
 def test_pull_not_quiet_multiple_images_break(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     images_names = ["busybox:1", "hellstuff"]
-    try:
-        ctr_client.image.remove(images_names)
-    except DockerException:
-        pass
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove(images_names, force=True)
 
     with pytest.raises(DockerException) as err:
         ctr_client.pull(images_names)
-
-    assert "docker image pull hellstuff" in str(err.value)
+    assert f"{ctr_client.client_config.client_call[0]} image pull hellstuff" in str(err.value)
 
 
 @parametrize_ctr_client("docker", "podman")
