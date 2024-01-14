@@ -1,43 +1,91 @@
+import logging
 import subprocess
 import tempfile
 import time
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Generator, List
 
 import pydantic
 import pytest
-from typing_extensions import Literal
 
-from python_on_whales import DockerClient, docker
-from python_on_whales.test_utils import DOCKER_TEST_FLAG, PODMAN_TEST_FLAG
+from python_on_whales import DockerClient
+
+logger = logging.getLogger(__name__)
+
+#
+# -----------------------------------------------------------------------------
+# Fixtures
 
 
-def pytest_addoption(parser):
-    """Pytest hook for adding CLI options."""
-
-    pow_group = parser.getgroup("python-on-whales")
-    for name in ("docker", "podman"):
-        pow_group.addoption(
-            f"--{name}-exe",
-            metavar="EXE",
-            default=name,
-            help=f"Path to the {name} executable to use in the unit tests."
-            f"Defaults to {name}.",
+def _get_ctr_client(client_type: str, pytestconfig: pytest.Config) -> DockerClient:
+    ctr_exe = pytestconfig.getoption(f"--{client_type}-exe")
+    client = DockerClient(client_call=[ctr_exe], client_type=client_type)
+    try:
+        # TODO: Implement 'DockerClient.version' and use that instead.
+        subprocess.run(
+            [ctr_exe, "version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+            timeout=10,
         )
+    except (
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+        FileNotFoundError,
+    ) as exc:
+        if isinstance(exc, subprocess.CalledProcessError):
+            reason = "\n" + exc.stderr.strip()
+        elif isinstance(exc, subprocess.TimeoutExpired):
+            reason = f"timed out after {exc.timeout} seconds"
+        elif isinstance(exc, FileNotFoundError):
+            reason = "executable not found"
+        logger.warning(
+            "Unable to get %s version with command '%s version': %s",
+            client_type,
+            ctr_exe,
+            reason,
+        )
+        pytest.skip(f"{client_type} unavailable")
+
+    return client
 
 
-@pytest.fixture
-def docker_registry():
-    yield from _docker_registry()
+@pytest.fixture(scope="session")
+def docker_client(pytestconfig: pytest.Config) -> DockerClient:
+    return _get_ctr_client("docker", pytestconfig)
 
 
-@pytest.fixture
-def docker_registry_without_login():
-    yield from _docker_registry(login=False)
+@pytest.fixture(scope="session")
+def podman_client(
+    pytestconfig: pytest.Config, request: pytest.FixtureRequest
+) -> DockerClient:
+    return _get_ctr_client("podman", pytestconfig)
 
 
-def _docker_registry(login=True):
-    encrypted_password = docker.run(
+# This is function-scoped so that all of a testcase's parameterisations run
+# in a row, before running other testcases.
+@pytest.fixture(scope="function")
+def ctr_client(request: pytest.FixtureRequest) -> DockerClient:
+    """Allows to parametrize a test with the container runtime as a string."""
+    return request.getfixturevalue(f"{request.param}_client")
+
+
+@pytest.fixture(scope="function")
+def docker_registry(docker_client: DockerClient) -> Generator[str, None, None]:
+    yield from _docker_registry(docker_client)
+
+
+@pytest.fixture(scope="function")
+def docker_registry_without_login(
+    docker_client: DockerClient,
+) -> Generator[str, None, None]:
+    yield from _docker_registry(docker_client, login=False)
+
+
+def _docker_registry(docker_client: DockerClient, login=True) -> str:
+    encrypted_password = docker_client.run(
         "mhenry07/apache2-utils",
         ["htpasswd", "-Bbn", "my_user", "my_password"],
         remove=True,
@@ -46,7 +94,7 @@ def _docker_registry(login=True):
         tmp_path = Path(tmp_path)
         htpasswd_file = tmp_path / "htpasswd"
         htpasswd_file.write_text(encrypted_password)
-        registry = docker.container.create(
+        registry = docker_client.container.create(
             "registry:2",
             remove=True,
             envs=dict(
@@ -61,104 +109,59 @@ def _docker_registry(login=True):
             registry.start()
             time.sleep(1.5)
             if login:
-                docker.login(
+                docker_client.login(
                     "localhost:5000", username="my_user", password="my_password"
                 )
             yield "localhost:5000"
 
 
-@pytest.fixture
-def swarm_mode():
-    docker.swarm.init()
+@pytest.fixture(scope="function")
+def swarm_mode(docker_client: DockerClient) -> Generator[None, None, None]:
+    docker_client.swarm.init()
     yield
-    docker.swarm.leave(force=True)
+    docker_client.swarm.leave(force=True)
     time.sleep(1)
 
 
-def pytest_collection_modifyitems(config, items):
-    if pydantic.__version__.startswith("1"):
-        return
+#
+# -----------------------------------------------------------------------------
+# Pytest hooks
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Pytest hook for adding CLI options."""
+
+    pow_group = parser.getgroup("python-on-whales")
+    for name in ("docker", "podman"):
+        pow_group.addoption(
+            f"--{name}-exe",
+            metavar="EXE",
+            default=name,
+            help=f"Path to the {name} executable to use in the unit tests."
+            f"Defaults to {name}.",
+        )
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    # Filter warnings
+    if not pydantic.__version__.startswith("1"):
+        config.addinivalue_line(
+            "filterwarnings", "error::pydantic.PydanticDeprecatedSince20"
+        )
+
+
+def pytest_collection_modifyitems(
+    session: pytest.Session, config: pytest.Config, items: List[pytest.Item]
+) -> None:
+    # Apply marks to testcases.
     for item in items:
-        item.add_marker(
-            pytest.mark.filterwarnings("error::pydantic.PydanticDeprecatedSince20")
-        )
-
-
-def is_available(
-    ctr_client: DockerClient,
-) -> Union[Tuple[Literal[True], None], Tuple[Literal[False], str]]:
-    """Returns a tuple (True, None) if the container runtime is available
-    and (False, reason (str)) if it's not available."""
-
-    try:
-        # TODO: Implement 'DockerClient.version' and use that instead.
-        subprocess.run(
-            ctr_client.client_config.client_call + ["version"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            check=True,
-            timeout=10,
-        )
-        return True, None
-    except (
-        subprocess.CalledProcessError,
-        subprocess.TimeoutExpired,
-        FileNotFoundError,
-    ) as exc:
-        if isinstance(exc, subprocess.CalledProcessError):
-            reason = "\n" + exc.output
-        elif isinstance(exc, subprocess.TimeoutExpired):
-            reason = f"timed out after {exc.timeout} seconds"
-        elif isinstance(exc, FileNotFoundError):
-            reason = "executable not found"
-        command = " ".join(ctr_client.client_config.client_call)
-        return False, (
-            f"Unable to get version with command"
-            f" '{command} version'. Reason: {reason}"
-        )
-
-
-class TestSessionClient:
-    def __init__(self, ctr_client: DockerClient):
-        self._ctr_client = ctr_client
-        self._available, self._reason = is_available(ctr_client)
-
-    def get_ctr_client(self) -> DockerClient:
-        """Try to get the ctr client and skip the entire test if it's not available."""
-        if not self._available:
-            pytest.skip(self._reason)
-        return self._ctr_client
-
-
-@pytest.fixture(scope="session")
-def docker_client_fixture(pytestconfig):
-    client = DockerClient(
-        client_call=[pytestconfig.getoption("--docker-exe")], client_type="docker"
-    )
-    yield TestSessionClient(client)
-
-
-@pytest.fixture(scope="session")
-def podman_client_fixture(pytestconfig):
-    client = DockerClient(
-        client_call=[pytestconfig.getoption("--podman-exe")], client_type="podman"
-    )
-    yield TestSessionClient(client)
-
-
-@pytest.fixture
-def ctr_client(
-    request,
-    docker_client_fixture: TestSessionClient,
-    podman_client_fixture: TestSessionClient,
-):
-    """Allows to parametrize a test with the container runtime as a string."""
-    if request.param == DOCKER_TEST_FLAG:
-        request.applymarker(pytest.mark.docker)
-        yield docker_client_fixture.get_ctr_client()
-    elif request.param == PODMAN_TEST_FLAG:
-        request.applymarker(pytest.mark.podman)
-        yield podman_client_fixture.get_ctr_client()
-    else:
-        raise ValueError(f"Unknown container runtime {request.param}")
+        assert isinstance(item, pytest.Function)
+        for runtime in ["docker", "podman"]:
+            if f"{runtime}_client" in item.fixturenames:
+                item.add_marker(runtime)
+            if (
+                hasattr(item, "callspec")
+                and "ctr_client" in item.callspec.params
+                and item.callspec.params["ctr_client"] == runtime
+            ):
+                item.add_marker(runtime)

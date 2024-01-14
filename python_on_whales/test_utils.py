@@ -4,8 +4,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import List
 
-import pytest
-
 from python_on_whales import client_config
 from python_on_whales.utils import PROJECT_ROOT
 
@@ -27,14 +25,3 @@ def get_all_jsons(object_types: str) -> List[Path]:
         PROJECT_ROOT / "tests/python_on_whales/components/jsons" / object_types
     )
     return sorted(list(jsons_directory.iterdir()), key=lambda x: int(x.stem))
-
-
-DOCKER_TEST_FLAG = "DOCKER_TEST_FLAG"
-PODMAN_TEST_FLAG = "PODMAN_TEST_FLAG"
-
-docker_client = pytest.param(
-    DOCKER_TEST_FLAG, marks=pytest.mark.docker, id="docker client"
-)
-podman_client = pytest.param(
-    PODMAN_TEST_FLAG, marks=pytest.mark.podman, id="podman client"
-)
