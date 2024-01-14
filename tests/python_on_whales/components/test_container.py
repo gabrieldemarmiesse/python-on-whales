@@ -252,7 +252,19 @@ def test_remove_on_exit(ctr_client: DockerClient):
     assert "Hello from Docker!" in output
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="Cgroup control not available with rootless podman on cgroups v1"
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_cpus(ctr_client: DockerClient):
     output = ctr_client.run("hello-world", cpus=1.5, remove=True)
     assert "Hello from Docker!" in output
