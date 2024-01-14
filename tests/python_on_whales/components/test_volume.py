@@ -52,7 +52,19 @@ def test_multiple_volumes(ctr_client: DockerClient):
         assert v not in ctr_client.volume.list()
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="'podman volume create' does not support size option"
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_volume_drivers(ctr_client: DockerClient):
     some_volume = ctr_client.volume.create(
         driver="local",
@@ -84,7 +96,17 @@ def test_list(ctr_client: DockerClient):
         assert v in all_volumes
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(reason="podman.volume.copy() not supported"),
+        ),
+    ],
+    indirect=True,
+)
 def test_copy_to_volume(ctr_client: DockerClient, tmp_path: Path):
     some_volume = ctr_client.volume.create()
     ctr_client.run(
@@ -98,7 +120,17 @@ def test_copy_to_volume(ctr_client: DockerClient, tmp_path: Path):
     assert (tmp_path / "dodo.txt").exists()
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(reason="podman.volume.copy() not supported"),
+        ),
+    ],
+    indirect=True,
+)
 def test_copy_to_volume_subdirectory(ctr_client: DockerClient, tmp_path: Path):
     some_volume = ctr_client.volume.create()
     ctr_client.run(
@@ -116,7 +148,17 @@ def test_copy_to_volume_subdirectory(ctr_client: DockerClient, tmp_path: Path):
     assert (tmp_path / "subdir2/dodo.txt").exists()
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(reason="podman.volume.copy() not supported"),
+        ),
+    ],
+    indirect=True,
+)
 def test_copy_to_and_from_volume(ctr_client: DockerClient, tmp_path: Path):
     some_volume = ctr_client.volume.create()
 
@@ -131,7 +173,17 @@ def test_copy_to_and_from_volume(ctr_client: DockerClient, tmp_path: Path):
     assert (tmp_path / "subdir/some_dir/dodo.txt").read_text() == "Hello\nWorld!"
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(reason="podman.volume.copy() not supported"),
+        ),
+    ],
+    indirect=True,
+)
 def test_volume_cp_from_in_dir(ctr_client: DockerClient, tmp_path: Path):
     some_volume = ctr_client.volume.create()
     ctr_client.run(
@@ -145,7 +197,17 @@ def test_volume_cp_from_in_dir(ctr_client: DockerClient, tmp_path: Path):
     assert (tmp_path / "dodo.txt").exists()
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(reason="podman.volume.copy() not supported"),
+        ),
+    ],
+    indirect=True,
+)
 def test_volume_cp_to_in_dir(ctr_client: DockerClient, tmp_path: Path):
     dodo = tmp_path / "dada" / "dodo.txt"
     dodo.parent.mkdir()
@@ -162,7 +224,17 @@ def test_volume_cp_to_in_dir(ctr_client: DockerClient, tmp_path: Path):
     assert files == "dodo.txt"
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(reason="podman.volume.clone() not supported"),
+        ),
+    ],
+    indirect=True,
+)
 def test_clone(ctr_client: DockerClient):
     some_volume = ctr_client.volume.create()
     ctr_client.run(
@@ -210,7 +282,19 @@ def test_volume_exists(ctr_client: DockerClient):
         assert ctr_client.volume.exists(v.name)
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="'podman volume prune' does not support --all"
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_prune(ctr_client: DockerClient):
     for volume in ctr_client.volume.list(filters={"name": "test-volume"}):
         volume.remove()
