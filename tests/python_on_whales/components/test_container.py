@@ -140,11 +140,7 @@ sys.exit(1)
         assert "Something is wrong!" in str(err.value)
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_container_repr(ctr_client: DockerClient):
     with ctr_client.run(
         "ubuntu",
@@ -156,11 +152,7 @@ def test_container_repr(ctr_client: DockerClient):
         assert container.id[:12] in repr(ctr_client.container.list())
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_with_random_port(ctr_client: DockerClient):
     with ctr_client.run(
         "ubuntu",
@@ -325,11 +317,7 @@ def test_simple_logs_follow(ctr_client: DockerClient):
         assert output == "dodo\n"
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_simple_logs_stream(ctr_client: DockerClient):
     with ctr_client.run("busybox:1", ["echo", "dodo"], detach=True) as c:
         time.sleep(0.3)
@@ -337,11 +325,7 @@ def test_simple_logs_stream(ctr_client: DockerClient):
         assert output == [("stdout", b"dodo\n")]
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_simple_logs_stream_stderr(ctr_client: DockerClient):
     with ctr_client.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
         time.sleep(0.3)
@@ -349,11 +333,7 @@ def test_simple_logs_stream_stderr(ctr_client: DockerClient):
         assert output == [("stderr", b"dodo\n")]
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_simple_logs_stream_stdout_and_stderr(ctr_client: DockerClient):
     with ctr_client.run(
         "busybox:1", ["sh", "-c", ">&2 echo dodo && echo dudu"], detach=True
@@ -365,11 +345,7 @@ def test_simple_logs_stream_stdout_and_stderr(ctr_client: DockerClient):
         assert set(output) == {("stderr", b"dodo\n"), ("stdout", b"dudu\n")}
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_simple_logs_stream_wait(ctr_client: DockerClient):
     with ctr_client.run(
         "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
@@ -429,11 +405,7 @@ def test_container_state(ctr_client: DockerClient):
     )
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_restart(ctr_client: DockerClient):
     cmd = ["sleep", "infinity"]
     containers = [ctr_client.run("busybox:1", cmd, detach=True) for _ in range(3)]
@@ -511,6 +483,7 @@ def test_kill_signal(ctr_client: DockerClient):
         "busybox:1", ["sleep", "infinity"], init=True, detach=True
     )
     my_container.kill(signal=signal.SIGINT)
+    my_container.reload()
     assert not my_container.state.running
     assert my_container.state.exit_code == 130
     my_container.remove()
@@ -870,11 +843,7 @@ def test_rename_nosuchcontainer(ctr_client: DockerClient):
         ctr_client.container.rename("dodueizbgueirzhgueoz", "new_name")
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_update_nosuchcontainer(ctr_client: DockerClient):
     with pytest.raises(NoSuchContainer):
         ctr_client.container.update("grueighuri", cpus=1)
