@@ -136,7 +136,19 @@ def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
     ctr_client.image.inspect(image_names)
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman lists images with registry in image name"
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_filter_when_listing(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list(filters=dict(reference="hello-world"))
@@ -160,7 +172,19 @@ def test_filter_when_listing_old_signature(docker_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman lists images with registry in image name"
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_use_first_argument_to_filter(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list("hello-world")
