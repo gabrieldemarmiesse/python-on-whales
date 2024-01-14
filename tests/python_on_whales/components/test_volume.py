@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient
 from python_on_whales.components.volume.models import VolumeInspectResult
 from python_on_whales.exceptions import NoSuchVolume
 from python_on_whales.test_utils import get_all_jsons
@@ -30,71 +30,78 @@ def test_load_json(json_file):
         assert a.options is None
 
 
-def test_simple_volume():
-    some_volume = docker.volume.create()
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_volume(ctr_client: DockerClient):
+    some_volume = ctr_client.volume.create()
     assert some_volume.exists()
-    assert some_volume.name in repr(docker.volume.list())
-    assert some_volume.driver in repr(docker.volume.list())
-    docker.volume.remove(some_volume)
+    assert some_volume.name in repr(ctr_client.volume.list())
+    assert some_volume.driver in repr(ctr_client.volume.list())
+    ctr_client.volume.remove(some_volume)
 
 
-def test_multiple_volumes():
-    volumes = [docker.volume.create() for _ in range(3)]
-
-    for v in volumes:
-        assert v in docker.volume.list()
-
-    docker.volume.remove(volumes)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_multiple_volumes(ctr_client: DockerClient):
+    volumes = [ctr_client.volume.create() for _ in range(3)]
 
     for v in volumes:
-        assert v not in docker.volume.list()
+        assert v in ctr_client.volume.list()
+
+    ctr_client.volume.remove(volumes)
+
+    for v in volumes:
+        assert v not in ctr_client.volume.list()
 
 
-def test_volume_drivers():
-    some_volume = docker.volume.create(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_drivers(ctr_client: DockerClient):
+    some_volume = ctr_client.volume.create(
         driver="local",
         options=dict(type="tmpfs", device="tmpfs", o="size=100m,uid=1000"),
     )
-    docker.run(
+    ctr_client.run(
         "busybox",
         ["touch", "/dodo/dada"],
         volumes=[(some_volume, "/dodo")],
         remove=True,
     )
-    docker.volume.remove(some_volume)
+    ctr_client.volume.remove(some_volume)
 
 
-def test_volume_labels():
-    some_volume = docker.volume.create(labels=dict(dodo="dada"))
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_labels(ctr_client: DockerClient):
+    some_volume = ctr_client.volume.create(labels=dict(dodo="dada"))
 
     assert some_volume.labels["dodo"] == "dada"
-    docker.volume.remove(some_volume)
+    ctr_client.volume.remove(some_volume)
 
 
-def test_list():
-    volumes = [docker.volume.create() for _ in range(3)]
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_list(ctr_client: DockerClient):
+    volumes = [ctr_client.volume.create() for _ in range(3)]
 
-    all_volumes = docker.volume.list()
+    all_volumes = ctr_client.volume.list()
     for v in volumes:
         assert v in all_volumes
 
 
-def test_copy_to_volume(tmp_path):
-    some_volume = docker.volume.create()
-    docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_copy_to_volume(ctr_client: DockerClient, tmp_path: Path):
+    some_volume = ctr_client.volume.create()
+    ctr_client.run(
         "busybox",
         ["touch", "/volume/dodo.txt"],
         remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
-    docker.volume.copy((some_volume, "dodo.txt"), tmp_path)
+    ctr_client.volume.copy((some_volume, "dodo.txt"), tmp_path)
     assert (tmp_path / "dodo.txt").exists()
 
 
-def test_copy_to_volume_subdirectory(tmp_path):
-    some_volume = docker.volume.create()
-    docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_copy_to_volume_subdirectory(ctr_client: DockerClient, tmp_path: Path):
+    some_volume = ctr_client.volume.create()
+    ctr_client.run(
         "busybox",
         [
             "sh",
@@ -105,44 +112,47 @@ def test_copy_to_volume_subdirectory(tmp_path):
         volumes=[(some_volume, "/volume")],
     )
 
-    docker.volume.copy((some_volume, "subdir/subdir2"), tmp_path)
+    ctr_client.volume.copy((some_volume, "subdir/subdir2"), tmp_path)
     assert (tmp_path / "subdir2/dodo.txt").exists()
 
 
-def test_copy_to_and_from_volume(tmp_path):
-    some_volume = docker.volume.create()
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_copy_to_and_from_volume(ctr_client: DockerClient, tmp_path: Path):
+    some_volume = ctr_client.volume.create()
 
     text_file = tmp_path / "some_dir" / "dodo.txt"
     text_file.parent.mkdir(parents=True)
     text_file.write_text("Hello\nWorld!")
-    docker.volume.copy(tmp_path, (some_volume, "subdir"))
+    ctr_client.volume.copy(tmp_path, (some_volume, "subdir"))
 
     text_file.unlink()
-    docker.volume.copy((some_volume, "subdir/"), tmp_path)
+    ctr_client.volume.copy((some_volume, "subdir/"), tmp_path)
 
     assert (tmp_path / "subdir/some_dir/dodo.txt").read_text() == "Hello\nWorld!"
 
 
-def test_volume_cp_from_in_dir(tmp_path):
-    some_volume = docker.volume.create()
-    docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_cp_from_in_dir(ctr_client: DockerClient, tmp_path: Path):
+    some_volume = ctr_client.volume.create()
+    ctr_client.run(
         "busybox",
         ["touch", "/volume/dodo.txt"],
         remove=True,
         volumes=[(some_volume, "/volume")],
     )
 
-    docker.volume.copy((some_volume, "."), tmp_path)
+    ctr_client.volume.copy((some_volume, "."), tmp_path)
     assert (tmp_path / "dodo.txt").exists()
 
 
-def test_volume_cp_to_in_dir(tmp_path):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_cp_to_in_dir(ctr_client: DockerClient, tmp_path: Path):
     dodo = tmp_path / "dada" / "dodo.txt"
     dodo.parent.mkdir()
     dodo.touch()
-    some_volume = docker.volume.create()
-    docker.volume.copy(str(tmp_path) + "/.", (some_volume, ""))
-    files = docker.run(
+    some_volume = ctr_client.volume.create()
+    ctr_client.volume.copy(str(tmp_path) + "/.", (some_volume, ""))
+    files = ctr_client.run(
         "busybox",
         ["ls", "/volume/dada/"],
         remove=True,
@@ -152,9 +162,10 @@ def test_volume_cp_to_in_dir(tmp_path):
     assert files == "dodo.txt"
 
 
-def test_clone():
-    some_volume = docker.volume.create()
-    docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_clone(ctr_client: DockerClient):
+    some_volume = ctr_client.volume.create()
+    ctr_client.run(
         "busybox",
         [
             "sh",
@@ -165,8 +176,8 @@ def test_clone():
         volumes=[(some_volume, "/volume")],
     )
 
-    new_volume = docker.volume.clone(some_volume)
-    files = docker.run(
+    new_volume = ctr_client.volume.clone(some_volume)
+    files = ctr_client.run(
         "busybox",
         [
             "sh",
@@ -179,45 +190,48 @@ def test_clone():
     assert files == "dodo.txt"
 
 
-@pytest.mark.parametrize(
-    "docker_function", [docker.volume.inspect, docker.volume.remove]
-)
-def test_functions_no_such_volume(docker_function):
+@pytest.mark.parametrize("method", ["inspect", "remove"])
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_functions_no_such_volume(ctr_client: DockerClient, method: str):
     with pytest.raises(NoSuchVolume) as e:
-        docker_function("dodo")
+        getattr(ctr_client.volume, method)("dodo")
     assert "no such volume" in str(e.value).lower()
 
 
-def test_volume_does_not_exists():
-    assert not docker.volume.exists("dodo")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_does_not_exists(ctr_client: DockerClient):
+    assert not ctr_client.volume.exists("dodo")
 
 
-def test_volume_exists():
-    with docker.volume.create() as v:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_exists(ctr_client: DockerClient):
+    with ctr_client.volume.create() as v:
         assert v.exists()
-        assert docker.volume.exists(v.name)
+        assert ctr_client.volume.exists(v.name)
 
 
-def test_prune():
-    for volume in docker.volume.list(filters={"name": "test-volume"}):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_prune(ctr_client: DockerClient):
+    for volume in ctr_client.volume.list(filters={"name": "test-volume"}):
         volume.remove()
-    volume = docker.volume.create("test-volume")
-    assert volume in docker.volume.list()
+    volume = ctr_client.volume.create("test-volume")
+    assert volume in ctr_client.volume.list()
 
     # volume not pruned because it does not have label "dne"
-    docker.volume.prune(filters={"label": "dne"}, all=True)
-    assert volume in docker.volume.list()
+    ctr_client.volume.prune(filters={"label": "dne"}, all=True)
+    assert volume in ctr_client.volume.list()
 
     # could only find "label" filter for `docker volume prune`
 
     # volume pruned
-    docker.volume.prune(all=True)
-    assert volume not in docker.volume.list()
+    ctr_client.volume.prune(all=True)
+    assert volume not in ctr_client.volume.list()
 
 
-def test_volume_remove_empty_list():
-    with docker.volume.create() as my_volume:
-        assert my_volume in docker.volume.list()
-        all_volumes = set(docker.volume.list())
-        docker.volume.remove([])
-        assert all_volumes == set(docker.volume.list())
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_volume_remove_empty_list(ctr_client: DockerClient):
+    with ctr_client.volume.create() as my_volume:
+        assert my_volume in ctr_client.volume.list()
+        all_volumes = set(ctr_client.volume.list())
+        ctr_client.volume.remove([])
+        assert all_volumes == set(ctr_client.volume.list())
