@@ -4,8 +4,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import List
 
-import pytest
-
 from python_on_whales import client_config
 from python_on_whales.utils import PROJECT_ROOT
 
@@ -27,14 +25,3 @@ def get_all_jsons(object_types: str) -> List[Path]:
         PROJECT_ROOT / "tests/python_on_whales/components/jsons" / object_types
     )
     return sorted(list(jsons_directory.iterdir()), key=lambda x: int(x.stem))
-
-
-def parametrize_ctr_client(*args) -> pytest.MarkDecorator:
-    return pytest.mark.parametrize(
-        "ctr_client",
-        [
-            pytest.param(runtime, marks=getattr(pytest.mark, runtime))
-            for runtime in args
-        ],
-        indirect=True,
-    )

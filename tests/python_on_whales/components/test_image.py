@@ -8,11 +8,7 @@ import pytest
 from python_on_whales import DockerClient, docker
 from python_on_whales.components.image.models import ImageInspectResult
 from python_on_whales.exceptions import DockerException, NoSuchImage
-from python_on_whales.test_utils import (
-    get_all_jsons,
-    parametrize_ctr_client,
-    random_name,
-)
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("images"))
@@ -22,7 +18,7 @@ def test_load_json(json_file):
     # we could do more checks here if needed
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_image_repr(ctr_client: DockerClient):
     ctr_client.image.pull("busybox:1", quiet=True)
     ctr_client.image.pull("busybox:1.32", quiet=True)
@@ -31,17 +27,27 @@ def test_image_repr(ctr_client: DockerClient):
     ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_image_remove(ctr_client: DockerClient):
     ctr_client.image.pull("busybox:1", quiet=True)
     ctr_client.image.pull("busybox:1.32", quiet=True)
     ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=[
+                pytest.mark.xfail("podman.image.load() gives SHA instead of image tag")
+            ],
+        ),
+    ],
+    indirect=True,
+)
 def test_save_load(ctr_client: DockerClient, tmp_path: Path):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail("podman.image.load() gives SHA instead of image tag")
     tar_file = tmp_path / "dodo.tar"
     image = ctr_client.image.pull("busybox:1", quiet=True)
     image_tags = image.repo_tags
@@ -50,7 +56,7 @@ def test_save_load(ctr_client: DockerClient, tmp_path: Path):
     assert ctr_client.image.load(input=tar_file) == image_tags
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_iterator_bytes(ctr_client: DockerClient):
     ctr_client.image.pull("busybox:1", quiet=True)
     iterator = ctr_client.image.save("busybox:1")
@@ -62,10 +68,20 @@ def test_save_iterator_bytes(ctr_client: DockerClient):
     assert i != 0
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=[
+                pytest.mark.xfail("podman.image.load() gives SHA instead of image tag")
+            ],
+        ),
+    ],
+    indirect=True,
+)
 def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail("podman.image.load() gives SHA instead of image tag")
     image = ctr_client.image.pull("busybox:1", quiet=True)
     image_tags = image.repo_tags
     iterator = image.save()
@@ -75,10 +91,20 @@ def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
     ctr_client.image.inspect("busybox:1")
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=[
+                pytest.mark.xfail("podman.image.load() gives SHA instead of image tag")
+            ],
+        ),
+    ],
+    indirect=True,
+)
 def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail("podman.image.load() gives SHA instead of image tag")
     image = ctr_client.image.pull("busybox:1", quiet=True)
     image_tags = image.repo_tags
     iterator = image.save()
@@ -86,12 +112,11 @@ def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     ctr_client.image.inspect("busybox:1")
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
-        ctr_client: DockerClient,
+    ctr_client: DockerClient,
+    xfail={"podman": "podman.image.load() gives SHA instead of image tag"},
 ):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail("podman.image.load() gives SHA instead of image tag")
     images = ctr_client.image.pull(["busybox:1", "hello-world:latest"], quiet=True)
     image_tags = {tag for image in images for tag in image.repo_tags}
     iterator = ctr_client.image.save(images)
@@ -99,7 +124,7 @@ def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
     ctr_client.image.inspect(["busybox:1", "hello-world:latest"])
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_filter_when_listing(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list(filters=dict(reference="hello-world"))
@@ -123,7 +148,7 @@ def test_filter_when_listing_old_signature(docker_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_use_first_argument_to_filter(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list("hello-world")
@@ -131,7 +156,7 @@ def test_use_first_argument_to_filter(ctr_client: DockerClient):
     assert tags == {"hello-world:latest"}
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_image_list(ctr_client: DockerClient):
     image_list = ctr_client.image.list()
     all_ids = [x.id for x in image_list]
@@ -139,14 +164,16 @@ def test_image_list(ctr_client: DockerClient):
     assert len(set(all_ids_uniquified)) == len(image_list)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_image_list_tags(ctr_client: DockerClient):
     ctr_client.image.pull("busybox:1", quiet=True)
     all_images = ctr_client.image.list()
-    assert "busybox:1" in {tag.split("/")[-1] for image in all_images for tag in image.repo_tags}
+    assert "busybox:1" in {
+        tag.split("/")[-1] for image in all_images for tag in image.repo_tags
+    }
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_pull_not_quiet(ctr_client: DockerClient):
     with contextlib.suppress(DockerException):
         ctr_client.image.remove("busybox:1", force=True)
@@ -154,10 +181,12 @@ def test_pull_not_quiet(ctr_client: DockerClient):
     assert "busybox:1" in {tag.split("/")[-1] for tag in image.repo_tags}
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     images_names = ["busybox:1", "hello-world:latest"]
     with contextlib.suppress(DockerException):
         ctr_client.image.remove(images_names, force=True)
@@ -166,7 +195,7 @@ def test_pull_not_quiet_multiple_images(ctr_client: DockerClient):
         assert image_name in image.repo_tags
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_pull_not_quiet_multiple_images_break(ctr_client: DockerClient):
     images_names = ["busybox:1", "hellstuff"]
     with contextlib.suppress(DockerException):
@@ -174,10 +203,12 @@ def test_pull_not_quiet_multiple_images_break(ctr_client: DockerClient):
 
     with pytest.raises(DockerException) as err:
         ctr_client.pull(images_names)
-    assert f"{ctr_client.client_config.client_call[0]} image pull hellstuff" in str(err.value)
+    assert f"{ctr_client.client_config.client_call[0]} image pull hellstuff" in str(
+        err.value
+    )
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_copy_from_and_to(ctr_client: DockerClient, tmp_path: Path):
     my_image = ctr_client.pull("busybox:1")
     (tmp_path / "dodo.txt").write_text("Hello world!")
@@ -190,7 +221,7 @@ def test_copy_from_and_to(ctr_client: DockerClient, tmp_path: Path):
     assert (tmp_path / "dodo.txt").read_text() == (tmp_path / "dudu.txt").read_text()
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_copy_from_and_to_directory(ctr_client: DockerClient, tmp_path: Path):
     my_image = ctr_client.pull("busybox:1")
     (tmp_path / "dodo.txt").write_text("Hello world!")
@@ -203,7 +234,7 @@ def test_copy_from_and_to_directory(ctr_client: DockerClient, tmp_path: Path):
     assert "Hello world!" == (tmp_path / "some_path" / "dodo.txt").read_text()
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_prune(ctr_client: DockerClient):
     ctr_client.pull("busybox")
     ctr_client.image.prune(all=True)
@@ -211,7 +242,7 @@ def test_prune(ctr_client: DockerClient):
         ctr_client.image.inspect("busybox")
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_remove_nothing(ctr_client: DockerClient):
     with ctr_client.pull("hello-world"):
         all_images = set(ctr_client.image.list())
@@ -219,10 +250,12 @@ def test_remove_nothing(ctr_client: DockerClient):
         assert all_images == set(ctr_client.image.list())
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_no_such_image_inspect(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         ctr_client.image.inspect(image_name_that_does_not_exists)
@@ -230,10 +263,12 @@ def test_no_such_image_inspect(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_no_such_image_remove(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         ctr_client.image.remove(image_name_that_does_not_exists)
@@ -241,10 +276,12 @@ def test_no_such_image_remove(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_no_such_image_push(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         ctr_client.push(image_name_that_does_not_exists)
@@ -252,10 +289,12 @@ def test_no_such_image_push(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_no_such_image_save(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         ctr_client.image.save(image_name_that_does_not_exists, output="/tmp/dada")
@@ -263,10 +302,12 @@ def test_no_such_image_save(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_no_such_image_save_generator(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         for _ in ctr_client.image.save(image_name_that_does_not_exists):
@@ -275,10 +316,12 @@ def test_no_such_image_save_generator(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_no_such_image_tag(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         ctr_client.image.tag(image_name_that_does_not_exists, "something")
@@ -286,10 +329,12 @@ def test_no_such_image_tag(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@parametrize_ctr_client("docker", "podman")
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=[pytest.mark.xfail])],
+    indirect=True,
+)
 def test_exists(ctr_client: DockerClient):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail()
     my_image = ctr_client.pull("busybox")
     assert my_image.exists()
     assert ctr_client.image.exists("busybox")
