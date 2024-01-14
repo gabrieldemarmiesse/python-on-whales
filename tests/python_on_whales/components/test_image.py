@@ -7,12 +7,7 @@ import pytest
 from python_on_whales import DockerClient, docker
 from python_on_whales.components.image.models import ImageInspectResult
 from python_on_whales.exceptions import DockerException, NoSuchImage
-from python_on_whales.test_utils import (
-    docker_client,
-    get_all_jsons,
-    podman_client,
-    random_name,
-)
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("images"))
@@ -30,17 +25,19 @@ def test_image_repr():
     docker.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@pytest.mark.parametrize("ctr_client", [docker_client, podman_client], indirect=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_image_remove(ctr_client: DockerClient):
     ctr_client.image.pull("busybox:1", quiet=True)
     ctr_client.image.pull("busybox:1.32", quiet=True)
     ctr_client.image.remove(["busybox:1", "busybox:1.32"])
 
 
-@pytest.mark.parametrize("ctr_client", [docker_client, podman_client], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
 def test_image_save_load(ctr_client: DockerClient, tmp_path: Path):
-    if ctr_client.client_config.client_type == "podman":
-        pytest.xfail("podman save/load is not implemented yet")
     tar_file = tmp_path / "dodo.tar"
     ctr_client.image.pull("busybox:1", quiet=True)
     ctr_client.image.save("busybox:1", output=tar_file)
