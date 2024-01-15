@@ -36,3 +36,4 @@ markers = [
     "docker: marks tests as needing a docker engine to run",
     "podman: marks tests as needing a podman engine to run"
 ]
+xfail_strict = true
