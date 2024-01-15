@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 import python_on_whales
-from python_on_whales import Image, docker
+from python_on_whales import DockerClient, Image, docker
 from python_on_whales.components.container.cli_wrapper import ContainerStats
 from python_on_whales.components.container.models import (
     ContainerInspectResult,
@@ -21,76 +21,7 @@ from python_on_whales.exceptions import DockerException, NoSuchContainer
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
-@pytest.mark.parametrize("json_file", get_all_jsons("containers"))
-def test_load_json(json_file):
-    json_as_txt = json_file.read_text()
-    ContainerInspectResult(**json.loads(json_as_txt))
-    # we could do more checks here if needed
-
-
-def test_simple_command():
-    output = docker.run("hello-world", remove=True)
-    assert "Hello from Docker!" in output
-
-
-def test_simple_mistake_on_run():
-    with pytest.raises(TypeError) as err:
-        docker.run("ubuntu", "ls")
-    assert "docker.run('ubuntu', ['ls'], ...)" in str(err)
-    docker.run("ubuntu", ["ls"], remove=True)
-
-
-def test_simple_command_create_start():
-    output = docker.container.create("hello-world", remove=True).start(attach=True)
-    assert "Hello from Docker!" in output
-
-
-def test_simple_stream():
-    output = docker.run("hello-world", remove=True, stream=True)
-
-    assert ("stdout", b"Hello from Docker!\n") in list(output)
-
-
-def test_simple_stream_create_start():
-    container = docker.container.create("hello-world", remove=True)
-    output = container.start(attach=True, stream=True)
-    assert ("stdout", b"Hello from Docker!\n") in list(output)
-
-
-def test_same_output_run_create_start():
-    python_code = """
-import sys
-sys.stdout.write("everything is fine\\n\\nhello world")
-sys.stderr.write("Something is wrong!")
-    """
-    image = build_image_running(python_code)
-    output_run = docker.run(image, remove=True)
-    output_create = docker.container.create(image, remove=True).start(attach=True)
-    assert output_run == output_create
-
-
-def test_same_stream_run_create_start():
-    python_code = """
-import sys
-sys.stdout.write("everything is fine\\n\\nhello world")
-sys.stderr.write("Something is wrong!")
-    """
-    image = build_image_running(python_code)
-    output_run = set(docker.run(image, remove=True, stream=True))
-    container = docker.container.create(image, remove=True)
-    output_create = set(container.start(attach=True, stream=True))
-    assert output_run == output_create
-
-
-def test_exact_output():
-    try:
-        docker.image.remove("busybox")
-    except DockerException:
-        pass
-    assert docker.run("busybox", ["echo", "dodo"], remove=True) == "dodo"
-
-
-def build_image_running(python_code) -> Image:
+def build_image(ctr_client: DockerClient, python_code: str) -> Image:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
         (tmpdir / "file.py").write_text(python_code)
@@ -101,37 +32,137 @@ COPY file.py /file.py
 CMD python /file.py
         """
         )
-        return docker.build(tmpdir, tags="some_image", load=True)
+        return ctr_client.build(tmpdir, tags="some_image", load=True)
 
 
-def test_fails_correctly():
+@pytest.mark.parametrize("json_file", get_all_jsons("containers"))
+def test_load_json(json_file):
+    json_as_txt = json_file.read_text()
+    ContainerInspectResult(**json.loads(json_as_txt))
+    # we could do more checks here if needed
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_command(ctr_client: DockerClient):
+    output = ctr_client.run("hello-world", remove=True)
+    assert "Hello from Docker!" in output
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_mistake_on_run(ctr_client: DockerClient):
+    with pytest.raises(TypeError) as err:
+        ctr_client.run("ubuntu", "ls")
+    assert "docker.run('ubuntu', ['ls'], ...)" in str(err)
+    ctr_client.run("ubuntu", ["ls"], remove=True)
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_command_create_start(ctr_client: DockerClient):
+    output = ctr_client.container.create("hello-world", remove=True).start(attach=True)
+    assert "Hello from Docker!" in output
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_stream(ctr_client: DockerClient):
+    output = ctr_client.run("hello-world", remove=True, stream=True)
+
+    assert ("stdout", b"Hello from Docker!\n") in list(output)
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_stream_create_start(ctr_client: DockerClient):
+    container = ctr_client.container.create("hello-world", remove=True)
+    output = container.start(attach=True, stream=True)
+    assert ("stdout", b"Hello from Docker!\n") in list(output)
+
+
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_same_output_run_create_start(ctr_client: DockerClient):
+    python_code = """
+import sys
+sys.stdout.write("everything is fine\\n\\nhello world")
+sys.stderr.write("Something is wrong!")
+    """
+    image = build_image(ctr_client, python_code)
+    output_run = ctr_client.run(image, remove=True)
+    output_create = ctr_client.container.create(image, remove=True).start(attach=True)
+    assert output_run == output_create
+
+
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_same_stream_run_create_start(ctr_client: DockerClient):
+    python_code = """
+import sys
+sys.stdout.write("everything is fine\\n\\nhello world")
+sys.stderr.write("Something is wrong!")
+    """
+    image = build_image(ctr_client, python_code)
+    output_run = set(ctr_client.run(image, remove=True, stream=True))
+    container = ctr_client.container.create(image, remove=True)
+    output_create = set(container.start(attach=True, stream=True))
+    assert output_run == output_create
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exact_output(ctr_client: DockerClient):
+    try:
+        ctr_client.image.remove("busybox")
+    except DockerException:
+        pass
+    assert ctr_client.run("busybox", ["echo", "dodo"], remove=True) == "dodo"
+
+
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_fails_correctly(ctr_client: DockerClient):
     python_code = """
 import sys
 sys.stdout.write("everything is fine")
 sys.stderr.write("Something is wrong!")
 sys.exit(1)
 """
-    image = build_image_running(python_code)
+    image = build_image(ctr_client, python_code)
     with image:
         with pytest.raises(DockerException) as err:
-            for _ in docker.run(image, stream=True, remove=True):
+            for _ in ctr_client.run(image, stream=True, remove=True):
                 pass
         assert "Something is wrong!" in str(err.value)
 
 
-def test_container_repr():
-    with docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_container_repr(ctr_client: DockerClient):
+    with ctr_client.run(
         "ubuntu",
         ["sleep", "infinity"],
         remove=True,
         detach=True,
         stop_timeout=1,
     ) as container:
-        assert container.id[:12] in repr(docker.container.list())
+        assert container.id[:12] in repr(ctr_client.container.list())
 
 
-def test_container_run_with_random_port():
-    with docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_run_with_random_port(ctr_client: DockerClient):
+    with ctr_client.run(
         "ubuntu",
         ["sleep", "infinity"],
         publish=[(90,)],
@@ -140,19 +171,25 @@ def test_container_run_with_random_port():
         stop_timeout=1,
     ) as container:
         assert container.network_settings.ports["90/tcp"][0]["HostPort"] is not None
-        assert container.id[:12] in repr(docker.container.list())
+        assert container.id[:12] in repr(ctr_client.container.list())
 
 
-def test_container_create_with_random_ports():
-    with docker.container.create(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_create_with_random_ports(ctr_client: DockerClient):
+    with ctr_client.container.create(
         "ubuntu", ["sleep", "infinity"], publish=[(90,)], stop_timeout=1
     ) as container:
         container.start()
         assert container.network_settings.ports["90/tcp"][0]["HostPort"] is not None
 
 
-def test_container_create_with_cgroupns():
-    with docker.container.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_create_with_cgroupns(ctr_client: DockerClient):
+    with ctr_client.container.run(
         "ubuntu", ["sleep", "infinity"], cgroupns="host", detach=True, stop_timeout=1
     ) as container:
         assert container.host_config.cgroupns_mode == "host"
@@ -161,7 +198,7 @@ def test_container_create_with_cgroupns():
 @pytest.mark.parametrize("systemd_mode", [True, False, "always"])
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container", Mock())
-def test_container_create_with_systemd_mode(
+def test_mock_create_with_systemd_mode(
     run_mock: Mock, systemd_mode: Union[bool, Literal["always"]]
 ):
     docker.container.create(
@@ -181,132 +218,186 @@ def test_container_create_with_systemd_mode(
     )
 
 
-def test_fails_correctly_create_start():
+def test_create_with_systemd_mode(podman_client: DockerClient):
+    with podman_client.container.run(
+        "ubuntu", ["sleep", "infinity"], systemd="always", detach=True, stop_timeout=1
+    ) as container:
+        assert container.config.systemd_mode is True
+
+
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_fails_correctly_create_start(ctr_client: DockerClient):
     python_code = """
 import sys
 sys.stdout.write("everything is fine")
 sys.stderr.write("Something is wrong!")
 sys.exit(1)
 """
-    image = build_image_running(python_code)
+    image = build_image(ctr_client, python_code)
     with image:
-        container = docker.container.create(image, remove=True)
+        container = ctr_client.container.create(image, remove=True)
         with pytest.raises(DockerException) as err:
             for _ in container.start(attach=True, stream=True):
                 pass
         assert "Something is wrong!" in str(err.value)
 
 
-def test_remove():
-    output = docker.run("hello-world", remove=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_remove_on_exit(ctr_client: DockerClient):
+    output = ctr_client.run("hello-world", remove=True)
     assert "Hello from Docker!" in output
 
 
-def test_cpus():
-    output = docker.run("hello-world", cpus=1.5, remove=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="Cgroup control not available with rootless podman on cgroups v1"
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_cpus(ctr_client: DockerClient):
+    output = ctr_client.run("hello-world", cpus=1.5, remove=True)
     assert "Hello from Docker!" in output
 
 
-def test_run_volumes():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_run_volumes(ctr_client: DockerClient):
     volume_name = random_name()
-    docker.run(
+    ctr_client.run(
         "busybox",
         ["touch", "/some/path/dodo"],
         volumes=[(volume_name, "/some/path")],
         remove=True,
     )
-    docker.volume.remove(volume_name)
+    ctr_client.volume.remove(volume_name)
 
 
-def test_container_remove():
-    container = docker.run("hello-world", detach=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_remove_manually(ctr_client: DockerClient):
+    container = ctr_client.run("hello-world", detach=True)
     time.sleep(0.3)
-    assert container in docker.container.list(all=True)
-    docker.container.remove(container)
-    assert container not in docker.container.list(all=True)
+    assert container in ctr_client.container.list(all=True)
+    ctr_client.container.remove(container)
+    assert container not in ctr_client.container.list(all=True)
 
 
-def test_simple_logs():
-    with docker.run("busybox:1", ["echo", "dodo"], detach=True) as c:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_logs(ctr_client: DockerClient):
+    with ctr_client.run("busybox:1", ["echo", "dodo"], detach=True) as c:
         time.sleep(0.3)
-        output = docker.container.logs(c)
+        output = ctr_client.container.logs(c)
         assert output == "dodo\n"
 
 
-def test_simple_logs_stderr():
-    with docker.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_logs_stderr(ctr_client: DockerClient):
+    with ctr_client.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
         time.sleep(0.3)
-        output = docker.container.logs(c)
+        output = ctr_client.container.logs(c)
         assert output == "dodo\n"
 
 
-def test_simple_logs_do_not_follow():
-    with docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_logs_do_not_follow(ctr_client: DockerClient):
+    with ctr_client.run(
         "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
     ) as c:
-        output = docker.container.logs(c, follow=False)
+        output = ctr_client.container.logs(c, follow=False)
         assert output == ""
 
 
-def test_simple_logs_follow():
-    with docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_simple_logs_follow(ctr_client: DockerClient):
+    with ctr_client.run(
         "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
     ) as c:
-        output = docker.container.logs(c, follow=True)
+        output = ctr_client.container.logs(c, follow=True)
         assert output == "dodo\n"
 
 
-def test_simple_logs_stream():
-    with docker.run("busybox:1", ["echo", "dodo"], detach=True) as c:
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_simple_logs_stream(ctr_client: DockerClient):
+    with ctr_client.run("busybox:1", ["echo", "dodo"], detach=True) as c:
         time.sleep(0.3)
-        output = list(docker.container.logs(c, stream=True))
+        output = list(ctr_client.container.logs(c, stream=True))
         assert output == [("stdout", b"dodo\n")]
 
 
-def test_simple_logs_stream_stderr():
-    with docker.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_simple_logs_stream_stderr(ctr_client: DockerClient):
+    with ctr_client.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
         time.sleep(0.3)
-        output = list(docker.container.logs(c, stream=True))
+        output = list(ctr_client.container.logs(c, stream=True))
         assert output == [("stderr", b"dodo\n")]
 
 
-def test_simple_logs_stream_stdout_and_stderr():
-    with docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_simple_logs_stream_stdout_and_stderr(ctr_client: DockerClient):
+    with ctr_client.run(
         "busybox:1", ["sh", "-c", ">&2 echo dodo && echo dudu"], detach=True
     ) as c:
         time.sleep(0.3)
-        output = list(docker.container.logs(c, stream=True))
+        output = list(ctr_client.container.logs(c, stream=True))
 
         # the order of stderr and stdout is not guaranteed.
         assert set(output) == {("stderr", b"dodo\n"), ("stdout", b"dudu\n")}
 
 
-def test_simple_logs_stream_wait():
-    with docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_simple_logs_stream_wait(ctr_client: DockerClient):
+    with ctr_client.run(
         "busybox:1", ["sh", "-c", "sleep 3 && echo dodo"], detach=True
     ) as c:
         time.sleep(0.3)
-        output = list(docker.container.logs(c, follow=True, stream=True))
+        output = list(ctr_client.container.logs(c, follow=True, stream=True))
         assert output == [("stdout", b"dodo\n")]
 
 
-def test_rename():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_rename(ctr_client: DockerClient):
     name = random_name()
     new_name = random_name()
     assert name != new_name
-    container = docker.container.run("hello-world", name=name, detach=True)
-    docker.container.rename(container, new_name)
+    container = ctr_client.container.run("hello-world", name=name, detach=True)
+    ctr_client.container.rename(container, new_name)
     container.reload()
 
     assert container.name == new_name
-    docker.container.remove(container)
+    ctr_client.container.remove(container)
 
 
-def test_name():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_name(ctr_client: DockerClient):
     name = random_name()
-    container = docker.container.run("hello-world", name=name, detach=True)
+    container = ctr_client.container.run("hello-world", name=name, detach=True)
     assert container.name == name
-    docker.container.remove(container)
+    ctr_client.container.remove(container)
 
 
 json_state = """
@@ -326,7 +417,8 @@ json_state = """
 """
 
 
-def test_container_state():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_container_state(ctr_client: DockerClient):
     a = ContainerState(**json.loads(json_state))
 
     assert a.status == "running"
@@ -337,70 +429,85 @@ def test_container_state():
     )
 
 
-def test_restart():
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_restart(ctr_client: DockerClient):
     cmd = ["sleep", "infinity"]
-    containers = [docker.run("busybox:1", cmd, detach=True) for _ in range(3)]
-    docker.kill(containers)
+    containers = [ctr_client.run("busybox:1", cmd, detach=True) for _ in range(3)]
+    ctr_client.kill(containers)
 
-    docker.restart(containers)
+    ctr_client.restart(containers)
     for container in containers:
         assert container.state.running
 
 
-def test_execute():
-    my_container = docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_execute(ctr_client: DockerClient):
+    my_container = ctr_client.run(
         "busybox:1", ["sleep", "infinity"], detach=True, remove=True
     )
-    exec_result = docker.execute(my_container, ["echo", "dodo"])
+    exec_result = ctr_client.execute(my_container, ["echo", "dodo"])
     assert exec_result == "dodo"
-    docker.kill(my_container)
+    ctr_client.kill(my_container)
 
 
-def test_execute_simple_mistake():
-    with docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_execute_simple_mistake(ctr_client: DockerClient):
+    with ctr_client.run(
         "busybox:1", ["sleep", "infinity"], detach=True, remove=True
     ) as my_container:
         with pytest.raises(TypeError) as err:
-            docker.execute(my_container, "echo dodo")
+            ctr_client.execute(my_container, "echo dodo")
         assert f"docker.execute('{my_container.name}', ['echo', 'dodo'], ...)" in str(
             err
         )
 
 
-def test_execute_stream():
-    my_container = docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_execute_stream(ctr_client: DockerClient):
+    my_container = ctr_client.run(
         "busybox:1", ["sleep", "infinity"], detach=True, remove=True
     )
     exec_result = list(
-        docker.execute(my_container, ["sh", "-c", ">&2 echo dodo"], stream=True)
+        ctr_client.execute(my_container, ["sh", "-c", ">&2 echo dodo"], stream=True)
     )
     assert exec_result == [("stderr", b"dodo\n")]
-    docker.kill(my_container)
+    ctr_client.kill(my_container)
 
 
-def test_diff():
-    my_container = docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_diff(ctr_client: DockerClient):
+    my_container = ctr_client.run(
         "busybox:1", ["sleep", "infinity"], detach=True, remove=True
     )
 
-    docker.execute(my_container, ["mkdir", "/some_path"])
-    docker.execute(my_container, ["touch", "/some_file"])
-    docker.execute(my_container, ["rm", "-rf", "/tmp"])
+    ctr_client.execute(my_container, ["mkdir", "/some_path"])
+    ctr_client.execute(my_container, ["touch", "/some_file"])
+    ctr_client.execute(my_container, ["rm", "-rf", "/tmp"])
 
-    diff = docker.diff(my_container)
+    diff = ctr_client.diff(my_container)
     assert diff == {"/some_path": "A", "/some_file": "A", "/tmp": "D"}
-    docker.kill(my_container)
+    ctr_client.kill(my_container)
 
 
-def test_methods():
-    my_container = docker.run("busybox:1", ["sleep", "infinity"], detach=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_methods(ctr_client: DockerClient):
+    my_container = ctr_client.run("busybox:1", ["sleep", "infinity"], detach=True)
     my_container.kill()
     assert not my_container.state.running
     my_container.remove()
 
 
-def test_kill_signal():
-    my_container = docker.run(
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_kill_signal(ctr_client: DockerClient):
+    my_container = ctr_client.run(
         "busybox:1", ["sleep", "infinity"], init=True, detach=True
     )
     my_container.kill(signal=signal.SIGINT)
@@ -409,37 +516,40 @@ def test_kill_signal():
     my_container.remove()
 
 
-def test_context_manager():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_context_manager(ctr_client: DockerClient):
     container_name = random_name()
     with pytest.raises(ArithmeticError):
-        with docker.run(
+        with ctr_client.run(
             "busybox:1", ["sleep", "infinity"], detach=True, name=container_name
         ):
             raise ArithmeticError
 
-    assert container_name not in [x.name for x in docker.container.list(all=True)]
+    assert container_name not in [x.name for x in ctr_client.container.list(all=True)]
 
 
-def test_context_manager_with_create():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_context_manager_with_create(ctr_client: DockerClient):
     container_name = random_name()
     with pytest.raises(ArithmeticError):
-        with docker.container.create(
+        with ctr_client.container.create(
             "busybox:1", ["sleep", "infinity"], name=container_name
         ) as c:
             assert isinstance(c, python_on_whales.Container)
             raise ArithmeticError
 
-    assert container_name not in [x.name for x in docker.container.list(all=True)]
+    assert container_name not in [x.name for x in ctr_client.container.list(all=True)]
 
 
-def test_filters():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_filters(ctr_client: DockerClient):
     random_label_value = random_name()
 
     containers_with_labels = []
 
     for _ in range(3):
         containers_with_labels.append(
-            docker.run(
+            ctr_client.run(
                 "busybox",
                 ["sleep", "infinity"],
                 remove=True,
@@ -451,7 +561,7 @@ def test_filters():
     containers_with_wrong_labels = []
     for _ in range(3):
         containers_with_wrong_labels.append(
-            docker.run(
+            ctr_client.run(
                 "busybox",
                 ["sleep", "infinity"],
                 remove=True,
@@ -460,7 +570,7 @@ def test_filters():
             )
         )
 
-    expected_containers_with_labels = docker.container.list(
+    expected_containers_with_labels = ctr_client.container.list(
         filters=dict(label=f"dodo={random_label_value}")
     )
 
@@ -470,44 +580,53 @@ def test_filters():
         container.kill()
 
 
-def test_wait_single_container():
-    cont_1 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 8"], detach=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_wait_single_container(ctr_client: DockerClient):
+    cont_1 = ctr_client.run("busybox", ["sh", "-c", "sleep 2 && exit 8"], detach=True)
     with cont_1:
-        exit_code = docker.wait(cont_1)
+        exit_code = ctr_client.wait(cont_1)
 
     assert exit_code == 8
 
 
-def test_wait_single_container_already_finished():
-    cont_1 = docker.run("busybox", ["sh", "-c", "exit 8"], detach=True)
-    first_exit_code = docker.wait(cont_1)
-    second_exit_code = docker.wait(cont_1)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_wait_single_container_already_finished(ctr_client: DockerClient):
+    cont_1 = ctr_client.run("busybox", ["sh", "-c", "exit 8"], detach=True)
+    first_exit_code = ctr_client.wait(cont_1)
+    second_exit_code = ctr_client.wait(cont_1)
 
     assert first_exit_code == second_exit_code == 8
 
 
-def test_wait_multiple_container():
-    cont_1 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 8"], detach=True)
-    cont_2 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 10"], detach=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_wait_multiple_container(ctr_client: DockerClient):
+    cont_1 = ctr_client.run("busybox", ["sh", "-c", "sleep 2 && exit 8"], detach=True)
+    cont_2 = ctr_client.run("busybox", ["sh", "-c", "sleep 2 && exit 10"], detach=True)
 
     with cont_1, cont_2:
-        exit_codes = docker.wait([cont_1, cont_2])
+        exit_codes = ctr_client.wait([cont_1, cont_2])
 
     assert exit_codes == [8, 10]
 
 
-def test_wait_multiple_container_random_exit_order():
-    cont_1 = docker.run("busybox", ["sh", "-c", "sleep 4 && exit 8"], detach=True)
-    cont_2 = docker.run("busybox", ["sh", "-c", "sleep 2 && exit 10"], detach=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_wait_multiple_container_random_exit_order(ctr_client: DockerClient):
+    cont_1 = ctr_client.run("busybox", ["sh", "-c", "sleep 4 && exit 8"], detach=True)
+    cont_2 = ctr_client.run("busybox", ["sh", "-c", "sleep 2 && exit 10"], detach=True)
 
     with cont_1, cont_2:
-        exit_codes = docker.wait([cont_1, cont_2])
+        exit_codes = ctr_client.wait([cont_1, cont_2])
 
     assert exit_codes == [8, 10]
 
 
-def test_pause_unpause():
-    container = docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_pause_unpause(ctr_client: DockerClient):
+    container = ctr_client.run(
         "busybox", ["ping", "www.google.com"], detach=True, remove=True
     )
 
@@ -527,11 +646,16 @@ def test_load_stats_json(json_file):
     assert stats.memory_used > 100
 
 
-def test_docker_stats():
-    with docker.run(
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_stats_all(ctr_client: DockerClient):
+    with ctr_client.run(
         "busybox", ["sleep", "infinity"], detach=True, stop_timeout=1
     ) as container:
-        for stat in docker.stats():
+        for stat in ctr_client.stats():
             if stat.container_id == container.id:
                 break
         assert stat.container_name == container.name
@@ -539,16 +663,21 @@ def test_docker_stats():
         assert stat.memory_used <= 100_000_000
 
 
-def test_docker_stats_container() -> None:
-    with docker.run("busybox", ["sleep", "infinity"], detach=True) as container:
-        with docker.run("busybox", ["sleep", "infinity"], detach=True) as _:
-            stats = docker.stats(containers=[container.id])
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_stats_container(ctr_client: DockerClient):
+    with ctr_client.run("busybox", ["sleep", "infinity"], detach=True) as container:
+        with ctr_client.run("busybox", ["sleep", "infinity"], detach=True):
+            stats = ctr_client.stats(containers=[container.id])
             assert len(stats) == 1
             assert stats[0].container_name == container.name
 
 
 @patch("python_on_whales.components.container.cli_wrapper.run")
-def test_docker_stats_cli_default(run_mock: Mock) -> None:
+def test_stats_cli_default(run_mock: Mock):
     docker.container.stats()
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd
@@ -564,7 +693,7 @@ def test_docker_stats_cli_default(run_mock: Mock) -> None:
 
 
 @patch("python_on_whales.components.container.cli_wrapper.run")
-def test_docker_stats_cli_container(run_mock: Mock) -> None:
+def test_stats_cli_container(run_mock: Mock):
     test_containers = ["dummy_container_0", "dummy_container_1"]
     docker.container.stats(containers=test_containers)
     run_mock.assert_called_once_with(
@@ -581,70 +710,81 @@ def test_docker_stats_cli_container(run_mock: Mock) -> None:
     )
 
 
-def test_docker_stats_cli_empty_selection() -> None:
-    assert docker.container.stats(containers=[]) == []
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_stats_cli_empty_selection(ctr_client: DockerClient):
+    assert ctr_client.container.stats(containers=[]) == []
 
 
-def test_remove_anonymous_volume_too():
-    container = docker.run("postgres:9.6.20-alpine", detach=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_remove_anonymous_volume_too(ctr_client: DockerClient):
+    container = ctr_client.run("postgres:9.6.20-alpine", detach=True)
 
     volume_id = container.mounts[0].name
-    volume = docker.volume.inspect(volume_id)
+    volume = ctr_client.volume.inspect(volume_id)
 
     with container:
         pass
 
-    assert volume not in docker.volume.list()
-    assert container not in docker.ps(all=True)
+    assert volume not in ctr_client.volume.list()
+    assert container not in ctr_client.ps(all=True)
 
 
-def test_remove_nothing():
-    docker.container.remove([])
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_remove_nothing(ctr_client: DockerClient):
+    ctr_client.container.remove([])
 
 
-def test_stop_nothing():
-    docker.container.stop([])
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_stop_nothing(ctr_client: DockerClient):
+    ctr_client.container.stop([])
 
 
-def test_kill_nothing():
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True):
-        set_of_containers = set(docker.ps())
-        docker.container.kill([])
-        assert set_of_containers == set(docker.ps())
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_kill_nothing(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True):
+        set_of_containers = set(ctr_client.ps())
+        ctr_client.container.kill([])
+        assert set_of_containers == set(ctr_client.ps())
 
 
-def test_exec_env():
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_env(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         result = c.execute(["bash", "-c", "echo $DODO"], envs={"DODO": "dada"})
 
     assert result == "dada"
 
 
-def test_exec_env_file(tmp_path):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_env_file(ctr_client: DockerClient, tmp_path: Path):
     env_file = tmp_path / "variables.env"
     env_file.write_text("DODO=dada\n")
 
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         result = c.execute(["bash", "-c", "echo $DODO"], env_files=[env_file])
     assert result == "dada"
 
 
-def test_export_file(tmp_path):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_export_file(ctr_client: DockerClient, tmp_path: Path):
     dest = tmp_path / "dodo.tar"
-    with docker.run("busybox", ["sleep", "infinity"], detach=True, remove=True) as c:
+    with ctr_client.run(
+        "busybox", ["sleep", "infinity"], detach=True, remove=True
+    ) as c:
         c.export(dest)
 
     assert dest.exists()
     assert dest.stat().st_size > 10_000
 
 
-def test_exec_privilged_flag(mocker):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_privilged_flag(ctr_client: DockerClient, mocker):
     fake_completed_process = mocker.MagicMock()
     fake_completed_process.returncode = 0
 
     patched_run = mocker.patch("subprocess.run")
     patched_run.return_value = fake_completed_process
-    docker.execute("my_container", ["some_command"], privileged=True)
+    ctr_client.execute("my_container", ["some_command"], privileged=True)
 
     assert patched_run.call_args[0][0][1:] == [
         "exec",
@@ -654,99 +794,125 @@ def test_exec_privilged_flag(mocker):
     ]
 
 
-def test_exec_change_user():
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_change_user(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         c.execute(["useradd", "-ms", "/bin/bash", "newuser"])
         assert c.execute(["whoami"], user="newuser") == "newuser"
 
 
-def test_exec_change_directory():
-    with docker.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_change_directory(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         assert c.execute(["pwd"], workdir="/tmp") == "/tmp"
         assert c.execute(["pwd"], workdir="/etc") == "/etc"
         assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"
 
 
 @pytest.mark.parametrize(
-    "docker_function",
+    "method",
     [
-        docker.container.attach,
-        docker.container.commit,
-        docker.container.diff,
-        docker.container.inspect,
-        docker.container.kill,
-        docker.container.logs,
-        docker.container.pause,
-        docker.container.remove,
-        docker.container.restart,
-        docker.container.start,
-        docker.container.stop,
-        docker.container.unpause,
-        docker.container.wait,
+        "attach",
+        "commit",
+        "diff",
+        "inspect",
+        "kill",
+        "logs",
+        "pause",
+        "remove",
+        "restart",
+        "start",
+        "stop",
+        "unpause",
+        "wait",
     ],
 )
-def test_functions_nosuchcontainer(docker_function):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_functions_nosuchcontainer(ctr_client: DockerClient, method: str):
+    if ctr_client.client_config.client_type == "podman" and method in [
+        "diff",
+        "pause",
+        "unpause",
+    ]:
+        pytest.xfail()
     with pytest.raises(NoSuchContainer):
-        docker_function("DOODODGOIHURHURI")
+        getattr(ctr_client.container, method)("DOODODGOIHURHURI")
 
 
-def test_copy_nosuchcontainer():
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_copy_nosuchcontainer(ctr_client: DockerClient):
     with pytest.raises(NoSuchContainer):
-        docker.container.copy(("dodueizbgueirzhgueoz", "/dududada"), "/tmp/dudufeoz")
+        ctr_client.container.copy(
+            ("dodueizbgueirzhgueoz", "/dududada"), "/tmp/dudufeoz"
+        )
 
 
-def test_execute_nosuchcontainer():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_execute_nosuchcontainer(ctr_client: DockerClient):
     with pytest.raises(NoSuchContainer):
-        docker.container.execute("dodueizbgueirzhgueoz", ["echo", "dudu"])
+        ctr_client.container.execute("dodueizbgueirzhgueoz", ["echo", "dudu"])
 
 
-def test_export_nosuchcontainer(tmp_path):
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_export_nosuchcontainer(ctr_client: DockerClient, tmp_path: Path):
     dest = tmp_path / "dodo.tar"
     with pytest.raises(NoSuchContainer):
-        docker.container.export("some_random_container_that_does_not_exists", dest)
+        ctr_client.container.export("some_random_container_that_does_not_exists", dest)
 
 
-def test_rename_nosuchcontainer():
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_rename_nosuchcontainer(ctr_client: DockerClient):
     with pytest.raises(NoSuchContainer):
-        docker.container.rename("dodueizbgueirzhgueoz", "new_name")
+        ctr_client.container.rename("dodueizbgueirzhgueoz", "new_name")
 
 
-def test_update_nosuchcontainer():
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_update_nosuchcontainer(ctr_client: DockerClient):
     with pytest.raises(NoSuchContainer):
-        docker.container.update("grueighuri", cpus=1)
+        ctr_client.container.update("grueighuri", cpus=1)
 
 
-def test_prune():
-    for container in docker.container.list(filters={"name": "test-container"}):
-        docker.container.remove(container, force=True)
-    container = docker.container.create("busybox")
-    assert container in docker.container.list(all=True)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_prune(ctr_client: DockerClient):
+    for container in ctr_client.container.list(filters={"name": "test-container"}):
+        ctr_client.container.remove(container, force=True)
+    container = ctr_client.container.create("busybox")
+    assert container in ctr_client.container.list(all=True)
 
     # container not pruned because it is not old enough
-    docker.container.prune(filters={"until": "100h"})
-    assert container in docker.container.list(all=True)
+    ctr_client.container.prune(filters={"until": "100h"})
+    assert container in ctr_client.container.list(all=True)
 
     # container not pruned because it is does not have label "dne"
-    docker.container.prune(filters={"label": "dne"})
-    assert container in docker.container.list(all=True)
+    ctr_client.container.prune(filters={"label": "dne"})
+    assert container in ctr_client.container.list(all=True)
 
     # container not pruned because it is not old enough and does not have label "dne"
-    docker.container.prune(filters={"until": "100h", "label": "dne"})
-    assert container in docker.container.list(all=True)
+    ctr_client.container.prune(filters={"until": "100h", "label": "dne"})
+    assert container in ctr_client.container.list(all=True)
 
     # container pruned
-    docker.container.prune()
-    assert container not in docker.container.list(all=True)
+    ctr_client.container.prune()
+    assert container not in ctr_client.container.list(all=True)
 
 
-def test_run_detached_interactive():
-    with docker.run("ubuntu", interactive=True, detach=True, tty=False) as c:
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_run_detached_interactive(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", interactive=True, detach=True, tty=False) as c:
         c.execute(["true"])
 
 
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
-def test_attach_default(run_mock: Mock, inspect_mock: Mock) -> None:
+def test_attach_default(run_mock: Mock, inspect_mock: Mock):
     test_container_name = "test_dummy_container"
 
     docker.attach(test_container_name)
@@ -761,7 +927,7 @@ def test_attach_default(run_mock: Mock, inspect_mock: Mock) -> None:
 
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
-def test_attach_detach_keys_argument(run_mock: Mock, inspect_mock: Mock) -> None:
+def test_attach_detach_keys_argument(run_mock: Mock, inspect_mock: Mock):
     test_container_name = "test_dummy_container"
     test_detach_key = "dummy"
 
@@ -783,7 +949,7 @@ def test_attach_detach_keys_argument(run_mock: Mock, inspect_mock: Mock) -> None
 
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
-def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock) -> None:
+def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock):
     test_container_name = "test_dummy_container"
 
     docker.attach(test_container_name, stdin=False)
@@ -798,7 +964,7 @@ def test_attach_no_stdin_argument(run_mock: Mock, inspect_mock: Mock) -> None:
 
 @patch("python_on_whales.components.container.cli_wrapper.ContainerCLI.inspect")
 @patch("python_on_whales.components.container.cli_wrapper.run")
-def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
+def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock):
     test_container_name = "test_dummy_container"
 
     docker.attach(test_container_name, sig_proxy=False)
@@ -812,9 +978,7 @@ def test_attach_sig_proxy_argument(run_mock: Mock, inspect_mock: Mock) -> None:
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_create_default_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock
-) -> None:
+def test_create_default_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -832,9 +996,7 @@ def test_container_create_default_pull(
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_create_missing_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock
-) -> None:
+def test_create_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -852,9 +1014,7 @@ def test_container_create_missing_pull(
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_create_always_pull(
-    image_mock: Mock, _: Mock, run_mock: Mock
-) -> None:
+def test_create_always_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -872,7 +1032,7 @@ def test_container_create_always_pull(
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+def test_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -890,7 +1050,7 @@ def test_container_create_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) 
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+def test_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -910,7 +1070,7 @@ def test_container_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock) -
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+def test_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -930,7 +1090,7 @@ def test_container_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock) -
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+def test_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -950,7 +1110,7 @@ def test_container_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock) ->
 @patch("python_on_whales.components.container.cli_wrapper.run")
 @patch("python_on_whales.components.container.cli_wrapper.Container")
 @patch("python_on_whales.components.image.cli_wrapper.ImageCLI")
-def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> None:
+def test_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     image_cli_mock = Mock()
     image_mock.return_value = image_cli_mock
 
@@ -968,43 +1128,68 @@ def test_container_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock) -> 
     )
 
 
-def test_container_call_create_never_pull_error() -> None:
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_create_never_pull_error(ctr_client: DockerClient):
     test_image = "alpine:latest"
 
-    if docker.image.exists(test_image):
-        docker.image.remove(test_image, force=True)
+    if ctr_client.image.exists(test_image):
+        ctr_client.image.remove(test_image, force=True)
 
     with pytest.raises(DockerException):
-        docker.container.create(test_image, pull="never")
+        ctr_client.container.create(test_image, pull="never")
 
 
-def test_container_call_run_never_pull_error() -> None:
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_run_never_pull_error(ctr_client: DockerClient):
     test_image = "alpine:latest"
 
-    if docker.image.exists(test_image):
-        docker.image.remove(test_image, force=True)
+    if ctr_client.image.exists(test_image):
+        ctr_client.image.remove(test_image, force=True)
 
     with pytest.raises(DockerException):
-        docker.container.run(test_image, pull="never")
+        ctr_client.container.run(test_image, pull="never")
 
 
-def test_container_call_create_missing_pull_unexistent() -> None:
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman.image.exists() fails for non-existent image"
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_create_missing_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
-    if docker.image.exists(base_image_name):
-        docker.image.remove(base_image_name, force=True)
-    assert not docker.image.exists(base_image_name)
-    docker.container.create(base_image_name, pull="missing")
-    assert docker.image.exists(base_image_name)
+    if ctr_client.image.exists(base_image_name):
+        ctr_client.image.remove(base_image_name, force=True)
+    assert not ctr_client.image.exists(base_image_name)
+    ctr_client.container.create(base_image_name, pull="missing")
+    assert ctr_client.image.exists(base_image_name)
 
 
-def test_container_call_create_missing_pull_existent(tmp_path, docker_registry) -> None:
+def test_create_missing_pull_existent(
+    docker_client: DockerClient, tmp_path: Path, docker_registry: str
+):
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
-    base_image = docker.image.pull(base_image_name)
+    base_image = docker_client.image.pull(base_image_name)
     base_image.tag(test_image_name)
-    docker.push(test_image_name)
+    docker_client.push(test_image_name)
     remote_id = base_image.id
 
     (tmp_path / "dodo.txt").write_text("Hello world!")
@@ -1014,27 +1199,42 @@ def test_container_call_create_missing_pull_existent(tmp_path, docker_registry) 
     local_id = updated_image.id
 
     assert remote_id != local_id
-    docker.container.create(test_image_name, pull="missing")
-    assert docker.image.inspect(test_image_name).id == local_id
+    docker_client.container.create(test_image_name, pull="missing")
+    assert docker_client.image.inspect(test_image_name).id == local_id
 
 
-def test_container_call_run_missing_pull_unexistent() -> None:
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman.image.exists() fails for non-existent image"
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_run_missing_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
-    if docker.image.exists(base_image_name):
-        docker.image.remove(base_image_name, force=True)
-    assert not docker.image.exists(base_image_name)
-    docker.container.run(base_image_name, pull="missing")
-    assert docker.image.exists(base_image_name)
+    if ctr_client.image.exists(base_image_name):
+        ctr_client.image.remove(base_image_name, force=True)
+    assert not ctr_client.image.exists(base_image_name)
+    ctr_client.container.run(base_image_name, pull="missing")
+    assert ctr_client.image.exists(base_image_name)
 
 
-def test_container_call_run_missing_pull_existent(tmp_path, docker_registry) -> None:
+def test_run_missing_pull_existent(
+    docker_client: DockerClient, tmp_path: Path, docker_registry: str
+):
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
-    base_image = docker.image.pull(base_image_name)
+    base_image = docker_client.image.pull(base_image_name)
     base_image.tag(test_image_name)
-    docker.push(test_image_name)
+    docker_client.push(test_image_name)
     remote_id = base_image.id
 
     (tmp_path / "dodo.txt").write_text("Hello world!")
@@ -1044,27 +1244,42 @@ def test_container_call_run_missing_pull_existent(tmp_path, docker_registry) -> 
     local_id = updated_image.id
 
     assert remote_id != local_id
-    docker.container.run(test_image_name, pull="missing")
-    assert docker.image.inspect(test_image_name).id == local_id
+    docker_client.container.run(test_image_name, pull="missing")
+    assert docker_client.image.inspect(test_image_name).id == local_id
 
 
-def test_container_call_create_always_pull_unexistent() -> None:
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman.image.exists() fails for non-existent image"
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_create_always_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
-    if docker.image.exists(base_image_name):
-        docker.image.remove(base_image_name, force=True)
-    assert not docker.image.exists(base_image_name)
-    docker.container.create(base_image_name, pull="always")
-    assert docker.image.exists(base_image_name)
+    if ctr_client.image.exists(base_image_name):
+        ctr_client.image.remove(base_image_name, force=True)
+    assert not ctr_client.image.exists(base_image_name)
+    ctr_client.container.create(base_image_name, pull="always")
+    assert ctr_client.image.exists(base_image_name)
 
 
-def test_container_call_create_always_pull_existent(tmp_path, docker_registry) -> None:
+def test_create_always_pull_existent(
+    docker_client: DockerClient, tmp_path: Path, docker_registry: str
+):
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
-    base_image = docker.image.pull(base_image_name)
+    base_image = docker_client.image.pull(base_image_name)
     base_image.tag(test_image_name)
-    docker.push(test_image_name)
+    docker_client.push(test_image_name)
     remote_id = base_image.id
 
     (tmp_path / "dodo.txt").write_text("Hello world!")
@@ -1074,27 +1289,42 @@ def test_container_call_create_always_pull_existent(tmp_path, docker_registry) -
     local_id = updated_image.id
 
     assert remote_id != local_id
-    docker.container.create(test_image_name, pull="always")
-    assert docker.image.inspect(test_image_name).id == remote_id
+    docker_client.container.create(test_image_name, pull="always")
+    assert docker_client.image.inspect(test_image_name).id == remote_id
 
 
-def test_container_call_run_always_pull_unexistent() -> None:
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="podman.image.exists() fails for non-existent image"
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_run_always_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
-    if docker.image.exists(base_image_name):
-        docker.image.remove(base_image_name, force=True)
-    assert not docker.image.exists(base_image_name)
-    docker.container.run(base_image_name, pull="always")
-    assert docker.image.exists(base_image_name)
+    if ctr_client.image.exists(base_image_name):
+        ctr_client.image.remove(base_image_name, force=True)
+    assert not ctr_client.image.exists(base_image_name)
+    ctr_client.container.run(base_image_name, pull="always")
+    assert ctr_client.image.exists(base_image_name)
 
 
-def test_container_call_run_always_pull_existent(tmp_path, docker_registry) -> None:
+def test_run_always_pull_existent(
+    docker_client: DockerClient, tmp_path: Path, docker_registry: str
+):
     base_image_name = "alpine:latest"
     test_image_name = f"{docker_registry}/{base_image_name}"
 
-    base_image = docker.image.pull(base_image_name)
+    base_image = docker_client.image.pull(base_image_name)
     base_image.tag(test_image_name)
-    docker.push(test_image_name)
+    docker_client.push(test_image_name)
     remote_id = base_image.id
 
     (tmp_path / "dodo.txt").write_text("Hello world!")
@@ -1104,5 +1334,5 @@ def test_container_call_run_always_pull_existent(tmp_path, docker_registry) -> N
     local_id = updated_image.id
 
     assert remote_id != local_id
-    docker.container.run(test_image_name, pull="always")
-    assert docker.image.inspect(test_image_name).id == remote_id
+    docker_client.container.run(test_image_name, pull="always")
+    assert docker_client.image.inspect(test_image_name).id == remote_id

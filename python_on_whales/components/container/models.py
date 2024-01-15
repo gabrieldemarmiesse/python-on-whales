@@ -218,6 +218,7 @@ class ContainerConfig(DockerCamelModel):
     stop_signal: Optional[Union[str, int]] = None
     stop_timeout: Optional[int] = None
     shell: Optional[List[str]] = None
+    systemd_mode: Optional[bool] = None
 
 
 class Mount(DockerCamelModel):
