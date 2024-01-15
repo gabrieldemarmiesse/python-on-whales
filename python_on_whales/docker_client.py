@@ -13,6 +13,7 @@ from python_on_whales.components.manifest.cli_wrapper import ManifestCLI
 from python_on_whales.components.network.cli_wrapper import NetworkCLI
 from python_on_whales.components.node.cli_wrapper import NodeCLI
 from python_on_whales.components.plugin.cli_wrapper import PluginCLI
+from python_on_whales.components.pod.cli_wrapper import PodCLI
 from python_on_whales.components.secret.cli_wrapper import SecretCLI
 from python_on_whales.components.service.cli_wrapper import ServiceCLI
 from python_on_whales.components.stack.cli_wrapper import StackCLI
@@ -151,6 +152,7 @@ class DockerClient(DockerCLICaller):
         self.network = NetworkCLI(self.client_config)
         self.node = NodeCLI(self.client_config)
         self.plugin = PluginCLI(self.client_config)
+        self.pod = PodCLI(self.client_config)
         self.secret = SecretCLI(self.client_config)
         self.service = ServiceCLI(self.client_config)
         self.stack = StackCLI(self.client_config)
