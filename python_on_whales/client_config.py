@@ -239,14 +239,13 @@ class ReloadableObjectFromJson(ReloadableObject):
         raise NotImplementedError
 
     def _fetch_and_parse_inspect_result(self, reference: str):
-        json_str = self._fetch_inspect_result_json(reference)
-        json_object = json.loads(json_str)[0]
+        json_object = self._fetch_inspect_result_json(reference)
         try:
             return self._parse_json_object(json_object)
         except pydantic.ValidationError as err:
             fd, json_response_file = tempfile.mkstemp(suffix=".json", text=True)
             with open(json_response_file, "w") as f:
-                f.write(json_str)
+                json.dump(json_object, f, indent=2)
 
             raise ParsingError(
                 f"There was an error parsing the json response from the Docker daemon. \n"
