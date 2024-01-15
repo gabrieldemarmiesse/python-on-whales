@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient
 from python_on_whales.components.node.models import NodeInspectResult
 from python_on_whales.test_utils import get_all_jsons
 
@@ -24,40 +24,40 @@ def test_load_json(json_file):
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_list_nodes():
-    nodes = docker.node.list()
+def test_list_nodes(docker_client: DockerClient):
+    nodes = docker_client.node.list()
     assert nodes[0].id[:12] in repr(nodes)
     assert len(nodes) == 1
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_add_label():
-    nodes = docker.node.list()
+def test_add_label(docker_client: DockerClient):
+    nodes = docker_client.node.list()
     nodes[0].update(labels_add={"foo": "bar"})
     assert nodes[0].spec.labels["foo"] == "bar"
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_remove_label():
-    nodes = docker.node.list()
+def test_remove_label(docker_client: DockerClient):
+    nodes = docker_client.node.list()
     nodes[0].update(labels_add={"foo": "bar"})
     nodes[0].update(rm_labels=["foo"])
     assert "foo" not in nodes[0].spec.labels
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_tasks():
-    service = docker.service.create("busybox", ["sleep", "infinity"])
+def test_tasks(docker_client: DockerClient):
+    service = docker_client.service.create("busybox", ["sleep", "infinity"])
 
-    current_node = docker.node.list()[0]
+    current_node = docker_client.node.list()[0]
     tasks = current_node.ps()
     assert len(tasks) > 0
     assert tasks[0].desired_state == "running"
-    docker.service.remove(service)
+    docker_client.service.remove(service)
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_list_tasks_node():
-    with docker.service.create("busybox", ["sleep", "infinity"]) as my_service:
-        assert docker.node.ps([]) == []
-        assert set(docker.node.ps()) == set(docker.service.ps(my_service))
+def test_list_tasks_node(docker_client: DockerClient):
+    with docker_client.service.create("busybox", ["sleep", "infinity"]) as my_service:
+        assert docker_client.node.ps([]) == []
+        assert set(docker_client.node.ps()) == set(docker_client.service.ps(my_service))
