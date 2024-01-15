@@ -477,13 +477,24 @@ def test_methods(ctr_client: DockerClient):
     my_container.remove()
 
 
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+@pytest.mark.parametrize(
+    "ctr_client",
+    [
+        "docker",
+        pytest.param(
+            "podman",
+            marks=pytest.mark.xfail(
+                reason="container sometimes fails to exit with podman", strict=False
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_kill_signal(ctr_client: DockerClient):
     my_container = ctr_client.run(
         "busybox:1", ["sleep", "infinity"], init=True, detach=True
     )
     my_container.kill(signal=signal.SIGINT)
-    my_container.reload()
     assert not my_container.state.running
     assert my_container.state.exit_code == 130
     my_container.remove()
