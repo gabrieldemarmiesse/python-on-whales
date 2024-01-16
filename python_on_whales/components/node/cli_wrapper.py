@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
@@ -27,7 +28,8 @@ class Node(ReloadableObjectFromJson):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["node", "inspect", reference])
+        json_str = run(self.docker_cmd + ["node", "inspect", reference])
+        return json.loads(json_str)[0]
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> NodeInspectResult:
         return NodeInspectResult(**json_object)

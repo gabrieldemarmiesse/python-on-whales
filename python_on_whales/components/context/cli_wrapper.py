@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, overload
@@ -36,7 +37,8 @@ class Context(ReloadableObjectFromJson):
         full_cmd = self.docker_cmd + ["context", "inspect"]
         if reference is not None:
             full_cmd.append(reference)
-        return run(full_cmd)
+        json_str = run(full_cmd)
+        return json.loads(json_str)[0]
 
     def _parse_json_object(self, json_object: Dict[str, Any]):
         return ContextInspectResult(**json_object)

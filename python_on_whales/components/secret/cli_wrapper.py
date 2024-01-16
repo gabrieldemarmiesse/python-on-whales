@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
@@ -22,7 +23,8 @@ class Secret(ReloadableObjectFromJson):
         self.remove()
 
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["secret", "inspect", reference])
+        json_str = run(self.docker_cmd + ["secret", "inspect", reference])
+        return json.loads(json_str)[0]
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> SecretInspectResult:
         return SecretInspectResult(**json_object)

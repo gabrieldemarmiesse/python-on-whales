@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import warnings
 from datetime import datetime
 from multiprocessing.pool import ThreadPool
@@ -45,7 +46,8 @@ class Image(ReloadableObjectFromJson):
         self.remove(force=True)
 
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["image", "inspect", reference])
+        json_str = run(self.docker_cmd + ["image", "inspect", reference])
+        return json.loads(json_str)[0]
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> ImageInspectResult:
         return ImageInspectResult(**json_object)
