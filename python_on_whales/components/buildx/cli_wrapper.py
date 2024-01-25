@@ -441,6 +441,7 @@ class BuildxCLI(DockerCLICaller):
         context_or_endpoint: Optional[str] = None,
         buildkitd_flags: Optional[str] = None,
         config: Optional[ValidPath] = None,
+        platforms: Optional[List[str]] = None,
         driver: Optional[str] = None,
         driver_options: Dict[str, str] = {},
         name: Optional[str] = None,
@@ -452,6 +453,8 @@ class BuildxCLI(DockerCLICaller):
             context_or_endpoint:
             buildkitd_flags: Flags for buildkitd daemon
             config: BuildKit config file
+            platforms: Comma-separated list of platforms of the form OS/architecture/variant. Ex:
+                `platforms=["linux/amd64", "linux/arm64"]`
             driver: Driver to use (available: [kubernetes docker docker-container])
             driver_options: Options for the driver.
                 e.g `driver_options=dict(network="host")`
@@ -465,6 +468,8 @@ class BuildxCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
         full_cmd.add_simple_arg("--config", config)
+        if platforms is not None:
+            full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--driver", driver)
         if driver_options != {}:
             full_cmd.add_simple_arg(
