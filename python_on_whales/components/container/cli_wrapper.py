@@ -469,7 +469,7 @@ class ContainerCLI(DockerCLICaller):
         # TODO: fixme
         # full_cmd += ["--pause", str(pause).lower()]
 
-        full_cmd.append(container)
+        full_cmd.append(str(container))
         if tag is not None:
             full_cmd.append(tag)
 
@@ -791,8 +791,8 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--workdir", workdir)
 
-        full_cmd.append(str(image))
-        full_cmd.extend(command)
+        full_cmd.append(image)
+        full_cmd += command
         return Container(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def diff(self, container: ValidContainer) -> Dict[str, str]:
@@ -1020,7 +1020,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["container", "kill"]
 
         full_cmd.add_simple_arg("--signal", format_signal_arg(signal))
-        full_cmd.extend(containers)
+        full_cmd += containers
 
         run(full_cmd)
 
@@ -1792,7 +1792,7 @@ class ContainerCLI(DockerCLICaller):
             containers do not exist.
         """
         containers = to_list(containers)
-        if len(containers) == 0:
+        if containers == []:
             # nothing to do
             return
         full_cmd = self.docker_cmd + ["container", "stop"]
