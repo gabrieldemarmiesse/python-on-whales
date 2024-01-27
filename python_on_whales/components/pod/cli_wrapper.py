@@ -16,14 +16,14 @@ from typing import (
     overload,
 )
 
+import python_on_whales.components.container.cli_wrapper
+import python_on_whales.components.image.cli_wrapper
+import python_on_whales.components.network.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.components.container.cli_wrapper import ValidContainer
-from python_on_whales.components.image.cli_wrapper import ValidImage
-from python_on_whales.components.network.cli_wrapper import ValidNetwork
 from python_on_whales.components.pod.models import (
     PodContainer,
     PodInfraConfig,
@@ -170,7 +170,9 @@ class Pod(ReloadableObjectFromJson):
     def logs(
         self,
         *,
-        container: Optional[ValidContainer] = None,
+        container: Optional[
+            python_on_whales.components.container.cli_wrapper.ValidContainer
+        ] = None,
         names: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -271,7 +273,9 @@ class PodCLI(DockerCLICaller):
         infra: Optional[bool] = None,
         infra_command: Optional[str] = None,
         infra_conmon_pidfile: Optional[ValidPath] = None,
-        infra_image: Optional[ValidImage] = None,
+        infra_image: Optional[
+            python_on_whales.components.image.cli_wrapper.ValidImage
+        ] = None,
         infra_name: Optional[str] = None,
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
@@ -279,7 +283,9 @@ class PodCLI(DockerCLICaller):
         label_files: List[ValidPath] = [],
         mac_address: Optional[str] = None,
         memory: Union[int, str, None] = None,
-        networks: List[ValidNetwork] = [],
+        networks: List[
+            python_on_whales.components.network.cli_wrapper.ValidNetwork
+        ] = [],
         network_aliases: List[str] = [],
         no_hosts: bool = False,
         pid: Optional[str] = None,
@@ -295,7 +301,9 @@ class PodCLI(DockerCLICaller):
         userns: Optional[str] = None,
         uts: Optional[str] = None,
         volumes: Optional[List[VolumeDefinition]] = [],
-        volumes_from: List[ValidContainer] = [],
+        volumes_from: List[
+            python_on_whales.components.container.cli_wrapper.ValidContainer
+        ] = [],
     ) -> Pod:
         """Creates a pod, but does not start it.
 
@@ -448,7 +456,9 @@ class PodCLI(DockerCLICaller):
         self,
         pod: ValidPod,
         *,
-        container: Optional[ValidContainer] = None,
+        container: Optional[
+            python_on_whales.components.container.cli_wrapper.ValidContainer
+        ] = None,
         names: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,

@@ -21,6 +21,7 @@ import pydantic
 
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.network.cli_wrapper
+import python_on_whales.components.pod.cli_wrapper
 import python_on_whales.components.volume.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
@@ -598,6 +599,7 @@ class ContainerCLI(DockerCLICaller):
         pid: Optional[str] = None,
         pids_limit: Optional[int] = None,
         platform: Optional[str] = None,
+        pod: Optional[python_on_whales.components.pod.cli_wrapper.ValidPod] = None,
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
@@ -751,6 +753,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--pids-limit", pids_limit)
 
         full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.add_simple_arg("--pod", pod)
         full_cmd.add_flag("--privileged", privileged)
 
         full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
@@ -1311,6 +1314,7 @@ class ContainerCLI(DockerCLICaller):
         pid: Optional[str] = None,
         pids_limit: Optional[int] = None,
         platform: Optional[str] = None,
+        pod: Optional[python_on_whales.components.pod.cli_wrapper.ValidPod] = None,
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
@@ -1467,6 +1471,7 @@ class ContainerCLI(DockerCLICaller):
             pid: PID namespace to use
             pids_limit: Tune container pids limit (set `-1` for unlimited)
             platform: Set platform if server is multi-platform capable.
+            pod: Create the container in an existing pod (only supported with podman).
             privileged: Give extended privileges to this container.
             publish: Ports to publish, same as the `-p` argument in the Docker CLI.
                 example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
@@ -1629,6 +1634,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--pids-limit", pids_limit)
 
         full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.add_simple_arg("--pod", pod)
         full_cmd.add_flag("--privileged", privileged)
 
         full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
