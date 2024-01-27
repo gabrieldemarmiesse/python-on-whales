@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
@@ -24,7 +25,8 @@ class ManifestList(ReloadableObjectFromJson):
         self.remove()
 
     def _fetch_inspect_result_json(self, reference):
-        return f'[{run(self.docker_cmd + ["manifest", "inspect", reference])}]'
+        json_str = run(self.docker_cmd + ["manifest", "inspect", reference])
+        return json.loads(json_str)
 
     def _parse_json_object(
         self, json_object: Dict[str, Any]

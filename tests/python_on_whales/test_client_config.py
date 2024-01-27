@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -5,21 +6,15 @@ import pytest
 from python_on_whales import docker
 from python_on_whales.client_config import ParsingError
 
-fake_json_message = """
-[
-    {
-        "CreatedAt": "2020-10-08T18:32:55Z",
-        "Driver": ["dummy", "fake", ["driver"]],
-        "Labels": {
-            "com.docker.stack.namespace": "dodo"
-        },
-        "Mountpoint": "/var/lib/docker/volumes/dodo_traefik-data/_data",
-        "Name": "dodo_traefik-data",
-        "Options": null,
-        "Scope": "local"
-    }
-]
-"""
+fake_json_message = {
+    "CreatedAt": "2020-10-08T18:32:55Z",
+    "Driver": ["dummy", "fake", ["driver"]],
+    "Labels": {"com.docker.stack.namespace": "dodo"},
+    "Mountpoint": "/var/lib/docker/volumes/dodo_traefik-data/_data",
+    "Name": "dodo_traefik-data",
+    "Options": None,
+    "Scope": "local",
+}
 
 
 def test_pretty_exception_message_and_report(mocker):
@@ -40,4 +35,4 @@ def test_pretty_exception_message_and_report(mocker):
     else:
         raise IndexError
 
-    assert Path(word).read_text() == fake_json_message
+    assert Path(word).read_text() == json.dumps(fake_json_message, indent=2)

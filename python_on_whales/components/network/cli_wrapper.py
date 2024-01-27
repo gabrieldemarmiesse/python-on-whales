@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, overload
 
@@ -30,7 +31,8 @@ class Network(ReloadableObjectFromJson):
         self.remove()
 
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["network", "inspect", reference])
+        json_str = run(self.docker_cmd + ["network", "inspect", reference])
+        return json.loads(json_str)[0]
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> NetworkInspectResult:
         return NetworkInspectResult(**json_object)

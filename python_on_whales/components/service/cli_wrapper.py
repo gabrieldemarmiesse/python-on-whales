@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Literal, Optional, Union, overload
 
@@ -41,7 +42,8 @@ class Service(ReloadableObjectFromJson):
         self.remove()
 
     def _fetch_inspect_result_json(self, reference):
-        return run(self.docker_cmd + ["service", "inspect", reference])
+        json_str = run(self.docker_cmd + ["service", "inspect", reference])
+        return json.loads(json_str)[0]
 
     def _parse_json_object(self, json_object: Dict[str, Any]) -> ServiceInspectResult:
         return ServiceInspectResult(**json_object)

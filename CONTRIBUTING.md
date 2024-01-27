@@ -86,3 +86,54 @@ docker.image.remove(my_ubuntu)
 
 Since `Image` has all the information you can find with `docker image inspect ...`, we need 
 to parse the json output. All parsing models are found in `python_on_whales/components/image/models.py`.
+
+## Some coding rules that are not enforced by the CI:
+
+#### Create a diff that only changes the visual representation of the code
+Do not make a diff just to change the code style of something. This diff will get rejected if you do it.
+As an example, those kind of diff will get rejected during code reviews:
+
+```diff
+- my_list += other_list
++ my_list.extends(other_list)
+
+- if my_list == []:
++ if len(my_list) == 0:
+
+- for i in range(10):
+-     if ...:
+-         my_list.append(...)
++ my_list = [... for i in range(10) if ...]
+```
+
+If the diff lowers the complexity of the statement by using less operations/functions, then it's ok. For 
+example, this kind of diff is welcome:
+
+```
+- for element in my_list:
+-     old_list.append(element)
++ old_list.extends(my_list)
+```
+
+This is to ensure that, as maintainers, we have a little code to review as possible. The first programmer
+who writes a line of code chooses the style. If you need to change a line for another reason than the code style,
+then you can change the code style.
+
+#### Do not modify a mutable argument of a function, unless it's `self`
+
+Because it's usually unexpected for the caller and causes unexpected side-effects
+
+Not ok:
+```python
+def do_something(input_list):
+    input_list.append(...)
+    ...
+```
+if you really need it, either:
+* Copy the input argument so that the caller doesn't have any side effect `ìnput_list = copy(input_list)`
+* Make a class and a method `self.input_list.append(...)`
+
+#### All methods should have types in their signature (arguments and return type)
+You don't have to type the local variables.
+
+If you believe a reviewer asked you to comply to a rule that wasn't specified here or in the CI, feel free to raise an issue. There should be no implicit rule when reviewing.
