@@ -146,8 +146,12 @@ class Pod(ReloadableObjectFromJson):
         return self._get_inspect_result().num_containers
 
     @property
-    def containers(self) -> List[PodContainer]:
-        return self._get_inspect_result().containers
+    def containers(self) -> List[python_on_whales.Container]:
+        container_cli = python_on_whales.components.container.cli_wrapper.ContainerCLI(
+            self.client_config
+        )
+        container_ids = [c.id for c in self._get_inspect_result().containers]
+        return [container_cli.inspect(c_id) for c_id in container_ids]
 
     def __repr__(self):
         return f"python_on_whales.Pod(id='{self.id[:20]}', name={self.name})"

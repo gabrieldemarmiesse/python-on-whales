@@ -217,6 +217,14 @@ def test_create_with_systemd_mode(podman_client: DockerClient):
         assert container.config.systemd_mode is True
 
 
+def test_create_in_pod(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name):
+        container = podman_client.container.create("ubuntu", pod=pod_name)
+        assert container.pod.name == pod_name
+    assert not container.exists()
+
+
 @pytest.mark.parametrize(
     "ctr_client",
     ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
