@@ -146,12 +146,8 @@ class Pod(ReloadableObjectFromJson):
         return self._get_inspect_result().num_containers
 
     @property
-    def containers(self) -> List[python_on_whales.Container]:
-        container_cli = python_on_whales.components.container.cli_wrapper.ContainerCLI(
-            self.client_config
-        )
-        container_ids = [c.id for c in self._get_inspect_result().containers]
-        return [container_cli.inspect(c_id) for c_id in container_ids]
+    def containers(self) -> List[PodContainer]:
+        return self._get_inspect_result().containers
 
     def __repr__(self):
         return f"python_on_whales.Pod(id='{self.id[:20]}', name={self.name})"
@@ -297,6 +293,7 @@ class PodCLI(DockerCLICaller):
         publish: List[ValidPortMapping] = [],
         replace: bool = False,
         security_options: List[str] = [],
+        share: List[str] = [],
         shm_size: Optional[Union[int, str]] = None,
         subgidname: Optional[str] = None,
         subuidname: Optional[str] = None,
@@ -350,6 +347,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
         full_cmd.add_flag("--replace", replace)
         full_cmd.add_args_list("--security-opt", security_options)
+        full_cmd.add_args_list("--share", share)
         full_cmd.add_simple_arg("--shm-size", shm_size)
         full_cmd.add_simple_arg("--subgidname", subgidname)
         full_cmd.add_simple_arg("--subuidname", subuidname)

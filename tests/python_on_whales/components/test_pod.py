@@ -40,6 +40,16 @@ def test_start_simple(podman_client: DockerClient):
     assert not pod.exists()
 
 
+def test_stop_simple(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name) as pod:
+        pod.start()
+        assert pod.state.lower() == "running"
+        pod.stop()
+        assert pod.state.lower() == "exited"
+    assert not pod.exists()
+
+
 def test_inspect(podman_client: DockerClient):
     pod_name = random_name()
     with podman_client.pod.create(pod_name) as pod:
@@ -60,3 +70,13 @@ def test_list_multiple(podman_client: DockerClient):
 
 def test_does_not_exist(podman_client: DockerClient):
     assert podman_client.pod.exists("pod-that-does-not-exist") is False
+
+
+def test_create_with_container(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, infra=True) as pod:
+        ubuntu_container = podman_client.container.create("ubuntu", pod=pod)
+        assert pod.num_containers == 2
+        assert ubuntu_container.id in [ctr.id for ctr in pod.containers]
+    assert not pod.exists()
+    assert not ubuntu_container.exists()

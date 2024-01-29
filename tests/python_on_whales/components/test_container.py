@@ -219,9 +219,9 @@ def test_create_with_systemd_mode(podman_client: DockerClient):
 
 def test_create_in_pod(podman_client: DockerClient):
     pod_name = random_name()
-    with podman_client.pod.create(pod_name):
+    with podman_client.pod.create(pod_name) as pod:
         container = podman_client.container.create("ubuntu", pod=pod_name)
-        assert container.pod.name == pod_name
+        assert container.pod == pod.id
     assert not container.exists()
 
 

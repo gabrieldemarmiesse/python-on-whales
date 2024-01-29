@@ -133,10 +133,8 @@ class Container(ReloadableObjectFromJson):
         return self._get_inspect_result().image
 
     @property
-    def pod(self) -> Optional[python_on_whales.Pod]:
-        pod_cli = python_on_whales.components.pod.cli_wrapper.PodCLI(self.client_config)
-        pod_id = self._get_inspect_result().pod
-        return pod_cli.inspect(pod_id) if pod_id else None
+    def pod(self) -> Optional[str]:
+        return self._get_inspect_result().pod
 
     @property
     def resolv_conf_path(self) -> str:
