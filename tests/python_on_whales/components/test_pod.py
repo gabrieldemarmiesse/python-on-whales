@@ -1,18 +1,11 @@
 import json
-import signal
-import sys
-import tempfile
-import time
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
 
-import python_on_whales
 from python_on_whales import DockerClient
-from python_on_whales.components.pod.cli_wrapper import Pod
 from python_on_whales.components.pod.models import PodInspectResult
-from python_on_whales.exceptions import DockerException, NoSuchPod
+from python_on_whales.exceptions import NoSuchPod
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
@@ -114,17 +107,8 @@ def test_kill_with_container(podman_client: DockerClient):
 
 @pytest.mark.parametrize(
     "method",
-    [
-        "inspect",
-        "kill",
-        "logs",
-        "remove",
-        "restart",
-        "start",
-        "stop"
-    ],
+    ["inspect", "kill", "logs", "remove", "restart", "start", "stop"],
 )
 def test_functions_nosuchpod(method: str, podman_client: DockerClient):
     with pytest.raises(NoSuchPod):
         getattr(podman_client.pod, method)("pod-that-does-not-exist")
-
