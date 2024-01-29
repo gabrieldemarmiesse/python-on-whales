@@ -80,3 +80,51 @@ def test_create_with_container(podman_client: DockerClient):
         assert ubuntu_container.id in [ctr.id for ctr in pod.containers]
     assert not pod.exists()
     assert not ubuntu_container.exists()
+
+
+def test_start_with_container(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, infra=True) as pod:
+        ubuntu_container = podman_client.container.create(
+            "ubuntu", ["sleep", "infinity"], pod=pod
+        )
+        assert ubuntu_container.state.running is False
+        pod.start()
+        ubuntu_container.reload()
+        assert ubuntu_container.state.running is True
+    assert not pod.exists()
+    assert not ubuntu_container.exists()
+
+
+def test_kill_with_container(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, infra=True) as pod:
+        ubuntu_container = podman_client.container.create(
+            "ubuntu", ["sleep", "infinity"], pod=pod
+        )
+        assert ubuntu_container.state.running is False
+        pod.start()
+        ubuntu_container.reload()
+        assert ubuntu_container.state.running is True
+        pod.kill()
+        assert ubuntu_container.state.running is False
+    assert not pod.exists()
+    assert not ubuntu_container.exists()
+
+
+@pytest.mark.parametrize(
+    "method",
+    [
+        "inspect",
+        "kill",
+        "logs",
+        "remove",
+        "restart",
+        "start",
+        "stop"
+    ],
+)
+def test_functions_nosuchpod(method: str, podman_client: DockerClient):
+    with pytest.raises(NoSuchPod):
+        getattr(podman_client.pod, method)("pod-that-does-not-exist")
+
