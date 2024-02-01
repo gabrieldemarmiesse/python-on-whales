@@ -387,14 +387,14 @@ class Container(ReloadableObjectFromJson):
         )
 
     def start(
-        self, attach: bool = False, stream: bool = False
+        self, attach: bool = False, interactive: bool = False, stream: bool = False
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this container.
 
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).start(self, attach, stream)
+        return ContainerCLI(self.client_config).start(self, attach, interactive, stream)
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
@@ -571,6 +571,7 @@ class ContainerCLI(DockerCLICaller):
         health_timeout: Union[None, int, timedelta] = None,
         hostname: Optional[str] = None,
         init: bool = False,
+        interactive: bool = False,
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
         ipc: Optional[str] = None,
@@ -615,6 +616,7 @@ class ContainerCLI(DockerCLICaller):
         sysctl: Dict[str, str] = {},
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
+        tty: bool = False,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -714,6 +716,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--hostname", hostname)
 
         full_cmd.add_flag("--init", init)
+        full_cmd.add_flag("--interactive", interactive)
 
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
@@ -777,6 +780,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_flag("--tty", tty)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
@@ -1590,7 +1594,6 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--init", init)
 
         full_cmd.add_flag("--interactive", interactive)
-        full_cmd.add_flag("--tty", tty)
 
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
@@ -1655,6 +1658,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_flag("--tty", tty)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
@@ -1689,15 +1693,19 @@ class ContainerCLI(DockerCLICaller):
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
         attach: bool = False,
+        interactive: bool = False,
         stream: bool = False,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
-        """Starts one or more stopped containers.
+        """Starts one or more created/stopped containers.
 
         Aliases: `docker.start`, `docker.container.start`,
         `python_on_whales.Container.start`.
 
         Parameters:
             containers: One or a list of containers.
+            attach: Attach stdout/stderr and forward signals.
+            interactive: Attach stdin (ensure it is open).
+            stream: Stream output as a generator.
         """
         containers = to_list(containers)
         if containers == []:
@@ -1712,6 +1720,7 @@ class ContainerCLI(DockerCLICaller):
             )
         full_cmd = self.docker_cmd + ["container", "start"]
         full_cmd.add_flag("--attach", attach)
+        full_cmd.add_flag("--interactive", interactive)
         full_cmd += containers
 
         if stream:
