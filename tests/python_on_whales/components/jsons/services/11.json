@@ -1,0 +1,85 @@
+{
+    "ID": "u5qxp0uf6ilujoh0w78pgk3c3",
+    "Version": {
+        "Index": 2388
+    },
+    "CreatedAt": "2024-02-05T12:31:00.458807712Z",
+    "UpdatedAt": "2024-02-05T12:31:00.468744192Z",
+    "Spec": {
+        "Name": "bepa_internal-multi-flag",
+        "Labels": {
+            "com.docker.stack.image": "bad-ssh",
+            "com.docker.stack.namespace": "bepa"
+        },
+        "TaskTemplate": {
+            "ContainerSpec": {
+                "Image": "bad-ssh:latest",
+                "Labels": {
+                    "com.docker.stack.namespace": "bepa"
+                },
+                "Hostname": "internal-multi-flag",
+                "Env": [
+                    "FLAGIMFB=apabepa"
+                ],
+                "Privileges": {
+                    "CredentialSpec": null,
+                    "SELinuxContext": null,
+                    "NoNewPrivileges": false
+                },
+                "StopGracePeriod": 10000000000,
+                "DNSConfig": {},
+                "Isolation": "default"
+            },
+            "Resources": {},
+            "RestartPolicy": {
+                "Condition": "any",
+                "Delay": 5000000000,
+                "MaxAttempts": 0
+            },
+            "Placement": {},
+            "Networks": [
+                {
+                    "Target": "q2gjvz30s7so0aucb7kuxw267",
+                    "Aliases": [
+                        "internal-multi-flag"
+                    ]
+                }
+            ],
+            "ForceUpdate": 0,
+            "Runtime": "container"
+        },
+        "Mode": {
+            "Replicated": {
+                "Replicas": 1
+            }
+        },
+        "UpdateConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "RollbackConfig": {
+            "Parallelism": 1,
+            "FailureAction": "pause",
+            "Monitor": 5000000000,
+            "MaxFailureRatio": 0,
+            "Order": "stop-first"
+        },
+        "EndpointSpec": {
+            "Mode": "vip"
+        }
+    },
+    "Endpoint": {
+        "Spec": {
+            "Mode": "vip"
+        },
+        "VirtualIPs": [
+            {
+                "NetworkID": "q2gjvz30s7so0aucb7kuxw267",
+                "Addr": "10.0.1.2/24"
+            }
+        ]
+    }
+}
