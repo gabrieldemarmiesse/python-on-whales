@@ -71,6 +71,7 @@ def to_docker_camel(string):
             "ipam": "IPAM",
             "tls_info": "TLSInfo",
             "virtual_ips": "VirtualIPs",
+            "infra_container_id": "InfraContainerID",
         }
         return special_cases[string]
     except KeyError:
