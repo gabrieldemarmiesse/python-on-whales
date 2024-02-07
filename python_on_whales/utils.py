@@ -217,6 +217,10 @@ def post_process_stream(stream: Optional[bytes]):
 
 
 ValidPath = Union[str, Path]
+ValidPortMapping = Union[
+    Tuple[Union[str, int], Union[str, int]],
+    Tuple[Union[str, int], Union[str, int], str],
+]
 
 
 def to_list(x) -> list:
@@ -343,8 +347,36 @@ def format_signal_for_docker(signal_object: Union[int, str]) -> str:
         raise TypeError(f"Got unexpected signal type {type(signal_object).__name__!r}")
 
 
+def format_port_arg(port_object: ValidPortMapping) -> str:
+    if len(port_object) == 1:
+        return port_object[0]
+    elif len(port_object) == 2:
+        return f"{port_object[0]}:{port_object[1]}"
+    elif len(port_object) == 3:
+        return f"{port_object[0]}:{port_object[1]}/{port_object[2]}"
+    else:
+        raise ValueError(
+            "The size of the tuples in the publish list must be 1, 2, or 3"
+        )
+
+
 def parse_ls_status_count(status_output, status) -> int:
     try:
         return int(status_output.split(status + "(")[1].split(")")[0])
     except IndexError:
         return 0
+
+
+def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
+    if sequence is None:
+        return None
+    sequence = [str(x) for x in sequence]
+    return ",".join(sequence)
+
+
+def to_seconds(duration: Optional[Union[int, timedelta]]) -> Optional[str]:
+    if duration is None:
+        return None
+    if isinstance(duration, timedelta):
+        duration = int(duration.total_seconds())
+    return f"{duration}s"
