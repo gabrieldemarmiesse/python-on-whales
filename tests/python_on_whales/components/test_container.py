@@ -1,4 +1,5 @@
 import json
+import os
 import signal
 import sys
 import tempfile
@@ -729,6 +730,26 @@ def test_kill_nothing(ctr_client: DockerClient):
         set_of_containers = set(ctr_client.ps())
         ctr_client.container.kill([])
         assert set_of_containers == set(ctr_client.ps())
+
+
+def test_run_with_env_host(podman_client: DockerClient):
+    try:
+        os.environ["POW_TEST_FOO"] = "foo"
+        os.environ["POW_TEST_BAR"] = "bar"
+        with podman_client.run(
+            "ubuntu",
+            ["sleep", "infinity"],
+            env_host=True,
+            envs={"POW_TEST_BAR": "override"},
+            detach=True,
+        ) as c:
+            foo_env = c.execute(["bash", "-c", "echo $POW_TEST_FOO"])
+            bar_env = c.execute(["bash", "-c", "echo $POW_TEST_BAR"])
+        assert foo_env == "foo"
+        assert bar_env == "override"
+    finally:
+        os.environ.pop("POW_TEST_FOO")
+        os.environ.pop("POW_TEST_BAR")
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
