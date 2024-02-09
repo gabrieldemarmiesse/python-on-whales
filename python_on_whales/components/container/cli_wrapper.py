@@ -1726,9 +1726,10 @@ class ContainerCLI(DockerCLICaller):
         if stream:
             return stream_stdout_and_stderr(full_cmd)
         elif attach:
-            return run(full_cmd)
+            run(full_cmd, tty=True)
+            return None
         else:
-            run(full_cmd)
+            return run(full_cmd)
 
     def stats(
         self,
