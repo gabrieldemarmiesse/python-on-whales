@@ -846,7 +846,7 @@ class ContainerCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with `None`. If `False`,
                 returns the command stdout as string.
-            detach_keys: Key sequence to detach from the container.
+            detach_keys: Override the key sequence for detaching a container.
             envs: Set environment variables
             env_files: Read one or more files of environment variables
             interactive: Leave stdin open during the duration of the process
@@ -1710,7 +1710,7 @@ class ContainerCLI(DockerCLICaller):
         Parameters:
             containers: One or a list of containers.
             attach: Attach stdout/stderr and forward signals.
-            detach_keys: Key sequence for detaching from the container.
+            detach_keys: Override the key sequence for detaching a container.
             interactive: Attach stdin (ensure it is open).
             stream: Stream output as a generator.
         """
