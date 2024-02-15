@@ -393,14 +393,16 @@ class Container(ReloadableObjectFromJson):
         attach: bool = False,
         detach_keys: Optional[str] = None,
         interactive: bool = False,
-        stream: bool = False
+        stream: bool = False,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this container.
 
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).start(self, attach, detach_keys, interactive, stream)
+        return ContainerCLI(self.client_config).start(
+            self, attach, detach_keys, interactive, stream
+        )
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
