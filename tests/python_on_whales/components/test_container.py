@@ -733,10 +733,10 @@ def test_kill_nothing(ctr_client: DockerClient):
 
 @patch("python_on_whales.components.container.cli_wrapper.run")
 def test_start_detach_keys(run_mock: Mock):
-    docker.start("container", ["cmd"], detach_keys="a,b")
+    docker.start("ctr_name", detach_keys="a,b")
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd
-        + ["container", "start", "--detach-keys", "a,b", "container", "cmd"]
+        + ["container", "start", "--detach-keys", "a,b", "ctr_name"]
     )
 
 
@@ -760,10 +760,11 @@ def test_exec_env_file(ctr_client: DockerClient, tmp_path: Path):
 
 @patch("python_on_whales.components.container.cli_wrapper.run")
 def test_exec_detach_keys(run_mock: Mock):
-    docker.execute("container", ["cmd"], detach_keys="a,b")
+    docker.execute("ctr_name", ["cmd"], detach_keys="a,b")
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd
-        + ["exec", "--detach-keys", "a,b", "container", "cmd"]
+        + ["exec", "--detach-keys", "a,b", "ctr_name", "cmd"],
+        tty=False,
     )
 
 
