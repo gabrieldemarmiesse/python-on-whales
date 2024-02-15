@@ -389,7 +389,11 @@ class Container(ReloadableObjectFromJson):
         )
 
     def start(
-        self, attach: bool = False, detach_keys: Optional[str] = None, interactive: bool = False, stream: bool = False
+        self,
+        attach: bool = False,
+        detach_keys: Optional[str] = None,
+        interactive: bool = False,
+        stream: bool = False
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this container.
 
