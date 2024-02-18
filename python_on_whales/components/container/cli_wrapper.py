@@ -568,6 +568,7 @@ class ContainerCLI(DockerCLICaller):
         entrypoint: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
+        env_host: bool = False,
         expose: Union[int, List[int]] = [],
         gpus: Union[int, str, None] = None,
         groups_add: List[str] = [],
@@ -705,6 +706,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_flag("--env-host", env_host)
 
         full_cmd.add_args_list("--expose", expose)
 
@@ -1287,6 +1289,7 @@ class ContainerCLI(DockerCLICaller):
         entrypoint: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
+        env_host: bool = False,
         expose: Union[int, List[int]] = [],
         gpus: Union[int, str, None] = None,
         groups_add: List[str] = [],
@@ -1448,6 +1451,8 @@ class ContainerCLI(DockerCLICaller):
             envs: Environment variables as a `dict`.
                 For example: `{"OMP_NUM_THREADS": 3}`
             env_files: One or a list of env files.
+            env_host: Use host environment inside the container. Only supported
+                with podman.
             gpus: For this to work, you need the
                 [Nvidia container runtime](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#install-guide)
                 The value needed is a `str` or `int`. Some examples of valid argument
@@ -1584,6 +1589,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_flag("--env-host", env_host)
 
         full_cmd.add_args_list("--expose", expose)
 
