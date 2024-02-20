@@ -268,7 +268,6 @@ class Container(ReloadableObjectFromJson):
         self,
         command: List[str],
         detach: bool = False,
-        detach_keys: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
         interactive: bool = False,
@@ -277,6 +276,7 @@ class Container(ReloadableObjectFromJson):
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command in this container
 
@@ -287,7 +287,6 @@ class Container(ReloadableObjectFromJson):
             self,
             command,
             detach,
-            detach_keys,
             envs,
             env_files,
             interactive,
@@ -296,6 +295,7 @@ class Container(ReloadableObjectFromJson):
             user,
             workdir,
             stream,
+            detach_keys,
         )
 
     def exists(self) -> bool:
@@ -391,9 +391,9 @@ class Container(ReloadableObjectFromJson):
     def start(
         self,
         attach: bool = False,
-        detach_keys: Optional[str] = None,
         interactive: bool = False,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this container.
 
@@ -401,7 +401,7 @@ class Container(ReloadableObjectFromJson):
         information about the arguments.
         """
         return ContainerCLI(self.client_config).start(
-            self, attach, detach_keys, interactive, stream
+            self, attach, interactive, stream, detach_keys
         )
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
@@ -835,7 +835,6 @@ class ContainerCLI(DockerCLICaller):
         container: ValidContainer,
         command: List[str],
         detach: bool = False,
-        detach_keys: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
         interactive: bool = False,
@@ -844,6 +843,7 @@ class ContainerCLI(DockerCLICaller):
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command inside a container
 
@@ -854,7 +854,6 @@ class ContainerCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with `None`. If `False`,
                 returns the command stdout as string.
-            detach_keys: Override the key sequence for detaching a container.
             envs: Set environment variables
             env_files: Read one or more files of environment variables
             interactive: Leave stdin open during the duration of the process
@@ -867,6 +866,7 @@ class ContainerCLI(DockerCLICaller):
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
             stream: Similar to `docker.run(..., stream=True)`.
+            detach_keys: Override the key sequence for detaching a container.
 
         Returns:
             Optional[str]
@@ -1710,9 +1710,9 @@ class ContainerCLI(DockerCLICaller):
         self,
         containers: Union[ValidContainer, List[ValidContainer]],
         attach: bool = False,
-        detach_keys: Optional[str] = None,
         interactive: bool = False,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts one or more created/stopped containers.
 
@@ -1722,9 +1722,9 @@ class ContainerCLI(DockerCLICaller):
         Parameters:
             containers: One or a list of containers.
             attach: Attach stdout/stderr and forward signals.
-            detach_keys: Override the key sequence for detaching a container.
             interactive: Attach stdin (ensure it is open).
             stream: Stream output as a generator.
+            detach_keys: Override the key sequence for detaching a container.
         """
         containers = to_list(containers)
         if containers == []:
