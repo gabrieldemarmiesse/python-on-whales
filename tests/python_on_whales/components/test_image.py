@@ -321,11 +321,7 @@ def test_no_such_image_tag(ctr_client: DockerClient):
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_exists(ctr_client: DockerClient):
     my_image = ctr_client.pull("busybox")
     assert my_image.exists()

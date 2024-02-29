@@ -153,7 +153,7 @@ def run(
     if completed_process.returncode != 0:
         if completed_process.stderr is not None:
             decoded_stderr = completed_process.stderr.decode().lower()
-            if "no such image" in decoded_stderr:
+            if "no such image" in decoded_stderr or "image not known" in decoded_stderr:
                 raise NoSuchImage(
                     args,
                     completed_process.returncode,

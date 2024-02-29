@@ -1148,11 +1148,7 @@ def test_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     )
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_create_never_pull_error(ctr_client: DockerClient):
     test_image = "alpine:latest"
 
@@ -1163,11 +1159,7 @@ def test_create_never_pull_error(ctr_client: DockerClient):
         ctr_client.container.create(test_image, pull="never")
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_never_pull_error(ctr_client: DockerClient):
     test_image = "alpine:latest"
 
@@ -1178,19 +1170,7 @@ def test_run_never_pull_error(ctr_client: DockerClient):
         ctr_client.container.run(test_image, pull="never")
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_create_missing_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
@@ -1223,19 +1203,7 @@ def test_create_missing_pull_existent(
     assert docker_client.image.inspect(test_image_name).id == local_id
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_missing_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
@@ -1268,19 +1236,7 @@ def test_run_missing_pull_existent(
     assert docker_client.image.inspect(test_image_name).id == local_id
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_create_always_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
@@ -1313,19 +1269,7 @@ def test_create_always_pull_existent(
     assert docker_client.image.inspect(test_image_name).id == remote_id
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_always_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
