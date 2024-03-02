@@ -39,7 +39,20 @@ class ComposeServiceBuild(BaseModel):
     context: Optional[Path] = None
     dockerfile: Optional[Path] = None
     args: Optional[Dict[str, Any]] = None
+    cache_from: Optional[List[str]] = None
     labels: Optional[Dict[str, Any]] = None
+    network: Optional[str] = None
+    target: Optional[str] = None
+
+
+class ComposeServiceHealthcheck(BaseModel):
+    disable: Optional[bool] = None
+    interval: Optional[str] = None
+    start_period: Optional[str] = None
+    start_interval: Optional[str] = None
+    test: Optional[List[str]] = None
+    timeout: Optional[str] = None
+    retries: Optional[int] = None
 
 
 class ComposeServicePort(BaseModel):
@@ -47,6 +60,16 @@ class ComposeServicePort(BaseModel):
     protocol: Optional[str] = None
     published: Optional[int] = None
     target: Optional[int] = None
+
+
+class ComposeServiceULimitsNoFile(BaseModel):
+    soft: Optional[int] = None
+    hard: Optional[int] = None
+
+
+class ComposeServiceULimits(BaseModel):
+    nproc: Optional[int] = None
+    nofile: Optional[ComposeServiceULimitsNoFile] = None
 
 
 class ComposeServiceVolume(BaseModel):
@@ -57,27 +80,45 @@ class ComposeServiceVolume(BaseModel):
 
 
 class ComposeConfigService(BaseModel):
-    deploy: Optional[ServiceDeployConfig] = None
     blkio_config: Optional[Any] = None
+    build: Optional[ComposeServiceBuild] = None
+    cap_add: Annotated[Optional[List[str]], Field(default_factory=list)]
+    cap_drop: Annotated[Optional[List[str]], Field(default_factory=list)]
+    command: Optional[List[str]] = None
+    cgroup_parent: Optional[str] = None
+    container_name: Optional[str] = None
     cpu_count: Optional[float] = None
     cpu_percent: Optional[float] = None
     cpu_shares: Optional[int] = None
     cpuset: Optional[str] = None
-    build: Optional[ComposeServiceBuild] = None
-    cap_add: Annotated[Optional[List[str]], Field(default_factory=list)]
-    cap_drop: Annotated[Optional[List[str]], Field(default_factory=list)]
-    cgroup_parent: Optional[str] = None
-    command: Optional[List[str]] = None
-    configs: Any = None
-    container_name: Optional[str] = None
     depends_on: Annotated[Dict[str, DependencyCondition], Field(default_factory=dict)]
+    deploy: Optional[ServiceDeployConfig] = None
+    devices: List[str] = None
     device_cgroup_rules: Annotated[List[str], Field(default_factory=list)]
-    devices: Any = None
-    environment: Optional[Dict[str, Optional[str]]] = None
+    dns: Optional[List[str]] = None
+    dns_search: Optional[List[str]] = None
     entrypoint: Optional[List[str]] = None
+    environment: Optional[Dict[str, Optional[str]]] = None
+    expose: Optional[List[str]] = None
+    external_links: Optional[List[str]] = None
+    extra_hosts: Optional[List[str]] = None
+    healthcheck: Optional[ComposeServiceHealthcheck] = None
     image: Optional[str] = None
+    init: Optional[bool] = False
+    isolation: str = Field(default="default")
     labels: Annotated[Optional[Dict[str, str]], Field(default_factory=dict)]
+    network_mode: Optional[str] = None
+    networks: Optional[Any] = None
+    pid: Optional[str] = None
     ports: Optional[List[ComposeServicePort]] = None
+    profiles: Optional[List[str]] = None
+    restart: str = "no"
+    secrets: Optional[List[Dict[str, Any]]] = None
+    stop_grace_period: str = Field(default="10s")
+    stop_signal: str = Field(default="SIGTERM")
+    tmpfs: Optional[List[str]] = None
+    ulimits: Optional[ComposeServiceULimits] = None
+    userns_mode: Optional[str] = None
     volumes: Optional[List[ComposeServiceVolume]] = None
 
 

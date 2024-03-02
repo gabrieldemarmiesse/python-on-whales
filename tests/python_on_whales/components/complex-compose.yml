@@ -1,0 +1,66 @@
+version: "3.7"
+
+services:
+  my_service:
+    build:
+      context: my_service_build
+    image: some_random_image
+    command: ping -c 2 www.google.com
+    ports:
+     - "5000:5000"
+    volumes:
+     - /tmp:/tmp
+     - dodo:/dodo
+    environment:
+     - DATADOG_HOST=something
+    dns: 8.8.8.8
+    dns_search:
+      - dc1.example.com
+      - dc2.example.com
+    expose:
+      - "5000"
+      - 8000
+    external_links:
+      - "redis"
+    extra_hosts:
+      - "somehost:162.242.195.82"
+      - "otherhost:50.31.209.229"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    init: true
+    isolation: "process"
+    network_mode: "host"
+    pid: "host"
+    secrets:
+      - my_secret
+    tmpfs: /run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    userns_mode: "host"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.hello-world == yes
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 20M
+        limits:
+          cpus: '2'
+          memory: 40M
+      replicas: 4
+
+secrets:
+  my_secret:
+    external: true
+
+
+volumes:
+  dodo: {}

@@ -554,10 +554,10 @@ def test_entrypoint_loaded_in_config():
     assert docker.compose.config().services["dodo"].entrypoint == ["/bin/sh"]
 
 
-def test_config_complexe_compose():
+def test_config_complex_compose():
     """Checking that the pydantic model does its job"""
     compose_file = (
-        PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
+        PROJECT_ROOT / "tests/python_on_whales/components/complex-compose.yml"
     )
     docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     config = docker.compose.config()
@@ -580,6 +580,49 @@ def test_config_complexe_compose():
     assert config.services["my_service"].volumes[1].target == "/dodo"
 
     assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
+
+    assert config.services["my_service"].dns == ["8.8.8.8"]
+    assert config.services["my_service"].dns_search == [
+        "dc1.example.com",
+        "dc2.example.com",
+    ]
+
+    assert config.services["my_service"].expose == ["5000", "8000"]
+
+    assert config.services["my_service"].external_links == ["redis"]
+
+    assert config.services["my_service"].extra_hosts == [
+        "otherhost:50.31.209.229",
+        "somehost:162.242.195.82",
+    ]
+
+    assert config.services["my_service"].healthcheck.test == [
+        "CMD",
+        "curl",
+        "-f",
+        "http://localhost",
+    ]
+    assert config.services["my_service"].healthcheck.interval == "1m30s"
+    assert config.services["my_service"].healthcheck.timeout == "10s"
+    assert config.services["my_service"].healthcheck.retries == 3
+    assert config.services["my_service"].healthcheck.start_period == "40s"
+
+    assert config.services["my_service"].init
+    assert config.services["my_service"].isolation == "process"
+    assert config.services["my_service"].network_mode == "host"
+    assert config.services["my_service"].pid == "host"
+    assert config.services["my_service"].restart == "no"
+    assert config.services["my_service"].secrets == [{"source": "my_secret"}]
+    assert config.services["my_service"].stop_grace_period == "10s"
+    assert config.services["my_service"].stop_signal == "SIGTERM"
+    assert config.services["my_service"].tmpfs == ["/run"]
+
+    assert config.services["my_service"].ulimits.nproc == 65535
+    assert config.services["my_service"].ulimits.nofile.soft == 20000
+    assert config.services["my_service"].ulimits.nofile.hard == 40000
+
+    assert config.services["my_service"].userns_mode == "host"
+
     assert config.services["my_service"].deploy.placement.constraints == [
         "node.labels.hello-world == yes"
     ]
@@ -1049,10 +1092,17 @@ def test_build_args():
         "python_version": "3.78",
         "python_version_1": "3.78",
     }
+    assert config.services["my_service"].build.cache_from == [
+        "alpine:latest",
+        "corp/web_app:3.14",
+    ]
     assert config.services["my_service"].build.labels == {
         "com.example.description": "Accounting webapp",
         "com.example.department": "Finance",
     }
+    assert config.services["my_service"].build.network == "host"
+    assert config.services["my_service"].build.target == "prod"
+
     assert config.services["my_service"].image == "some_random_image"
     assert config.services["my_service"].command == [
         "ping",
