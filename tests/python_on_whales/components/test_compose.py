@@ -122,6 +122,7 @@ def test_compose_project_name():
 def test_docker_compose_build():
     docker.compose.build()
     docker.compose.build(["my_service"])
+    docker.compose.build("my_service")
     docker.image.remove("some_random_image")
 
 

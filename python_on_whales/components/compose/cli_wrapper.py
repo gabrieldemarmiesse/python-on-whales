@@ -24,7 +24,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def build(
         self,
-        services: Optional[List[str]] = ...,
+        services: Union[List[str], str, None] = ...,
         build_args: Dict[str, str] = ...,
         cache: bool = ...,
         progress: Optional[str] = ...,
@@ -38,7 +38,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def build(
         self,
-        services: Optional[List[str]] = ...,
+        services: Union[List[str], str, None] = ...,
         build_args: Dict[str, str] = ...,
         cache: bool = ...,
         progress: Optional[str] = ...,
@@ -51,7 +51,7 @@ class ComposeCLI(DockerCLICaller):
 
     def build(
         self,
-        services: Optional[List[str]] = None,
+        services: Union[List[str], str, None] = None,
         build_args: Dict[str, str] = {},
         cache: bool = True,
         progress: Optional[str] = None,
@@ -99,7 +99,9 @@ class ComposeCLI(DockerCLICaller):
         if services == []:
             return
         elif services is not None:
-            full_cmd += services
+            full_cmd += to_list(services)
+        else:
+            pass  # passing nothing means all services are built
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)
         else:
