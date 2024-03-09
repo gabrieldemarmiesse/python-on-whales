@@ -353,13 +353,18 @@ class ServiceCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def list(self) -> List[Service]:
+    def list(self, filters: Dict[str, str] = {}) -> List[Service]:
         """Returns the list of services
+
+        Parameters:
+            filters: If you want to filter the results based on a given condition.
+                For example, `docker.service.list(filters=dict(label="my_label=hello"))`.
 
         # Returns
             A `List[python_on_whales.Services]`
         """
         full_cmd = self.docker_cmd + ["service", "list", "--quiet"]
+        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
 
         ids_truncated = run(full_cmd).splitlines()
 

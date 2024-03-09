@@ -7,7 +7,7 @@ import pytest
 from python_on_whales import DockerClient
 from python_on_whales.components.service.models import ServiceInspectResult
 from python_on_whales.exceptions import NoSuchService, NotASwarmManager
-from python_on_whales.test_utils import get_all_jsons
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("services"))
@@ -43,6 +43,29 @@ def test_get_list_of_services(docker_client: DockerClient):
     ) as my_service:
         list_of_services = docker_client.service.list()
         assert [my_service] == list_of_services
+
+
+@pytest.mark.usefixtures("swarm_mode")
+def test_filters(docker_client: DockerClient):
+    random_label_value = random_name()
+    with docker_client.service.create(
+        "busybox",
+        ["sleep", "infinity"],
+        labels=dict(dodo=random_label_value),
+    ) as my_service:
+        with docker_client.service.create(
+            "busybox",
+            ["sleep", "infinity"],
+            labels=dict(dodo="something"),
+        ):
+            expected_services = docker_client.service.list(
+                filters=dict(label=f"dodo={random_label_value}")
+            )
+            assert expected_services == [my_service]
+            no_expected_services = docker_client.service.list(
+                filters=dict(label=f"dodo={random_name()}")
+            )
+            assert len(no_expected_services) == 0
 
 
 @pytest.mark.usefixtures("swarm_mode")
