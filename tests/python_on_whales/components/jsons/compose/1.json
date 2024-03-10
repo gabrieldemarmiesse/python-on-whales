@@ -1,0 +1,147 @@
+{
+    "name": "python-on-whales",
+    "networks": {
+        "factory-net": {
+            "name": "factory-net",
+            "ipam": {},
+            "external": true
+        }
+    },
+    "services": {
+        "broker": {
+            "command": null,
+            "container_name": "broker",
+            "depends_on": {
+                "zookeeper": {
+                    "condition": "service_started",
+                    "required": true
+                }
+            },
+            "entrypoint": null,
+            "environment": {
+                "KAFKA_ADVERTISED_LISTENERS": "PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092",
+                "KAFKA_BROKER_ID": "1",
+                "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP": "PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT",
+                "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR": "1",
+                "KAFKA_TRANSACTION_STATE_LOG_MIN_ISR": "1",
+                "KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR": "1",
+                "KAFKA_ZOOKEEPER_CONNECT": "zookeeper:2181"
+            },
+            "expose": [
+                "29092"
+            ],
+            "healthcheck": {
+                "test": [
+                    "CMD-SHELL",
+                    "nc -z localhost 9092 || exit -1"
+                ],
+                "timeout": "10s",
+                "interval": "5s",
+                "retries": 10,
+                "start_period": "15s"
+            },
+            "image": "confluentinc/cp-kafka:7.4.0",
+            "networks": {
+                "factory-net": null
+            },
+            "ports": [
+                {
+                    "mode": "ingress",
+                    "target": 9092,
+                    "published": "9092",
+                    "protocol": "tcp"
+                }
+            ]
+        },
+        "ksqldb-cli": {
+            "command": null,
+            "container_name": "ksqldb-cli",
+            "depends_on": {
+                "broker": {
+                    "condition": "service_healthy",
+                    "required": true
+                },
+                "ksqldb-server": {
+                    "condition": "service_healthy",
+                    "required": true
+                }
+            },
+            "entrypoint": [
+                "bash",
+                "-c",
+                "source ./scripts/start_ksql.sh; tail -F anything"
+            ],
+            "environment": {
+                "KSQL_START_SCRIPTS": "mtcdevices.sql"
+            },
+            "image": "confluentinc/ksqldb-cli:0.29.0",
+            "networks": {
+                "factory-net": null
+            },
+            "tty": true,
+            "volumes": [
+                {
+                    "type": "bind",
+                    "source": "/projects/open_source/python-on-whales/scripts",
+                    "target": "/home/appuser/scripts",
+                    "bind": {
+                        "create_host_path": true
+                    }
+                }
+            ]
+        },
+        "ksqldb-server": {
+            "command": null,
+            "container_name": "ksqldb-server",
+            "depends_on": {
+                "broker": {
+                    "condition": "service_healthy",
+                    "required": true
+                }
+            },
+            "entrypoint": null,
+            "environment": {
+                "KSQL_BOOTSTRAP_SERVERS": "broker:29092",
+                "KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE": "true",
+                "KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE": "true",
+                "KSQL_LISTENERS": "http://0.0.0.0:8088"
+            },
+            "hostname": "ksqldb-server",
+            "healthcheck": {
+                "test": [
+                    "CMD-SHELL",
+                    "nc -z localhost 8088 || exit -1"
+                ],
+                "timeout": "10s",
+                "interval": "5s",
+                "retries": 10,
+                "start_period": "15s"
+            },
+            "image": "confluentinc/ksqldb-server:0.29.0",
+            "networks": {
+                "factory-net": null
+            },
+            "ports": [
+                {
+                    "mode": "ingress",
+                    "target": 8088,
+                    "published": "8088",
+                    "protocol": "tcp"
+                }
+            ]
+        },
+        "zookeeper": {
+            "command": null,
+            "container_name": "zookeeper",
+            "entrypoint": null,
+            "environment": {
+                "ZOOKEEPER_CLIENT_PORT": "2181",
+                "ZOOKEEPER_TICK_TIME": "2000"
+            },
+            "image": "confluentinc/cp-zookeeper:7.4.0",
+            "networks": {
+                "factory-net": null
+            }
+        }
+    }
+}
