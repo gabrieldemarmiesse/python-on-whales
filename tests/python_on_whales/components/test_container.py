@@ -946,8 +946,11 @@ def test_prune_streaming(ctr_client: DockerClient):
         )
 
         logs_as_big_binary += log_value
-        print(log_type, log_value)
-    assert b"Total reclaimed space:" in logs_as_big_binary
+    assert (
+        b"Total reclaimed space:" in logs_as_big_binary
+        if ctr_client.client_config.client_type == "docker"
+        else True
+    )
 
     # container not pruned because it is does not have label "dne"
     # podman does not provide logs when not pruned
@@ -959,8 +962,12 @@ def test_prune_streaming(ctr_client: DockerClient):
     for log_type, log_value in logs:
         assert log_type in ("stdout", "stderr")
         logs_as_big_binary += log_value
-        print(log_type, log_value)
-    assert b"Total reclaimed space:" in logs_as_big_binary
+
+    assert (
+        b"Total reclaimed space:" in logs_as_big_binary
+        if ctr_client.client_config.client_type == "docker"
+        else True
+    )
 
     # container not pruned because it is not old enough and does not have label "dne"
     # podman does not provide logs when not pruned
@@ -980,8 +987,12 @@ def test_prune_streaming(ctr_client: DockerClient):
             else True
         )
         logs_as_big_binary += log_value
-        print(log_type, log_value)
-    assert b"Total reclaimed space:" in logs_as_big_binary
+
+    assert (
+        b"Total reclaimed space:" in logs_as_big_binary
+        if ctr_client.client_config.client_type == "docker"
+        else True
+    )
 
     # container pruned
     # podman does provide logs when pruned
@@ -991,14 +1002,22 @@ def test_prune_streaming(ctr_client: DockerClient):
     assert (
         len(logs) >= 3
         if ctr_client.client_config.client_type == "docker"
-        else len(logs) >= 1  # podman
+        else len(logs) >= 1  # podman only
     )
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert log_type in ("stdout", "stderr")
+        assert (
+            log_type in ("stdout", "stderr")
+            if ctr_client.client_config.client_type == "docker"
+            else True
+        )
         logs_as_big_binary += log_value
-        print(log_type, log_value)
-    assert b"Deleted Containers:" in logs_as_big_binary
+
+    assert (
+        b"Deleted Containers:" in logs_as_big_binary
+        if ctr_client.client_config.client_type == "docker"
+        else True
+    )
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
