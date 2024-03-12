@@ -983,10 +983,12 @@ class ContainerCLI(DockerCLICaller):
             run(full_cmd)
 
     @overload
-    def inspect(self, x: ValidContainer, /) -> Container: ...
+    def inspect(self, x: ValidContainer, /) -> Container:
+        ...
 
     @overload
-    def inspect(self, x: List[ValidContainer], /) -> List[Container]: ...
+    def inspect(self, x: List[ValidContainer], /) -> List[Container]:
+        ...
 
     def inspect(
         self, x: Union[ValidContainer, List[ValidContainer]], /

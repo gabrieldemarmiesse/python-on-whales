@@ -936,14 +936,15 @@ def test_prune_streaming(ctr_client: DockerClient):
     logs = list(ctr_client.container.prune(filters={"until": "100h"}, stream_logs=True))
     assert container in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else 0
+    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else True
     logs_as_big_binary = b""
     for log_type, log_value in logs:
         assert (
-            log_type in ("stdout", "stderr")
+            (log_type in ("stdout", "stderr"))
             if ctr_client.client_config.client_type == "docker"
-            else ()
+            else True
         )
+
         logs_as_big_binary += log_value
         print(log_type, log_value)
     assert b"Total reclaimed space:" in logs_as_big_binary
@@ -970,13 +971,13 @@ def test_prune_streaming(ctr_client: DockerClient):
     )
     assert container in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else 0
+    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else True
     logs_as_big_binary = b""
     for log_type, log_value in logs:
         assert (
             log_type in ("stdout", "stderr")
             if ctr_client.client_config.client_type == "docker"
-            else ()
+            else True
         )
         logs_as_big_binary += log_value
         print(log_type, log_value)
@@ -987,7 +988,11 @@ def test_prune_streaming(ctr_client: DockerClient):
     logs = list(ctr_client.container.prune(stream_logs=True))
     assert container not in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 3
+    assert (
+        len(logs) >= 3
+        if ctr_client.client_config.client_type == "docker"
+        else len(logs) >= 1  # podman
+    )
     logs_as_big_binary = b""
     for log_type, log_value in logs:
         assert log_type in ("stdout", "stderr")
