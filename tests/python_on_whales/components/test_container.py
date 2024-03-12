@@ -932,18 +932,24 @@ def test_prune_streaming(ctr_client: DockerClient):
     assert container in ctr_client.container.list(all=True)
 
     # container not pruned because it is not old enough
+    # podman does not provide logs when not pruned
     logs = list(ctr_client.container.prune(filters={"until": "100h"}, stream_logs=True))
     assert container in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 1
+    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else 0
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert log_type in ("stdout", "stderr")
+        assert (
+            log_type in ("stdout", "stderr")
+            if ctr_client.client_config.client_type == "docker"
+            else ()
+        )
         logs_as_big_binary += log_value
         print(log_type, log_value)
     assert b"Total reclaimed space:" in logs_as_big_binary
 
     # container not pruned because it is does not have label "dne"
+    # podman does not provide logs when not pruned
     logs = list(ctr_client.container.prune(filters={"label": "dne"}, stream_logs=True))
     assert container in ctr_client.container.list(all=True)
 
@@ -956,6 +962,7 @@ def test_prune_streaming(ctr_client: DockerClient):
     assert b"Total reclaimed space:" in logs_as_big_binary
 
     # container not pruned because it is not old enough and does not have label "dne"
+    # podman does not provide logs when not pruned
     logs = list(
         ctr_client.container.prune(
             filters={"until": "100h", "label": "dne"}, stream_logs=True
@@ -963,15 +970,20 @@ def test_prune_streaming(ctr_client: DockerClient):
     )
     assert container in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 1
+    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else 0
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert log_type in ("stdout", "stderr")
+        assert (
+            log_type in ("stdout", "stderr")
+            if ctr_client.client_config.client_type == "docker"
+            else ()
+        )
         logs_as_big_binary += log_value
         print(log_type, log_value)
     assert b"Total reclaimed space:" in logs_as_big_binary
 
     # container pruned
+    # podman does provide logs when pruned
     logs = list(ctr_client.container.prune(stream_logs=True))
     assert container not in ctr_client.container.list(all=True)
 
