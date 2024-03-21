@@ -958,11 +958,8 @@ def test_prune_streaming(ctr_client: DockerClient):
         assert log_type in ("stdout", "stderr")
         logs_as_big_binary += log_value
 
-    assert (
-        b"Total reclaimed space:" in logs_as_big_binary
-        if ctr_client.client_config.client_type == "docker"
-        else True
-    )
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
 
     # container not pruned because it is not old enough and does not have label "dne"
     # podman does not provide logs when not pruned
