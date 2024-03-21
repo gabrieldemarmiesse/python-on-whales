@@ -209,6 +209,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def down(
         self,
+        services: Union[List[str], str, None] = ...,
         remove_orphans: bool = ...,
         remove_images: Optional[str] = ...,
         timeout: Optional[int] = ...,
@@ -221,6 +222,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def down(
         self,
+        services: Union[List[str], str, None] = ...,
         remove_orphans: bool = ...,
         remove_images: Optional[str] = ...,
         timeout: Optional[int] = ...,
@@ -232,6 +234,7 @@ class ComposeCLI(DockerCLICaller):
 
     def down(
         self,
+        services: Union[List[str], str, None] = None,
         remove_orphans: bool = False,
         remove_images: Optional[str] = None,
         timeout: Optional[int] = None,
@@ -242,6 +245,9 @@ class ComposeCLI(DockerCLICaller):
         """Stops and removes the containers
 
         Parameters:
+            services: The services to stop. If `None` (default), all services are
+                stopped. If an empty list is provided, the function call does nothing, it's
+                a no-op.
             remove_orphans: Remove containers for services not defined in
                 the Compose file.
             remove_images: Remove images used by services.
@@ -265,6 +271,12 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--rmi", remove_images)
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
+
+        if services == []:
+            return
+        elif services is not None:
+            services = to_list(services)
+            full_cmd += services
 
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)
