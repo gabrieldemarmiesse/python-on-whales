@@ -940,11 +940,8 @@ def test_prune_streaming(ctr_client: DockerClient):
         assert len(logs) >= 1
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert (
-            (log_type in ("stdout", "stderr"))
-            if ctr_client.client_config.client_type == "docker"
-            else True
-        )
+         if ctr_client.client_config.client_type == "docker":
+             assert log_type in ("stdout", "stderr")
 
         logs_as_big_binary += log_value
     assert (
