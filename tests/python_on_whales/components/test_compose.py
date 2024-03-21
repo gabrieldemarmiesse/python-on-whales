@@ -193,6 +193,7 @@ def test_docker_compose_down_services():
             PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
         ],
         compose_compatibility=True,
+        compose_project_name="testing",
     )
     docker.compose.up(["busybox", "alpine"], detach=True)
     assert len(docker.compose.ps()) == 2
@@ -201,7 +202,7 @@ def test_docker_compose_down_services():
     assert output_of_down is None
     assert len(docker.compose.ps()) == 1
     active_container = docker.compose.ps()[0]
-    assert active_container.name == "components_alpine_1"
+    assert active_container.name == "testing_alpine_1"
 
     output_of_down = docker.compose.down(services=["alpine"])
     assert output_of_down is None
