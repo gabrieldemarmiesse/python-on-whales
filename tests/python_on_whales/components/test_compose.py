@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta
 from os import makedirs, remove
 from pathlib import Path
-from unittest import Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 import pytz
