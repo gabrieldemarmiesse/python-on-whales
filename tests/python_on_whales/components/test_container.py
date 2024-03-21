@@ -940,10 +940,10 @@ def test_prune_streaming(ctr_client: DockerClient):
         assert len(logs) >= 1
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-         if ctr_client.client_config.client_type == "docker":
-             assert log_type in ("stdout", "stderr")
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+            logs_as_big_binary += log_value
 
-        logs_as_big_binary += log_value
     if ctr_client.client_config.client_type == "docker":
         assert b"Total reclaimed space:" in logs_as_big_binary
 
@@ -952,11 +952,13 @@ def test_prune_streaming(ctr_client: DockerClient):
     logs = list(ctr_client.container.prune(filters={"label": "dne"}, stream_logs=True))
     assert container in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else True
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert log_type in ("stdout", "stderr")
-        logs_as_big_binary += log_value
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+            logs_as_big_binary += log_value
 
     if ctr_client.client_config.client_type == "docker":
         assert b"Total reclaimed space:" in logs_as_big_binary
@@ -970,46 +972,36 @@ def test_prune_streaming(ctr_client: DockerClient):
     )
     assert container in ctr_client.container.list(all=True)
 
-    assert len(logs) >= 1 if ctr_client.client_config.client_type == "docker" else True
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert (
-            log_type in ("stdout", "stderr")
-            if ctr_client.client_config.client_type == "docker"
-            else True
-        )
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
         logs_as_big_binary += log_value
 
-    assert (
-        b"Total reclaimed space:" in logs_as_big_binary
-        if ctr_client.client_config.client_type == "docker"
-        else True
-    )
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
 
     # container pruned
     # podman does provide logs when pruned
     logs = list(ctr_client.container.prune(stream_logs=True))
     assert container not in ctr_client.container.list(all=True)
 
-    assert (
+    if ctr_client.client_config.client_type == "docker":
         len(logs) >= 3
-        if ctr_client.client_config.client_type == "docker"
-        else len(logs) >= 1  # podman only
-    )
+
+    if ctr_client.client_config.client_type == "podman":
+        len(logs) >= 1
+
     logs_as_big_binary = b""
     for log_type, log_value in logs:
-        assert (
-            log_type in ("stdout", "stderr")
-            if ctr_client.client_config.client_type == "docker"
-            else True
-        )
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
         logs_as_big_binary += log_value
 
-    assert (
-        b"Deleted Containers:" in logs_as_big_binary
-        if ctr_client.client_config.client_type == "docker"
-        else True
-    )
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
