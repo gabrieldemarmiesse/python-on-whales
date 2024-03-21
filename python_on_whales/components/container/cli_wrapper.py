@@ -1185,7 +1185,9 @@ class ContainerCLI(DockerCLICaller):
         Parameters:
             filters: Filters as strings or list of strings
             stream_logs: If `True` this function will return an iterator of strings.
-                You can then read the logs as they arrive.
+                You can then read the logs as they arrive. If `False` (the default value), then
+                the function returns `None`, but when it returns, then the prune operation has already been
+                done.
         """
         if isinstance(filter, list):
             raise TypeError(
