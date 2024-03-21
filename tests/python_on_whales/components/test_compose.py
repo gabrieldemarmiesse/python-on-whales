@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timedelta
 from os import makedirs, remove
 from pathlib import Path
+from unittest import Mock, patch
 
 import pytest
 import pytz
@@ -184,6 +185,86 @@ def test_docker_compose_up_down_streaming():
 
     assert b"Removed" in logs_as_big_binary
     assert b"Container components_alpine_1" in logs_as_big_binary
+
+
+def test_docker_compose_down_services():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_compatibility=True,
+    )
+    docker.compose.up(["busybox", "alpine"], detach=True)
+    assert len(docker.compose.ps()) == 2
+
+    output_of_down = docker.compose.down(services=["busybox"])
+    assert output_of_down is None
+    assert len(docker.compose.ps()) == 1
+    active_container = docker.compose.ps()[0]
+    assert active_container.name == "components_alpine_1"
+
+    output_of_down = docker.compose.down(services=["alpine"])
+    assert output_of_down is None
+    assert docker.compose.ps() == []
+
+
+def test_docker_compose_down_no_services():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_compatibility=True,
+    )
+    docker.compose.up(["busybox", "alpine"], detach=True)
+    initial_containers = docker.compose.ps()
+    assert len(initial_containers) == 2
+
+    output_of_down = docker.compose.down(services=[])
+    assert output_of_down is None
+    final_containers = docker.compose.ps()
+    assert final_containers == initial_containers
+
+    output_of_down = docker.compose.down()
+    assert output_of_down is None
+    assert docker.compose.ps() == []
+
+
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test_docker_compose_cli_down_all_services(run_mock: Mock):
+    docker.compose.down()
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_compose_cmd + ["down"],
+        capture_stderr=False,
+        capture_stdout=False,
+    )
+
+
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test_docker_compose_cli_down_multiple_services(run_mock: Mock):
+    test_services = ["test_a", "test_b"]
+    docker.compose.down(services=test_services)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_compose_cmd + ["down"] + test_services,
+        capture_stderr=False,
+        capture_stdout=False,
+    )
+
+
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test_docker_compose_cli_down_single_service(run_mock: Mock):
+    test_service = "test_a"
+    docker.compose.down(services=test_service)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_compose_cmd + ["down"] + [test_service],
+        capture_stderr=False,
+        capture_stdout=False,
+    )
+
+
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test_docker_compose_cli_down_services_no_op(run_mock: Mock):
+    docker.compose.down(services=[])
+    run_mock.assert_not_called()
 
 
 def test_no_containers():
