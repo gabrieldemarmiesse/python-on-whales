@@ -107,6 +107,14 @@ class ComposeCLI(DockerCLICaller):
         else:
             run(full_cmd, capture_stdout=False)
 
+    @overload
+    def config(self, return_json: Literal[False] = ...) -> ComposeConfig:
+        ...
+
+    @overload
+    def config(self, return_json: Literal[True] = ...) -> Dict[str, Any]:
+        ...
+
     def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the configuration of the compose stack for further inspection.
 
