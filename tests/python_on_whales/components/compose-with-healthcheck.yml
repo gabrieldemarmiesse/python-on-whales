@@ -7,3 +7,12 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
+
+  unhealthy_service:
+    image: busybox:latest
+    command: sleep infinity
+    healthcheck:
+      test: ["CMD-SHELL", "false"]
+      interval: 1s
+      timeout: 3s
+      retries: 5

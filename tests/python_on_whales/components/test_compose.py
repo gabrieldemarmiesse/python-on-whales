@@ -74,6 +74,20 @@ def test_wait_for_service():
     assert container.state.health.status == "healthy"
     docker.compose.down(timeout=1, volumes=True)
 
+    # now we use wait with timeout and check that timeout respects
+    with pytest.raises(DockerException) as exc_info:
+        list(
+            docker.compose.up(
+                ["unhealthy_service"],
+                detach=True,
+                wait=True,
+                wait_timeout=1,
+                stream_logs=True,
+            )
+        )
+    assert "application not healthy after" in exc_info.value.stderr
+    docker.compose.down(timeout=1, volumes=True)
+
 
 def test_pause_empty_list_of_services():
     docker.compose.up(["my_service", "busybox", "alpine"], detach=True)
