@@ -651,7 +651,7 @@ def test_config_complexe_compose():
     docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     config = docker.compose.config()
 
-    assert config.services["my_service"].build.context == Path(
+    assert config.services["my_service"].build.context == (
         PROJECT_ROOT / "tests/python_on_whales/components/my_service_build"
     )
     assert config.services["my_service"].image == "some_random_image"
