@@ -925,6 +925,86 @@ def test_prune(ctr_client: DockerClient):
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_prune_streaming(ctr_client: DockerClient):
+    for container in ctr_client.container.list(filters={"name": "test-container"}):
+        ctr_client.container.remove(container, force=True)
+    container = ctr_client.container.create("busybox")
+    assert container in ctr_client.container.list(all=True)
+
+    # container not pruned because it is not old enough
+    # podman does not provide logs when not pruned
+    logs = list(ctr_client.container.prune(filters={"until": "100h"}, stream_logs=True))
+    assert container in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+            logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+    # container not pruned because it is does not have label "dne"
+    # podman does not provide logs when not pruned
+    logs = list(ctr_client.container.prune(filters={"label": "dne"}, stream_logs=True))
+    assert container in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+            logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+    # container not pruned because it is not old enough and does not have label "dne"
+    # podman does not provide logs when not pruned
+    logs = list(
+        ctr_client.container.prune(
+            filters={"until": "100h", "label": "dne"}, stream_logs=True
+        )
+    )
+    assert container in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+    # container pruned
+    # podman does provide logs when pruned
+    logs = list(ctr_client.container.prune(stream_logs=True))
+    assert container not in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        len(logs) >= 3
+
+    if ctr_client.client_config.client_type == "podman":
+        len(logs) >= 1
+
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_detached_interactive(ctr_client: DockerClient):
     with ctr_client.run("ubuntu", interactive=True, detach=True, tty=False) as c:
         c.execute(["true"])

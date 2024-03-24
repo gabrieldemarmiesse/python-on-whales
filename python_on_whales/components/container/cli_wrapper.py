@@ -1159,11 +1159,35 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def prune(self, filters: Dict[str, str] = {}) -> None:
+    @overload
+    def prune(
+        self,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def prune(
+        self,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
+    def prune(
+        self,
+        filters: Dict[str, str] = {},
+        stream_logs: bool = False,
+    ):
         """Remove containers that are not running.
 
         Parameters:
             filters: Filters as strings or list of strings
+            stream_logs: If `True` this function will return an iterator of strings.
+                You can then read the logs as they arrive. If `False` (the default value), then
+                the function returns `None`, but when it returns, then the prune operation has already been
+                done.
         """
         if isinstance(filter, list):
             raise TypeError(
@@ -1173,6 +1197,8 @@ class ContainerCLI(DockerCLICaller):
             )
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
         run(full_cmd)
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
