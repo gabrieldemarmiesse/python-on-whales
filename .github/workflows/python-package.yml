@@ -40,6 +40,7 @@ jobs:
           - test_network.py
           - test_node.py
           - test_plugin.py
+          - test_pod.py
           - test_service.py
           - test_stack.py
           - test_swarm.py

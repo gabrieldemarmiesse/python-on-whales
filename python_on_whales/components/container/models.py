@@ -292,6 +292,7 @@ class ContainerInspectResult(DockerCamelModel):
     args: Optional[List[str]] = None
     state: Optional[ContainerState] = None
     image: Optional[str] = None
+    pod: Optional[str] = None
     resolv_conf_path: Optional[str] = None
     hostname_path: Optional[Path] = None
     hosts_path: Optional[Path] = None

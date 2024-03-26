@@ -1,0 +1,58 @@
+{
+  "Id": "7598ce3d47dab194e174e1243bba90fe962b970185f8c46d5fae31e748f75bc8",
+  "Name": "my-pod",
+  "Created": "2024-01-26T17:12:52.515566037-08:00",
+  "CreateCommand": [
+    "podman",
+    "pod",
+    "create",
+    "--name",
+    "my-pod",
+    "--network",
+    "host",
+    "--pid",
+    "private",
+    "--share",
+    "ipc,net,pid"
+  ],
+  "ExitPolicy": "continue",
+  "State": "Running",
+  "Hostname": "",
+  "CreateCgroup": true,
+  "CgroupParent": "/libpod_parent",
+  "CgroupPath": "/libpod_parent/7598ce3d47dab194e174e1243bba90fe962b970185f8c46d5fae31e748f75bc8",
+  "CreateInfra": true,
+  "InfraContainerID": "d86533bd2a85b42db47db0675cdba0a7bcb01f3a98c24079f35c89b69445fcc1",
+  "InfraConfig": {
+    "PortBindings": {
+
+    },
+    "HostNetwork": true,
+    "StaticIP": "",
+    "StaticMAC": "",
+    "NoManageResolvConf": false,
+    "DNSServer": null,
+    "DNSSearch": null,
+    "DNSOption": null,
+    "NoManageHosts": false,
+    "HostAdd": null,
+    "Networks": null,
+    "NetworkOptions": null,
+    "pid_ns": "private",
+    "userns": "host",
+    "uts_ns": "private"
+  },
+  "SharedNamespaces": [
+    "pid",
+    "ipc",
+    "net"
+  ],
+  "NumContainers": 1,
+  "Containers": [
+    {
+      "Id": "d86533bd2a85b42db47db0675cdba0a7bcb01f3a98c24079f35c89b69445fcc1",
+      "Name": "7598ce3d47da-infra",
+      "State": "running"
+    }
+  ]
+}
