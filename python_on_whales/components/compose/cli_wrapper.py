@@ -1009,8 +1009,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--wait", wait)
-        if wait_timeout:
-            full_cmd.add_simple_arg("--wait-timeout", wait_timeout)
+        full_cmd.add_simple_arg("--wait-timeout", wait_timeout)
         full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
         for service, scale in scales.items():
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")
