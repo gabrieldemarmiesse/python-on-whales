@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import Field
 from typing_extensions import Annotated
@@ -20,7 +20,7 @@ class Resources(DockerCamelModel):
 class ContainerSpec(DockerCamelModel):
     image: Optional[str] = None
     labels: Optional[Dict[str, str]] = None
-    privileges: Optional[Dict[str, Optional[str]]] = None
+    privileges: Optional[Dict[str, Union[None, str, bool]]] = None
     stop_grace_period: Optional[int] = None
     isolation: Optional[str] = None
     env: Optional[List[str]] = None

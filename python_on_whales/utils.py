@@ -155,7 +155,7 @@ def run(
     if completed_process.returncode != 0:
         if completed_process.stderr is not None:
             decoded_stderr = completed_process.stderr.decode().lower()
-            if "no such image" in decoded_stderr:
+            if "no such image" in decoded_stderr or "image not known" in decoded_stderr:
                 raise NoSuchImage(
                     args,
                     completed_process.returncode,
@@ -332,7 +332,7 @@ def format_time_arg(time_object):
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
     if isinstance(time_object, datetime):
-        return time_object.strftime("%Y-%m-%dT%H:%M:%S")
+        return time_object.isoformat()
     elif isinstance(time_object, timedelta):
         return f"{time_object.total_seconds()}s"
 

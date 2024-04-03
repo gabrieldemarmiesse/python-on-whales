@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+
+  busybox:
+    container_name: busybox
+    image: busybox:latest
+    command: sleep infinity
+
+  alpine:
+    container_name: alpine
+    image: alpine:latest
+    command: sleep infinity
+    environment:
+     - DD_API_KEY=__your_datadog_api_key_here__
+     - POSTGRES_HOST_AUTH_METHOD=trust
+
+  dodo:
+    image: busybox:latest
+    entrypoint: /bin/sh

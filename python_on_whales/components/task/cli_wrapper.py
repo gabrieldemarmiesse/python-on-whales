@@ -90,7 +90,7 @@ class Task(ReloadableObjectFromJson):
         return self._get_inspect_result().desired_state
 
     def __repr__(self):
-        return f"python_on_whales.Image(id='{self.id[:12]}', name={self.name})"
+        return f"python_on_whales.Task(id='{self.id[:12]}', name={self.name})"
 
 
 class TaskCLI(DockerCLICaller):

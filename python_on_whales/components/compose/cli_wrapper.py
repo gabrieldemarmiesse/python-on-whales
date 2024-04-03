@@ -24,7 +24,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def build(
         self,
-        services: Optional[List[str]] = ...,
+        services: Union[List[str], str, None] = ...,
         build_args: Dict[str, str] = ...,
         cache: bool = ...,
         progress: Optional[str] = ...,
@@ -38,7 +38,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def build(
         self,
-        services: Optional[List[str]] = ...,
+        services: Union[List[str], str, None] = ...,
         build_args: Dict[str, str] = ...,
         cache: bool = ...,
         progress: Optional[str] = ...,
@@ -51,7 +51,7 @@ class ComposeCLI(DockerCLICaller):
 
     def build(
         self,
-        services: Optional[List[str]] = None,
+        services: Union[List[str], str, None] = None,
         build_args: Dict[str, str] = {},
         cache: bool = True,
         progress: Optional[str] = None,
@@ -99,11 +99,21 @@ class ComposeCLI(DockerCLICaller):
         if services == []:
             return
         elif services is not None:
-            full_cmd += services
+            full_cmd += to_list(services)
+        else:
+            pass  # passing nothing means all services are built
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)
         else:
             run(full_cmd, capture_stdout=False)
+
+    @overload
+    def config(self, return_json: Literal[False] = ...) -> ComposeConfig:
+        ...
+
+    @overload
+    def config(self, return_json: Literal[True] = ...) -> Dict[str, Any]:
+        ...
 
     def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the configuration of the compose stack for further inspection.
@@ -207,6 +217,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def down(
         self,
+        services: Union[List[str], str, None] = ...,
         remove_orphans: bool = ...,
         remove_images: Optional[str] = ...,
         timeout: Optional[int] = ...,
@@ -219,6 +230,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def down(
         self,
+        services: Union[List[str], str, None] = ...,
         remove_orphans: bool = ...,
         remove_images: Optional[str] = ...,
         timeout: Optional[int] = ...,
@@ -230,6 +242,7 @@ class ComposeCLI(DockerCLICaller):
 
     def down(
         self,
+        services: Union[List[str], str, None] = None,
         remove_orphans: bool = False,
         remove_images: Optional[str] = None,
         timeout: Optional[int] = None,
@@ -240,6 +253,9 @@ class ComposeCLI(DockerCLICaller):
         """Stops and removes the containers
 
         Parameters:
+            services: The services to stop. If `None` (default), all services are
+                stopped. If an empty list is provided, the function call does nothing, it's
+                a no-op.
             remove_orphans: Remove containers for services not defined in
                 the Compose file.
             remove_images: Remove images used by services.
@@ -263,6 +279,12 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--rmi", remove_images)
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
+
+        if services == []:
+            return
+        elif services is not None:
+            services = to_list(services)
+            full_cmd += services
 
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)

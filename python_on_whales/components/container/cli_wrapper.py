@@ -281,6 +281,7 @@ class Container(ReloadableObjectFromJson):
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command in this container
 
@@ -299,6 +300,7 @@ class Container(ReloadableObjectFromJson):
             user,
             workdir,
             stream,
+            detach_keys,
         )
 
     def exists(self) -> bool:
@@ -392,14 +394,20 @@ class Container(ReloadableObjectFromJson):
         )
 
     def start(
-        self, attach: bool = False, interactive: bool = False, stream: bool = False
+        self,
+        attach: bool = False,
+        interactive: bool = False,
+        stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this container.
 
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).start(self, attach, interactive, stream)
+        return ContainerCLI(self.client_config).start(
+            self, attach, interactive, stream, detach_keys
+        )
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
@@ -565,6 +573,7 @@ class ContainerCLI(DockerCLICaller):
         entrypoint: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
+        env_host: bool = False,
         expose: Union[int, List[int]] = [],
         gpus: Union[int, str, None] = None,
         groups_add: List[str] = [],
@@ -703,6 +712,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_flag("--env-host", env_host)
 
         full_cmd.add_args_list("--expose", expose)
 
@@ -840,6 +850,7 @@ class ContainerCLI(DockerCLICaller):
         user: Optional[str] = None,
         workdir: Optional[ValidPath] = None,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command inside a container
 
@@ -862,6 +873,7 @@ class ContainerCLI(DockerCLICaller):
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
             workdir: Working directory inside the container
             stream: Similar to `docker.run(..., stream=True)`.
+            detach_keys: Override the key sequence for detaching a container.
 
         Returns:
             Optional[str]
@@ -889,6 +901,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["exec"]
 
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_simple_arg("--detach-keys", detach_keys)
 
         full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
@@ -1153,11 +1166,35 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    def prune(self, filters: Dict[str, str] = {}) -> None:
+    @overload
+    def prune(
+        self,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def prune(
+        self,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
+    def prune(
+        self,
+        filters: Dict[str, str] = {},
+        stream_logs: bool = False,
+    ):
         """Remove containers that are not running.
 
         Parameters:
             filters: Filters as strings or list of strings
+            stream_logs: If `True` this function will return an iterator of strings.
+                You can then read the logs as they arrive. If `False` (the default value), then
+                the function returns `None`, but when it returns, then the prune operation has already been
+                done.
         """
         if isinstance(filter, list):
             raise TypeError(
@@ -1167,6 +1204,8 @@ class ContainerCLI(DockerCLICaller):
             )
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        if stream_logs:
+            return stream_stdout_and_stderr(full_cmd)
         run(full_cmd)
 
     def rename(self, container: ValidContainer, new_name: str) -> None:
@@ -1283,6 +1322,7 @@ class ContainerCLI(DockerCLICaller):
         entrypoint: Optional[str] = None,
         envs: Dict[str, str] = {},
         env_files: Union[ValidPath, List[ValidPath]] = [],
+        env_host: bool = False,
         expose: Union[int, List[int]] = [],
         gpus: Union[int, str, None] = None,
         groups_add: List[str] = [],
@@ -1445,6 +1485,8 @@ class ContainerCLI(DockerCLICaller):
             envs: Environment variables as a `dict`.
                 For example: `{"OMP_NUM_THREADS": 3}`
             env_files: One or a list of env files.
+            env_host: Use host environment inside the container. Only supported
+                with podman.
             gpus: For this to work, you need the
                 [Nvidia container runtime](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#install-guide)
                 The value needed is a `str` or `int`. Some examples of valid argument
@@ -1582,6 +1624,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_flag("--env-host", env_host)
 
         full_cmd.add_args_list("--expose", expose)
 
@@ -1705,6 +1748,7 @@ class ContainerCLI(DockerCLICaller):
         attach: bool = False,
         interactive: bool = False,
         stream: bool = False,
+        detach_keys: Optional[str] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts one or more created/stopped containers.
 
@@ -1716,6 +1760,7 @@ class ContainerCLI(DockerCLICaller):
             attach: Attach stdout/stderr and forward signals.
             interactive: Attach stdin (ensure it is open).
             stream: Stream output as a generator.
+            detach_keys: Override the key sequence for detaching a container.
         """
         containers = to_list(containers)
         if containers == []:
@@ -1730,6 +1775,7 @@ class ContainerCLI(DockerCLICaller):
             )
         full_cmd = self.docker_cmd + ["container", "start"]
         full_cmd.add_flag("--attach", attach)
+        full_cmd.add_simple_arg("--detach-keys", detach_keys)
         full_cmd.add_flag("--interactive", interactive)
         full_cmd += containers
 

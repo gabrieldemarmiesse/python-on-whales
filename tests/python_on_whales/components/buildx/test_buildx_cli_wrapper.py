@@ -470,6 +470,14 @@ def test_buildx_create_remove():
     docker.buildx.remove(builder)
 
 
+def test_buildx_create_remove_with_platforms():
+    builder = docker.buildx.create(platforms=["linux/amd64", "linux/arm64"])
+
+    assert builder.platforms == ["linux/amd64*", "linux/arm64*"]
+
+    docker.buildx.remove(builder)
+
+
 some_builder_info = """
 Name:   blissful_swartz
 Driver: docker-container

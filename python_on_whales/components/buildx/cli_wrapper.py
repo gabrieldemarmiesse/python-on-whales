@@ -441,6 +441,7 @@ class BuildxCLI(DockerCLICaller):
         context_or_endpoint: Optional[str] = None,
         buildkitd_flags: Optional[str] = None,
         config: Optional[ValidPath] = None,
+        platforms: Optional[List[str]] = None,
         driver: Optional[str] = None,
         driver_options: Dict[str, str] = {},
         name: Optional[str] = None,
@@ -452,6 +453,8 @@ class BuildxCLI(DockerCLICaller):
             context_or_endpoint:
             buildkitd_flags: Flags for buildkitd daemon
             config: BuildKit config file
+            platforms: Comma-separated list of platforms of the form OS/architecture/variant. Ex:
+                `platforms=["linux/amd64", "linux/arm64"]`
             driver: Driver to use (available: [kubernetes docker docker-container])
             driver_options: Options for the driver.
                 e.g `driver_options=dict(network="host")`
@@ -465,6 +468,8 @@ class BuildxCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
         full_cmd.add_simple_arg("--config", config)
+        if platforms is not None:
+            full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--driver", driver)
         if driver_options != {}:
             full_cmd.add_simple_arg(
@@ -503,6 +508,8 @@ class BuildxCLI(DockerCLICaller):
         # if the line starts by a " ", it's not a builder, it's a node
         lines = list(filter(lambda x: not x.startswith(" "), lines))
         builders_names = [x.split(" ")[0] for x in lines]
+        # in buildx 0.13.0, the "*" is added to the name, without whitespace
+        builders_names = [removesuffix(x, "*") for x in builders_names]
         return [
             Builder(self.client_config, x, is_immutable_id=True) for x in builders_names
         ]
@@ -583,6 +590,16 @@ class BuildxCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "--help"]
         help_output = run(full_cmd)
         return "buildx" in help_output
+
+
+def removesuffix(base_string: str, suffix: str) -> str:
+    """Backport of removesuffix for python <3.9.
+
+    TODO: Remove this when we drop support for python 3.8.
+    """
+    if base_string.endswith(suffix):
+        return base_string[: -len(suffix)]
+    return base_string
 
 
 def format_dict_for_buildx(options: Dict[str, str]) -> str:

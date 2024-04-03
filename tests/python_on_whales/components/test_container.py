@@ -1,4 +1,5 @@
 import json
+import os
 import signal
 import sys
 import tempfile
@@ -739,6 +740,35 @@ def test_kill_nothing(ctr_client: DockerClient):
         assert set_of_containers == set(ctr_client.ps())
 
 
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_start_detach_keys(run_mock: Mock):
+    docker.start("ctr_name", detach_keys="a,b")
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["container", "start", "--detach-keys", "a,b", "ctr_name"]
+    )
+
+
+def test_run_with_env_host(podman_client: DockerClient):
+    try:
+        os.environ["POW_TEST_FOO"] = "foo"
+        os.environ["POW_TEST_BAR"] = "bar"
+        with podman_client.run(
+            "ubuntu",
+            ["sleep", "infinity"],
+            env_host=True,
+            envs={"POW_TEST_BAR": "override"},
+            detach=True,
+        ) as c:
+            foo_env = c.execute(["bash", "-c", "echo $POW_TEST_FOO"])
+            bar_env = c.execute(["bash", "-c", "echo $POW_TEST_BAR"])
+        assert foo_env == "foo"
+        assert bar_env == "override"
+    finally:
+        os.environ.pop("POW_TEST_FOO")
+        os.environ.pop("POW_TEST_BAR")
+
+
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_exec_env(ctr_client: DockerClient):
     with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
@@ -755,6 +785,16 @@ def test_exec_env_file(ctr_client: DockerClient, tmp_path: Path):
     with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
         result = c.execute(["bash", "-c", "echo $DODO"], env_files=[env_file])
     assert result == "dada"
+
+
+@patch("python_on_whales.components.container.cli_wrapper.run")
+def test_exec_detach_keys(run_mock: Mock):
+    docker.execute("ctr_name", ["cmd"], detach_keys="a,b")
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_cmd
+        + ["exec", "--detach-keys", "a,b", "ctr_name", "cmd"],
+        tty=False,
+    )
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
@@ -890,6 +930,86 @@ def test_prune(ctr_client: DockerClient):
     # container pruned
     ctr_client.container.prune()
     assert container not in ctr_client.container.list(all=True)
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_prune_streaming(ctr_client: DockerClient):
+    for container in ctr_client.container.list(filters={"name": "test-container"}):
+        ctr_client.container.remove(container, force=True)
+    container = ctr_client.container.create("busybox")
+    assert container in ctr_client.container.list(all=True)
+
+    # container not pruned because it is not old enough
+    # podman does not provide logs when not pruned
+    logs = list(ctr_client.container.prune(filters={"until": "100h"}, stream_logs=True))
+    assert container in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+            logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+    # container not pruned because it is does not have label "dne"
+    # podman does not provide logs when not pruned
+    logs = list(ctr_client.container.prune(filters={"label": "dne"}, stream_logs=True))
+    assert container in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+            logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+    # container not pruned because it is not old enough and does not have label "dne"
+    # podman does not provide logs when not pruned
+    logs = list(
+        ctr_client.container.prune(
+            filters={"until": "100h", "label": "dne"}, stream_logs=True
+        )
+    )
+    assert container in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        assert len(logs) >= 1
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
+
+    # container pruned
+    # podman does provide logs when pruned
+    logs = list(ctr_client.container.prune(stream_logs=True))
+    assert container not in ctr_client.container.list(all=True)
+
+    if ctr_client.client_config.client_type == "docker":
+        len(logs) >= 3
+
+    if ctr_client.client_config.client_type == "podman":
+        len(logs) >= 1
+
+    logs_as_big_binary = b""
+    for log_type, log_value in logs:
+        if ctr_client.client_config.client_type == "docker":
+            assert log_type in ("stdout", "stderr")
+        logs_as_big_binary += log_value
+
+    if ctr_client.client_config.client_type == "docker":
+        assert b"Total reclaimed space:" in logs_as_big_binary
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
@@ -1116,11 +1236,7 @@ def test_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock):
     )
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_create_never_pull_error(ctr_client: DockerClient):
     test_image = "alpine:latest"
 
@@ -1131,11 +1247,7 @@ def test_create_never_pull_error(ctr_client: DockerClient):
         ctr_client.container.create(test_image, pull="never")
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_never_pull_error(ctr_client: DockerClient):
     test_image = "alpine:latest"
 
@@ -1146,19 +1258,7 @@ def test_run_never_pull_error(ctr_client: DockerClient):
         ctr_client.container.run(test_image, pull="never")
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_create_missing_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
@@ -1191,19 +1291,7 @@ def test_create_missing_pull_existent(
     assert docker_client.image.inspect(test_image_name).id == local_id
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_missing_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
@@ -1236,19 +1324,7 @@ def test_run_missing_pull_existent(
     assert docker_client.image.inspect(test_image_name).id == local_id
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_create_always_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
@@ -1281,19 +1357,7 @@ def test_create_always_pull_existent(
     assert docker_client.image.inspect(test_image_name).id == remote_id
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="podman.image.exists() fails for non-existent image"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_run_always_pull_nonexistent(ctr_client: DockerClient):
     base_image_name = "alpine:latest"
 
