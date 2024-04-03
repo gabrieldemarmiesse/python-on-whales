@@ -37,6 +37,7 @@ class PodInspectResult(DockerCamelModel):
     exit_policy: Optional[str] = None
     state: Optional[str] = None
     hostname: Optional[str] = None
+    labels: Optional[Mapping[str, str]] = None
     create_cgroup: Optional[bool] = None
     cgroup_parent: Optional[str] = None
     cgroup_path: Optional[str] = None

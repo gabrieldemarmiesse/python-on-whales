@@ -114,6 +114,10 @@ class Pod(ReloadableObjectFromJson):
         return self._get_inspect_result().hostname
 
     @property
+    def labels(self) -> Mapping[str, str]:
+        return self._get_inspect_result().labels
+
+    @property
     def create_cgroup(self) -> bool:
         return self._get_inspect_result().create_cgroup
 
