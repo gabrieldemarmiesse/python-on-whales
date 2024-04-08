@@ -786,6 +786,7 @@ def test_exec_detach_keys(run_mock: Mock):
         docker.client_config.docker_cmd
         + ["exec", "--detach-keys", "a,b", "ctr_name", "cmd"],
         tty=False,
+        pass_fds=(),
     )
 
 
@@ -1164,6 +1165,7 @@ def test_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
@@ -1184,6 +1186,7 @@ def test_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
@@ -1204,6 +1207,7 @@ def test_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
@@ -1225,6 +1229,7 @@ def test_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         + ["container", "run", "--pull", "never", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
