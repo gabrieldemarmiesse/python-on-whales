@@ -4,7 +4,18 @@ import json
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Literal, Optional, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+    overload,
+)
 
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
@@ -514,7 +525,25 @@ class BuildxCLI(DockerCLICaller):
             Builder(self.client_config, x, is_immutable_id=True) for x in builders_names
         ]
 
-    def prune(self, all: bool = False, filters: Dict[str, str] = {}) -> None:
+    @overload
+    def prune(
+        self,
+        all: bool = False,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]: ...
+
+    @overload
+    def prune(
+        self,
+        all: bool = False,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[False] = ...,
+    ) -> None: ...
+
+    def prune(
+        self, all: bool = False, filters: Dict[str, str] = {}, stream_logs: bool = False
+    ):
         """Remove build cache on the current builder.
 
         Parameters:
@@ -524,6 +553,8 @@ class BuildxCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        if stream_logs:
+            return stream_buildx_logs(full_cmd)
         run(full_cmd)
 
     def remove(self, builder: Union[Builder, str]) -> None:
