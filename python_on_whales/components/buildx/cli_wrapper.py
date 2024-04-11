@@ -549,6 +549,10 @@ class BuildxCLI(DockerCLICaller):
         Parameters:
             all: Remove all cache, not just dangling layers
             filters: Filters to use, for example `filters=dict(until="24h")`
+            stream_logs: If `True` this function will return an iterator of strings.
+                You can then read the logs as they arrive. If `False` (the default value), then
+                the function returns `None`, but when it returns, then the prune operation has already been
+                done.
         """
         full_cmd = self.docker_cmd + ["buildx", "prune", "--force"]
         full_cmd.add_flag("--all", all)
