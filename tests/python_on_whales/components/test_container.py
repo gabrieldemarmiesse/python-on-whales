@@ -218,6 +218,21 @@ def test_create_with_systemd_mode(podman_client: DockerClient):
         assert container.config.systemd_mode is True
 
 
+def test_run_with_preserve_fds(podman_client: DockerClient):
+    read_fd, write_fd = os.pipe()
+    # Pass through enough additional file descriptors (as well as 0-2, stdin,
+    # stdout, stderr, which are handled separately by the container runtime) to
+    # ensure the write fd is available to the container.
+    # See the podman documentation.
+    with podman_client.container.run(
+        "ubuntu",
+        ["bash", "-c", f"echo foobar >&{write_fd}"],
+        detach=True,
+        preserve_fds=write_fd - 2,
+    ):
+        assert os.read(read_fd, 7) == b"foobar\n"
+
+
 @pytest.mark.parametrize(
     "ctr_client",
     ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
@@ -786,6 +801,7 @@ def test_exec_detach_keys(run_mock: Mock):
         docker.client_config.docker_cmd
         + ["exec", "--detach-keys", "a,b", "ctr_name", "cmd"],
         tty=False,
+        pass_fds=(),
     )
 
 
@@ -1164,6 +1180,7 @@ def test_run_default_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
@@ -1184,6 +1201,7 @@ def test_run_missing_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
@@ -1204,6 +1222,7 @@ def test_run_always_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         docker.client_config.docker_cmd + ["container", "run", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
@@ -1225,6 +1244,7 @@ def test_run_never_pull(image_mock: Mock, _: Mock, run_mock: Mock):
         + ["container", "run", "--pull", "never", test_image_name],
         tty=False,
         capture_stderr=False,
+        pass_fds=(),
     )
 
 
