@@ -220,6 +220,10 @@ def test_create_with_systemd_mode(podman_client: DockerClient):
 
 def test_run_with_preserve_fds(podman_client: DockerClient):
     read_fd, write_fd = os.pipe()
+    # Pass through enough additional file descriptors (as well as 0-2, stdin,
+    # stdout, stderr, which are handled separately by the container runtime) to
+    # ensure the write fd is available to the container.
+    # See the podman documentation.
     with podman_client.container.run(
         "ubuntu",
         ["bash", "-c", f"echo foobar >&{write_fd}"],

@@ -863,7 +863,6 @@ class ContainerCLI(DockerCLICaller):
                 on the terminal.
             preserve_fds: The number of additional file descriptors to pass
                 through to the container. Only supported by podman.
-
             privileged: Give extended privileges to the container.
             tty: Allocate a pseudo-TTY. Allow the process to access your terminal
                 to write on it.
@@ -940,6 +939,9 @@ class ContainerCLI(DockerCLICaller):
             full_cmd.append(arg)
 
         if preserve_fds:
+            # Pass through additional file descriptors (as well as 0-2,
+            # stdin, stdout, stderr, which are handled separately by the
+            # container runtime). See the podman documentation.
             pass_fds = range(3, 3 + preserve_fds)
         else:
             pass_fds = ()
@@ -1741,6 +1743,9 @@ class ContainerCLI(DockerCLICaller):
                 )
 
         if preserve_fds:
+            # Pass through additional file descriptors (as well as 0-2,
+            # stdin, stdout, stderr, which are handled separately by the
+            # container runtime). See the podman documentation.
             pass_fds = range(3, 3 + preserve_fds)
         else:
             pass_fds = ()
