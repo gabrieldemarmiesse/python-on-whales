@@ -626,6 +626,7 @@ class ContainerCLI(DockerCLICaller):
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
+        tz: Optional[str] = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -791,6 +792,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
+        full_cmd.add_simple_arg("--tz", tz)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
@@ -1387,6 +1389,7 @@ class ContainerCLI(DockerCLICaller):
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
+        tz: Optional[str] = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -1718,6 +1721,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
+        full_cmd.add_simple_arg("--tz", tz)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
