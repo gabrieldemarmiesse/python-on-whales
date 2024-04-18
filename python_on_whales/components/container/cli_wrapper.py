@@ -1553,7 +1553,7 @@ class ContainerCLI(DockerCLICaller):
             tty: Allocate a pseudo-TTY. Allow the process to access your terminal
                 to write on it.
             tz: Set timezone in container, or `local` to match the host's timezone.
-                See `/usr/share/zoneinfo/` for valid timezones. 
+                See `/usr/share/zoneinfo/` for valid timezones.
                 Note: This option is only known to apply to Podman containers.
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
