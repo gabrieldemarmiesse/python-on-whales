@@ -233,6 +233,26 @@ def test_run_with_preserve_fds(podman_client: DockerClient):
         assert os.read(read_fd, 7) == b"foobar\n"
 
 
+def test_run_with_timezone(podman_client: DockerClient):
+    output = podman_client.container.run(
+        "ubuntu", ["date", "+%Z"], tz="local", remove=True
+    )
+    # Check the timezone in the container matches that in the host.
+    assert output == datetime.now().astimezone().strftime("%Z")
+
+
+def test_create_start_with_timezone(podman_client: DockerClient):
+    # Choose a timezone to check that's different from the default in ubuntu
+    # (UTC). GMT is a commonly available and valid timezone.
+    with podman_client.container.create(
+        "ubuntu", ["sleep", "infinity"], tz="GMT"
+    ) as container:
+        container.start()
+        output = podman_client.execute(container, ["date", "+%Z"])
+        # Check the timezone in the container matches what was specified
+        assert output == "GMT"
+
+
 @pytest.mark.parametrize(
     "ctr_client",
     ["docker", pytest.param("podman", marks=pytest.mark.xfail)],

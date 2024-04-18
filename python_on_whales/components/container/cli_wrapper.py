@@ -626,6 +626,7 @@ class ContainerCLI(DockerCLICaller):
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
+        tz: Optional[str] = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -791,6 +792,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
+        full_cmd.add_simple_arg("--tz", tz)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
@@ -1387,6 +1389,7 @@ class ContainerCLI(DockerCLICaller):
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
+        tz: Optional[str] = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -1549,6 +1552,9 @@ class ContainerCLI(DockerCLICaller):
                 https://docs.podman.io/en/latest/markdown/podman-run.1.html#systemd-true-false-always
             tty: Allocate a pseudo-TTY. Allow the process to access your terminal
                 to write on it.
+            tz: Set timezone in container, or `local` to match the host's timezone.
+                See `/usr/share/zoneinfo/` for valid timezones.
+                Note: This option is only known to apply to Podman containers.
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
@@ -1718,6 +1724,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
+        full_cmd.add_simple_arg("--tz", tz)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
