@@ -419,6 +419,8 @@ class Container(ReloadableObjectFromJson):
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
 ValidContainer = Union[Container, str]
+
+
 class RunArgs(TypedDict, total=False):
     add_hosts: List[Tuple[str, str]]
     blkio_weight: Optional[int]
@@ -1410,6 +1412,7 @@ class ContainerCLI(DockerCLICaller):
             **kwargs: Unpack[RunArgs]
         ) -> Container:
             ...
+
         @overload
         def run(
             self,
@@ -1421,6 +1424,7 @@ class ContainerCLI(DockerCLICaller):
             **kwargs: Unpack[RunArgs]
         ) -> Iterable[Tuple[str, bytes]]:
             ...
+
         @overload
         def run(
             self,
@@ -1432,6 +1436,7 @@ class ContainerCLI(DockerCLICaller):
             **kwargs: Unpack[RunArgs]
         ) -> str:
             ...
+
     def run(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
