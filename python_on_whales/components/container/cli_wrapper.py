@@ -1405,7 +1405,7 @@ class ContainerCLI(DockerCLICaller):
             *,
             detach: Literal[True],
             stream: bool = ...,
-            **kwargs: Unpack[RunArgs]
+            **kwargs: Unpack[RunArgs],
         ) -> Container:
             ...
 
@@ -1417,7 +1417,7 @@ class ContainerCLI(DockerCLICaller):
             *,
             detach: Literal[False] = ...,
             stream: Literal[True],
-            **kwargs: Unpack[RunArgs]
+            **kwargs: Unpack[RunArgs],
         ) -> Iterable[Tuple[str, bytes]]:
             ...
 
@@ -1429,7 +1429,7 @@ class ContainerCLI(DockerCLICaller):
             *,
             detach: Literal[False] = ...,
             stream: Literal[False] = ...,
-            **kwargs: Unpack[RunArgs]
+            **kwargs: Unpack[RunArgs],
         ) -> str:
             ...
 
