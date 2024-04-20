@@ -1397,6 +1397,7 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     if sys.version_info >= (3, 11):
+
         @overload
         def run(
             self,
@@ -1406,9 +1407,7 @@ class ContainerCLI(DockerCLICaller):
             detach: Literal[True],
             stream: bool = ...,
             **kwargs: Unpack[RunArgs],
-        ) -> Container:
-            ...
-
+        ) -> Container: ...
         @overload
         def run(
             self,
@@ -1418,9 +1417,7 @@ class ContainerCLI(DockerCLICaller):
             detach: Literal[False] = ...,
             stream: Literal[True],
             **kwargs: Unpack[RunArgs],
-        ) -> Iterable[Tuple[str, bytes]]:
-            ...
-
+        ) -> Iterable[Tuple[str, bytes]]: ...
         @overload
         def run(
             self,
@@ -1430,9 +1427,7 @@ class ContainerCLI(DockerCLICaller):
             detach: Literal[False] = ...,
             stream: Literal[False] = ...,
             **kwargs: Unpack[RunArgs],
-        ) -> str:
-            ...
-
+        ) -> str: ...
     def run(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
