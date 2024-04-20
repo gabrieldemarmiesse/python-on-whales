@@ -1406,7 +1406,7 @@ class ContainerCLI(DockerCLICaller):
             command: List[str] = [],
             *,
             detach: Literal[True],
-            stream: bool = ...
+            stream: bool = ...,
             **kwargs: Unpack[RunArgs]
         ) -> Container:
             ...
@@ -1416,8 +1416,8 @@ class ContainerCLI(DockerCLICaller):
             image: python_on_whales.components.image.cli_wrapper.ValidImage,
             command: List[str] = [],
             *,
-            detach: Literal[False] = ...
-            stream: Literal[True]
+            detach: Literal[False] = ...,
+            stream: Literal[True],
             **kwargs: Unpack[RunArgs]
         ) -> Iterable[Tuple[str, bytes]]:
             ...
@@ -1427,8 +1427,8 @@ class ContainerCLI(DockerCLICaller):
             image: python_on_whales.components.image.cli_wrapper.ValidImage,
             command: List[str] = [],
             *,
-            detach: Literal[False] = ...
-            stream: Literal[False] = ...
+            detach: Literal[False] = ...,
+            stream: Literal[False] = ...,
             **kwargs: Unpack[RunArgs]
         ) -> str:
             ...
