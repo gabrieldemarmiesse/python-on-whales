@@ -1408,6 +1408,7 @@ class ContainerCLI(DockerCLICaller):
             stream: bool = ...,
             **kwargs: Unpack[RunArgs],
         ) -> Container: ...
+
         @overload
         def run(
             self,
@@ -1418,6 +1419,7 @@ class ContainerCLI(DockerCLICaller):
             stream: Literal[True],
             **kwargs: Unpack[RunArgs],
         ) -> Iterable[Tuple[str, bytes]]: ...
+
         @overload
         def run(
             self,
@@ -1428,6 +1430,7 @@ class ContainerCLI(DockerCLICaller):
             stream: Literal[False] = ...,
             **kwargs: Unpack[RunArgs],
         ) -> str: ...
+
     def run(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
