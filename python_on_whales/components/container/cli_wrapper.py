@@ -1102,10 +1102,12 @@ class ContainerCLI(DockerCLICaller):
             run(full_cmd)
 
     @overload
-    def inspect(self, x: ValidContainer, /) -> Container: ...
+    def inspect(self, x: ValidContainer, /) -> Container:
+        ...
 
     @overload
-    def inspect(self, x: List[ValidContainer], /) -> List[Container]: ...
+    def inspect(self, x: List[ValidContainer], /) -> List[Container]:
+        ...
 
     def inspect(
         self, x: Union[ValidContainer, List[ValidContainer]], /
@@ -1281,14 +1283,16 @@ class ContainerCLI(DockerCLICaller):
         self,
         filters: Dict[str, str] = {},
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]: ...
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
 
     @overload
     def prune(
         self,
         filters: Dict[str, str] = {},
         stream_logs: Literal[False] = ...,
-    ) -> None: ...
+    ) -> None:
+        ...
 
     def prune(
         self,
@@ -1405,7 +1409,8 @@ class ContainerCLI(DockerCLICaller):
             detach: Literal[True],
             stream: bool = ...,
             **kwargs: Unpack[RunArgs],
-        ) -> Container: ...
+        ) -> Container:
+            ...
 
         @overload
         def run(
@@ -1416,7 +1421,8 @@ class ContainerCLI(DockerCLICaller):
             detach: Literal[False] = ...,
             stream: Literal[True],
             **kwargs: Unpack[RunArgs],
-        ) -> Iterable[Tuple[str, bytes]]: ...
+        ) -> Iterable[Tuple[str, bytes]]:
+            ...
 
         @overload
         def run(
@@ -1427,7 +1433,8 @@ class ContainerCLI(DockerCLICaller):
             detach: Literal[False] = ...,
             stream: Literal[False] = ...,
             **kwargs: Unpack[RunArgs],
-        ) -> str: ...
+        ) -> str:
+            ...
 
     def run(
         self,
@@ -2124,10 +2131,12 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def wait(self, x: ValidContainer) -> int: ...
+    def wait(self, x: ValidContainer) -> int:
+        ...
 
     @overload
-    def wait(self, x: List[ValidContainer]) -> List[int]: ...
+    def wait(self, x: List[ValidContainer]) -> List[int]:
+        ...
 
     def wait(
         self, x: Union[ValidContainer, List[ValidContainer]]
