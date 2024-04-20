@@ -483,9 +483,7 @@ class RunArgs(TypedDict, total=False):
     memory_swappiness: Optional[int]
     mounts: List[List[str]]
     name: Optional[str]
-    networks: List[
-        python_on_whales.components.network.cli_wrapper.ValidNetwork
-    ]
+    networks: List[python_on_whales.components.network.cli_wrapper.ValidNetwork]
     network_aliases: List[str]
     oom_kill: bool
     oom_score_adj: Optional[int]
@@ -516,9 +514,7 @@ class RunArgs(TypedDict, total=False):
     user: Optional[str]
     userns: Optional[str]
     uts: Optional[str]
-    volumes: Optional[
-        List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-    ]
+    volumes: Optional[List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]]
     volume_driver: Optional[str]
     volumes_from: List[ValidContainer]
     workdir: Optional[ValidPath]
