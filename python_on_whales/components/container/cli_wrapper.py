@@ -64,9 +64,7 @@ DockerContainerListFilters = TypedDict(
         "name": str,
         "label": str,
         "exited": int,
-        "status": Literal[
-            "created", "restarting", "running", "removing", "paused", "exited", "dead"
-        ],
+        "status": Literal["created", "restarting", "running", "removing", "paused", "exited", "dead"],
         "ancestor": str,
         "before": str,  # TODO: allow datetime
         "since": str,  # TODO: allow datetime
@@ -83,9 +81,7 @@ DockerContainerListFilters = TypedDict(
 
 
 class Container(ReloadableObjectFromJson):
-    def __init__(
-        self, client_config: ClientConfig, reference: str, is_immutable_id=False
-    ):
+    def __init__(self, client_config: ClientConfig, reference: str, is_immutable_id=False):
         super().__init__(client_config, "id", reference, is_immutable_id)
 
     def __enter__(self):
@@ -250,9 +246,7 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.commit`](../sub-commands/container.md) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).commit(
-            self, tag, author, message, pause
-        )
+        return ContainerCLI(self.client_config).commit(self, tag, author, message, pause)
 
     def copy_from(self, container_path: ValidPath, local_path: ValidPath):
         return ContainerCLI(self.client_config).copy((self, container_path), local_path)
@@ -388,9 +382,7 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.remove`](../sub-commands/container.md#remove) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).remove(
-            self, force=force, volumes=volumes
-        )
+        return ContainerCLI(self.client_config).remove(self, force=force, volumes=volumes)
 
     def start(
         self,
@@ -404,9 +396,7 @@ class Container(ReloadableObjectFromJson):
         See the [`docker.container.start`](../sub-commands/container.md#start) command for
         information about the arguments.
         """
-        return ContainerCLI(self.client_config).start(
-            self, attach, interactive, stream, detach_keys
-        )
+        return ContainerCLI(self.client_config).start(self, attach, interactive, stream, detach_keys)
 
     def stop(self, time: Union[int, timedelta] = None) -> None:
         """Stops this container.
@@ -702,9 +692,7 @@ class ContainerCLI(DockerCLICaller):
         memory_swappiness: Optional[int] = None,
         mounts: List[List[str]] = [],
         name: Optional[str] = None,
-        networks: List[
-            python_on_whales.components.network.cli_wrapper.ValidNetwork
-        ] = [],
+        networks: List[python_on_whales.components.network.cli_wrapper.ValidNetwork] = [],
         network_aliases: List[str] = [],
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
@@ -734,9 +722,7 @@ class ContainerCLI(DockerCLICaller):
         user: Optional[str] = None,
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
+        volumes: Optional[List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]] = [],
         volume_driver: Optional[str] = None,
         volumes_from: List[ValidContainer] = [],
         workdir: Optional[ValidPath] = None,
@@ -757,9 +743,7 @@ class ContainerCLI(DockerCLICaller):
         The arguments are the same as [`docker.run`](#run).
         """
 
-        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
-            self.client_config
-        )
+        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(self.client_config)
         if pull == "missing":
             image_cli._pull_if_necessary(image)
         elif pull == "always":
@@ -822,9 +806,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
         full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
         full_cmd.add_simple_arg("--health-retries", health_retries)
-        full_cmd.add_simple_arg(
-            "--health-start-period", to_seconds(health_start_period)
-        )
+        full_cmd.add_simple_arg("--health-start-period", to_seconds(health_start_period))
         full_cmd.add_simple_arg("--health-timeout", to_seconds(health_timeout))
 
         full_cmd.add_simple_arg("--hostname", hostname)
@@ -1016,20 +998,16 @@ class ContainerCLI(DockerCLICaller):
 
         if interactive and stream:
             raise ValueError(
-                "You can't set interactive=True and stream=True at the same"
-                "time. Their purpose are not compatible."
+                "You can't set interactive=True and stream=True at the same" "time. Their purpose are not compatible."
             )
 
         if tty and stream:
             raise ValueError(
-                "You can't set tty=True and stream=True at the same"
-                "time. Their purpose are not compatible."
+                "You can't set tty=True and stream=True at the same" "time. Their purpose are not compatible."
             )
 
         if detach and stream:
-            raise ValueError(
-                "You can't detach and stream at the same time. It's not compatible."
-            )
+            raise ValueError("You can't detach and stream at the same time. It's not compatible.")
 
         full_cmd.add_flag("--interactive", interactive)
         full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
@@ -1100,16 +1078,12 @@ class ContainerCLI(DockerCLICaller):
             run(full_cmd)
 
     @overload
-    def inspect(self, x: ValidContainer, /) -> Container:
-        ...
+    def inspect(self, x: ValidContainer, /) -> Container: ...
 
     @overload
-    def inspect(self, x: List[ValidContainer], /) -> List[Container]:
-        ...
+    def inspect(self, x: List[ValidContainer], /) -> List[Container]: ...
 
-    def inspect(
-        self, x: Union[ValidContainer, List[ValidContainer]], /
-    ) -> Union[Container, List[Container]]:
+    def inspect(self, x: Union[ValidContainer, List[ValidContainer]], /) -> Union[Container, List[Container]]:
         """Returns a container object from a name or ID.
 
         Parameters:
@@ -1231,9 +1205,7 @@ class ContainerCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def list(
-        self, all: bool = False, filters: DockerContainerListFilters = {}
-    ) -> List[Container]:
+    def list(self, all: bool = False, filters: DockerContainerListFilters = {}) -> List[Container]:
         """List the containers on the host.
 
         Alias: `docker.ps(...)`
@@ -1251,10 +1223,7 @@ class ContainerCLI(DockerCLICaller):
 
         # TODO: add a test for the fix of is_immutable_id, without it, we get
         # race conditions (we read the attributes of a container but it might not exist.
-        return [
-            Container(self.client_config, x, is_immutable_id=True)
-            for x in run(full_cmd).splitlines()
-        ]
+        return [Container(self.client_config, x, is_immutable_id=True) for x in run(full_cmd).splitlines()]
 
     def pause(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
         """Pauses one or more containers
@@ -1281,16 +1250,14 @@ class ContainerCLI(DockerCLICaller):
         self,
         filters: Dict[str, str] = {},
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def prune(
         self,
         filters: Dict[str, str] = {},
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def prune(
         self,
@@ -1402,7 +1369,7 @@ class ContainerCLI(DockerCLICaller):
         def run(
             self,
             image: python_on_whales.components.image.cli_wrapper.ValidImage,
-            command: List[str] = [],
+            command: List[str] = ...,
             *,
             detach: Literal[True],
             stream: bool = ...,
@@ -1413,7 +1380,7 @@ class ContainerCLI(DockerCLICaller):
         def run(
             self,
             image: python_on_whales.components.image.cli_wrapper.ValidImage,
-            command: List[str] = [],
+            command: List[str] = ...,
             *,
             detach: Literal[False] = ...,
             stream: Literal[True],
@@ -1424,7 +1391,7 @@ class ContainerCLI(DockerCLICaller):
         def run(
             self,
             image: python_on_whales.components.image.cli_wrapper.ValidImage,
-            command: List[str] = [],
+            command: List[str] = ...,
             *,
             detach: Literal[False] = ...,
             stream: Literal[False] = ...,
@@ -1498,9 +1465,7 @@ class ContainerCLI(DockerCLICaller):
         memory_swappiness: Optional[int] = None,
         mounts: List[List[str]] = [],
         name: Optional[str] = None,
-        networks: List[
-            python_on_whales.components.network.cli_wrapper.ValidNetwork
-        ] = [],
+        networks: List[python_on_whales.components.network.cli_wrapper.ValidNetwork] = [],
         network_aliases: List[str] = [],
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
@@ -1532,9 +1497,7 @@ class ContainerCLI(DockerCLICaller):
         user: Optional[str] = None,
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
+        volumes: Optional[List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]] = [],
         volume_driver: Optional[str] = None,
         volumes_from: List[ValidContainer] = [],
         workdir: Optional[ValidPath] = None,
@@ -1721,9 +1684,7 @@ class ContainerCLI(DockerCLICaller):
                 )
             raise TypeError(error_message)
 
-        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
-            self.client_config
-        )
+        image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(self.client_config)
         if pull == "missing":
             image_cli._pull_if_necessary(image)
         elif pull == "always":
@@ -1786,9 +1747,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
         full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
         full_cmd.add_simple_arg("--health-retries", health_retries)
-        full_cmd.add_simple_arg(
-            "--health-start-period", to_seconds(health_start_period)
-        )
+        full_cmd.add_simple_arg("--health-start-period", to_seconds(health_start_period))
         full_cmd.add_simple_arg("--health-timeout", to_seconds(health_timeout))
 
         full_cmd.add_simple_arg("--hostname", hostname)
@@ -1882,10 +1841,7 @@ class ContainerCLI(DockerCLICaller):
 
         if detach:
             if stream:
-                raise ValueError(
-                    "It's not possible to stream and detach a container at "
-                    "the same time."
-                )
+                raise ValueError("It's not possible to stream and detach a container at " "the same time.")
 
         if preserve_fds:
             # Pass through additional file descriptors (as well as 0-2,
@@ -2126,16 +2082,12 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def wait(self, x: ValidContainer) -> int:
-        ...
+    def wait(self, x: ValidContainer) -> int: ...
 
     @overload
-    def wait(self, x: List[ValidContainer]) -> List[int]:
-        ...
+    def wait(self, x: List[ValidContainer]) -> List[int]: ...
 
-    def wait(
-        self, x: Union[ValidContainer, List[ValidContainer]]
-    ) -> Union[int, List[int]]:
+    def wait(self, x: Union[ValidContainer, List[ValidContainer]]) -> Union[int, List[int]]:
         """Block until one or more containers stop, then returns their exit codes
 
         Alias: `docker.wait(...)`
@@ -2192,29 +2144,17 @@ class ContainerStats:
         """Takes a json_dict with container stats from the CLI and
         parses it.
         """
-        self.block_read: int = custom_parse_object_as(
-            pydantic.ByteSize, json_dict["BlockIO"].split("/")[0]
-        )
-        self.block_write: int = custom_parse_object_as(
-            pydantic.ByteSize, json_dict["BlockIO"].split("/")[1]
-        )
+        self.block_read: int = custom_parse_object_as(pydantic.ByteSize, json_dict["BlockIO"].split("/")[0])
+        self.block_write: int = custom_parse_object_as(pydantic.ByteSize, json_dict["BlockIO"].split("/")[1])
         self.cpu_percentage: float = float(json_dict["CPUPerc"][:-1])
         self.container: str = json_dict["Container"]
         self.container_id: str = json_dict["ID"]
         self.memory_percentage: float = float(json_dict["MemPerc"][:-1])
-        self.memory_used: int = custom_parse_object_as(
-            pydantic.ByteSize, json_dict["MemUsage"].split("/")[0]
-        )
-        self.memory_limit: int = custom_parse_object_as(
-            pydantic.ByteSize, json_dict["MemUsage"].split("/")[1]
-        )
+        self.memory_used: int = custom_parse_object_as(pydantic.ByteSize, json_dict["MemUsage"].split("/")[0])
+        self.memory_limit: int = custom_parse_object_as(pydantic.ByteSize, json_dict["MemUsage"].split("/")[1])
         self.container_name: str = json_dict["Name"]
-        self.net_upload: int = custom_parse_object_as(
-            pydantic.ByteSize, json_dict["NetIO"].split("/")[0]
-        )
-        self.net_download: int = custom_parse_object_as(
-            pydantic.ByteSize, json_dict["NetIO"].split("/")[1]
-        )
+        self.net_upload: int = custom_parse_object_as(pydantic.ByteSize, json_dict["NetIO"].split("/")[0])
+        self.net_download: int = custom_parse_object_as(pydantic.ByteSize, json_dict["NetIO"].split("/")[1])
 
     def __repr__(self):
         attr = ", ".join(f"{key}={value}" for key, value in self.__dict__.items())
