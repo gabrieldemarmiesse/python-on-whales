@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-on-whales"
-version = "0.70.1"
+version = "0.71.0"
 description = "A Docker client for Python, designed to be fun and intuitive!"
 readme = "README.md"
 license = { file = "LICENSE" }
