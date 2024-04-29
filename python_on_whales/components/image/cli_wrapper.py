@@ -146,7 +146,7 @@ class Image(ReloadableObjectFromJson):
     def remove(self, force: bool = False, prune: bool = True):
         """Remove this Docker image.
 
-        See the [`docker.image.remove`](../sub-commands/container.md#remove) command for
+        See the [`docker.image.remove`](../sub-commands/image.md#python_on_whales.components.image.cli_wrapper.ImageCLI.remove) command for
         information about the arguments.
         """
         ImageCLI(self.client_config).remove(self, force, prune)
@@ -154,7 +154,7 @@ class Image(ReloadableObjectFromJson):
     def save(self, output: Optional[ValidPath] = None) -> Optional[Iterator[bytes]]:
         """Saves this Docker image in a tar.
 
-        See the [`docker.image.save`](../sub-commands/container.md#save) command for
+        See the [`docker.image.save`](../sub-commands/image.md#python_on_whales.components.image.cli_wrapper.ImageCLI.save) command for
         information about the arguments.
         """
         return ImageCLI(self.client_config).save(self, output)
@@ -162,7 +162,7 @@ class Image(ReloadableObjectFromJson):
     def tag(self, new_tag: str) -> None:
         """Add a tag to a Docker image.
 
-        See the [`docker.image.tag`](../sub-commands/container.md#tag) command for
+        See the [`docker.image.tag`](../sub-commands/image.md#python_on_whales.components.image.cli_wrapper.ImageCLI.tag) command for
         information about the arguments.
         """
         return ImageCLI(self.client_config).tag(self, new_tag)
