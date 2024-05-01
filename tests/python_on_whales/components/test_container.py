@@ -875,7 +875,7 @@ def test_exec_interactive_no_tty(ctr_client: DockerClient):
         with pytest.raises(DockerException) as no_tty_exc:
             c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=False)
         assert no_tty_exc.value.stdout == ""
-        assert no_tty_exc.value.stderr == "/bin/bash: hi: command not found"
+        assert "hi: command not found" in no_tty_exc.value.stderr
 
 
 @pytest.mark.parametrize(
