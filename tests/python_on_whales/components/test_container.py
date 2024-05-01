@@ -872,11 +872,12 @@ def test_exec_change_directory(ctr_client: DockerClient):
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_exec_interactive_and_tty(ctr_client: DockerClient):
     with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
-        no_tty =  c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=False)
-        tty =  c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=True)
+        no_tty = c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=False)
+        tty = c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=True)
 
         assert no_tty == ""
         assert tty == "/bin/bash: hi: command not found"
+
 
 @pytest.mark.parametrize(
     "method",
