@@ -876,7 +876,7 @@ def test_exec_interactive_and_tty(ctr_client: DockerClient):
         tty =  c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=True)
 
         assert no_tty == ""
-        assert tty == "bash: hi: command not found"
+        assert tty == "/bin/bash: hi: command not found"
 
 @pytest.mark.parametrize(
     "method",
