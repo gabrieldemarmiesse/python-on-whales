@@ -4,6 +4,7 @@ import sys
 from typing import List, Optional
 
 import pydantic
+
 if sys.version_info >= (3, 9):
     from typing import Annotated
 else:
