@@ -56,6 +56,8 @@ from python_on_whales.utils import (
 
 if sys.version_info >= (3, 11):
     from typing import Unpack
+else:
+    from typing_extensions import Unpack
 
 DockerContainerListFilters = TypedDict(
     "DockerContainerListFilters",
@@ -1398,151 +1400,50 @@ class ContainerCLI(DockerCLICaller):
 
         run(full_cmd)
 
-    if sys.version_info >= (3, 11):
+    @overload
+    def run(
+        self,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
+        command: List[str] = ...,
+        *,
+        detach: Literal[True],
+        stream: bool = ...,
+        **kwargs: Unpack[RunArgs],
+    ) -> Container:
+        ...
 
-        @overload
-        def run(
-            self,
-            image: python_on_whales.components.image.cli_wrapper.ValidImage,
-            command: List[str] = ...,
-            *,
-            detach: Literal[True],
-            stream: bool = ...,
-            **kwargs: Unpack[RunArgs],
-        ) -> Container:
-            ...
+    @overload
+    def run(
+        self,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
+        command: List[str] = ...,
+        *,
+        detach: Literal[False] = ...,
+        stream: Literal[True],
+        **kwargs: Unpack[RunArgs],
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
 
-        @overload
-        def run(
-            self,
-            image: python_on_whales.components.image.cli_wrapper.ValidImage,
-            command: List[str] = ...,
-            *,
-            detach: Literal[False] = ...,
-            stream: Literal[True],
-            **kwargs: Unpack[RunArgs],
-        ) -> Iterable[Tuple[str, bytes]]:
-            ...
-
-        @overload
-        def run(
-            self,
-            image: python_on_whales.components.image.cli_wrapper.ValidImage,
-            command: List[str] = ...,
-            *,
-            detach: Literal[False] = ...,
-            stream: Literal[False] = ...,
-            **kwargs: Unpack[RunArgs],
-        ) -> str:
-            ...
+    @overload
+    def run(
+        self,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
+        command: List[str] = ...,
+        *,
+        detach: Literal[False] = ...,
+        stream: Literal[False] = ...,
+        **kwargs: Unpack[RunArgs],
+    ) -> str:
+        ...
 
     def run(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
         command: List[str] = [],
         *,
-        add_hosts: List[Tuple[str, str]] = [],
-        blkio_weight: Optional[int] = None,
-        blkio_weight_device: List[str] = [],
-        cap_add: List[str] = [],
-        cap_drop: List[str] = [],
-        cgroup_parent: Optional[str] = None,
-        cgroupns: Optional[str] = None,
-        cidfile: Optional[ValidPath] = None,
-        cpu_period: Optional[int] = None,
-        cpu_quota: Optional[int] = None,
-        cpu_rt_period: Optional[int] = None,
-        cpu_rt_runtime: Optional[int] = None,
-        cpu_shares: Optional[int] = None,
-        cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
-        detach: bool = False,
-        devices: List[str] = [],
-        device_cgroup_rules: List[str] = [],
-        device_read_bps: List[str] = [],
-        device_read_iops: List[str] = [],
-        device_write_bps: List[str] = [],
-        device_write_iops: List[str] = [],
-        content_trust: bool = False,
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
-        domainname: Optional[str] = None,
-        entrypoint: Optional[str] = None,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
-        env_host: bool = False,
-        expose: Union[int, List[int]] = [],
-        gpus: Union[int, str, None] = None,
-        groups_add: List[str] = [],
-        healthcheck: bool = True,
-        health_cmd: Optional[str] = None,
-        health_interval: Union[None, int, timedelta] = None,
-        health_retries: Optional[int] = None,
-        health_start_period: Union[None, int, timedelta] = None,
-        health_timeout: Union[None, int, timedelta] = None,
-        hostname: Optional[str] = None,
-        init: bool = False,
-        interactive: bool = False,
-        ip: Optional[str] = None,
-        ip6: Optional[str] = None,
-        ipc: Optional[str] = None,
-        isolation: Optional[str] = None,
-        kernel_memory: Union[int, str, None] = None,
-        labels: Dict[str, str] = {},
-        label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
-        link_local_ip: List[str] = [],
-        log_driver: Optional[str] = None,
-        log_options: List[str] = [],
-        mac_address: Optional[str] = None,
-        memory: Union[int, str, None] = None,
-        memory_reservation: Union[int, str, None] = None,
-        memory_swap: Union[int, str, None] = None,
-        memory_swappiness: Optional[int] = None,
-        mounts: List[List[str]] = [],
-        name: Optional[str] = None,
-        networks: List[
-            python_on_whales.components.network.cli_wrapper.ValidNetwork
-        ] = [],
-        network_aliases: List[str] = [],
-        oom_kill: bool = True,
-        oom_score_adj: Optional[int] = None,
-        pid: Optional[str] = None,
-        pids_limit: Optional[int] = None,
-        platform: Optional[str] = None,
-        preserve_fds: Optional[int] = None,
-        privileged: bool = False,
-        publish: List[ValidPortMapping] = [],
-        publish_all: bool = False,
-        pull: str = "missing",
-        read_only: bool = False,
-        restart: Optional[str] = None,
-        remove: bool = False,
-        runtime: Optional[str] = None,
-        security_options: List[str] = [],
-        shm_size: Union[int, str, None] = None,
-        sig_proxy: bool = True,
-        stop_signal: Optional[Union[int, str]] = None,
-        stop_timeout: Optional[int] = None,
-        storage_options: List[str] = [],
+        detach: bool = False
         stream: bool = False,
-        sysctl: Dict[str, str] = {},
-        systemd: Optional[Union[bool, Literal["always"]]] = None,
-        tmpfs: List[ValidPath] = [],
-        tty: bool = False,
-        tz: Optional[str] = None,
-        ulimit: List[str] = [],
-        user: Optional[str] = None,
-        userns: Optional[str] = None,
-        uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
-        volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
-        workdir: Optional[ValidPath] = None,
+        **kwargs: Unpack[RunArgs],
     ) -> Union[Container, str, Iterable[Tuple[str, bytes]]]:
         """Runs a container
 
@@ -1729,6 +1630,9 @@ class ContainerCLI(DockerCLICaller):
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )
+        pull = kwargs.get("pull", "missing")
+        preserve_fds = kwargs.get("preserve_fds")
+        tty = kwargs.get("tty", False)
         if pull == "missing":
             image_cli._pull_if_necessary(image)
         elif pull == "always":
@@ -1736,151 +1640,151 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd = self.docker_cmd + ["container", "run"]
 
-        add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
+        add_hosts = [f"{host}:{ip}" for host, ip in kwargs.get("add_hosts", ())]
         full_cmd.add_args_list("--add-host", add_hosts)
 
-        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
-        full_cmd.add_args_list("--blkio-weight-device", blkio_weight_device)
+        full_cmd.add_simple_arg("--blkio-weight", kwargs.get("blkio_weight"))
+        full_cmd.add_args_list("--blkio-weight-device", kwargs.get("blkio_weight_device", []))
 
-        full_cmd.add_args_list("--cap-add", cap_add)
-        full_cmd.add_args_list("--cap-drop", cap_drop)
+        full_cmd.add_args_list("--cap-add", kwargs.get("cap_add", []))
+        full_cmd.add_args_list("--cap-drop", kwargs.get("cap_drop", []))
 
-        full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
-        full_cmd.add_simple_arg("--cgroupns", cgroupns)
-        full_cmd.add_simple_arg("--cidfile", cidfile)
+        full_cmd.add_simple_arg("--cgroup-parent", kwargs.get("cgroup_parent"))
+        full_cmd.add_simple_arg("--cgroupns", kwargs.get("cgroupns"))
+        full_cmd.add_simple_arg("--cidfile", kwargs.get("cidfile"))
 
-        full_cmd.add_simple_arg("--cpu-period", cpu_period)
-        full_cmd.add_simple_arg("--cpu-quota", cpu_quota)
-        full_cmd.add_simple_arg("--cpu-rt-period", cpu_rt_period)
-        full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
-        full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
-        full_cmd.add_simple_arg("--cpus", cpus)
-        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
-        full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(cpuset_mems))
+        full_cmd.add_simple_arg("--cpu-period", kwargs.get("cpu_period"))
+        full_cmd.add_simple_arg("--cpu-quota", kwargs.get("cpu_quota"))
+        full_cmd.add_simple_arg("--cpu-rt-period", kwargs.get("cpu_rt_period"))
+        full_cmd.add_simple_arg("--cpu-rt-runtime", kwargs.get("cpu_rt_runtime"))
+        full_cmd.add_simple_arg("--cpu-shares", kwargs.get("cpu_shares"))
+        full_cmd.add_simple_arg("--cpus", kwargs.get("cpus"))
+        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(kwargs.get("cpuset_cpus")))
+        full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(kwargs.get("cpuset_mems")))
 
         full_cmd.add_flag("--detach", detach)
 
-        full_cmd.add_args_list("--device", devices)
-        full_cmd.add_args_list("--device-cgroup-rule", device_cgroup_rules)
-        full_cmd.add_args_list("--device-read-bps", device_read_bps)
-        full_cmd.add_args_list("--device-read-iops", device_read_iops)
-        full_cmd.add_args_list("--device-write-bps", device_write_bps)
-        full_cmd.add_args_list("--device-write-iops", device_write_iops)
+        full_cmd.add_args_list("--device", kwargs.get("devices", []))
+        full_cmd.add_args_list("--device-cgroup-rule", kwargs.get("device_cgroup_rules", []))
+        full_cmd.add_args_list("--device-read-bps", kwargs.get("device_read_bps", []))
+        full_cmd.add_args_list("--device-read-iops", kwargs.get("device_read_iops", []))
+        full_cmd.add_args_list("--device-write-bps", kwargs.get("device_write_bps", []))
+        full_cmd.add_args_list("--device-write-iops", kwargs.get("device_write_iops", []))
 
-        if content_trust:
+        if kwargs.get("content_trust"):
             full_cmd += ["--disable-content-trust", "false"]
 
-        full_cmd.add_args_list("--dns", dns)
-        full_cmd.add_args_list("--dns-option", dns_options)
-        full_cmd.add_args_list("--dns-search", dns_search)
-        full_cmd.add_simple_arg("--domainname", domainname)
+        full_cmd.add_args_list("--dns", kwargs.get("dns", []))
+        full_cmd.add_args_list("--dns-option", kwargs.get("dns_options", []))
+        full_cmd.add_args_list("--dns-search", kwargs.get("dns_search", []))
+        full_cmd.add_simple_arg("--domainname", kwargs.get("domainname"))
 
-        full_cmd.add_simple_arg("--entrypoint", entrypoint)
+        full_cmd.add_simple_arg("--entrypoint", kwargs.get("entrypoint"))
 
-        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
-        full_cmd.add_args_list("--env-file", env_files)
-        full_cmd.add_flag("--env-host", env_host)
+        full_cmd.add_args_list("--env", format_dict_for_cli(kwargs.get("envs", {})))
+        full_cmd.add_args_list("--env-file", kwargs.get("env_files", []))
+        full_cmd.add_flag("--env-host", kwargs.get("env_host", False))
 
-        full_cmd.add_args_list("--expose", expose)
+        full_cmd.add_args_list("--expose", kwargs.get("expose", []))
 
-        full_cmd.add_simple_arg("--gpus", gpus)
+        full_cmd.add_simple_arg("--gpus", kwargs.get("gpus"))
 
-        full_cmd.add_args_list("--group-add", groups_add)
+        full_cmd.add_args_list("--group-add", kwargs.get("groups_add", []))
 
-        full_cmd.add_flag("--no-healthcheck", not healthcheck)
-        full_cmd.add_simple_arg("--health-cmd", health_cmd)
-        full_cmd.add_simple_arg("--health-interval", to_seconds(health_interval))
-        full_cmd.add_simple_arg("--health-retries", health_retries)
+        full_cmd.add_flag("--no-healthcheck", not kwargs.get("healthcheck", True))
+        full_cmd.add_simple_arg("--health-cmd", kwargs.get("health_cmd"))
+        full_cmd.add_simple_arg("--health-interval", to_seconds(kwargs.get("health_interval")))
+        full_cmd.add_simple_arg("--health-retries", kwargs.get("health_retries"))
         full_cmd.add_simple_arg(
-            "--health-start-period", to_seconds(health_start_period)
+            "--health-start-period", to_seconds(kwargs.get("health_start_period"))
         )
-        full_cmd.add_simple_arg("--health-timeout", to_seconds(health_timeout))
+        full_cmd.add_simple_arg("--health-timeout", to_seconds(kwargs.get("health_timeout")))
 
-        full_cmd.add_simple_arg("--hostname", hostname)
+        full_cmd.add_simple_arg("--hostname", kwargs.get("hostname"))
 
-        full_cmd.add_flag("--init", init)
+        full_cmd.add_flag("--init", kwargs.get("init", False))
 
-        full_cmd.add_flag("--interactive", interactive)
+        full_cmd.add_flag("--interactive", kwargs.get("interactive", False))
 
-        full_cmd.add_simple_arg("--ip", ip)
-        full_cmd.add_simple_arg("--ip6", ip6)
-        full_cmd.add_simple_arg("--ipc", ipc)
+        full_cmd.add_simple_arg("--ip", kwargs.get("ip"))
+        full_cmd.add_simple_arg("--ip6", kwargs.get("ip6"))
+        full_cmd.add_simple_arg("--ipc", kwargs.get("ipc"))
 
-        full_cmd.add_simple_arg("--isolation", isolation)
-        full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
+        full_cmd.add_simple_arg("--isolation", kwargs.get("isolation"))
+        full_cmd.add_simple_arg("--kernel-memory", kwargs.get("kernel_memory"))
 
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_args_list("--label-file", label_files)
+        full_cmd.add_args_list("--label", format_dict_for_cli(kwargs.get("labels", {})))
+        full_cmd.add_args_list("--label-file", kwargs.get("label_files", []))
 
-        full_cmd.add_args_list("--link", link)
-        full_cmd.add_args_list("--link-local-ip", link_local_ip)
+        full_cmd.add_args_list("--link", kwargs.get("link", []))
+        full_cmd.add_args_list("--link-local-ip", kwargs.get("link_local_ip", []))
 
-        full_cmd.add_simple_arg("--log-driver", log_driver)
-        full_cmd.add_args_list("--log-opt", log_options)
+        full_cmd.add_simple_arg("--log-driver", kwargs.get("log_driver"))
+        full_cmd.add_args_list("--log-opt", kwargs.get("log_options", []))
 
-        full_cmd.add_simple_arg("--mac-address", mac_address)
+        full_cmd.add_simple_arg("--mac-address", kwargs.get("mac_address"))
 
-        full_cmd.add_simple_arg("--memory", memory)
-        full_cmd.add_simple_arg("--memory-reservation", memory_reservation)
-        full_cmd.add_simple_arg("--memory-swap", memory_swap)
-        full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
+        full_cmd.add_simple_arg("--memory", kwargs.get("memory"))
+        full_cmd.add_simple_arg("--memory-reservation", kwargs.get("memory_reservation"))
+        full_cmd.add_simple_arg("--memory-swap", kwargs.get("memory_swap"))
+        full_cmd.add_simple_arg("--memory-swappiness", kwargs.get("memory_swappiness"))
 
-        mounts = [",".join(x) for x in mounts]
+        mounts = [",".join(x) for x in kwargs.get("mounts", ())]
         full_cmd.add_args_list("--mount", mounts)
-        full_cmd.add_simple_arg("--name", name)
+        full_cmd.add_simple_arg("--name", kwargs.get("name"))
 
-        full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-alias", network_aliases)
+        full_cmd.add_args_list("--network", kwargs.get("networks", []))
+        full_cmd.add_args_list("--network-alias", kwargs.get("network_aliases", []))
 
-        full_cmd.add_flag("--oom-kill-disable", not oom_kill)
-        full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
+        full_cmd.add_flag("--oom-kill-disable", not kwargs.get("oom_kill", True))
+        full_cmd.add_simple_arg("--oom-score-adj", kwargs.get("oom_score_adj"))
 
-        full_cmd.add_simple_arg("--pid", pid)
-        full_cmd.add_simple_arg("--pids-limit", pids_limit)
+        full_cmd.add_simple_arg("--pid", kwargs.get("pid"))
+        full_cmd.add_simple_arg("--pids-limit", kwargs.get("pids_limit"))
 
-        full_cmd.add_simple_arg("--platform", platform)
+        full_cmd.add_simple_arg("--platform", kwargs.get("platform"))
         full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
-        full_cmd.add_flag("--privileged", privileged)
+        full_cmd.add_flag("--privileged", kwargs.get("privileged"))
 
-        full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
-        full_cmd.add_flag("--publish-all", publish_all)
+        full_cmd.add_args_list("-p", [format_port_arg(p) for p in kwargs.get("publish", ())])
+        full_cmd.add_flag("--publish-all", kwargs.get("publish_all", False))
 
         if pull == "never":
             full_cmd.add_simple_arg("--pull", "never")
 
-        full_cmd.add_flag("--read-only", read_only)
-        full_cmd.add_simple_arg("--restart", restart)
-        full_cmd.add_flag("--rm", remove)
+        full_cmd.add_flag("--read-only", kwargs.get("read_only", False))
+        full_cmd.add_simple_arg("--restart", kwargs.get("restart"))
+        full_cmd.add_flag("--rm", kwargs.get("remove", False))
 
-        full_cmd.add_simple_arg("--runtime", runtime)
-        full_cmd.add_args_list("--security-opt", security_options)
+        full_cmd.add_simple_arg("--runtime", kwargs.get("runtime"))
+        full_cmd.add_args_list("--security-opt", kwargs.get("security_options", []))
 
-        full_cmd.add_simple_arg("--shm-size", shm_size)
-        if sig_proxy is False:
+        full_cmd.add_simple_arg("--shm-size", kwargs.get("shm_size"))
+        if kwargs.get("sig_proxy", True) is False:
             full_cmd += ["--sig-proxy", "false"]
 
-        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
-        full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
+        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(kwargs.get("stop_signal")))
+        full_cmd.add_simple_arg("--stop-timeout", kwargs.get("stop_timeout"))
 
-        full_cmd.add_args_list("--storage-opt", storage_options)
-        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
-        full_cmd.add_simple_arg("--systemd", systemd)
-        full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_args_list("--storage-opt", kwargs.get("storage_options", []))
+        full_cmd.add_args_list("--sysctl", format_dict_for_cli(kwargs.get("sysctl", {})))
+        full_cmd.add_simple_arg("--systemd", kwargs.get("systemd"))
+        full_cmd.add_args_list("--tmpfs", kwargs.get("tmpfs", []))
         full_cmd.add_flag("--tty", tty)
-        full_cmd.add_simple_arg("--tz", tz)
-        full_cmd.add_args_list("--ulimit", ulimit)
+        full_cmd.add_simple_arg("--tz", kwargs.get("tz"))
+        full_cmd.add_args_list("--ulimit", kwargs.get("ulimit", []))
 
-        full_cmd.add_simple_arg("--user", user)
-        full_cmd.add_simple_arg("--userns", userns)
-        full_cmd.add_simple_arg("--uts", uts)
+        full_cmd.add_simple_arg("--user", kwargs.get("user"))
+        full_cmd.add_simple_arg("--userns", kwargs.get("userns"))
+        full_cmd.add_simple_arg("--uts", kwargs.get("uts"))
 
-        for volume_definition in volumes:
+        for volume_definition in kwargs.get("volumes", ()):
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
-        full_cmd.add_simple_arg("--volume-driver", volume_driver)
-        full_cmd.add_args_list("--volumes-from", volumes_from)
+        full_cmd.add_simple_arg("--volume-driver", kwargs.get("volume_driver"))
+        full_cmd.add_args_list("--volumes-from", kwargs.get("volumes_from", []))
 
-        full_cmd.add_simple_arg("--workdir", workdir)
+        full_cmd.add_simple_arg("--workdir", kwargs.get("workdir"))
 
         full_cmd.append(image)
         full_cmd += command
