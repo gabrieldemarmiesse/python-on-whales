@@ -1,8 +1,13 @@
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
-from typing_extensions import Annotated
+
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
 
 
 class ServicePlacement(BaseModel):

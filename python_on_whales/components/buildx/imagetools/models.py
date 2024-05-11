@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import sys
 from typing import List, Optional
 
 import pydantic
-from typing_extensions import Annotated
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
 
 
 class ManifestConfig(pydantic.BaseModel):

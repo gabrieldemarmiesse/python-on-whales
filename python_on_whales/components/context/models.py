@@ -1,9 +1,14 @@
+import sys
 from typing import Dict, Optional
 
 import pydantic
-from typing_extensions import Annotated
 
 from python_on_whales.utils import DockerCamelModel
+
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
 
 
 class ContextEndpoint(DockerCamelModel):
