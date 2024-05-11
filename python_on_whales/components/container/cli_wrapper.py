@@ -1644,7 +1644,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--add-host", add_hosts)
 
         full_cmd.add_simple_arg("--blkio-weight", kwargs.get("blkio_weight"))
-        full_cmd.add_args_list("--blkio-weight-device", kwargs.get("blkio_weight_device", []))
+        full_cmd.add_args_list(
+            "--blkio-weight-device", kwargs.get("blkio_weight_device", [])
+        )
 
         full_cmd.add_args_list("--cap-add", kwargs.get("cap_add", []))
         full_cmd.add_args_list("--cap-drop", kwargs.get("cap_drop", []))
@@ -1659,17 +1661,25 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cpu-rt-runtime", kwargs.get("cpu_rt_runtime"))
         full_cmd.add_simple_arg("--cpu-shares", kwargs.get("cpu_shares"))
         full_cmd.add_simple_arg("--cpus", kwargs.get("cpus"))
-        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(kwargs.get("cpuset_cpus")))
-        full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(kwargs.get("cpuset_mems")))
+        full_cmd.add_simple_arg(
+            "--cpuset-cpus", join_if_not_none(kwargs.get("cpuset_cpus"))
+        )
+        full_cmd.add_simple_arg(
+            "--cpuset-mems", join_if_not_none(kwargs.get("cpuset_mems"))
+        )
 
         full_cmd.add_flag("--detach", detach)
 
         full_cmd.add_args_list("--device", kwargs.get("devices", []))
-        full_cmd.add_args_list("--device-cgroup-rule", kwargs.get("device_cgroup_rules", []))
+        full_cmd.add_args_list(
+            "--device-cgroup-rule", kwargs.get("device_cgroup_rules", [])
+        )
         full_cmd.add_args_list("--device-read-bps", kwargs.get("device_read_bps", []))
         full_cmd.add_args_list("--device-read-iops", kwargs.get("device_read_iops", []))
         full_cmd.add_args_list("--device-write-bps", kwargs.get("device_write_bps", []))
-        full_cmd.add_args_list("--device-write-iops", kwargs.get("device_write_iops", []))
+        full_cmd.add_args_list(
+            "--device-write-iops", kwargs.get("device_write_iops", [])
+        )
 
         if kwargs.get("content_trust"):
             full_cmd += ["--disable-content-trust", "false"]
@@ -1693,12 +1703,16 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--no-healthcheck", not kwargs.get("healthcheck", True))
         full_cmd.add_simple_arg("--health-cmd", kwargs.get("health_cmd"))
-        full_cmd.add_simple_arg("--health-interval", to_seconds(kwargs.get("health_interval")))
+        full_cmd.add_simple_arg(
+            "--health-interval", to_seconds(kwargs.get("health_interval"))
+        )
         full_cmd.add_simple_arg("--health-retries", kwargs.get("health_retries"))
         full_cmd.add_simple_arg(
             "--health-start-period", to_seconds(kwargs.get("health_start_period"))
         )
-        full_cmd.add_simple_arg("--health-timeout", to_seconds(kwargs.get("health_timeout")))
+        full_cmd.add_simple_arg(
+            "--health-timeout", to_seconds(kwargs.get("health_timeout"))
+        )
 
         full_cmd.add_simple_arg("--hostname", kwargs.get("hostname"))
 
@@ -1725,7 +1739,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--mac-address", kwargs.get("mac_address"))
 
         full_cmd.add_simple_arg("--memory", kwargs.get("memory"))
-        full_cmd.add_simple_arg("--memory-reservation", kwargs.get("memory_reservation"))
+        full_cmd.add_simple_arg(
+            "--memory-reservation", kwargs.get("memory_reservation")
+        )
         full_cmd.add_simple_arg("--memory-swap", kwargs.get("memory_swap"))
         full_cmd.add_simple_arg("--memory-swappiness", kwargs.get("memory_swappiness"))
 
@@ -1746,7 +1762,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
         full_cmd.add_flag("--privileged", kwargs.get("privileged"))
 
-        full_cmd.add_args_list("-p", [format_port_arg(p) for p in kwargs.get("publish", ())])
+        full_cmd.add_args_list(
+            "-p", [format_port_arg(p) for p in kwargs.get("publish", ())]
+        )
         full_cmd.add_flag("--publish-all", kwargs.get("publish_all", False))
 
         if pull == "never":
@@ -1763,11 +1781,15 @@ class ContainerCLI(DockerCLICaller):
         if kwargs.get("sig_proxy", True) is False:
             full_cmd += ["--sig-proxy", "false"]
 
-        full_cmd.add_simple_arg("--stop-signal", format_signal_arg(kwargs.get("stop_signal")))
+        full_cmd.add_simple_arg(
+            "--stop-signal", format_signal_arg(kwargs.get("stop_signal"))
+        )
         full_cmd.add_simple_arg("--stop-timeout", kwargs.get("stop_timeout"))
 
         full_cmd.add_args_list("--storage-opt", kwargs.get("storage_options", []))
-        full_cmd.add_args_list("--sysctl", format_dict_for_cli(kwargs.get("sysctl", {})))
+        full_cmd.add_args_list(
+            "--sysctl", format_dict_for_cli(kwargs.get("sysctl", {}))
+        )
         full_cmd.add_simple_arg("--systemd", kwargs.get("systemd"))
         full_cmd.add_args_list("--tmpfs", kwargs.get("tmpfs", []))
         full_cmd.add_flag("--tty", tty)
