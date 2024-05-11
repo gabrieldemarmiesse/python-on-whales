@@ -1441,7 +1441,7 @@ class ContainerCLI(DockerCLICaller):
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
         command: List[str] = [],
         *,
-        detach: bool = False
+        detach: bool = False,
         stream: bool = False,
         **kwargs: Unpack[RunArgs],
     ) -> Union[Container, str, Iterable[Tuple[str, bytes]]]:
