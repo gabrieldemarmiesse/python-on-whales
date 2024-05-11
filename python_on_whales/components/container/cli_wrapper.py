@@ -632,6 +632,7 @@ class ContainerCLI(DockerCLICaller):
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
+        tz: Optional[str] = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -798,6 +799,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
+        full_cmd.add_simple_arg("--tz", tz)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
@@ -851,6 +853,7 @@ class ContainerCLI(DockerCLICaller):
         workdir: Optional[ValidPath] = None,
         stream: bool = False,
         detach_keys: Optional[str] = None,
+        preserve_fds: Optional[int] = None,
     ) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Execute a command inside a container
 
@@ -867,6 +870,8 @@ class ContainerCLI(DockerCLICaller):
                 to allow communication with the parent process.
                 Currently only works with `tty=True` for interactive use
                 on the terminal.
+            preserve_fds: The number of additional file descriptors to pass
+                through to the container. Only supported by podman.
             privileged: Give extended privileges to the container.
             tty: Allocate a pseudo-TTY. Allow the process to access your terminal
                 to write on it.
@@ -931,6 +936,7 @@ class ContainerCLI(DockerCLICaller):
             )
 
         full_cmd.add_flag("--interactive", interactive)
+        full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
         full_cmd.add_flag("--privileged", privileged)
         full_cmd.add_flag("--tty", tty)
 
@@ -940,10 +946,18 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.append(container)
         for arg in to_list(command):
             full_cmd.append(arg)
-        if stream:
-            return stream_stdout_and_stderr(full_cmd)
+
+        if preserve_fds:
+            # Pass through additional file descriptors (as well as 0-2,
+            # stdin, stdout, stderr, which are handled separately by the
+            # container runtime). See the podman documentation.
+            pass_fds = range(3, 3 + preserve_fds)
         else:
-            result = run(full_cmd, tty=tty)
+            pass_fds = ()
+        if stream:
+            return stream_stdout_and_stderr(full_cmd, pass_fds=pass_fds)
+        else:
+            result = run(full_cmd, tty=tty, pass_fds=pass_fds)
             if detach:
                 return None
             else:
@@ -1363,6 +1377,7 @@ class ContainerCLI(DockerCLICaller):
         pids_limit: Optional[int] = None,
         platform: Optional[str] = None,
         pod: Optional[python_on_whales.components.pod.cli_wrapper.ValidPod] = None,
+        preserve_fds: Optional[int] = None,
         privileged: bool = False,
         publish: List[ValidPortMapping] = [],
         publish_all: bool = False,
@@ -1382,6 +1397,7 @@ class ContainerCLI(DockerCLICaller):
         systemd: Optional[Union[bool, Literal["always"]]] = None,
         tmpfs: List[ValidPath] = [],
         tty: bool = False,
+        tz: Optional[str] = None,
         ulimit: List[str] = [],
         user: Optional[str] = None,
         userns: Optional[str] = None,
@@ -1522,6 +1538,8 @@ class ContainerCLI(DockerCLICaller):
             pids_limit: Tune container pids limit (set `-1` for unlimited)
             platform: Set platform if server is multi-platform capable.
             pod: Create the container in an existing pod (only supported with podman).
+            preserve_fds: The number of additional file descriptors to pass
+                through to the container. Only supported by podman.
             privileged: Give extended privileges to this container.
             publish: Ports to publish, same as the `-p` argument in the Docker CLI.
                 example are `[(8000, 7000) , ("127.0.0.1:3000", 2000)]` or
@@ -1543,6 +1561,9 @@ class ContainerCLI(DockerCLICaller):
                 https://docs.podman.io/en/latest/markdown/podman-run.1.html#systemd-true-false-always
             tty: Allocate a pseudo-TTY. Allow the process to access your terminal
                 to write on it.
+            tz: Set timezone in container, or `local` to match the host's timezone.
+                See `/usr/share/zoneinfo/` for valid timezones.
+                Note: This option is only known to apply to Podman containers.
             user: Username or UID (format: `<name|uid>[:<group|gid>]`)
             userns:  User namespace to use
             uts:  UTS namespace to use
@@ -1685,6 +1706,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.add_simple_arg("--pod", pod)
+        full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
         full_cmd.add_flag("--privileged", privileged)
 
         full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
@@ -1712,6 +1734,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_list("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
+        full_cmd.add_simple_arg("--tz", tz)
         full_cmd.add_args_list("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
@@ -1735,12 +1758,20 @@ class ContainerCLI(DockerCLICaller):
                     "It's not possible to stream and detach a container at "
                     "the same time."
                 )
-        if detach:
-            return Container(self.client_config, run(full_cmd))
-        elif stream:
-            return stream_stdout_and_stderr(full_cmd)
+
+        if preserve_fds:
+            # Pass through additional file descriptors (as well as 0-2,
+            # stdin, stdout, stderr, which are handled separately by the
+            # container runtime). See the podman documentation.
+            pass_fds = range(3, 3 + preserve_fds)
         else:
-            return run(full_cmd, tty=tty, capture_stderr=False)
+            pass_fds = ()
+        if detach:
+            return Container(self.client_config, run(full_cmd, pass_fds=pass_fds))
+        elif stream:
+            return stream_stdout_and_stderr(full_cmd, pass_fds=pass_fds)
+        else:
+            return run(full_cmd, tty=tty, capture_stderr=False, pass_fds=pass_fds)
 
     def start(
         self,

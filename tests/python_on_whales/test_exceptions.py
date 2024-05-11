@@ -9,7 +9,7 @@ def test_exception_attributes():
         docker.image.tag("wrong::image", "wrong::tag")
 
     exception = excinfo.value
-    assert "The docker command executed was" in str(exception)
+    assert "The command executed was" in str(exception)
     assert exception.docker_command[1:5] == [
         "image",
         "tag",
@@ -28,7 +28,7 @@ def test_not_showing_password_in_exception():
     with pytest.raises(DockerException) as excinfo:
         docker.login(username="ignore_user", password=chosen_password)
     exception = excinfo.value
-    assert "The docker command executed was" in str(exception)
+    assert "The command executed was" in str(exception)
     assert chosen_password not in str(exception)
     assert chosen_password not in exception.docker_command
     assert exception.return_code > 0

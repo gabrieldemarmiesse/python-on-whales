@@ -8,7 +8,7 @@ from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union, overload
 
 import pydantic
 from typing_extensions import Literal
@@ -100,6 +100,7 @@ def run(
     return_stderr: Literal[True] = ...,
     env: Dict[str, str] = ...,
     tty: bool = ...,
+    pass_fds: Sequence[int] = ...,
 ) -> Tuple[str, str]:
     ...
 
@@ -113,6 +114,7 @@ def run(
     return_stderr: Literal[False] = ...,
     env: Dict[str, str] = ...,
     tty: bool = ...,
+    pass_fds: Sequence[int] = ...,
 ) -> str:
     ...
 
@@ -125,6 +127,7 @@ def run(
     return_stderr: bool = False,
     env: Dict[str, str] = {},
     tty: bool = False,
+    pass_fds: Sequence[int] = (),
 ) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
     subprocess_env = dict(os.environ)
@@ -149,7 +152,12 @@ def run(
         print(f"Env: {subprocess_env}")
         print("------------------------------")
     completed_process = subprocess.run(
-        args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=subprocess_env
+        args,
+        input=input,
+        stdout=stdout_dest,
+        stderr=stderr_dest,
+        env=subprocess_env,
+        pass_fds=pass_fds,
     )
 
     if completed_process.returncode != 0:
@@ -264,7 +272,7 @@ def reader(pipe, pipe_name, queue):
 
 
 def stream_stdout_and_stderr(
-    full_cmd: list, env: Dict[str, str] = None
+    full_cmd: list, env: Dict[str, str] = None, pass_fds: Sequence[int] = ()
 ) -> Iterable[Tuple[str, bytes]]:
     if env is None:
         subprocess_env = None
@@ -273,7 +281,9 @@ def stream_stdout_and_stderr(
         subprocess_env.update(env)
 
     full_cmd = list(map(str, full_cmd))
-    process = Popen(full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env)
+    process = Popen(
+        full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env, pass_fds=pass_fds
+    )
     q = Queue()
     full_stderr = b""  # for the error message
     # we use deamon threads to avoid hanging if the user uses ctrl+c

@@ -902,6 +902,7 @@ class ComposeCLI(DockerCLICaller):
         no_attach_services: Union[List[str], str, None] = ...,
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[True] = ...,
+        wait_timeout: Optional[int] = ...,
     ) -> Iterable[Tuple[str, bytes]]:
         ...
 
@@ -927,6 +928,7 @@ class ComposeCLI(DockerCLICaller):
         no_attach_services: Union[List[str], str, None] = ...,
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[False] = ...,
+        wait_timeout: Optional[int] = ...,
     ) -> None:
         ...
 
@@ -951,6 +953,7 @@ class ComposeCLI(DockerCLICaller):
         no_attach_services: Union[List[str], str, None] = None,
         pull: Literal["always", "missing", "never", None] = None,
         stream_logs: bool = False,
+        wait_timeout: Optional[int] = None,
     ):
         """Start the containers.
 
@@ -995,6 +998,7 @@ class ComposeCLI(DockerCLICaller):
                 as bytes, you'll need to call `.decode()` if you want the logs as `str`.
                 See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
                 not familiar with the streaming of logs in Python-on-whales.
+            wait_timeout: Maximum duration to wait for the project to be running|healthy
         """
         if quiet and stream_logs:
             raise ValueError(
@@ -1005,6 +1009,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--wait", wait)
+        full_cmd.add_simple_arg("--wait-timeout", wait_timeout)
         full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
         for service, scale in scales.items():
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")

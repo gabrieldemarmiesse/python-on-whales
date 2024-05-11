@@ -1,3 +1,5 @@
+__all__ = ("download_docker_cli", "get_docker_binary_path_in_cache")
+
 import platform
 import shutil
 import tempfile
@@ -31,6 +33,13 @@ def get_docker_cli_url():
 
 
 def download_docker_cli():
+    warnings.warn(
+        "Downloading the docker client with python-on-whales is being "
+        "deprecated, and this functionality will be removed in v1.0. "
+        "See https://github.com/gabrieldemarmiesse/python-on-whales/issues/556 "
+        "for planned v1.0 changes.",
+        DeprecationWarning,
+    )
     file_to_download = get_docker_cli_url()
 
     extension = file_to_download.split(".")[-1]

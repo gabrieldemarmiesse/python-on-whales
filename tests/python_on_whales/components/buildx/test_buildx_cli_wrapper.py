@@ -47,6 +47,11 @@ def with_container_driver():
 
 
 @pytest.fixture
+def prune_all():
+    docker.buildx.prune(all=True)
+
+
+@pytest.fixture
 def with_oci_layout_compliant_dir(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
 
@@ -644,8 +649,55 @@ def test_bake_stream_logs(monkeypatch):
     assert output[-1].startswith("#")
 
 
-def test_prune():
-    docker.buildx.prune(filters=dict(until="3m"))
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("prune_all")
+def test_prune_all_empty():
+    logs = docker.buildx.prune(all=True, stream_logs=True)
+    logs = list(logs)
+    assert len(logs) == 1  # nothing reclaimable
+    assert logs[0] == "Total:\t0B\n"
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_prune(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(
+            tmp_path, cache_from=dict(type="local", src=tmp_path / "cache")
+        )
+        logs = list(docker.buildx.prune(all=True, stream_logs=True))
+        table_first_row_categories = logs[0]
+        table_total_freed_space = logs[-1]
+        random_row_with_reclaimable = logs[1]
+        assert (
+            table_first_row_categories
+            == "ID\t\t\t\t\t\tRECLAIMABLE\tSIZE\t\tLAST ACCESSED\n"
+        )
+        assert "Total:" in table_total_freed_space
+        assert "true" in random_row_with_reclaimable
+        assert len(logs) >= 2  # table header plus at least one freed file
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_prune_cache_mode_max(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+
+    with docker.buildx.create(driver_options=dict(network="host"), use=True):
+        docker.buildx.build(
+            tmp_path, cache_to=dict(type="local", dest=tmp_path / "cache", mode="max")
+        )
+        logs = list(docker.buildx.prune(all=True, stream_logs=True))
+        table_first_row_categories = logs[0]
+        table_total_freed_space = logs[-1]
+        random_row_with_reclaimable = logs[1]
+        assert (
+            table_first_row_categories
+            == "ID\t\t\t\t\t\tRECLAIMABLE\tSIZE\t\tLAST ACCESSED\n"
+        )
+        assert "Total:" in table_total_freed_space
+        assert "true" in random_row_with_reclaimable
+        assert len(logs) >= 2  # table header plus at least one freed file
 
 
 def test_list():
