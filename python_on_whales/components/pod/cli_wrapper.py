@@ -173,10 +173,10 @@ class Pod(ReloadableObjectFromJson):
 
     def logs(
         self,
-        *,
         container: Optional[
             python_on_whales.components.container.cli_wrapper.ValidContainer
         ] = None,
+        *,
         names: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -255,9 +255,6 @@ ValidPod = Union[str, Pod]
 
 
 class PodCLI(DockerCLICaller):
-    def __init__(self, client_config: ClientConfig):
-        super().__init__(client_config)
-
     def create(
         self,
         name: Optional[str] = None,
@@ -305,7 +302,7 @@ class PodCLI(DockerCLICaller):
         uidmaps: List[Tuple[int, int, int]] = [],
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: Optional[List[VolumeDefinition]] = [],
+        volumes: List[VolumeDefinition] = [],
         volumes_from: List[
             python_on_whales.components.container.cli_wrapper.ValidContainer
         ] = [],
@@ -458,13 +455,15 @@ class PodCLI(DockerCLICaller):
             for x in run(full_cmd).splitlines()
         ]
 
+    ps = list
+
     def logs(
         self,
         pod: ValidPod,
-        *,
         container: Optional[
             python_on_whales.components.container.cli_wrapper.ValidContainer
         ] = None,
+        *,
         names: bool = False,
         since: Union[None, datetime, timedelta] = None,
         tail: Optional[int] = None,
@@ -567,8 +566,6 @@ class PodCLI(DockerCLICaller):
         """Remove pods that are not running."""
         full_cmd = self.docker_cmd + ["pod", "prune", "--force"]
         run(full_cmd)
-
-    ps = list
 
     def remove(
         self,
