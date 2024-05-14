@@ -159,14 +159,14 @@ class Pod(ReloadableObjectFromJson):
     def exists(self) -> bool:
         """Returns `True` if the pod exists and `False` if not.
 
-        See the `docker.pod.exists` command for information about the arguments.
+        See the `podman.pod.exists` command for information about the arguments.
         """
         return PodCLI(self.client_config).exists(self.id)
 
     def kill(self, *, signal: Optional[Union[int, str]] = None) -> None:
         """Kill this pod
 
-        See the [`docker.pod.kill`](../sub-commands/container.md#kill) command for
+        See the [`podman.pod.kill`](../sub-commands/container.md#kill) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).kill(self, signal=signal)
@@ -187,7 +187,7 @@ class Pod(ReloadableObjectFromJson):
     ) -> Union[str, Iterable[Tuple[str, bytes]]]:
         """Returns the logs of the pod containers
 
-        See the [`docker.pod.logs`](../sub-commands/pod.md#logs) command for
+        See the [`podman.pod.logs`](../sub-commands/pod.md#logs) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).logs(
@@ -205,7 +205,7 @@ class Pod(ReloadableObjectFromJson):
     def pause(self) -> None:
         """Pause this pod.
 
-        See the [`docker.pod.pause`](../sub-commands/pod.md#pause) command for
+        See the [`podman.pod.pause`](../sub-commands/pod.md#pause) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).pause(self)
@@ -213,7 +213,7 @@ class Pod(ReloadableObjectFromJson):
     def unpause(self) -> None:
         """Unpause the pod
 
-        See the [`docker.pod.unpause`](../sub-commands/pod.md#unpause) command for
+        See the [`podman.pod.unpause`](../sub-commands/pod.md#unpause) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).unpause(self)
@@ -221,7 +221,7 @@ class Pod(ReloadableObjectFromJson):
     def restart(self) -> None:
         """Restart this pod.
 
-        See the [`docker.pod.restart`](../sub-commands/pod.md#restart) command for
+        See the [`podman.pod.restart`](../sub-commands/pod.md#restart) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).restart(self)
@@ -229,7 +229,7 @@ class Pod(ReloadableObjectFromJson):
     def remove(self, *, force: bool = False, time: Optional[int] = None) -> None:
         """Remove this pod.
 
-        See the [`docker.pod.remove`](../sub-commands/pod.md#remove) command for
+        See the [`podman.pod.remove`](../sub-commands/pod.md#remove) command for
         information about the arguments.
         """
         PodCLI(self.client_config).remove(self, force=force, time=time)
@@ -237,7 +237,7 @@ class Pod(ReloadableObjectFromJson):
     def start(self) -> Union[None, str, Iterable[Tuple[str, bytes]]]:
         """Starts this pod.
 
-        See the [`docker.pod.start`](../sub-commands/pod.md#start) command for
+        See the [`podman.pod.start`](../sub-commands/pod.md#start) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).start(self)
@@ -245,7 +245,7 @@ class Pod(ReloadableObjectFromJson):
     def stop(self, *, time: Optional[int] = None) -> None:
         """Stops this pod.
 
-        See the [`docker.pod.stop`](../sub-commands/pod.md#stop) command for
+        See the [`podman.pod.stop`](../sub-commands/pod.md#stop) command for
         information about the arguments.
         """
         return PodCLI(self.client_config).stop(self, time=time)
@@ -453,7 +453,7 @@ class PodCLI(DockerCLICaller):
     def exists(self, pod: ValidPod) -> bool:
         """Returns `True` if the pod exists. `False` otherwise.
 
-         It's just calling `docker.pod.inspect(...)` and verifies that it doesn't throw
+         It's just calling `podman.pod.inspect(...)` and verifies that it doesn't throw
          a `python_on_whales.exceptions.NoSuchPod`.
 
         # Returns

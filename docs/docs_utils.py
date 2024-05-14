@@ -1,8 +1,11 @@
 import tempfile
 from pathlib import Path
 
-from python_on_whales import docker
+from python_on_whales import DockerClient, docker
 from python_on_whales.exceptions import DockerException
+
+
+podman = DockerClient(client_call=["podman"])
 
 
 def write_code(i: int, attribute_access: str, value) -> str:
@@ -439,17 +442,42 @@ def generate_code_demo_containers():
     return "\n".join(result)
 
 
+def generate_code_demo_pods():
+    result = []
+
+    pod = podman.pod.create("my-pod")
+
+    with pod:
+        to_evaluate = [
+            "pod.id",
+            "pod.name",
+            "pod.created",
+            "pod.state",
+            "pod.num_containers",
+            "pod.infra_container_id",
+            "pod.shared_namespaces",
+            "pod.hostname",
+            "pod.exit_policy",
+        ]
+
+        for i, attribute_access in enumerate(to_evaluate):
+            value = eval(attribute_access)
+            result.append(write_code(i + 5, attribute_access, value))
+
+    return "\n".join(result)
+
+
 def add_links(text):
     text = text.replace(
         "`python_on_whales.Container`",
-        "[`python_on_whales.Container`](/docker_objects/containers/)",
+        "[`python_on_whales.Container`](/objects/containers/)",
     )
 
     return text
 
 
 def add_code_example(destination, markdown_file: str, code: str):
-    path_file = destination / "docker_objects" / markdown_file
+    path_file = destination / "objects" / markdown_file
     path_file.write_text(path_file.read_text().replace("@INSERT_GENERATED_CODE@", code))
     print("added code example for", markdown_file)
 
@@ -464,3 +492,4 @@ def add_all_code_examples(destination):
     add_code_example(destination, "builders.md", generate_code_demo_builders())
     add_code_example(destination, "nodes.md", generate_code_demo_nodes())
     add_code_example(destination, "services.md", generate_code_demo_services())
+    add_code_example(destination, "pods.md", generate_code_demo_pods())
