@@ -4,7 +4,6 @@ from pathlib import Path
 from python_on_whales import DockerClient, docker
 from python_on_whales.exceptions import DockerException
 
-
 podman = DockerClient(client_call=["podman"])
 
 
