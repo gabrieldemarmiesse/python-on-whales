@@ -877,6 +877,15 @@ def test_exec_change_directory(ctr_client: DockerClient):
         assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"
 
 
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_interactive_no_tty(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        with pytest.raises(DockerException) as no_tty_exc:
+            c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=False)
+        assert no_tty_exc.value.stdout == ""
+        assert "hi: command not found" in no_tty_exc.value.stderr
+
+
 @pytest.mark.parametrize(
     "method",
     [

@@ -911,13 +911,6 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_list("--env", format_dict_for_cli(envs))
         full_cmd.add_args_list("--env-file", env_files)
 
-        # TODO: activate interactive and tty
-        if interactive and not tty:
-            raise NotImplementedError(
-                "Currently, docker.container.execute(interactive=True) must have"
-                "tty=True. interactive=True and tty=False is not yet implemented."
-            )
-
         if interactive and stream:
             raise ValueError(
                 "You can't set interactive=True and stream=True at the same"
