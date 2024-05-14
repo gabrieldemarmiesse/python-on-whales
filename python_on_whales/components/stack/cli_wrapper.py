@@ -57,7 +57,7 @@ class StackCLI(DockerCLICaller):
             name: The name of the stack to deploy. Mandatory.
             compose_files: One or more docker-compose files. If there are more than
                 one, they will be fused together.
-                orchestrator: The orchestrator to use, `"swarm" or "kubernetes" or "all".
+            orchestrator: The orchestrator to use, `"swarm" or "kubernetes" or "all".
             prune: Prune services that are no longer referenced
             resolve_image: Query the registry to resolve image digest
                 and supported platforms `"always"|"changed"|"never"` (default `"always"`).
