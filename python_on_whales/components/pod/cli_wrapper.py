@@ -293,6 +293,7 @@ class PodCLI(DockerCLICaller):
         pod_id_file: Optional[ValidPath] = None,
         publish: List[ValidPortMapping] = [],
         replace: bool = False,
+        restart: Optional[str] = None,
         security_options: List[str] = [],
         share: List[str] = [],
         shm_size: Optional[Union[int, str]] = None,
@@ -310,6 +311,92 @@ class PodCLI(DockerCLICaller):
         """Creates a pod, but does not start it.
 
         Start it then with the `.start()` method.
+
+        Parameters:
+            name: The name to set the pod to. If not specified a name is
+                generated.
+            add_hosts: Add a custom host-to-IP mapping (format 'host:ip'), which
+                adds a line to /etc/hosts. Conflicts with the no_hosts option.
+            cgroup_parent: Path to cgroups under which the cgroup for the pod is
+                created. If the path is not absolute, the path is considered to
+                be relative to the cgroups path of the init process.
+            cpus: Set the total number of CPUs delegated to the pod. The default
+                is 0.0 indicating that there is no limit on computation power.
+            cpuset_cpus: CPUs in which to allow execution.
+            devices: List of device names to pass from the host to containers
+                in the pod.
+            device_read_bps: Limit read rate (in bytes per second) from a device
+                (e.g. device_read_bps=/dev/sda:1mb).
+            dns: Set custom DNS servers in the /etc/resolv.conf file that is
+                shared between all containers in the pod.
+            dns_options: Set custom DNS options in the /etc/resolv.conf file
+                that is shared between all containers in the pod.
+            dns_search: Set custom DNS search domains in the /etc/resolv.conf
+                file that is shared between all containers in the pod.
+            exit_policy: Set the exit policy of the pod when the last container
+                exits. Supported policies are 'continue' (default) and 'stop'.
+            gidmaps: GID map for the user namespace. Using this flag runs all
+                containers in the pod with user namespace enabled. It conflicts
+                with the --userns and --subgidname flags.
+            hostname: Set the pod's hostname.
+            infra: Whether to create an infra container and associate it with
+                the pod. An infra container is a lightweight container used to
+                coordinate the shared kernel namespace of a pod.
+            infra_command: Specify the command that is run to start the infra
+                container.
+            infra_conmon_pidfile: Write the pid of the infra container's conmon
+                process to a file.
+            infra_image: The custom image that is used for the infra container.
+            infra_name: The name that is used for the pod's infra container.
+            ip: Specify a static IPv4 address for the pod, for example
+                10.88.64.128. This option can only be used if the pod is joined
+                to only a single network - i.e., network=network-name is used at
+                most once - and if the pod is not joining another container's
+                network namespace via network=container:id. The address must be
+                within the network's IP address pool (default 10.88.0.0/16).
+            ip6: Specify a static IPv6 address for the pod, for example
+                fd46:db93:aa76:ac37::10. This option can only be used if the pod is
+                joined to only a single network (see note on the ip argument).
+                The address must be within the network's IPv6 address pool.
+            labels: Add metadata labels to a pod.
+            label_files: Read in a line-delimited file of labels.
+            mac_address: Pod network interface MAC address
+                (e.g. 92:d0:c6:0a:29:33). This option can only be used if the
+                pod is joined to only a single network (see note on the ip
+                argument).
+            memory: Memory limit for the pod.
+            networks: Specify networks to use for the pod.
+            network_aliases: Add network-scoped aliases for the pod, setting the
+                alias for all networks that the container joins.
+            no_hosts: Do not create /etc/hosts for the pod. This option
+                conflicts with --add-host.
+            pid: Set the PID mode for the pod. The default is to create a
+                private PID namespace for the pod.
+            pod_id_file: Write the pod ID to the specified file.
+            publish: Publish a container's port, or range of ports, within this
+                pod to the host.
+            replace: If another pod with the same name already exists, replace
+                and remove it.
+            restart: Restart policy for containers in the pod.
+            security_options: Security options (AppArmor or SELinux).
+            share: Namespaces to share between containers in the pod.
+            shm_size: Size of /dev/shm.
+            subgidname: Run the container in a new user namespace using the map
+                with name in the /etc/subgid file.
+            subuidname: Run the container in a new user namespace using the map
+                with name in the /etc/subuid file.
+            sysctl: Configure namespaced kernel parameters for all containers in
+                the pod.
+            uidmaps: Run all containers in the pod in a new user namespace using
+                the supplied UID mapping. This option conflicts with the userns
+                and subuidname options.
+            userns: Set the user namespace mode for all the containers in a pod.
+            uts: Set the UTS namespace mode for the pod.
+            volumes: Specify volumes passed to all containers in the pod.
+            volumes_from: Mount volumes from the specified container(s).
+
+        # Returns
+            A `python_on_whales.Pod` object.
         """
         full_cmd = self.docker_cmd + ["pod", "create"]
         full_cmd.add_simple_arg("--name", name)
@@ -347,6 +434,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--pid", pid)
         full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
         full_cmd.add_flag("--replace", replace)
+        full_cmd.add_simple_arg("--restart", restart)
         full_cmd.add_args_list("--security-opt", security_options)
         full_cmd.add_args_list("--share", share)
         full_cmd.add_simple_arg("--shm-size", shm_size)
