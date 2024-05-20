@@ -432,6 +432,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.add_args_list("--network-alias", network_aliases)
         full_cmd.add_flag("--no-hosts", no_hosts)
         full_cmd.add_simple_arg("--pid", pid)
+        full_cmd.add_simple_arg("--pod-id-file", pod_id_file)
         full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
         full_cmd.add_flag("--replace", replace)
         full_cmd.add_simple_arg("--restart", restart)

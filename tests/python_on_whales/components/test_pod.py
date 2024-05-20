@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -103,6 +104,108 @@ def test_kill_with_container(podman_client: DockerClient):
         assert ubuntu_container.state.running is False
     assert not pod.exists()
     assert not ubuntu_container.exists()
+
+
+def test_create_devices_arg(podman_client: DockerClient):
+    # Should skip if podman version is below 4.0 (need to implement
+    # DockerClient.version).
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, devices=["/dev/net/tun"]) as pod:
+        output = podman_client.container.run(
+            "ubuntu", ["find", "/dev/", "-name", "tun"], pod=pod
+        )
+        assert "/dev/net/tun" in output
+
+
+def test_create_dns_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, dns="1.2.3.4") as pod:
+        output = podman_client.container.run(
+            "ubuntu", ["cat", "/etc/resolv.conf"], pod=pod
+        )
+        assert "1.2.3.4" in output
+
+
+def test_create_exit_policy_arg(podman_client: DockerClient):
+    # Should skip if podman version is below 4.2 (need to implement
+    # DockerClient.version).
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, exit_policy="stop") as pod:
+        assert pod.state == "Created"
+        podman_client.container.run("ubuntu", ["true"], pod=pod)
+        assert pod.state == "Exited"
+
+
+def test_create_hostname_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, hostname="myhost") as pod:
+        output = podman_client.container.run(
+            "ubuntu", ["cat", "/etc/hostname"], pod=pod
+        )
+        assert output == "myhost"
+
+
+def test_create_infra_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, infra=False) as pod:
+        podman_client.container.run(
+            "ubuntu", ["sleep", "infinity"], pod=pod, detach=True, stop_timeout=0
+        )
+        assert pod.num_containers == 1
+
+
+def test_create_labels_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, labels={"foo": "bar"}) as pod:
+        assert pod.labels == {"foo": "bar"}
+
+
+def test_create_no_hosts_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, no_hosts=True) as pod:
+        output = podman_client.container.run("ubuntu", ["cat", "/etc/hosts"], pod=pod)
+        assert output == ""
+
+
+def test_create_pod_id_file_arg(podman_client: DockerClient, tmp_path: Path):
+    pod_name = random_name()
+    pod_id_file = tmp_path / "id"
+    with podman_client.pod.create(pod_name, pod_id_file=pod_id_file) as pod:
+        assert pod.id == pod_id_file.read_text().strip()
+
+
+def test_create_replace_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    pod1 = podman_client.pod.create(pod_name)
+    pod1_id = pod1.id
+    with podman_client.pod.create(pod_name, replace=True) as pod2:
+        assert not pod1.exists()
+        assert pod1_id != pod2.id
+
+
+def test_create_share_arg(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, share=[]) as pod:
+        pod.start()  # start the infra container
+        output = podman_client.container.run(
+            "ubuntu", ["readlink", "/proc/self"], pod=pod
+        )
+        assert output == "1"
+    with podman_client.pod.create(pod_name, share=["pid"]) as pod:
+        pod.start()  # start the infra container (PID 1)
+        output = podman_client.container.run(
+            "ubuntu", ["readlink", "/proc/self"], pod=pod
+        )
+        assert re.fullmatch(r"\d+", output) and output != "1"
+
+
+def test_create_shm_size_arg(podman_client: DockerClient):
+    # Should skip if podman version is below 4.2 (need to implement
+    # DockerClient.version).
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name, shm_size=1_024_000) as pod:
+        output = podman_client.container.run("ubuntu", ["findmnt", "/dev/shm"], pod=pod)
+        assert "size=1000k" in output
 
 
 @pytest.mark.parametrize(
