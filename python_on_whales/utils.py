@@ -295,8 +295,21 @@ def stream_stdout_and_stderr(
         raise DockerException(full_cmd, exit_code, stderr=full_stderr)
 
 
-def format_dict_for_cli(dictionary: Dict[str, str], separator="="):
-    return [f"{key}{separator}{value}" for key, value in dictionary.items()]
+def format_dict_for_cli(dictionary: Dict[str, Union[str, List[str]]], separator="=") -> List[str]:
+    result_list = []
+
+    for key, value in dictionary.items():
+        if isinstance(value, str):
+            result_list.append(
+                f"{key}{separator}{value}"
+            )
+        elif isinstance(value, (list, tuple)):
+            result_list.extend(
+                f"{key}{separator}{v}"
+                for v in value
+            )
+
+    return result_list
 
 
 def read_env_file(env_file: Path) -> Dict[str, str]:
