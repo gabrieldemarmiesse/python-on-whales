@@ -70,6 +70,8 @@ def to_docker_camel(string):
             "ipam": "IPAM",
             "tls_info": "TLSInfo",
             "virtual_ips": "VirtualIPs",
+            "default_api_version": "DefaultAPIVersion",
+            "min_api_version": "MinAPIVersion",
         }
         return special_cases[string]
     except KeyError:
