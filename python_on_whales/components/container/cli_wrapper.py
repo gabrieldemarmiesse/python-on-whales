@@ -58,7 +58,7 @@ DockerContainerListFilters = TypedDict(
     {
         "id": str,
         "name": str,
-        "label": str,
+        "label": Union[str, List[str]],
         "exited": int,
         "status": Literal[
             "created", "restarting", "running", "removing", "paused", "exited", "dead"
