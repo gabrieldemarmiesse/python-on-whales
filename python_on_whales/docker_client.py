@@ -51,7 +51,9 @@ class ClientVersion(DockerCamelModel):
     else:
         build_time: Annotated[
             Optional[str],
-            pydantic.Field(validation_alias=pydantic.AliasChoices("BuiltTime")),
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("BuildTime", "BuiltTime")
+            ),
         ] = None
     context: Optional[str] = None
     experimental: Optional[bool] = None
@@ -87,7 +89,9 @@ class ServerVersion(DockerCamelModel):
     else:
         build_time: Annotated[
             Optional[str],
-            pydantic.Field(validation_alias=pydantic.AliasChoices("BuiltTime")),
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("BuildTime", "BuiltTime")
+            ),
         ] = None
 
 
