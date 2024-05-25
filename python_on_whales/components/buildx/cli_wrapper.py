@@ -196,7 +196,7 @@ class BuildxCLI(DockerCLICaller):
             full_cmd += ["--progress", progress]
         for file in to_list(files):
             full_cmd.add_simple_arg("--file", file)
-        full_cmd.add_args_list("--set", format_dict_for_cli(set))
+        full_cmd.add_args_iterable_or_single("--set", format_dict_for_cli(set))
         targets = to_list(targets)
         env = dict(variables)
         if print:
@@ -326,16 +326,20 @@ class BuildxCLI(DockerCLICaller):
         if progress != "auto" and isinstance(progress, str):
             full_cmd += ["--progress", progress]
 
-        full_cmd.add_args_list(
+        full_cmd.add_args_iterable_or_single(
             "--add-host", format_dict_for_cli(add_hosts, separator=":")
         )
-        full_cmd.add_args_list("--allow", allow)
+        full_cmd.add_args_iterable_or_single("--allow", allow)
         if isinstance(attest, dict):
             full_cmd.add_simple_arg("--attest", format_dict_for_buildx(attest))
-        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
-        full_cmd.add_args_list("--build-context", format_dict_for_cli(build_contexts))
+        full_cmd.add_args_iterable_or_single(
+            "--build-arg", format_dict_for_cli(build_args)
+        )
+        full_cmd.add_args_iterable_or_single(
+            "--build-context", format_dict_for_cli(build_contexts)
+        )
         full_cmd.add_simple_arg("--builder", builder)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_dict_for_cli(labels))
 
         full_cmd.add_simple_arg("--ssh", ssh)
 
@@ -363,14 +367,14 @@ class BuildxCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--cache-to", format_dict_for_buildx(cache_to))
         else:
             full_cmd.add_simple_arg("--cache-to", cache_to)
-        full_cmd.add_args_list("--secret", to_list(secrets))
+        full_cmd.add_args_iterable_or_single("--secret", to_list(secrets))
         if output != {}:
             full_cmd += ["--output", format_dict_for_buildx(output)]
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
-        full_cmd.add_args_list("--tag", tags)
+        full_cmd.add_args_iterable_or_single("--tag", tags)
 
         if stream_logs:
             if progress in (False, "tty"):
@@ -558,7 +562,7 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
         if stream_logs:
             return stream_buildx_logs(full_cmd)
         run(full_cmd)

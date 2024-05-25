@@ -157,10 +157,10 @@ class NetworkCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["network", "connect"]
         full_cmd.add_simple_arg("--alias", alias)
-        full_cmd.add_args_list("--driver-opt", driver_options)
+        full_cmd.add_args_iterable_or_single("--driver-opt", driver_options)
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
-        full_cmd.add_args_list("--link", links)
+        full_cmd.add_args_iterable_or_single("--link", links)
         full_cmd += [network, container]
         run(full_cmd)
 
@@ -187,8 +187,8 @@ class NetworkCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--driver", driver)
         full_cmd.add_simple_arg("--gateway", gateway)
         full_cmd.add_simple_arg("--subnet", subnet)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_args_list("--opt", options)
+        full_cmd.add_args_iterable_or_single("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--opt", options)
         full_cmd.append(name)
         return Network(self.client_config, run(full_cmd), is_immutable_id=True)
 
@@ -225,14 +225,14 @@ class NetworkCLI(DockerCLICaller):
 
     def list(self, filters: Dict[str, str] = {}) -> List[Network]:
         full_cmd = self.docker_cmd + ["network", "ls", "--no-trunc", "--quiet"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
 
         ids = run(full_cmd).splitlines()
         return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
     def prune(self, filters: Dict[str, str] = {}):
         full_cmd = self.docker_cmd + ["network", "prune", "--force"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
         run(full_cmd)
 
     def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):

@@ -186,7 +186,7 @@ class VolumeCLI(DockerCLICaller):
         """
 
         full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
 
         volumes_names = run(full_cmd).splitlines()
 

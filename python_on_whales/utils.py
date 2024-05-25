@@ -232,8 +232,8 @@ ValidPortMapping = Union[
 
 
 def to_list(x) -> list:
-    if isinstance(x, list):
-        return x
+    if isinstance(x, Iterable):
+        return list(x)
     else:
         return [x]
 

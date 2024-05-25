@@ -79,7 +79,7 @@ class StackCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["stack", "deploy"]
 
-        full_cmd.add_args_list("--compose-file", compose_files)
+        full_cmd.add_args_iterable_or_single("--compose-file", compose_files)
         full_cmd.add_simple_arg("--orchestrator", orchestrator)
         full_cmd.add_flag("--prune", prune)
         full_cmd.add_simple_arg("--resolve-image", resolve_image)

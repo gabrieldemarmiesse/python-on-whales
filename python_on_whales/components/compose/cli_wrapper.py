@@ -89,7 +89,9 @@ class ComposeCLI(DockerCLICaller):
             )
 
         full_cmd = self.docker_compose_cmd + ["build"]
-        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
+        full_cmd.add_args_iterable_or_single(
+            "--build-arg", format_dict_for_cli(build_args)
+        )
         full_cmd.add_flag("--no-cache", not cache)
         full_cmd.add_simple_arg("--progress", progress)
         full_cmd.add_flag("--pull", pull)
@@ -500,7 +502,7 @@ class ComposeCLI(DockerCLICaller):
         """
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
 
         return [
             ComposeProject(
@@ -751,7 +753,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_dict_for_cli(labels))
         full_cmd.append(service)
         full_cmd += command
 
