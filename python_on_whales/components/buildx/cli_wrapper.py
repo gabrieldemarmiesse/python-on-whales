@@ -27,7 +27,7 @@ from python_on_whales.components.buildx.imagetools.cli_wrapper import Imagetools
 from python_on_whales.components.buildx.models import BuilderInspectResult
 from python_on_whales.utils import (
     ValidPath,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     run,
     stream_stdout_and_stderr,
     to_list,
@@ -196,7 +196,7 @@ class BuildxCLI(DockerCLICaller):
             full_cmd += ["--progress", progress]
         for file in to_list(files):
             full_cmd.add_simple_arg("--file", file)
-        full_cmd.add_args_iterable_or_single("--set", format_dict_for_cli(set))
+        full_cmd.add_args_iterable_or_single("--set", format_mapping_for_cli(set))
         targets = to_list(targets)
         env = dict(variables)
         if print:
@@ -327,19 +327,19 @@ class BuildxCLI(DockerCLICaller):
             full_cmd += ["--progress", progress]
 
         full_cmd.add_args_iterable_or_single(
-            "--add-host", format_dict_for_cli(add_hosts, separator=":")
+            "--add-host", format_mapping_for_cli(add_hosts, separator=":")
         )
         full_cmd.add_args_iterable_or_single("--allow", allow)
         if isinstance(attest, dict):
             full_cmd.add_simple_arg("--attest", format_dict_for_buildx(attest))
         full_cmd.add_args_iterable_or_single(
-            "--build-arg", format_dict_for_cli(build_args)
+            "--build-arg", format_mapping_for_cli(build_args)
         )
         full_cmd.add_args_iterable_or_single(
-            "--build-context", format_dict_for_cli(build_contexts)
+            "--build-context", format_mapping_for_cli(build_contexts)
         )
         full_cmd.add_simple_arg("--builder", builder)
-        full_cmd.add_args_iterable_or_single("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
 
         full_cmd.add_simple_arg("--ssh", ssh)
 
@@ -562,7 +562,9 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         if stream_logs:
             return stream_buildx_logs(full_cmd)
         run(full_cmd)
@@ -644,7 +646,7 @@ def removesuffix(base_string: str, suffix: str) -> str:
 
 
 def format_dict_for_buildx(options: Dict[str, str]) -> str:
-    return ",".join(format_dict_for_cli(options, separator="="))
+    return ",".join(format_mapping_for_cli(options, separator="="))
 
 
 def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:

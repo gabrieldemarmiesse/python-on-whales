@@ -41,7 +41,7 @@ from python_on_whales.utils import (
     ValidPath,
     ValidPortMapping,
     custom_parse_object_as,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     format_port_arg,
     format_signal_arg,
     format_time_arg,
@@ -709,7 +709,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_iterable_or_single("--env", format_dict_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
         full_cmd.add_args_iterable_or_single("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
@@ -740,7 +740,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
-        full_cmd.add_args_iterable_or_single("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.add_args_iterable_or_single("--label-file", label_files)
 
         full_cmd.add_args_iterable_or_single("--link", link)
@@ -794,7 +794,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
         full_cmd.add_args_iterable_or_single("--storage-opt", storage_options)
-        full_cmd.add_args_iterable_or_single("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_iterable_or_single("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
@@ -907,7 +907,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--detach-keys", detach_keys)
 
-        full_cmd.add_args_iterable_or_single("--env", format_dict_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
         full_cmd.add_args_iterable_or_single("--env-file", env_files)
 
         if interactive and stream:
@@ -1142,7 +1142,9 @@ class ContainerCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
-        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         full_cmd.add_flag("--all", all)
 
         # TODO: add a test for the fix of is_immutable_id, without it, we get
@@ -1209,7 +1211,9 @@ class ContainerCLI(DockerCLICaller):
                 "docker.container.prune(filters={...})"
             )
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
-        full_cmd.add_args_iterable_or_single("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)
         run(full_cmd)
@@ -1637,7 +1641,7 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_iterable_or_single("--env", format_dict_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
         full_cmd.add_args_iterable_or_single("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
@@ -1669,7 +1673,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
-        full_cmd.add_args_iterable_or_single("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.add_args_iterable_or_single("--label-file", label_files)
 
         full_cmd.add_args_iterable_or_single("--link", link)
@@ -1725,7 +1729,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
         full_cmd.add_args_iterable_or_single("--storage-opt", storage_options)
-        full_cmd.add_args_iterable_or_single("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
         full_cmd.add_simple_arg("--systemd", systemd)
         full_cmd.add_args_iterable_or_single("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)

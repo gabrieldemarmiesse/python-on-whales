@@ -8,7 +8,18 @@ from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union, overload
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    overload,
+)
 
 import pydantic
 from typing_extensions import Literal
@@ -295,8 +306,8 @@ def stream_stdout_and_stderr(
         raise DockerException(full_cmd, exit_code, stderr=full_stderr)
 
 
-def format_dict_for_cli(dictionary: Dict[str, str], separator="="):
-    return [f"{key}{separator}{value}" for key, value in dictionary.items()]
+def format_mapping_for_cli(mapping: Mapping[str, str], separator="="):
+    return [f"{key}{separator}{value}" for key, value in mapping.items()]
 
 
 def read_env_file(env_file: Path) -> Dict[str, str]:
