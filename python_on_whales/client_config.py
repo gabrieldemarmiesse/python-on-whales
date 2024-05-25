@@ -15,7 +15,7 @@ from python_on_whales.download_binaries import (
 )
 
 from . import utils
-from .utils import ValidPath, run, to_list
+from .utils import ValidPath, run
 
 CACHE_VALIDITY_PERIOD = 0.01
 
@@ -44,7 +44,11 @@ class Command(list):
     def add_args_iterable_or_single(
         self, arg_name: str, iterable_or_single: Union[Iterable[Any], Any]
     ):
-        for value in to_list(iterable_or_single):
+        if isinstance(iterable_or_single, Iterable):
+            arg_values = iterable_or_single
+        else:
+            arg_values = [iterable_or_single]
+        for value in arg_values:
             self.extend([arg_name, value])
 
     def add_args_mapping(
