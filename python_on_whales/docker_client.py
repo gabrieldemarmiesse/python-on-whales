@@ -32,21 +32,27 @@ from .utils import DockerCamelModel, ValidPath, run
 class ClientVersion(DockerCamelModel):
     platform: Optional[Dict[str, str]] = None
     version: Optional[str] = None
-    api_version: Annotated[
-        Optional[str],
-        pydantic.Field(
-            validation_alias=pydantic.AliasChoices("APIVersion", "ApiVersion")
-        ),
-    ] = None
+    if pydantic.VERSION.startswith("1."):
+        api_version: Optional[str] = None
+    else:
+        api_version: Annotated[
+            Optional[str],
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("APIVersion", "ApiVersion")
+            ),
+        ] = None
     default_api_version: Optional[str] = None
     git_commit: Optional[str] = None
     go_version: Optional[str] = None
     os: Optional[str] = None
     arch: Optional[str] = None
-    build_time: Annotated[
-        Optional[str],
-        pydantic.Field(validation_alias=pydantic.AliasChoices("BuiltTime")),
-    ] = None
+    if pydantic.VERSION.startswith("1."):
+        build_time: Optional[str] = None
+    else:
+        build_time: Annotated[
+            Optional[str],
+            pydantic.Field(validation_alias=pydantic.AliasChoices("BuiltTime")),
+        ] = None
     context: Optional[str] = None
     experimental: Optional[bool] = None
 
@@ -61,22 +67,28 @@ class ServerVersion(DockerCamelModel):
     platform: Optional[Dict[str, str]] = None
     components: Optional[List[ServerVersionComponent]] = None
     version: Optional[str] = None
-    api_version: Annotated[
-        Optional[str],
-        pydantic.Field(
-            validation_alias=pydantic.AliasChoices("APIVersion", "ApiVersion")
-        ),
-    ] = None
+    if pydantic.VERSION.startswith("1."):
+        api_version: Optional[str] = None
+    else:
+        api_version: Annotated[
+            Optional[str],
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("APIVersion", "ApiVersion")
+            ),
+        ] = None
     min_api_version: Optional[str] = None
     git_commit: Optional[str] = None
     go_version: Optional[str] = None
     os: Optional[str] = None
     arch: Optional[str] = None
     kernel_version: Optional[str] = None
-    build_time: Annotated[
-        Optional[str],
-        pydantic.Field(validation_alias=pydantic.AliasChoices("BuiltTime")),
-    ] = None
+    if pydantic.VERSION.startswith("1."):
+        build_time: Optional[str] = None
+    else:
+        build_time: Annotated[
+            Optional[str],
+            pydantic.Field(validation_alias=pydantic.AliasChoices("BuiltTime")),
+        ] = None
 
 
 class Version(DockerCamelModel):
