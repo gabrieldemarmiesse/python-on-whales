@@ -37,11 +37,15 @@ def test_image_remove(ctr_client: DockerClient):
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_load(ctr_client: DockerClient, tmp_path: Path):
     tar_file = tmp_path / "dodo.tar"
-    image = ctr_client.image.pull("busybox:1", quiet=True)
-    image_tags = image.repo_tags
-    ctr_client.image.save("busybox:1", output=tar_file)
+    image_name = "busybox:1"
+    image = ctr_client.image.pull(image_name, quiet=True)
+    image_tag = [tag for tag in image.repo_tags if tag.endswith(image_name)][0]
+    ctr_client.image.save(image_tag, output=tar_file)
     image.remove(force=True)
-    assert ctr_client.image.load(input=tar_file) == image_tags
+    assert not ctr_client.image.exists(image_tag)
+    loaded_tags = ctr_client.image.load(input=tar_file)
+    assert loaded_tags == [image_tag]
+    assert ctr_client.image.exists(image_tag)
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
