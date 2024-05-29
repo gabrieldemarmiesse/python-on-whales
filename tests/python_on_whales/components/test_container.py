@@ -218,6 +218,14 @@ def test_create_with_systemd_mode(podman_client: DockerClient):
         assert container.config.systemd_mode is True
 
 
+def test_create_in_pod(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name) as pod:
+        container = podman_client.container.create("ubuntu", pod=pod_name)
+        assert container.pod == pod.id
+    assert not container.exists()
+
+
 def test_run_with_preserve_fds(podman_client: DockerClient):
     read_fd, write_fd = os.pipe()
     # Pass through enough additional file descriptors (as well as 0-2, stdin,

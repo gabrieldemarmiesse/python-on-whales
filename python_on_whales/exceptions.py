@@ -49,6 +49,10 @@ class NoSuchImage(DockerException):
     pass
 
 
+class NoSuchPod(DockerException):
+    pass
+
+
 class NoSuchService(DockerException):
     pass
 
