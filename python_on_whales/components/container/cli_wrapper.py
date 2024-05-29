@@ -42,7 +42,7 @@ from python_on_whales.utils import (
     ValidPath,
     ValidPortMapping,
     custom_parse_object_as,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     format_port_arg,
     format_signal_arg,
     format_time_arg,
@@ -671,13 +671,15 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["create"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
-        full_cmd.add_args_list("--add-host", add_hosts)
+        full_cmd.add_args_iterable_or_single("--add-host", add_hosts)
 
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
-        full_cmd.add_args_list("--blkio-weight-device", blkio_weight_device)
+        full_cmd.add_args_iterable_or_single(
+            "--blkio-weight-device", blkio_weight_device
+        )
 
-        full_cmd.add_args_list("--cap-add", cap_add)
-        full_cmd.add_args_list("--cap-drop", cap_drop)
+        full_cmd.add_args_iterable_or_single("--cap-add", cap_add)
+        full_cmd.add_args_iterable_or_single("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cgroupns", cgroupns)
@@ -694,32 +696,34 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--detach", detach)
 
-        full_cmd.add_args_list("--device", devices)
-        full_cmd.add_args_list("--device-cgroup-rule", device_cgroup_rules)
-        full_cmd.add_args_list("--device-read-bps", device_read_bps)
-        full_cmd.add_args_list("--device-read-iops", device_read_iops)
-        full_cmd.add_args_list("--device-write-bps", device_write_bps)
-        full_cmd.add_args_list("--device-write-iops", device_write_iops)
+        full_cmd.add_args_iterable_or_single("--device", devices)
+        full_cmd.add_args_iterable_or_single(
+            "--device-cgroup-rule", device_cgroup_rules
+        )
+        full_cmd.add_args_iterable_or_single("--device-read-bps", device_read_bps)
+        full_cmd.add_args_iterable_or_single("--device-read-iops", device_read_iops)
+        full_cmd.add_args_iterable_or_single("--device-write-bps", device_write_bps)
+        full_cmd.add_args_iterable_or_single("--device-write-iops", device_write_iops)
 
         if content_trust:
             full_cmd += ["--disable-content-trust", "false"]
 
-        full_cmd.add_args_list("--dns", dns)
-        full_cmd.add_args_list("--dns-option", dns_options)
-        full_cmd.add_args_list("--dns-search", dns_search)
+        full_cmd.add_args_iterable_or_single("--dns", dns)
+        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
+        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
         full_cmd.add_simple_arg("--domainname", domainname)
 
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
-        full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
-        full_cmd.add_args_list("--expose", expose)
+        full_cmd.add_args_iterable_or_single("--expose", expose)
 
         full_cmd.add_simple_arg("--gpus", gpus)
 
-        full_cmd.add_args_list("--group-add", groups_add)
+        full_cmd.add_args_iterable_or_single("--group-add", groups_add)
 
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
@@ -742,14 +746,14 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_args_list("--label-file", label_files)
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label-file", label_files)
 
-        full_cmd.add_args_list("--link", link)
-        full_cmd.add_args_list("--link-local-ip", link_local_ip)
+        full_cmd.add_args_iterable_or_single("--link", link)
+        full_cmd.add_args_iterable_or_single("--link-local-ip", link_local_ip)
 
         full_cmd.add_simple_arg("--log-driver", log_driver)
-        full_cmd.add_args_list("--log-opt", log_options)
+        full_cmd.add_args_iterable_or_single("--log-opt", log_options)
 
         full_cmd.add_simple_arg("--mac-address", mac_address)
 
@@ -758,11 +762,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
         full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
 
-        full_cmd.add_args_list("--mount", [",".join(x) for x in mounts])
+        full_cmd.add_args_iterable_or_single("--mount", [",".join(x) for x in mounts])
         full_cmd.add_simple_arg("--name", name)
 
-        full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-alias", network_aliases)
+        full_cmd.add_args_iterable_or_single("--network", networks)
+        full_cmd.add_args_iterable_or_single("--network-alias", network_aliases)
 
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
         full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
@@ -774,7 +778,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--pod", pod)
         full_cmd.add_flag("--privileged", privileged)
 
-        full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
+        full_cmd.add_args_iterable_or_single(
+            "-p", [format_port_arg(p) for p in publish]
+        )
         full_cmd.add_flag("--publish-all", publish_all)
 
         if pull == "never":
@@ -785,7 +791,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--rm", remove)
 
         full_cmd.add_simple_arg("--runtime", runtime)
-        full_cmd.add_args_list("--security-opt", security_options)
+        full_cmd.add_args_iterable_or_single("--security-opt", security_options)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
         if sig_proxy is False:
@@ -794,13 +800,13 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
-        full_cmd.add_args_list("--storage-opt", storage_options)
-        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_args_iterable_or_single("--storage-opt", storage_options)
+        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
         full_cmd.add_simple_arg("--systemd", systemd)
-        full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_args_iterable_or_single("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
         full_cmd.add_simple_arg("--tz", tz)
-        full_cmd.add_args_list("--ulimit", ulimit)
+        full_cmd.add_args_iterable_or_single("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--userns", userns)
@@ -810,7 +816,7 @@ class ContainerCLI(DockerCLICaller):
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
-        full_cmd.add_args_list("--volumes-from", volumes_from)
+        full_cmd.add_args_iterable_or_single("--volumes-from", volumes_from)
 
         full_cmd.add_simple_arg("--workdir", workdir)
 
@@ -908,8 +914,8 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--detach-keys", detach_keys)
 
-        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
-        full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env-file", env_files)
 
         if interactive and stream:
             raise ValueError(
@@ -1143,7 +1149,9 @@ class ContainerCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd
         full_cmd += ["container", "list", "-q", "--no-trunc"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         full_cmd.add_flag("--all", all)
 
         # TODO: add a test for the fix of is_immutable_id, without it, we get
@@ -1210,7 +1218,9 @@ class ContainerCLI(DockerCLICaller):
                 "docker.container.prune(filters={...})"
             )
         full_cmd = self.docker_cmd + ["container", "prune", "--force"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)
         run(full_cmd)
@@ -1596,13 +1606,15 @@ class ContainerCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["container", "run"]
 
         add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
-        full_cmd.add_args_list("--add-host", add_hosts)
+        full_cmd.add_args_iterable_or_single("--add-host", add_hosts)
 
         full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
-        full_cmd.add_args_list("--blkio-weight-device", blkio_weight_device)
+        full_cmd.add_args_iterable_or_single(
+            "--blkio-weight-device", blkio_weight_device
+        )
 
-        full_cmd.add_args_list("--cap-add", cap_add)
-        full_cmd.add_args_list("--cap-drop", cap_drop)
+        full_cmd.add_args_iterable_or_single("--cap-add", cap_add)
+        full_cmd.add_args_iterable_or_single("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cgroupns", cgroupns)
@@ -1619,32 +1631,34 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--detach", detach)
 
-        full_cmd.add_args_list("--device", devices)
-        full_cmd.add_args_list("--device-cgroup-rule", device_cgroup_rules)
-        full_cmd.add_args_list("--device-read-bps", device_read_bps)
-        full_cmd.add_args_list("--device-read-iops", device_read_iops)
-        full_cmd.add_args_list("--device-write-bps", device_write_bps)
-        full_cmd.add_args_list("--device-write-iops", device_write_iops)
+        full_cmd.add_args_iterable_or_single("--device", devices)
+        full_cmd.add_args_iterable_or_single(
+            "--device-cgroup-rule", device_cgroup_rules
+        )
+        full_cmd.add_args_iterable_or_single("--device-read-bps", device_read_bps)
+        full_cmd.add_args_iterable_or_single("--device-read-iops", device_read_iops)
+        full_cmd.add_args_iterable_or_single("--device-write-bps", device_write_bps)
+        full_cmd.add_args_iterable_or_single("--device-write-iops", device_write_iops)
 
         if content_trust:
             full_cmd += ["--disable-content-trust", "false"]
 
-        full_cmd.add_args_list("--dns", dns)
-        full_cmd.add_args_list("--dns-option", dns_options)
-        full_cmd.add_args_list("--dns-search", dns_search)
+        full_cmd.add_args_iterable_or_single("--dns", dns)
+        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
+        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
         full_cmd.add_simple_arg("--domainname", domainname)
 
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
-        full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
-        full_cmd.add_args_list("--expose", expose)
+        full_cmd.add_args_iterable_or_single("--expose", expose)
 
         full_cmd.add_simple_arg("--gpus", gpus)
 
-        full_cmd.add_args_list("--group-add", groups_add)
+        full_cmd.add_args_iterable_or_single("--group-add", groups_add)
 
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
@@ -1668,14 +1682,14 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_args_list("--label-file", label_files)
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label-file", label_files)
 
-        full_cmd.add_args_list("--link", link)
-        full_cmd.add_args_list("--link-local-ip", link_local_ip)
+        full_cmd.add_args_iterable_or_single("--link", link)
+        full_cmd.add_args_iterable_or_single("--link-local-ip", link_local_ip)
 
         full_cmd.add_simple_arg("--log-driver", log_driver)
-        full_cmd.add_args_list("--log-opt", log_options)
+        full_cmd.add_args_iterable_or_single("--log-opt", log_options)
 
         full_cmd.add_simple_arg("--mac-address", mac_address)
 
@@ -1685,11 +1699,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
 
         mounts = [",".join(x) for x in mounts]
-        full_cmd.add_args_list("--mount", mounts)
+        full_cmd.add_args_iterable_or_single("--mount", mounts)
         full_cmd.add_simple_arg("--name", name)
 
-        full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-alias", network_aliases)
+        full_cmd.add_args_iterable_or_single("--network", networks)
+        full_cmd.add_args_iterable_or_single("--network-alias", network_aliases)
 
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
         full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
@@ -1702,7 +1716,9 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
         full_cmd.add_flag("--privileged", privileged)
 
-        full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
+        full_cmd.add_args_iterable_or_single(
+            "-p", [format_port_arg(p) for p in publish]
+        )
         full_cmd.add_flag("--publish-all", publish_all)
 
         if pull == "never":
@@ -1713,7 +1729,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--rm", remove)
 
         full_cmd.add_simple_arg("--runtime", runtime)
-        full_cmd.add_args_list("--security-opt", security_options)
+        full_cmd.add_args_iterable_or_single("--security-opt", security_options)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
         if sig_proxy is False:
@@ -1722,13 +1738,13 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
-        full_cmd.add_args_list("--storage-opt", storage_options)
-        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
+        full_cmd.add_args_iterable_or_single("--storage-opt", storage_options)
+        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
         full_cmd.add_simple_arg("--systemd", systemd)
-        full_cmd.add_args_list("--tmpfs", tmpfs)
+        full_cmd.add_args_iterable_or_single("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
         full_cmd.add_simple_arg("--tz", tz)
-        full_cmd.add_args_list("--ulimit", ulimit)
+        full_cmd.add_args_iterable_or_single("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--userns", userns)
@@ -1738,7 +1754,7 @@ class ContainerCLI(DockerCLICaller):
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
-        full_cmd.add_args_list("--volumes-from", volumes_from)
+        full_cmd.add_args_iterable_or_single("--volumes-from", volumes_from)
 
         full_cmd.add_simple_arg("--workdir", workdir)
 

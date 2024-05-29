@@ -1,6 +1,10 @@
 import base64
+import json
 import warnings
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
+
+import pydantic
+from typing_extensions import Annotated
 
 from python_on_whales.client_config import ClientConfig, DockerCLICaller
 from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
@@ -23,7 +27,78 @@ from python_on_whales.components.task.cli_wrapper import TaskCLI
 from python_on_whales.components.trust.cli_wrapper import TrustCLI
 from python_on_whales.components.volume.cli_wrapper import VolumeCLI
 
-from .utils import ValidPath, run
+from .utils import DockerCamelModel, ValidPath, run
+
+
+class ClientVersion(DockerCamelModel):
+    platform: Optional[Dict[str, str]] = None
+    version: Optional[str] = None
+    if pydantic.VERSION.startswith("1."):
+        api_version: Optional[str] = None
+    else:
+        api_version: Annotated[
+            Optional[str],
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("APIVersion", "ApiVersion")
+            ),
+        ] = None
+    default_api_version: Optional[str] = None
+    git_commit: Optional[str] = None
+    go_version: Optional[str] = None
+    os: Optional[str] = None
+    arch: Optional[str] = None
+    if pydantic.VERSION.startswith("1."):
+        build_time: Optional[str] = None
+    else:
+        build_time: Annotated[
+            Optional[str],
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("BuildTime", "BuiltTime")
+            ),
+        ] = None
+    context: Optional[str] = None
+    experimental: Optional[bool] = None
+
+
+class ServerVersionComponent(DockerCamelModel):
+    name: Optional[str] = None
+    version: Optional[str] = None
+    details: Optional[Dict[str, str]] = None
+
+
+class ServerVersion(DockerCamelModel):
+    platform: Optional[Dict[str, str]] = None
+    components: Optional[List[ServerVersionComponent]] = None
+    version: Optional[str] = None
+    if pydantic.VERSION.startswith("1."):
+        api_version: Optional[str] = None
+    else:
+        api_version: Annotated[
+            Optional[str],
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("APIVersion", "ApiVersion")
+            ),
+        ] = None
+    min_api_version: Optional[str] = None
+    git_commit: Optional[str] = None
+    go_version: Optional[str] = None
+    os: Optional[str] = None
+    arch: Optional[str] = None
+    kernel_version: Optional[str] = None
+    if pydantic.VERSION.startswith("1."):
+        build_time: Optional[str] = None
+    else:
+        build_time: Annotated[
+            Optional[str],
+            pydantic.Field(
+                validation_alias=pydantic.AliasChoices("BuildTime", "BuiltTime")
+            ),
+        ] = None
+
+
+class Version(DockerCamelModel):
+    client: Optional[ClientVersion] = None
+    server: Optional[ServerVersion] = None
 
 
 class DockerClient(DockerCLICaller):
@@ -200,9 +275,28 @@ class DockerClient(DockerCLICaller):
         self.update = self.container.update
         self.wait = self.container.wait
 
-    def version(self):
-        """Not yet implemented"""
-        raise NotImplementedError
+    def version(self) -> Version:
+        """
+        Get version information about the container client and server.
+
+        # Returns
+            A `python_on_whales.Version` object
+
+        As an example:
+
+        ```python
+        from python_on_whales import docker
+
+        version_info = docker.version()
+        print(version_info.client.version)
+        # 3.4.2
+        print(version_info.server.kernel_version)
+        # 5.15.133.1-microsoft-standard-WSL2
+        ...
+        ```
+        """
+        full_cmd = self.docker_cmd + ["version", "-f", "{{json .}}"]
+        return Version(**json.loads(run(full_cmd)))
 
     def login(
         self,

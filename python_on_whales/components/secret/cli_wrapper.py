@@ -7,7 +7,7 @@ from python_on_whales.client_config import (
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.secret.models import SecretInspectResult
-from python_on_whales.utils import ValidPath, format_dict_for_cli, run, to_list
+from python_on_whales.utils import ValidPath, format_mapping_for_cli, run, to_list
 
 
 class Secret(ReloadableObjectFromJson):
@@ -65,7 +65,7 @@ class SecretCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["secret", "create"]
         full_cmd.add_simple_arg("--driver", driver)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.add_simple_arg("--template-driver", template_driver)
         full_cmd += [name, file]
         return Secret(self.client_config, run(full_cmd), is_immutable_id=True)
@@ -84,7 +84,9 @@ class SecretCLI(DockerCLICaller):
     def list(self, filters: Dict[str, str] = {}) -> List[Secret]:
         """Returns all secrets as a `List[python_on_whales.Secret]`."""
         full_cmd = self.docker_cmd + ["secret", "list", "--quiet"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         ids = run(full_cmd).splitlines()
         return [Secret(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 

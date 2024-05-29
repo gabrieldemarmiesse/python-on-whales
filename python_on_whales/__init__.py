@@ -18,7 +18,7 @@ from .components.stack.cli_wrapper import Stack
 from .components.system.cli_wrapper import SystemInfo
 from .components.task.cli_wrapper import Task
 from .components.volume.cli_wrapper import Volume
-from .docker_client import DockerClient
+from .docker_client import DockerClient, Version
 from .exceptions import DockerException
 
 # alias
@@ -45,5 +45,6 @@ __all__ = [
     "Stack",
     "SystemInfo",
     "Task",
+    "Version",
     "Volume",
 ]

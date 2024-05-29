@@ -34,7 +34,7 @@ from python_on_whales.exceptions import NoSuchPod
 from python_on_whales.utils import (
     ValidPath,
     ValidPortMapping,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     format_port_arg,
     format_signal_arg,
     format_time_arg,
@@ -401,17 +401,19 @@ class PodCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["pod", "create"]
         full_cmd.add_simple_arg("--name", name)
 
-        full_cmd.add_args_list("--add-host", [f"{host}:{ip}" for host, ip in add_hosts])
+        full_cmd.add_args_iterable_or_single(
+            "--add-host", [f"{host}:{ip}" for host, ip in add_hosts]
+        )
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cpus", cpus)
         full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
-        full_cmd.add_args_list("--device", devices)
-        full_cmd.add_args_list("--device-read-bps", device_read_bps)
-        full_cmd.add_args_list("--dns", dns)
-        full_cmd.add_args_list("--dns-option", dns_options)
-        full_cmd.add_args_list("--dns-search", dns_search)
+        full_cmd.add_args_iterable_or_single("--device", devices)
+        full_cmd.add_args_iterable_or_single("--device-read-bps", device_read_bps)
+        full_cmd.add_args_iterable_or_single("--dns", dns)
+        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
+        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
         full_cmd.add_simple_arg("--exit-policy", exit_policy)
-        full_cmd.add_args_list("--gidmap", [":".join(x) for x in gidmaps])
+        full_cmd.add_args_iterable_or_single("--gidmap", [":".join(x) for x in gidmaps])
         full_cmd.add_simple_arg("--hostname", hostname)
 
         if infra is not None:
@@ -424,30 +426,32 @@ class PodCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
-        full_cmd.add_args_list("--label-file", label_files)
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label-file", label_files)
         full_cmd.add_simple_arg("--mac-address", mac_address)
         full_cmd.add_simple_arg("--memory", memory)
-        full_cmd.add_args_list("--network", networks)
-        full_cmd.add_args_list("--network-alias", network_aliases)
+        full_cmd.add_args_iterable_or_single("--network", networks)
+        full_cmd.add_args_iterable_or_single("--network-alias", network_aliases)
         full_cmd.add_flag("--no-hosts", no_hosts)
         full_cmd.add_simple_arg("--pid", pid)
         full_cmd.add_simple_arg("--pod-id-file", pod_id_file)
-        full_cmd.add_args_list("-p", [format_port_arg(p) for p in publish])
+        full_cmd.add_args_iterable_or_single(
+            "-p", [format_port_arg(p) for p in publish]
+        )
         full_cmd.add_flag("--replace", replace)
         full_cmd.add_simple_arg("--restart", restart)
-        full_cmd.add_args_list("--security-opt", security_options)
-        full_cmd.add_args_list("--share", share)
+        full_cmd.add_args_iterable_or_single("--security-opt", security_options)
+        full_cmd.add_args_iterable_or_single("--share", share)
         full_cmd.add_simple_arg("--shm-size", shm_size)
         full_cmd.add_simple_arg("--subgidname", subgidname)
         full_cmd.add_simple_arg("--subuidname", subuidname)
-        full_cmd.add_args_list("--sysctl", format_dict_for_cli(sysctl))
-        full_cmd.add_args_list("--uidmap", [":".join(x) for x in uidmaps])
+        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
+        full_cmd.add_args_iterable_or_single("--uidmap", [":".join(x) for x in uidmaps])
         full_cmd.add_simple_arg("--userns", userns)
         full_cmd.add_simple_arg("--uts", uts)
         for volume_definition in volumes:
             full_cmd += ["--volume", ":".join(str(x) for x in volume_definition)]
-        full_cmd.add_args_list("--volumes-from", volumes_from)
+        full_cmd.add_args_iterable_or_single("--volumes-from", volumes_from)
 
         return Pod(self.client_config, run(full_cmd), is_immutable_id=True)
 
@@ -528,7 +532,9 @@ class PodCLI(DockerCLICaller):
             A `List[python_on_whales.Pod]`
         """
         full_cmd = self.docker_cmd + ["pod", "ps", "-q", "--no-trunc"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
 
         return [
             Pod(self.client_config, x, is_immutable_id=True)
