@@ -5,7 +5,7 @@ import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Union
 
 import pydantic
 
@@ -13,9 +13,9 @@ from python_on_whales.download_binaries import (
     download_docker_cli,
     get_docker_binary_path_in_cache,
 )
-from python_on_whales.utils import to_list
 
-from .utils import ValidPath, run
+from . import utils
+from .utils import ValidPath, run, to_list
 
 CACHE_VALIDITY_PERIOD = 0.01
 
@@ -37,9 +37,22 @@ class Command(list):
         if value:
             self.append(name)
 
-    def add_args_list(self, arg_name: str, list_values: list):
-        for value in to_list(list_values):
+    def add_args_iterable(self, arg_name: str, values: Iterable[Any]):
+        for value in values:
             self.extend([arg_name, value])
+
+    def add_args_iterable_or_single(
+        self, arg_name: str, iterable_or_single: Union[Iterable[Any], Any]
+    ):
+        for value in to_list(iterable_or_single):
+            self.extend([arg_name, value])
+
+    def add_args_mapping(
+        self, arg_name: str, mapping: Mapping[Any, Any], *, separator="="
+    ):
+        self.add_args_iterable(
+            arg_name, utils.format_mapping_for_cli(mapping, separator)
+        )
 
     def __add__(self, other) -> "Command":
         return Command(super().__add__(other))
@@ -144,8 +157,8 @@ class ClientConfig:
     @property
     def docker_compose_cmd(self) -> Command:
         base_cmd = self.docker_cmd + ["compose"]
-        base_cmd.add_args_list("--file", self.compose_files)
-        base_cmd.add_args_list("--profile", self.compose_profiles)
+        base_cmd.add_args_iterable_or_single("--file", self.compose_files)
+        base_cmd.add_args_iterable_or_single("--profile", self.compose_profiles)
         base_cmd.add_simple_arg("--env-file", self.compose_env_file)
         base_cmd.add_simple_arg("--project-name", self.compose_project_name)
         base_cmd.add_simple_arg("--project-directory", self.compose_project_directory)

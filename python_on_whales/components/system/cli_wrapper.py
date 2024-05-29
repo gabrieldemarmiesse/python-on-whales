@@ -9,7 +9,7 @@ from python_on_whales.components.system.models import (
     SystemInfo,
 )
 from python_on_whales.utils import (
-    format_dict_for_cli,
+    format_mapping_for_cli,
     format_time_arg,
     run,
     stream_stdout_and_stderr,
@@ -122,7 +122,9 @@ class SystemCLI(DockerCLICaller):
         ]
         full_cmd.add_simple_arg("--since", format_time_arg(since))
         full_cmd.add_simple_arg("--until", format_time_arg(until))
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         iterator = stream_stdout_and_stderr(full_cmd)
         for stream_origin, stream_content in iterator:
             if stream_origin == "stdout":
@@ -168,5 +170,7 @@ class SystemCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["system", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_flag("--volumes", volumes)
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         run(full_cmd)

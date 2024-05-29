@@ -26,7 +26,7 @@ from python_on_whales.components.image.models import (
 from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.utils import (
     ValidPath,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     run,
     stream_stdout_and_stderr,
     to_list,
@@ -269,17 +269,19 @@ class ImageCLI(DockerCLICaller):
         tags = to_list(tags)
         full_cmd = self.docker_cmd + ["build", "--quiet"]
 
-        full_cmd.add_args_list(
-            "--add-host", format_dict_for_cli(add_hosts, separator=":")
+        full_cmd.add_args_iterable_or_single(
+            "--add-host", format_mapping_for_cli(add_hosts, separator=":")
         )
-        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single(
+            "--build-arg", format_mapping_for_cli(build_args)
+        )
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
-        full_cmd.add_args_list("--tag", tags)
+        full_cmd.add_args_iterable_or_single("--tag", tags)
 
         docker_image = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
@@ -310,7 +312,7 @@ class ImageCLI(DockerCLICaller):
             platform: Set platform if server is multi-platform capable
         """
         full_cmd = self.docker_cmd + ["image", "import"]
-        full_cmd.add_args_list("--change", changes)
+        full_cmd.add_args_iterable_or_single("--change", changes)
         full_cmd.add_simple_arg("--message", message)
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.append(source)
@@ -450,7 +452,9 @@ class ImageCLI(DockerCLICaller):
             "--quiet",
             "--no-trunc",
         ]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         full_cmd.add_flag("--all", all)
 
         if repository_or_tag is not None:
@@ -474,7 +478,7 @@ class ImageCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["image", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filter))
+        full_cmd.add_args_iterable_or_single("--filter", format_mapping_for_cli(filter))
         return run(full_cmd)
 
     def pull(
