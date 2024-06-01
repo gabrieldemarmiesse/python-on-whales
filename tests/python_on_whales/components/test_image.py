@@ -100,7 +100,7 @@ def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
     ]
     iterator = ctr_client.image.save(image_names)
     # Cannot remove the image here because the save may still be in progress!
-    assert set(ctr_client.image.load(iterator)) == image_tags
+    assert set(ctr_client.image.load(iterator)) == set(image_tags)
 
 
 @pytest.mark.parametrize(
