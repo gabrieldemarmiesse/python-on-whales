@@ -78,10 +78,8 @@ def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
     image = ctr_client.image.pull(image_name, quiet=True)
     image_tag = [tag for tag in image.repo_tags if tag.endswith(image_name)][0]
     iterator = ctr_client.image.save(image_name)
-    ctr_client.image.remove(image_name, force=True)
-    assert not ctr_client.image.exists(image_name)
+    # Cannot remove the image here because the save may still be in progress!
     assert ctr_client.image.load(iterator) == [image_tag]
-    assert ctr_client.image.exists(image_name)
 
 
 @pytest.mark.parametrize(
@@ -101,10 +99,8 @@ def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
         if any(tag.endswith(n) for n in image_names)
     ]
     iterator = ctr_client.image.save(image_names)
-    ctr_client.image.remove(image_names, force=True)
-    assert not ctr_client.image.exists(image_names)
+    # Cannot remove the image here because the save may still be in progress!
     assert set(ctr_client.image.load(iterator)) == image_tags
-    assert ctr_client.image.exists(image_names)
 
 
 @pytest.mark.parametrize(
