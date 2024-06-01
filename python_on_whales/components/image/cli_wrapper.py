@@ -559,7 +559,7 @@ class ImageCLI(DockerCLICaller):
 
     def _push_single_tag(self, tag_or_repo: str, quiet: bool):
         full_cmd = self.docker_cmd + ["image", "push"]
-        full_cmd.add_flag(quiet)
+        full_cmd.add_flag("--quiet", quiet)
         full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
