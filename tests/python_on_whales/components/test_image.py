@@ -40,12 +40,12 @@ def test_save_load(ctr_client: DockerClient, tmp_path: Path):
     image_name = "busybox:1"
     image = ctr_client.image.pull(image_name, quiet=True)
     image_tag = [tag for tag in image.repo_tags if tag.endswith(image_name)][0]
-    ctr_client.image.save(image_tag, output=tar_file)
-    image.remove(force=True)
-    assert not ctr_client.image.exists(image_tag)
+    ctr_client.image.save(image_name, output=tar_file)
+    ctr_client.image.remove(image_name, force=True)
+    assert not ctr_client.image.exists(image_name)
     loaded_tags = ctr_client.image.load(input=tar_file)
     assert loaded_tags == [image_tag]
-    assert ctr_client.image.exists(image_tag)
+    assert ctr_client.image.exists(image_name)
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
@@ -62,22 +62,26 @@ def test_save_iterator_bytes(ctr_client: DockerClient):
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_iterator_bytes_and_load(ctr_client: DockerClient):
-    image = ctr_client.image.pull("busybox:1", quiet=True)
-    image_tags = image.repo_tags
-    iterator = ctr_client.image.save("busybox:1")
+    image_name = "busybox:1"
+    image = ctr_client.image.pull(image_name, quiet=True)
+    image_tag = [tag for tag in image.repo_tags if tag.endswith(image_name)][0]
+    iterator = ctr_client.image.save(image_name)
     my_tar_as_bytes = b"".join(iterator)
     image.remove(force=True)
-    assert ctr_client.image.load(my_tar_as_bytes) == image_tags
-    ctr_client.image.inspect("busybox:1")
+    assert ctr_client.image.load(my_tar_as_bytes) == [image_tag]
+    assert ctr_client.image.exists(image_name)
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_save_iterator_bytes_and_load_from_iterator(ctr_client: DockerClient):
-    image = ctr_client.image.pull("busybox:1", quiet=True)
-    image_tags = image.repo_tags
-    iterator = ctr_client.image.save("busybox:1")
-    assert ctr_client.image.load(iterator) == image_tags
-    ctr_client.image.inspect("busybox:1")
+    image_name = "busybox:1"
+    image = ctr_client.image.pull(image_name, quiet=True)
+    image_tag = [tag for tag in image.repo_tags if tag.endswith(image_name)][0]
+    iterator = ctr_client.image.save(image_name)
+    ctr_client.image.remove(image_name, force=True)
+    assert not ctr_client.image.exists(image_name)
+    assert ctr_client.image.load(iterator) == [image_tag]
+    assert ctr_client.image.exists(image_name)
 
 
 @pytest.mark.parametrize(
@@ -90,10 +94,17 @@ def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
 ):
     image_names = ["busybox:1", "hello-world:latest"]
     images = ctr_client.image.pull(image_names, quiet=True)
-    image_tags = {tag for image in images for tag in image.repo_tags}
+    image_tags = [
+        tag
+        for image in images
+        for tag in image.repo_tags
+        if any(tag.endswith(n) for n in image_names)
+    ]
     iterator = ctr_client.image.save(image_names)
+    ctr_client.image.remove(image_names, force=True)
+    assert not ctr_client.image.exists(image_names)
     assert set(ctr_client.image.load(iterator)) == image_tags
-    ctr_client.image.inspect(image_names)
+    assert ctr_client.image.exists(image_names)
 
 
 @pytest.mark.parametrize(
