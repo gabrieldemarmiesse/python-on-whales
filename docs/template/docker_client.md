@@ -20,6 +20,7 @@
 * [`docker.system`](sub-commands/system.md)
 * [`docker.trust`](sub-commands/trust.md)
 * [`docker.volume`](sub-commands/volume.md)
+* [`podman.pod`](sub-commands/pod.md)
 
 
 # Other commands

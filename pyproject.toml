@@ -37,3 +37,4 @@ markers = [
     "podman: marks tests as needing a podman engine to run"
 ]
 xfail_strict = true
+pythonpath = ["./"]

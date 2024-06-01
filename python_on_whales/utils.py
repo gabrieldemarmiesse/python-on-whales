@@ -28,6 +28,7 @@ from python_on_whales.exceptions import (
     DockerException,
     NoSuchContainer,
     NoSuchImage,
+    NoSuchPod,
     NoSuchService,
     NoSuchVolume,
     NotASwarmManager,
@@ -81,6 +82,9 @@ def to_docker_camel(string):
             "ipam": "IPAM",
             "tls_info": "TLSInfo",
             "virtual_ips": "VirtualIPs",
+            "infra_container_id": "InfraContainerID",
+            "default_api_version": "DefaultAPIVersion",
+            "min_api_version": "MinAPIVersion",
         }
         return special_cases[string]
     except KeyError:
@@ -190,6 +194,13 @@ def run(
                 )
             if "no such container" in decoded_stderr:
                 raise NoSuchContainer(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+            if "no such pod" in decoded_stderr:
+                raise NoSuchPod(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
