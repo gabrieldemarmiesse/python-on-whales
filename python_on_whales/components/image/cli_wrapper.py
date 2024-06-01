@@ -6,7 +6,7 @@ from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any, Dict, Iterator, List, Optional, Union, overload
+from typing import Any, Iterable, Iterator, List, Mapping, Optional, Union, overload
 
 import python_on_whales.components.buildx.cli_wrapper
 from python_on_whales.client_config import (
@@ -24,13 +24,7 @@ from python_on_whales.components.image.models import (
     ImageRootFS,
 )
 from python_on_whales.exceptions import DockerException, NoSuchImage
-from python_on_whales.utils import (
-    ValidPath,
-    format_mapping_for_cli,
-    run,
-    stream_stdout_and_stderr,
-    to_list,
-)
+from python_on_whales.utils import ValidPath, run, stream_stdout_and_stderr, to_list
 
 
 class Image(ReloadableObjectFromJson):
@@ -49,7 +43,7 @@ class Image(ReloadableObjectFromJson):
         json_str = run(self.docker_cmd + ["image", "inspect", reference])
         return json.loads(json_str)[0]
 
-    def _parse_json_object(self, json_object: Dict[str, Any]) -> ImageInspectResult:
+    def _parse_json_object(self, json_object: Mapping[str, Any]) -> ImageInspectResult:
         return ImageInspectResult(**json_object)
 
     def _get_inspect_result(self) -> ImageInspectResult:
@@ -137,7 +131,7 @@ class Image(ReloadableObjectFromJson):
         return self._get_inspect_result().root_fs
 
     @property
-    def metadata(self) -> Optional[Dict[str, str]]:
+    def metadata(self) -> Optional[Mapping[str, str]]:
         return self._get_inspect_result().metadata
 
     def __repr__(self):
@@ -220,14 +214,14 @@ class ImageCLI(DockerCLICaller):
     def legacy_build(
         self,
         context_path: ValidPath,
-        add_hosts: Dict[str, str] = {},
-        build_args: Dict[str, str] = {},
+        add_hosts: Mapping[str, str] = {},
+        build_args: Mapping[str, str] = {},
         cache: bool = True,
         file: Optional[ValidPath] = None,
-        labels: Dict[str, str] = {},
+        labels: Mapping[str, str] = {},
         network: Optional[str] = None,
         pull: bool = False,
-        tags: Union[str, List[str]] = [],
+        tags: Union[str, Iterable[str]] = (),
         target: Optional[str] = None,
     ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Build a Docker image with the old Docker builder (meaning not using buildx/buildkit)
@@ -254,7 +248,7 @@ class ImageCLI(DockerCLICaller):
                 ex `build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}`.
             cache: Whether or not to use the cache, defaults to True
             file: The path of the Dockerfile, defaults to `context_path/Dockerfile`
-            labels: Dict of labels to add to the image.
+            labels: Mapping of labels to add to the image.
                 `labels={"very-secure": "1", "needs-gpu": "0"}` for example.
             network: which network to use when building the Docker image
             pull: Always attempt to pull a newer version of the image
@@ -266,16 +260,11 @@ class ImageCLI(DockerCLICaller):
         """
         # to make it easier to write and read tests, the tests of this function
         # are also grouped with the tests of "docker.build()".
-        tags = to_list(tags)
         full_cmd = self.docker_cmd + ["build", "--quiet"]
 
-        full_cmd.add_args_iterable_or_single(
-            "--add-host", format_mapping_for_cli(add_hosts, separator=":")
-        )
-        full_cmd.add_args_iterable_or_single(
-            "--build-arg", format_mapping_for_cli(build_args)
-        )
-        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
+        full_cmd.add_args_mapping("--add-host", add_hosts, separator=":")
+        full_cmd.add_args_mapping("--build-arg", build_args)
+        full_cmd.add_args_mapping("--label", labels)
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--target", target)
@@ -298,7 +287,7 @@ class ImageCLI(DockerCLICaller):
         self,
         source: ValidPath,
         tag: Optional[str] = None,
-        changes: List[str] = [],
+        changes: Iterable[str] = (),
         message: Optional[str] = None,
         platform: Optional[str] = None,
     ) -> Image:
@@ -312,7 +301,7 @@ class ImageCLI(DockerCLICaller):
             platform: Set platform if server is multi-platform capable
         """
         full_cmd = self.docker_cmd + ["image", "import"]
-        full_cmd.add_args_iterable_or_single("--change", changes)
+        full_cmd.add_args_iterable("--change", changes)
         full_cmd.add_simple_arg("--message", message)
         full_cmd.add_simple_arg("--platform", platform)
         full_cmd.append(source)
@@ -325,10 +314,10 @@ class ImageCLI(DockerCLICaller):
         ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Image]:
+    def inspect(self, x: Iterable[str]) -> List[Image]:
         ...
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Image, List[Image]]:
+    def inspect(self, x: Union[str, Iterable[str]]) -> Union[Image, List[Image]]:
         """Creates a `python_on_whales.Image` object.
 
         # Returns
@@ -339,10 +328,10 @@ class ImageCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
 
         """
-        if isinstance(x, list):
-            return [Image(self.client_config, identifier) for identifier in x]
-        else:
+        if isinstance(x, str):
             return Image(self.client_config, x)
+        else:
+            return [Image(self.client_config, identifier) for identifier in x]
 
     def exists(self, x: str) -> bool:
         """Returns `True` if the image exists. `False` otherwise.
@@ -419,7 +408,7 @@ class ImageCLI(DockerCLICaller):
     def list(
         self,
         repository_or_tag: Optional[str] = None,
-        filters: Dict[str, str] = {},
+        filters: Mapping[str, str] = {},
         all: bool = False,
     ) -> List[Image]:
         """Returns the list of Docker images present on the machine.
@@ -452,9 +441,7 @@ class ImageCLI(DockerCLICaller):
             "--quiet",
             "--no-trunc",
         ]
-        full_cmd.add_args_iterable_or_single(
-            "--filter", format_mapping_for_cli(filters)
-        )
+        full_cmd.add_args_mapping("--filter", filters)
         full_cmd.add_flag("--all", all)
 
         if repository_or_tag is not None:
@@ -466,7 +453,7 @@ class ImageCLI(DockerCLICaller):
 
         return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def prune(self, all: bool = False, filter: Dict[str, str] = {}) -> str:
+    def prune(self, all: bool = False, filter: Mapping[str, str] = {}) -> str:
         """Remove unused images
 
         Parameters:
@@ -478,12 +465,12 @@ class ImageCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["image", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_iterable_or_single("--filter", format_mapping_for_cli(filter))
+        full_cmd.add_args_mapping("--filter", filter)
         return run(full_cmd)
 
     def pull(
         self,
-        x: Union[str, List[str]],
+        x: Union[str, Iterable[str]],
         quiet: bool = False,
         platform: Optional[str] = None,
     ) -> Union[Image, List[Image]]:
@@ -504,14 +491,14 @@ class ImageCLI(DockerCLICaller):
             If a list was passed as input, then a `List[python_on_whales.Image]` will
             be returned.
         """
-
-        if x == []:
-            return []
-        elif isinstance(x, str):
+        if isinstance(x, str):
             return self._pull_single_tag(x, quiet=quiet, platform=platform)
-        elif isinstance(x, list) and len(x) == 1:
+        x = list(x)
+        if not x:
+            return []
+        if len(x) == 1:
             return [self._pull_single_tag(x[0], quiet=quiet, platform=platform)]
-        elif len(x) >= 2:
+        else:
             pool = ThreadPool(4)
             generator = self._generate_args_pull(x, quiet, platform)
             all_images = pool.starmap(self._pull_single_tag, generator)
@@ -520,7 +507,7 @@ class ImageCLI(DockerCLICaller):
             return all_images
 
     def _generate_args_pull(
-        self, _list: List[str], quiet: bool, platform: Optional[str] = None
+        self, _list: Iterable[str], quiet: bool, platform: Optional[str] = None
     ):
         for tag in _list:
             yield tag, quiet, platform
@@ -540,82 +527,72 @@ class ImageCLI(DockerCLICaller):
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
         return Image(self.client_config, image_name)
 
-    def push(self, x: Union[str, List[str]], quiet: bool = False):
+    def push(self, x: Union[str, Iterable[str]], quiet: bool = False) -> None:
         """Push a tag or a repository to a registry
 
         Alias: `docker.push(...)`
 
         Parameters:
-            x: Tag(s) or repo(s) to push. Can be a string or a list of strings.
-                If it's a list of string, python-on-whales will push all the images with
+            x: Tag(s) or repo(s) to push. Can be a string or an iterable of strings.
+                If it's an iterable, python-on-whales will push all the images with
                 multiple threads. The progress bars might look strange as multiple
                 processes are drawing on the terminal at the same time.
             quiet: If you don't want to see the progress bars.
 
         # Raises
-            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exist.
         """
-        x = to_list(x)
+        images = to_list(x)
 
         # this is just to raise a correct exception if the images don't exist
-        self.inspect(x)
+        self.inspect(images)
 
-        if x == []:
+        if images == []:
             return
-        elif len(x) == 1:
-            self._push_single_tag(x[0], quiet=quiet)
-        elif len(x) >= 2:
+        elif len(images) == 1:
+            self._push_single_tag(images[0], quiet)
+        elif len(images) >= 2:
             pool = ThreadPool(4)
-            generator = self._generate_args_push(x, quiet)
-            pool.starmap(self._push_single_tag, generator)
+            pool.starmap(self._push_single_tag, ((img, quiet) for img in images))
             pool.close()
             pool.join()
 
-    def _generate_args_push(self, _list: List[str], quiet: bool):
-        for tag in _list:
-            yield tag, quiet
-
     def _push_single_tag(self, tag_or_repo: str, quiet: bool):
         full_cmd = self.docker_cmd + ["image", "push"]
-
-        if quiet:
-            full_cmd.append("--quiet")
-
+        full_cmd.add_flag("--quiet", quiet)
         full_cmd.append(tag_or_repo)
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
 
     def remove(
         self,
-        x: Union[ValidImage, List[ValidImage]],
+        x: Union[ValidImage, Iterable[ValidImage]],
         force: bool = False,
         prune: bool = True,
     ):
         """Remove one or more docker images.
 
         Parameters:
-            x: Single image or list of Docker images to remove. You can use tags or
+            x: Single image or iterable of Docker images to remove. You can use tags or
                 `python_on_whales.Image` objects.
-            force: Force removal of the image
-            prune: Delete untagged parents
+            force: Force removal of the image(s).
+            prune: Delete untagged parents.
 
         # Raises
-            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exist.
 
         """
-
+        images = to_list(x)
+        if x == []:
+            return
         full_cmd = self.docker_cmd + ["image", "rm"]
         full_cmd.add_flag("--force", force)
         full_cmd.add_flag("--no-prune", not prune)
-        if x == []:
-            return
-        for image in to_list(x):
-            full_cmd.append(image)
-
+        full_cmd.extend(images)
         run(full_cmd)
 
     def save(
         self,
-        images: Union[ValidImage, List[ValidImage]],
+        images: Union[ValidImage, Iterable[ValidImage]],
         output: Optional[ValidPath] = None,
     ) -> Optional[Iterator[bytes]]:
         """Save one or more images to a tar archive. Returns a stream if output is `None`
@@ -623,7 +600,7 @@ class ImageCLI(DockerCLICaller):
         Alias: `docker.save(...)`
 
         Parameters:
-            images: Single docker image or list of docker images to save
+            images: Single image or non-empty iterable of images to save.
             output: Path of the tar archive to produce. If `output` is None, a generator
                 of bytes is produced. It can be used to stream those bytes elsewhere,
                 to another Docker daemon for example.
@@ -632,7 +609,7 @@ class ImageCLI(DockerCLICaller):
             `Optional[Iterator[bytes]]`. If output is a path, nothing is returned.
 
         # Raises
-            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exists.
+            `python_on_whales.exceptions.NoSuchImage` if one of the images does not exist.
 
         # Example
 
@@ -652,26 +629,26 @@ class ImageCLI(DockerCLICaller):
         remote_docker.image.load(bytes_iterator)
         ```
 
-        Of course the best solution is to use a registry to transfer image but
+        Of course the best solution is to use a registry to transfer images, but
         it's a cool example nonetheless.
         """
-        full_cmd = self.docker_cmd + ["image", "save"]
         images = to_list(images)
+        if len(images) == 0:
+            raise ValueError("One or more images must be provided")
 
-        # trigger an exception early
+        # Trigger an exception early if an image doesn't exist.
         self.inspect(images)
 
-        if output is not None:
-            full_cmd += ["--output", str(output)]
-
-        full_cmd += images
+        full_cmd = self.docker_cmd + ["image", "save"]
+        full_cmd.add_simple_arg("--output", output)
+        full_cmd.extend(images)
         if output is None:
             # we stream the bytes
             return self._save_generator(full_cmd)
         else:
             run(full_cmd)
 
-    def _save_generator(self, full_cmd) -> Iterator[bytes]:
+    def _save_generator(self, full_cmd: List[Any]) -> Iterator[bytes]:
         full_cmd = [str(x) for x in full_cmd]
         p = Popen(full_cmd, stdout=PIPE, stderr=PIPE)
         for line in p.stdout:
@@ -693,7 +670,7 @@ class ImageCLI(DockerCLICaller):
             new_tag: The tag to add to the Docker image.
 
         # Raises
-            `python_on_whales.exceptions.NoSuchImage` if the image does not exists.
+            `python_on_whales.exceptions.NoSuchImage` if the image does not exist.
         """
         full_cmd = self.docker_cmd + [
             "image",
