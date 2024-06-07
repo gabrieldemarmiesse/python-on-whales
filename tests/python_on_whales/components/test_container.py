@@ -295,7 +295,8 @@ def test_remove_on_exit(ctr_client: DockerClient):
         pytest.param(
             "podman",
             marks=pytest.mark.xfail(
-                reason="Cgroup control not available with rootless podman on cgroups v1"
+                reason="Cgroup control not available with rootless podman on cgroups v1",
+                strict=False,
             ),
         ),
     ],
