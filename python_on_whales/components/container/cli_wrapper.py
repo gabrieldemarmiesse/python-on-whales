@@ -1797,7 +1797,10 @@ class ContainerCLI(DockerCLICaller):
 
         Parameters:
             containers: One or a list of containers.
-            attach: Attach stdout/stderr and forward signals.
+            attach: Attach stdout/stderr and forward signals. Note that in
+                previous versions the behaviour was to run without attaching
+                the TTY - the behaviour now matches the
+                `docker.container.attach` method.
             interactive: Attach stdin (ensure it is open).
             stream: Stream output as a generator.
             detach_keys: Override the key sequence for detaching a container.
@@ -1822,9 +1825,10 @@ class ContainerCLI(DockerCLICaller):
         if stream:
             return stream_stdout_and_stderr(full_cmd)
         elif attach:
-            return run(full_cmd)
+            run(full_cmd, tty=True)
+            return None
         else:
-            run(full_cmd)
+            return run(full_cmd)
 
     def stats(
         self,
