@@ -1437,3 +1437,16 @@ def test_run_always_pull_existent(
     assert remote_id != local_id
     docker_client.container.run(test_image_name, pull="always")
     assert docker_client.image.inspect(test_image_name).id == remote_id
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_non_unicode_output(ctr_client: DockerClient):
+    """Non-unicode characters in container output should not lead to an exception."""
+    latin_char = "þ".encode("latin")
+    with pytest.raises(UnicodeDecodeError):
+        latin_char.decode(encoding="utf-8")
+    byte_repr = r"\x{:x}".format(ord(latin_char))
+    output = ctr_client.container.run(
+        "ubuntu", ["bash", "-c", f"echo -n $'{byte_repr}'"], remove=True
+    )
+    assert output == "�"

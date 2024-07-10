@@ -237,10 +237,10 @@ def run(
         return post_process_stream(completed_process.stdout)
 
 
-def post_process_stream(stream: Optional[bytes]):
+def post_process_stream(stream: Optional[bytes]) -> str:
     if stream is None:
         return ""
-    stream = stream.decode()
+    stream = stream.decode(errors="replace")
     if len(stream) != 0 and stream[-1] == "\n":
         stream = stream[:-1]
     return stream
