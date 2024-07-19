@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 docs/generated_sources
 docs/site
+mkdocs.yml
+generated_sources/

@@ -29,6 +29,7 @@ plugins:
             show_category_heading: false
             heading_level: 1
             show_root_toc_entry: false
+            docstring_section_style: spacy
             separate_signature: true
             merge_init_into_class: false
             show_root_full_path: false

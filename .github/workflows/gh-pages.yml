@@ -17,8 +17,8 @@ jobs:
         run: |
           pip install -r ./requirements.txt -r docs/requirements.txt -e .
           python docs/autogen.py
-          mv docs/generated_sources ./generated_sources
-          mv docs/mkdocs.yml ./
+          cp -r docs/generated_sources ./generated_sources
+          cp docs/mkdocs.yml ./
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@1.26
         env:
