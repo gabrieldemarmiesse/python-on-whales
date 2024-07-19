@@ -7,6 +7,23 @@ on:
   pull_request: {}
 
 jobs:
+  render-docs:
+    name: Render docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: prepare
+        run: |
+          pip install -r ./requirements.txt -r docs/requirements.txt -e .
+          python docs/autogen.py
+          cp -r docs/generated_sources ./generated_sources
+          cp docs/mkdocs.yml ./
+      - name: Render
+        run: mkdocs build
+
   build-linux-lint:
     runs-on: ubuntu-latest
     steps:
