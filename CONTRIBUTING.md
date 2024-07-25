@@ -18,7 +18,7 @@ with the help of [mkdocstrings](https://mkdocstrings.github.io/) and
 #### First install the dependencies:
 
 ```
-pip install -r doc-requirements.txt
+pip install -r docs/requirements.txt
 ```
 
 #### Generate the documentation files and serve them

@@ -16,7 +16,6 @@ plugins:
   - search
   - autorefs
   - mkdocstrings:
-      custom_templates: templates
       default_handler: python
       handlers:
         python:
@@ -29,6 +28,7 @@ plugins:
             show_category_heading: false
             heading_level: 1
             show_root_toc_entry: false
+            docstring_section_style: spacy
             separate_signature: true
             merge_init_into_class: false
             show_root_full_path: false
@@ -55,19 +55,21 @@ nav:
     - docker task: sub-commands/task.md
     - docker trust: sub-commands/trust.md
     - docker volume: sub-commands/volume.md
-  - Docker objects:
-    - Builders: docker_objects/builders.md
-    - Configs: docker_objects/configs.md
-    - Containers: docker_objects/containers.md
-    - Images: docker_objects/images.md
-    - Networks: docker_objects/networks.md
-    - Nodes: docker_objects/nodes.md
-    - Plugins: docker_objects/plugins.md
-    - Secrets: docker_objects/secrets.md
-    - Services: docker_objects/services.md
-    - Stacks: docker_objects/stacks.md
-    - Tasks: docker_objects/tasks.md
-    - Volumes: docker_objects/volumes.md
+    - podman pod: sub-commands/pod.md
+  - Objects:
+    - Builders: objects/builders.md
+    - Configs: objects/configs.md
+    - Containers: objects/containers.md
+    - Images: objects/images.md
+    - Networks: objects/networks.md
+    - Nodes: objects/nodes.md
+    - Plugins: objects/plugins.md
+    - Pods: objects/pods.md
+    - Secrets: objects/secrets.md
+    - Services: objects/services.md
+    - Stacks: objects/stacks.md
+    - Tasks: objects/tasks.md
+    - Volumes: objects/volumes.md
   - User guide:
       - docker.run() guide: user_guide/docker_run.md
       - Swarm generic resources: user_guide/generic_resources.md

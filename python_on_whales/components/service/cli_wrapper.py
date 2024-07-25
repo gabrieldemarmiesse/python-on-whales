@@ -21,7 +21,7 @@ from python_on_whales.components.service.models import (
 from python_on_whales.exceptions import NoSuchService
 from python_on_whales.utils import (
     ValidPath,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     format_time_arg,
     run,
     stream_stdout_and_stderr,
@@ -195,22 +195,22 @@ class ServiceCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["service", "create", "--quiet"]
 
-        full_cmd.add_args_list("--cap-add", cap_add)
-        full_cmd.add_args_list("--cap-drop", cap_drop)
-        full_cmd.add_args_list("--constraint", constraints)
+        full_cmd.add_args_iterable_or_single("--cap-add", cap_add)
+        full_cmd.add_args_iterable_or_single("--cap-drop", cap_drop)
+        full_cmd.add_args_iterable_or_single("--constraint", constraints)
 
         full_cmd.add_flag("--detach", detach)
-        full_cmd.add_args_list("--dns", dns)
-        full_cmd.add_args_list("--dns-option", dns_options)
-        full_cmd.add_args_list("--dns-search", dns_search)
+        full_cmd.add_args_iterable_or_single("--dns", dns)
+        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
+        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
         full_cmd.add_simple_arg("--endpoint-mode", endpoint_mode)
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_list("--env", format_dict_for_cli(envs))
-        full_cmd.add_args_list("--env-file", env_files)
+        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
+        full_cmd.add_args_iterable_or_single("--env-file", env_files)
 
-        full_cmd.add_args_list("--generic-resource", generic_resources)
-        full_cmd.add_args_list("--group", groups)
+        full_cmd.add_args_iterable_or_single("--generic-resource", generic_resources)
+        full_cmd.add_args_iterable_or_single("--group", groups)
 
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
@@ -227,19 +227,19 @@ class ServiceCLI(DockerCLICaller):
 
         full_cmd.add_flag("--init", init)
         full_cmd.add_simple_arg("--isolation", isolation)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.add_simple_arg("--limit-cpu", limit_cpu)
         full_cmd.add_simple_arg("--limit-memory", limit_memory)
         full_cmd.add_simple_arg("--limit-pids", limit_pids)
         full_cmd.add_simple_arg("--log-driver", log_driver)
         full_cmd.add_simple_arg("--restart-condition", restart_condition)
         full_cmd.add_simple_arg("--restart-max-attempts", restart_max_attempts)
-        full_cmd.add_args_list(
-            "--mount", [",".join(format_dict_for_cli(s)) for s in mounts or []]
+        full_cmd.add_args_iterable_or_single(
+            "--mount", [",".join(format_mapping_for_cli(s)) for s in mounts or []]
         )
         full_cmd.add_simple_arg("--network", network)
-        full_cmd.add_args_list(
-            "--secret", [",".join(format_dict_for_cli(s)) for s in secrets or []]
+        full_cmd.add_args_iterable_or_single(
+            "--secret", [",".join(format_mapping_for_cli(s)) for s in secrets or []]
         )
 
         full_cmd.append(image)
@@ -364,7 +364,9 @@ class ServiceCLI(DockerCLICaller):
             A `List[python_on_whales.Services]`
         """
         full_cmd = self.docker_cmd + ["service", "list", "--quiet"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
 
         ids_truncated = run(full_cmd).splitlines()
 

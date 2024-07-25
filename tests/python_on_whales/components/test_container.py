@@ -218,6 +218,14 @@ def test_create_with_systemd_mode(podman_client: DockerClient):
         assert container.config.systemd_mode is True
 
 
+def test_create_in_pod(podman_client: DockerClient):
+    pod_name = random_name()
+    with podman_client.pod.create(pod_name) as pod:
+        container = podman_client.container.create("ubuntu", pod=pod_name)
+        assert container.pod == pod.id
+    assert not container.exists()
+
+
 def test_run_with_preserve_fds(podman_client: DockerClient):
     read_fd, write_fd = os.pipe()
     # Pass through enough additional file descriptors (as well as 0-2, stdin,
@@ -287,7 +295,8 @@ def test_remove_on_exit(ctr_client: DockerClient):
         pytest.param(
             "podman",
             marks=pytest.mark.xfail(
-                reason="Cgroup control not available with rootless podman on cgroups v1"
+                reason="Cgroup control not available with rootless podman on cgroups v1",
+                strict=False,
             ),
         ),
     ],
@@ -869,6 +878,15 @@ def test_exec_change_directory(ctr_client: DockerClient):
         assert c.execute(["pwd"], workdir="/usr/lib") == "/usr/lib"
 
 
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_exec_interactive_no_tty(ctr_client: DockerClient):
+    with ctr_client.run("ubuntu", ["sleep", "infinity"], detach=True, remove=True) as c:
+        with pytest.raises(DockerException) as no_tty_exc:
+            c.execute(["/bin/bash", "-c", "hi"], interactive=True, tty=False)
+        assert no_tty_exc.value.stdout == ""
+        assert "hi: command not found" in no_tty_exc.value.stderr
+
+
 @pytest.mark.parametrize(
     "method",
     [
@@ -1420,3 +1438,16 @@ def test_run_always_pull_existent(
     assert remote_id != local_id
     docker_client.container.run(test_image_name, pull="always")
     assert docker_client.image.inspect(test_image_name).id == remote_id
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_non_unicode_output(ctr_client: DockerClient):
+    """Non-unicode characters in container output should not lead to an exception."""
+    latin_char = "þ".encode("latin")
+    with pytest.raises(UnicodeDecodeError):
+        latin_char.decode(encoding="utf-8")
+    byte_repr = r"\x{:x}".format(ord(latin_char))
+    output = ctr_client.container.run(
+        "ubuntu", ["bash", "-c", f"echo -n $'{byte_repr}'"], remove=True
+    )
+    assert output == "�"

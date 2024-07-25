@@ -42,6 +42,7 @@ pages = {
     "sub-commands/plugin.md": [
         "python_on_whales.components.plugin.cli_wrapper.PluginCLI"
     ],
+    "sub-commands/pod.md": ["python_on_whales.components.pod.cli_wrapper.PodCLI"],
     "sub-commands/secret.md": [
         "python_on_whales.components.secret.cli_wrapper.SecretCLI"
     ],
@@ -58,18 +59,19 @@ pages = {
     "sub-commands/volume.md": [
         "python_on_whales.components.volume.cli_wrapper.VolumeCLI"
     ],
-    "docker_objects/builders.md": ["python_on_whales.Builder"],
-    "docker_objects/containers.md": ["python_on_whales.Container"],
-    "docker_objects/configs.md": ["python_on_whales.Config"],
-    "docker_objects/images.md": ["python_on_whales.Image"],
-    "docker_objects/networks.md": ["python_on_whales.Network"],
-    "docker_objects/nodes.md": ["python_on_whales.Node"],
-    "docker_objects/plugins.md": ["python_on_whales.Plugin"],
-    "docker_objects/services.md": ["python_on_whales.Service"],
-    "docker_objects/secrets.md": ["python_on_whales.Secret"],
-    "docker_objects/stacks.md": ["python_on_whales.Stack"],
-    "docker_objects/volumes.md": ["python_on_whales.Volume"],
-    "docker_objects/tasks.md": [],
+    "objects/builders.md": ["python_on_whales.Builder"],
+    "objects/containers.md": ["python_on_whales.Container"],
+    "objects/configs.md": ["python_on_whales.Config"],
+    "objects/images.md": ["python_on_whales.Image"],
+    "objects/networks.md": ["python_on_whales.Network"],
+    "objects/nodes.md": ["python_on_whales.Node"],
+    "objects/plugins.md": ["python_on_whales.Plugin"],
+    "objects/pods.md": ["python_on_whales.Pod"],
+    "objects/services.md": ["python_on_whales.Service"],
+    "objects/secrets.md": ["python_on_whales.Secret"],
+    "objects/stacks.md": ["python_on_whales.Stack"],
+    "objects/volumes.md": ["python_on_whales.Volume"],
+    "objects/tasks.md": [],
     "user_guide/docker_run.md": [],
     "user_guide/generic_resources.md": [],
     "user_guide/running_python_on_whales_inside_a_container.md": [],
