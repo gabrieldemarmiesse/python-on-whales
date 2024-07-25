@@ -1703,8 +1703,12 @@ class ContainerCLI(DockerCLICaller):
             full_cmd += ["--disable-content-trust", "false"]
 
         full_cmd.add_args_iterable_or_single("--dns", kwargs.get("dns", []))
-        full_cmd.add_args_iterable_or_single("--dns-option", kwargs.get("dns_options", []))
-        full_cmd.add_args_iterable_or_single("--dns-search", kwargs.get("dns_search", []))
+        full_cmd.add_args_iterable_or_single(
+            "--dns-option", kwargs.get("dns_options", [])
+        )
+        full_cmd.add_args_iterable_or_single(
+            "--dns-search", kwargs.get("dns_search", [])
+        )
         full_cmd.add_simple_arg("--domainname", kwargs.get("domainname"))
 
         full_cmd.add_simple_arg("--entrypoint", kwargs.get("entrypoint"))
@@ -1719,7 +1723,9 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--gpus", kwargs.get("gpus"))
 
-        full_cmd.add_args_iterable_or_single("--group-add", kwargs.get("groups_add", []))
+        full_cmd.add_args_iterable_or_single(
+            "--group-add", kwargs.get("groups_add", [])
+        )
 
         full_cmd.add_flag("--no-healthcheck", not kwargs.get("healthcheck", True))
         full_cmd.add_simple_arg("--health-cmd", kwargs.get("health_cmd"))
@@ -1747,11 +1753,17 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", kwargs.get("isolation"))
         full_cmd.add_simple_arg("--kernel-memory", kwargs.get("kernel_memory"))
 
-        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(kwargs.get("labels", {})))
-        full_cmd.add_args_iterable_or_single("--label-file", kwargs.get("label_files", []))
+        full_cmd.add_args_iterable_or_single(
+            "--label", format_mapping_for_cli(kwargs.get("labels", {}))
+        )
+        full_cmd.add_args_iterable_or_single(
+            "--label-file", kwargs.get("label_files", [])
+        )
 
         full_cmd.add_args_iterable_or_single("--link", kwargs.get("link", []))
-        full_cmd.add_args_iterable_or_single("--link-local-ip", kwargs.get("link_local_ip", []))
+        full_cmd.add_args_iterable_or_single(
+            "--link-local-ip", kwargs.get("link_local_ip", [])
+        )
 
         full_cmd.add_simple_arg("--log-driver", kwargs.get("log_driver"))
         full_cmd.add_args_iterable_or_single("--log-opt", kwargs.get("log_options", []))
@@ -1811,7 +1823,9 @@ class ContainerCLI(DockerCLICaller):
         )
         full_cmd.add_simple_arg("--stop-timeout", kwargs.get("stop_timeout"))
 
-        full_cmd.add_args_iterable_or_single("--storage-opt", kwargs.get("storage_options", []))
+        full_cmd.add_args_iterable_or_single(
+            "--storage-opt", kwargs.get("storage_options", [])
+        )
         full_cmd.add_args_iterable_or_single(
             "--sysctl", format_mapping_for_cli(kwargs.get("sysctl", {}))
         )
@@ -1829,7 +1843,9 @@ class ContainerCLI(DockerCLICaller):
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--volume-driver", kwargs.get("volume_driver"))
-        full_cmd.add_args_iterable_or_single("--volumes-from", kwargs.get("volumes_from", []))
+        full_cmd.add_args_iterable_or_single(
+            "--volumes-from", kwargs.get("volumes_from", [])
+        )
 
         full_cmd.add_simple_arg("--workdir", kwargs.get("workdir"))
 
