@@ -371,7 +371,7 @@ def test_buildx_inspect_bootstrap():
     with my_builder:
         docker.buildx.inspect(my_builder.name, bootstrap=True)
         assert my_builder.status == 'running'
-        #Must contain at least the host native platform
+        # Must contain at least the host native platform
         assert my_builder.platforms
 
 
@@ -488,7 +488,7 @@ def test_buildx_create_bootstrap():
     my_builder = docker.buildx.create(bootstrap=True)
     with my_builder:
         assert my_builder.status == 'running'
-        #Must contain at least the host native platform
+        # Must contain at least the host native platform
         assert my_builder.platforms
 
 
