@@ -366,6 +366,15 @@ def test_inspect():
         assert docker.buildx.inspect() == my_builder
 
 
+def test_buildx_inspect_bootstrap():
+    my_builder = docker.buildx.create()
+    with my_builder:
+        docker.buildx.inspect(my_builder.name, bootstrap=True)
+        assert my_builder.status == "running"
+        # Must contain at least the host native platform
+        assert my_builder.platforms
+
+
 def test_builder_name():
     my_builder = docker.buildx.create(name="some_builder")
     with my_builder:
@@ -473,6 +482,14 @@ def test_buildx_create_remove():
     builder = docker.buildx.create()
 
     docker.buildx.remove(builder)
+
+
+def test_buildx_create_bootstrap():
+    my_builder = docker.buildx.create(bootstrap=True)
+    with my_builder:
+        assert my_builder.status == "running"
+        # Must contain at least the host native platform
+        assert my_builder.platforms
 
 
 def test_buildx_create_remove_with_platforms():

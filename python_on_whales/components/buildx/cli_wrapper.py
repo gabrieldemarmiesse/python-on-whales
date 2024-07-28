@@ -454,6 +454,7 @@ class BuildxCLI(DockerCLICaller):
     def create(
         self,
         context_or_endpoint: Optional[str] = None,
+        bootstrap: bool = False,
         buildkitd_flags: Optional[str] = None,
         config: Optional[ValidPath] = None,
         platforms: Optional[List[str]] = None,
@@ -466,6 +467,7 @@ class BuildxCLI(DockerCLICaller):
 
         Parameters:
             context_or_endpoint:
+            bootstrap: Boot builder after creation
             buildkitd_flags: Flags for buildkitd daemon
             config: BuildKit config file
             platforms: Comma-separated list of platforms of the form OS/architecture/variant. Ex:
@@ -481,6 +483,7 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
+        full_cmd.add_flag("--bootstrap", bootstrap)
         full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
         full_cmd.add_simple_arg("--config", config)
         if platforms is not None:
@@ -501,16 +504,27 @@ class BuildxCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self, x: Optional[str] = None) -> Builder:
+    def inspect(
+        self,
+        x: Optional[str] = None,
+        bootstrap: bool = False,
+    ) -> Builder:
         """Returns a builder instance from the name.
 
         Parameters:
             x: If `None` (the default), returns the current builder. If a string is provided,
                 the builder that has this name is returned.
+            bootstrap: If set to True, ensure builder has booted before inspecting.
 
         # Returns
             A `python_on_whales.Builder` object.
         """
+        if bootstrap:
+            full_cmd = self.docker_cmd + ["buildx", "inspect"]
+            if x is not None:
+                full_cmd.append(x)
+            full_cmd.add_flag("--bootstrap", bootstrap)
+            run(full_cmd)
         return Builder(self.client_config, x, is_immutable_id=False)
 
     def list(self) -> List[Builder]:
