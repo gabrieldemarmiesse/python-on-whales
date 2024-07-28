@@ -507,7 +507,7 @@ class BuildxCLI(DockerCLICaller):
     def inspect(
         self,
         x: Optional[str] = None,
-        bootstrap: Optional[bool] = False,
+        bootstrap: bool = False,
     ) -> Builder:
         """Returns a builder instance from the name.
 
