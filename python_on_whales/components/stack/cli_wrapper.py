@@ -57,7 +57,7 @@ class StackCLI(DockerCLICaller):
             name: The name of the stack to deploy. Mandatory.
             compose_files: One or more docker-compose files. If there are more than
                 one, they will be fused together.
-                orchestrator: The orchestrator to use, `"swarm" or "kubernetes" or "all".
+            orchestrator: The orchestrator to use, `"swarm" or "kubernetes" or "all".
             prune: Prune services that are no longer referenced
             resolve_image: Query the registry to resolve image digest
                 and supported platforms `"always"|"changed"|"never"` (default `"always"`).
@@ -79,7 +79,7 @@ class StackCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["stack", "deploy"]
 
-        full_cmd.add_args_list("--compose-file", compose_files)
+        full_cmd.add_args_iterable_or_single("--compose-file", compose_files)
         full_cmd.add_simple_arg("--orchestrator", orchestrator)
         full_cmd.add_flag("--prune", prune)
         full_cmd.add_simple_arg("--resolve-image", resolve_image)

@@ -15,7 +15,7 @@ from python_on_whales.components.config.models import (
     ConfigSpec,
     DockerObjectVersion,
 )
-from python_on_whales.utils import format_dict_for_cli, run, to_list
+from python_on_whales.utils import format_mapping_for_cli, run, to_list
 
 
 class Config(ReloadableObjectFromJson):
@@ -96,7 +96,7 @@ class ConfigCLI(DockerCLICaller):
             A `python_on_whales.Config` object.
         """
         full_cmd = self.docker_cmd + ["config", "create"]
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.add_simple_arg("--template-driver", template_driver)
         full_cmd += [name, file]
         return Config(self.client_config, run(full_cmd), is_immutable_id=True)
@@ -135,7 +135,9 @@ class ConfigCLI(DockerCLICaller):
             A `List[python_on_whales.Config]`.
         """
         full_cmd = self.docker_cmd + ["config", "list", "--quiet"]
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
         output = run(full_cmd)
         ids = output.splitlines()
         return [Config(self.client_config, id_, is_immutable_id=True) for id_ in ids]

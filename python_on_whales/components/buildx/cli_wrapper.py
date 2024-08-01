@@ -4,7 +4,18 @@ import json
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Literal, Optional, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+    overload,
+)
 
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
@@ -16,7 +27,7 @@ from python_on_whales.components.buildx.imagetools.cli_wrapper import Imagetools
 from python_on_whales.components.buildx.models import BuilderInspectResult
 from python_on_whales.utils import (
     ValidPath,
-    format_dict_for_cli,
+    format_mapping_for_cli,
     run,
     stream_stdout_and_stderr,
     to_list,
@@ -185,7 +196,7 @@ class BuildxCLI(DockerCLICaller):
             full_cmd += ["--progress", progress]
         for file in to_list(files):
             full_cmd.add_simple_arg("--file", file)
-        full_cmd.add_args_list("--set", format_dict_for_cli(set))
+        full_cmd.add_args_iterable_or_single("--set", format_mapping_for_cli(set))
         targets = to_list(targets)
         env = dict(variables)
         if print:
@@ -315,16 +326,20 @@ class BuildxCLI(DockerCLICaller):
         if progress != "auto" and isinstance(progress, str):
             full_cmd += ["--progress", progress]
 
-        full_cmd.add_args_list(
-            "--add-host", format_dict_for_cli(add_hosts, separator=":")
+        full_cmd.add_args_iterable_or_single(
+            "--add-host", format_mapping_for_cli(add_hosts, separator=":")
         )
-        full_cmd.add_args_list("--allow", allow)
+        full_cmd.add_args_iterable_or_single("--allow", allow)
         if isinstance(attest, dict):
             full_cmd.add_simple_arg("--attest", format_dict_for_buildx(attest))
-        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
-        full_cmd.add_args_list("--build-context", format_dict_for_cli(build_contexts))
+        full_cmd.add_args_iterable_or_single(
+            "--build-arg", format_mapping_for_cli(build_args)
+        )
+        full_cmd.add_args_iterable_or_single(
+            "--build-context", format_mapping_for_cli(build_contexts)
+        )
         full_cmd.add_simple_arg("--builder", builder)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
 
         full_cmd.add_simple_arg("--ssh", ssh)
 
@@ -352,14 +367,14 @@ class BuildxCLI(DockerCLICaller):
             full_cmd.add_simple_arg("--cache-to", format_dict_for_buildx(cache_to))
         else:
             full_cmd.add_simple_arg("--cache-to", cache_to)
-        full_cmd.add_args_list("--secret", to_list(secrets))
+        full_cmd.add_args_iterable_or_single("--secret", to_list(secrets))
         if output != {}:
             full_cmd += ["--output", format_dict_for_buildx(output)]
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
-        full_cmd.add_args_list("--tag", tags)
+        full_cmd.add_args_iterable_or_single("--tag", tags)
 
         if stream_logs:
             if progress in (False, "tty"):
@@ -439,6 +454,7 @@ class BuildxCLI(DockerCLICaller):
     def create(
         self,
         context_or_endpoint: Optional[str] = None,
+        bootstrap: bool = False,
         buildkitd_flags: Optional[str] = None,
         config: Optional[ValidPath] = None,
         platforms: Optional[List[str]] = None,
@@ -451,6 +467,7 @@ class BuildxCLI(DockerCLICaller):
 
         Parameters:
             context_or_endpoint:
+            bootstrap: Boot builder after creation
             buildkitd_flags: Flags for buildkitd daemon
             config: BuildKit config file
             platforms: Comma-separated list of platforms of the form OS/architecture/variant. Ex:
@@ -466,6 +483,7 @@ class BuildxCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
+        full_cmd.add_flag("--bootstrap", bootstrap)
         full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
         full_cmd.add_simple_arg("--config", config)
         if platforms is not None:
@@ -486,16 +504,27 @@ class BuildxCLI(DockerCLICaller):
         """Not yet implemented"""
         raise NotImplementedError
 
-    def inspect(self, x: Optional[str] = None) -> Builder:
+    def inspect(
+        self,
+        x: Optional[str] = None,
+        bootstrap: bool = False,
+    ) -> Builder:
         """Returns a builder instance from the name.
 
         Parameters:
             x: If `None` (the default), returns the current builder. If a string is provided,
                 the builder that has this name is returned.
+            bootstrap: If set to True, ensure builder has booted before inspecting.
 
         # Returns
             A `python_on_whales.Builder` object.
         """
+        if bootstrap:
+            full_cmd = self.docker_cmd + ["buildx", "inspect"]
+            if x is not None:
+                full_cmd.append(x)
+            full_cmd.add_flag("--bootstrap", bootstrap)
+            run(full_cmd)
         return Builder(self.client_config, x, is_immutable_id=False)
 
     def list(self) -> List[Builder]:
@@ -514,16 +543,44 @@ class BuildxCLI(DockerCLICaller):
             Builder(self.client_config, x, is_immutable_id=True) for x in builders_names
         ]
 
-    def prune(self, all: bool = False, filters: Dict[str, str] = {}) -> None:
+    @overload
+    def prune(
+        self,
+        all: bool = False,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[True] = ...,
+    ) -> Iterable[Tuple[str, bytes]]:
+        ...
+
+    @overload
+    def prune(
+        self,
+        all: bool = False,
+        filters: Dict[str, str] = {},
+        stream_logs: Literal[False] = ...,
+    ) -> None:
+        ...
+
+    def prune(
+        self, all: bool = False, filters: Dict[str, str] = {}, stream_logs: bool = False
+    ):
         """Remove build cache on the current builder.
 
         Parameters:
             all: Remove all cache, not just dangling layers
             filters: Filters to use, for example `filters=dict(until="24h")`
+            stream_logs: If `True` this function will return an iterator of strings.
+                You can then read the logs as they arrive. If `False` (the default value), then
+                the function returns `None`, but when it returns, then the prune operation has already been
+                done.
         """
         full_cmd = self.docker_cmd + ["buildx", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
+        if stream_logs:
+            return stream_buildx_logs(full_cmd)
         run(full_cmd)
 
     def remove(self, builder: Union[Builder, str]) -> None:
@@ -603,7 +660,7 @@ def removesuffix(base_string: str, suffix: str) -> str:
 
 
 def format_dict_for_buildx(options: Dict[str, str]) -> str:
-    return ",".join(format_dict_for_cli(options, separator="="))
+    return ",".join(format_mapping_for_cli(options, separator="="))
 
 
 def stream_buildx_logs(full_cmd: list, env: Dict[str, str] = None) -> Iterator[str]:

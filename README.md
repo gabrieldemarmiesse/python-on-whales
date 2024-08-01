@@ -33,13 +33,13 @@ from python_on_whales import docker
 ```
 and then:
 
-* `docker run hello-world` -> [`docker.run("hello-world")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#run)
-* `docker pull ubuntu` -> [`docker.pull("ubuntu")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#pull)
-* `docker build ./` -> [`docker.build("./")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/buildx/#build)
-* `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/compose/#up)
-* `docker image ls` -> [`docker.image.list()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#list)
-* `docker ps` -> [`docker.ps()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#list)
-* `docker cp` -> [`docker.copy()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#copy)
+* `docker run hello-world` -> [`docker.run("hello-world")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.run)
+* `docker pull ubuntu` -> [`docker.pull("ubuntu")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.pull)
+* `docker build ./` -> [`docker.build("./")`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/buildx/#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build)
+* `docker compose up my_service` -> [`docker.compose.up(["my_service"])`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/compose/#python_on_whales.components.compose.cli_wrapper.ComposeCLI.up)
+* `docker image ls` -> [`docker.image.list()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.list)
+* `docker ps` -> [`docker.ps()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.list)
+* `docker cp` -> [`docker.copy()`](https://gabrieldemarmiesse.github.io/python-on-whales/sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.copy)
 
 You get the idea 🙂 it's the same as the CLI we all know and love.
 
@@ -314,7 +314,7 @@ print(podman.ps())
 
 ## Contributing
 
-Any and all PRs are welcome. Please see [this documentation](./CONTRIBUTING.md).
+Any and all PRs are welcome. Please see [this documentation](https://github.com/gabrieldemarmiesse/python-on-whales/blob/master/CONTRIBUTING.md).
 
 
 ## What about the license?

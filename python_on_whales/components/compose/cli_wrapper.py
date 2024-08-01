@@ -11,7 +11,7 @@ import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
-    format_dict_for_cli,
+    format_mapping_for_cli,
     format_signal_arg,
     parse_ls_status_count,
     run,
@@ -89,7 +89,9 @@ class ComposeCLI(DockerCLICaller):
             )
 
         full_cmd = self.docker_compose_cmd + ["build"]
-        full_cmd.add_args_list("--build-arg", format_dict_for_cli(build_args))
+        full_cmd.add_args_iterable_or_single(
+            "--build-arg", format_mapping_for_cli(build_args)
+        )
         full_cmd.add_flag("--no-cache", not cache)
         full_cmd.add_simple_arg("--progress", progress)
         full_cmd.add_flag("--pull", pull)
@@ -217,6 +219,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def down(
         self,
+        services: Union[List[str], str, None] = ...,
         remove_orphans: bool = ...,
         remove_images: Optional[str] = ...,
         timeout: Optional[int] = ...,
@@ -229,6 +232,7 @@ class ComposeCLI(DockerCLICaller):
     @overload
     def down(
         self,
+        services: Union[List[str], str, None] = ...,
         remove_orphans: bool = ...,
         remove_images: Optional[str] = ...,
         timeout: Optional[int] = ...,
@@ -240,6 +244,7 @@ class ComposeCLI(DockerCLICaller):
 
     def down(
         self,
+        services: Union[List[str], str, None] = None,
         remove_orphans: bool = False,
         remove_images: Optional[str] = None,
         timeout: Optional[int] = None,
@@ -250,6 +255,9 @@ class ComposeCLI(DockerCLICaller):
         """Stops and removes the containers
 
         Parameters:
+            services: The services to stop. If `None` (default), all services are
+                stopped. If an empty list is provided, the function call does nothing, it's
+                a no-op.
             remove_orphans: Remove containers for services not defined in
                 the Compose file.
             remove_images: Remove images used by services.
@@ -273,6 +281,12 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--rmi", remove_images)
         full_cmd.add_simple_arg("--timeout", timeout)
         full_cmd.add_flag("--volumes", volumes)
+
+        if services == []:
+            return
+        elif services is not None:
+            services = to_list(services)
+            full_cmd += services
 
         if stream_logs:
             return stream_stdout_and_stderr(full_cmd)
@@ -488,7 +502,9 @@ class ComposeCLI(DockerCLICaller):
         """
         full_cmd = self.docker_compose_cmd + ["ls", "--format", "json"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_list("--filter", format_dict_for_cli(filters))
+        full_cmd.add_args_iterable_or_single(
+            "--filter", format_mapping_for_cli(filters)
+        )
 
         return [
             ComposeProject(
@@ -739,7 +755,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--workdir", workdir)
-        full_cmd.add_args_list("--label", format_dict_for_cli(labels))
+        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.append(service)
         full_cmd += command
 
@@ -890,6 +906,7 @@ class ComposeCLI(DockerCLICaller):
         no_attach_services: Union[List[str], str, None] = ...,
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[True] = ...,
+        wait_timeout: Optional[int] = ...,
     ) -> Iterable[Tuple[str, bytes]]:
         ...
 
@@ -915,6 +932,7 @@ class ComposeCLI(DockerCLICaller):
         no_attach_services: Union[List[str], str, None] = ...,
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[False] = ...,
+        wait_timeout: Optional[int] = ...,
     ) -> None:
         ...
 
@@ -939,6 +957,7 @@ class ComposeCLI(DockerCLICaller):
         no_attach_services: Union[List[str], str, None] = None,
         pull: Literal["always", "missing", "never", None] = None,
         stream_logs: bool = False,
+        wait_timeout: Optional[int] = None,
     ):
         """Start the containers.
 
@@ -983,6 +1002,7 @@ class ComposeCLI(DockerCLICaller):
                 as bytes, you'll need to call `.decode()` if you want the logs as `str`.
                 See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
                 not familiar with the streaming of logs in Python-on-whales.
+            wait_timeout: Maximum duration to wait for the project to be running|healthy
         """
         if quiet and stream_logs:
             raise ValueError(
@@ -993,6 +1013,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_flag("--wait", wait)
+        full_cmd.add_simple_arg("--wait-timeout", wait_timeout)
         full_cmd.add_flag("--abort-on-container-exit", abort_on_container_exit)
         for service, scale in scales.items():
             full_cmd.add_simple_arg("--scale", f"{service}={scale}")

@@ -21,7 +21,7 @@ class DockerException(Exception):
             self.stderr: Optional[str] = stderr.decode()
         command_launched_str = " ".join(command_launched)
         error_msg = (
-            f"The docker command executed was `{command_launched_str}`.\n"
+            f"The command executed was `{command_launched_str}`.\n"
             f"It returned with code {return_code}\n"
         )
         if stdout is not None:
@@ -46,6 +46,10 @@ class NoSuchContainer(DockerException):
 
 
 class NoSuchImage(DockerException):
+    pass
+
+
+class NoSuchPod(DockerException):
     pass
 
 

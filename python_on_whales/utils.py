@@ -8,7 +8,18 @@ from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    overload,
+)
 
 import pydantic
 from typing_extensions import Literal
@@ -17,6 +28,7 @@ from python_on_whales.exceptions import (
     DockerException,
     NoSuchContainer,
     NoSuchImage,
+    NoSuchPod,
     NoSuchService,
     NoSuchVolume,
     NotASwarmManager,
@@ -70,6 +82,9 @@ def to_docker_camel(string):
             "ipam": "IPAM",
             "tls_info": "TLSInfo",
             "virtual_ips": "VirtualIPs",
+            "infra_container_id": "InfraContainerID",
+            "default_api_version": "DefaultAPIVersion",
+            "min_api_version": "MinAPIVersion",
         }
         return special_cases[string]
     except KeyError:
@@ -98,6 +113,7 @@ def run(
     return_stderr: Literal[True] = ...,
     env: Dict[str, str] = ...,
     tty: bool = ...,
+    pass_fds: Sequence[int] = ...,
 ) -> Tuple[str, str]:
     ...
 
@@ -111,6 +127,7 @@ def run(
     return_stderr: Literal[False] = ...,
     env: Dict[str, str] = ...,
     tty: bool = ...,
+    pass_fds: Sequence[int] = ...,
 ) -> str:
     ...
 
@@ -123,6 +140,7 @@ def run(
     return_stderr: bool = False,
     env: Dict[str, str] = {},
     tty: bool = False,
+    pass_fds: Sequence[int] = (),
 ) -> Union[str, Tuple[str, str]]:
     args = [str(x) for x in args]
     subprocess_env = dict(os.environ)
@@ -147,7 +165,12 @@ def run(
         print(f"Env: {subprocess_env}")
         print("------------------------------")
     completed_process = subprocess.run(
-        args, input=input, stdout=stdout_dest, stderr=stderr_dest, env=subprocess_env
+        args,
+        input=input,
+        stdout=stdout_dest,
+        stderr=stderr_dest,
+        env=subprocess_env,
+        pass_fds=pass_fds,
     )
 
     if completed_process.returncode != 0:
@@ -171,6 +194,13 @@ def run(
                 )
             if "no such container" in decoded_stderr:
                 raise NoSuchContainer(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+            if "no such pod" in decoded_stderr:
+                raise NoSuchPod(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
@@ -207,10 +237,10 @@ def run(
         return post_process_stream(completed_process.stdout)
 
 
-def post_process_stream(stream: Optional[bytes]):
+def post_process_stream(stream: Optional[bytes]) -> str:
     if stream is None:
         return ""
-    stream = stream.decode()
+    stream = stream.decode(errors="replace")
     if len(stream) != 0 and stream[-1] == "\n":
         stream = stream[:-1]
     return stream
@@ -226,6 +256,10 @@ ValidPortMapping = Union[
 def to_list(x) -> list:
     if isinstance(x, list):
         return x
+    elif isinstance(x, (str, bytes)):
+        return [x]
+    elif isinstance(x, Iterable):
+        return list(x)
     else:
         return [x]
 
@@ -255,7 +289,7 @@ def reader(pipe, pipe_name, queue):
 
 
 def stream_stdout_and_stderr(
-    full_cmd: list, env: Dict[str, str] = None
+    full_cmd: list, env: Dict[str, str] = None, pass_fds: Sequence[int] = ()
 ) -> Iterable[Tuple[str, bytes]]:
     if env is None:
         subprocess_env = None
@@ -264,7 +298,9 @@ def stream_stdout_and_stderr(
         subprocess_env.update(env)
 
     full_cmd = list(map(str, full_cmd))
-    process = Popen(full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env)
+    process = Popen(
+        full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env, pass_fds=pass_fds
+    )
     q = Queue()
     full_stderr = b""  # for the error message
     # we use deamon threads to avoid hanging if the user uses ctrl+c
@@ -285,8 +321,8 @@ def stream_stdout_and_stderr(
         raise DockerException(full_cmd, exit_code, stderr=full_stderr)
 
 
-def format_dict_for_cli(dictionary: Dict[str, str], separator="="):
-    return [f"{key}{separator}{value}" for key, value in dictionary.items()]
+def format_mapping_for_cli(mapping: Mapping[str, str], separator="="):
+    return [f"{key}{separator}{value}" for key, value in mapping.items()]
 
 
 def read_env_file(env_file: Path) -> Dict[str, str]:
@@ -323,7 +359,7 @@ def format_time_arg(time_object):
 
 def format_time_for_docker(time_object: Union[datetime, timedelta]) -> str:
     if isinstance(time_object, datetime):
-        return time_object.strftime("%Y-%m-%dT%H:%M:%S")
+        return time_object.isoformat()
     elif isinstance(time_object, timedelta):
         return f"{time_object.total_seconds()}s"
 
