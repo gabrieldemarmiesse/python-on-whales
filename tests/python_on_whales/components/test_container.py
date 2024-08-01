@@ -261,6 +261,16 @@ def test_create_start_with_timezone(podman_client: DockerClient):
         assert output == "GMT"
 
 
+def test_init_container(podman_client: DockerClient):
+    with podman_client.container.create("ubuntu", ["sleep", "infinity"]) as container:
+        assert not container.state.pid
+        assert container.state.status.lower() == "created"
+        container.init()
+        container.reload()
+        assert container.state.pid
+        assert container.state.status.lower() == "initialized"
+
+
 @pytest.mark.parametrize(
     "ctr_client",
     ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
@@ -915,6 +925,11 @@ def test_functions_nosuchcontainer(ctr_client: DockerClient, method: str):
         pytest.xfail()
     with pytest.raises(NoSuchContainer):
         getattr(ctr_client.container, method)("DOODODGOIHURHURI")
+
+
+def test_init_nosuchcontainer(podman_client: DockerClient):
+    with pytest.raises(NoSuchContainer):
+        podman_client.container.init("DOODODGOIHURHURI")
 
 
 @pytest.mark.parametrize(
