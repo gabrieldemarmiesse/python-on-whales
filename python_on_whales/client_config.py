@@ -2,6 +2,7 @@ import json
 import shutil
 import tempfile
 import warnings
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -37,7 +38,7 @@ class Command(list):
         if value:
             self.append(name)
 
-    def add_args_list(self, arg_name: str, list_values: list):
+    def add_args_list(self, arg_name: str, list_values: Sequence):
         for value in to_list(list_values):
             self.extend([arg_name, value])
 
@@ -61,6 +62,7 @@ class ClientConfig:
     compose_files: List[ValidPath] = field(default_factory=list)
     compose_profiles: List[str] = field(default_factory=list)
     compose_env_file: Optional[ValidPath] = None
+    compose_env_files: Sequence[ValidPath] = field(default_factory=list)
     compose_project_name: Optional[str] = None
     compose_project_directory: Optional[ValidPath] = None
     compose_compatibility: Optional[bool] = None
@@ -146,7 +148,18 @@ class ClientConfig:
         base_cmd = self.docker_cmd + ["compose"]
         base_cmd.add_args_list("--file", self.compose_files)
         base_cmd.add_args_list("--profile", self.compose_profiles)
-        base_cmd.add_simple_arg("--env-file", self.compose_env_file)
+        if self.compose_env_files:
+            if self.compose_env_file:
+                warnings.warn(
+                    "You can't set both `compose_env_file` and `compose_env_files`. Files used in `compose_env_files` will be used."
+                )
+            base_cmd.add_args_list("--env-file", self.compose_env_files)
+        elif self.compose_env_file:
+            warnings.warn(
+                "`compose_env_file` is deprecated. Use `compose_env_files` instead."
+            )
+            base_cmd.add_simple_arg("--env-file", self.compose_env_file)
+
         base_cmd.add_simple_arg("--project-name", self.compose_project_name)
         base_cmd.add_simple_arg("--project-directory", self.compose_project_directory)
         base_cmd.add_flag("--compatibility", self.compose_compatibility)
