@@ -37,7 +37,7 @@ jobs:
           pip install -e ./[dev]
       - name: Run all checks
         run: |
-          ruff --check ./
+          ruff check ./
           ruff format --check ./
 
   build-linux-test-component:
