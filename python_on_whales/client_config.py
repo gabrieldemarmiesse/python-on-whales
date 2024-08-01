@@ -2,7 +2,6 @@ import json
 import shutil
 import tempfile
 import warnings
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -75,7 +74,7 @@ class ClientConfig:
     compose_files: List[ValidPath] = field(default_factory=list)
     compose_profiles: List[str] = field(default_factory=list)
     compose_env_file: Optional[ValidPath] = None
-    compose_env_files: Sequence[ValidPath] = field(default_factory=list)
+    compose_env_files: Iterable[ValidPath] = field(default_factory=list)
     compose_project_name: Optional[str] = None
     compose_project_directory: Optional[ValidPath] = None
     compose_compatibility: Optional[bool] = None
