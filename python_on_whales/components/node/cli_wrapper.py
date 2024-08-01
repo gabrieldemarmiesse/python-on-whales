@@ -116,12 +116,10 @@ class NodeCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Node:
-        ...
+    def inspect(self, x: str) -> Node: ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Node]:
-        ...
+    def inspect(self, x: List[str]) -> List[Node]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Node, List[Node]]:
         """Returns a `python_on_whales.Node` object from a string

@@ -32,8 +32,7 @@ class ComposeCLI(DockerCLICaller):
         quiet: bool = ...,
         ssh: Optional[str] = ...,
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def build(
@@ -46,8 +45,7 @@ class ComposeCLI(DockerCLICaller):
         quiet: bool = ...,
         ssh: Optional[str] = ...,
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def build(
         self,
@@ -110,12 +108,10 @@ class ComposeCLI(DockerCLICaller):
             run(full_cmd, capture_stdout=False)
 
     @overload
-    def config(self, return_json: Literal[False] = ...) -> ComposeConfig:
-        ...
+    def config(self, return_json: Literal[False] = ...) -> ComposeConfig: ...
 
     @overload
-    def config(self, return_json: Literal[True] = ...) -> Dict[str, Any]:
-        ...
+    def config(self, return_json: Literal[True] = ...) -> Dict[str, Any]: ...
 
     def config(self, return_json: bool = False) -> Union[ComposeConfig, Dict[str, Any]]:
         """Returns the configuration of the compose stack for further inspection.
@@ -155,8 +151,7 @@ class ComposeCLI(DockerCLICaller):
         no_build: bool = ...,
         no_recreate: bool = ...,
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def create(
@@ -167,8 +162,7 @@ class ComposeCLI(DockerCLICaller):
         no_build: bool = ...,
         no_recreate: bool = ...,
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def create(
         self,
@@ -226,8 +220,7 @@ class ComposeCLI(DockerCLICaller):
         volumes: bool = ...,
         quiet: bool = ...,
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def down(
@@ -239,8 +232,7 @@ class ComposeCLI(DockerCLICaller):
         volumes: bool = ...,
         quiet: bool = ...,
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def down(
         self,
@@ -533,8 +525,7 @@ class ComposeCLI(DockerCLICaller):
         include_deps: bool = ...,
         quiet: bool = ...,
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def pull(
@@ -544,8 +535,7 @@ class ComposeCLI(DockerCLICaller):
         include_deps: bool = ...,
         quiet: bool = ...,
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def pull(
         self,
@@ -774,16 +764,14 @@ class ComposeCLI(DockerCLICaller):
         self,
         services: Union[str, List[str], None] = ...,
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def start(
         self,
         services: Union[str, List[str], None] = ...,
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def start(
         self, services: Union[str, List[str], None] = None, stream_logs: bool = False
@@ -817,8 +805,7 @@ class ComposeCLI(DockerCLICaller):
         services: Union[str, List[str], None] = ...,
         timeout: Union[int, timedelta, None] = ...,
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def stop(
@@ -826,8 +813,7 @@ class ComposeCLI(DockerCLICaller):
         services: Union[str, List[str], None] = ...,
         timeout: Union[int, timedelta, None] = ...,
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def stop(
         self,
@@ -907,8 +893,7 @@ class ComposeCLI(DockerCLICaller):
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[True] = ...,
         wait_timeout: Optional[int] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def up(
@@ -933,8 +918,7 @@ class ComposeCLI(DockerCLICaller):
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[False] = ...,
         wait_timeout: Optional[int] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def up(
         self,

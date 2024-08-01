@@ -178,12 +178,10 @@ class ContextCLI(DockerCLICaller):
         return self.inspect(context_name)
 
     @overload
-    def inspect(self, x: Union[None, str]) -> Context:
-        ...
+    def inspect(self, x: Union[None, str]) -> Context: ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Context]:
-        ...
+    def inspect(self, x: List[str]) -> List[Context]: ...
 
     def inspect(
         self, x: Union[None, str, List[str]] = None

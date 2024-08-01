@@ -114,8 +114,7 @@ def run(
     env: Dict[str, str] = ...,
     tty: bool = ...,
     pass_fds: Sequence[int] = ...,
-) -> Tuple[str, str]:
-    ...
+) -> Tuple[str, str]: ...
 
 
 @overload
@@ -128,8 +127,7 @@ def run(
     env: Dict[str, str] = ...,
     tty: bool = ...,
     pass_fds: Sequence[int] = ...,
-) -> str:
-    ...
+) -> str: ...
 
 
 def run(

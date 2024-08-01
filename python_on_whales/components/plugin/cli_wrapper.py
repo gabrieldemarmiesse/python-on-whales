@@ -147,12 +147,10 @@ class PluginCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Plugin:
-        ...
+    def inspect(self, x: str) -> Plugin: ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Plugin]:
-        ...
+    def inspect(self, x: List[str]) -> List[Plugin]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Plugin, List[Plugin]]:
         """Returns a `python_on_whales.Plugin` object from a string

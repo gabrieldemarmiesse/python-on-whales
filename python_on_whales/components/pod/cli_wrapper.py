@@ -472,12 +472,10 @@ class PodCLI(DockerCLICaller):
             return True
 
     @overload
-    def inspect(self, x: ValidPod, /) -> Pod:
-        ...
+    def inspect(self, x: ValidPod, /) -> Pod: ...
 
     @overload
-    def inspect(self, x: Sequence[ValidPod], /) -> List[Pod]:
-        ...
+    def inspect(self, x: Sequence[ValidPod], /) -> List[Pod]: ...
 
     def inspect(
         self, x: Union[ValidPod, Sequence[ValidPod]], /
