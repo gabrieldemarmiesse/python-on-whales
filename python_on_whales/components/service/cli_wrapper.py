@@ -255,8 +255,7 @@ class ServiceCLI(DockerCLICaller):
         pass
 
     @overload
-    def inspect(self, x: List[str]) -> List[Service]:
-        ...
+    def inspect(self, x: List[str]) -> List[Service]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Service, List[Service]]:
         """Returns one or a list of `python_on_whales.Service` object(s).

@@ -549,8 +549,7 @@ class BuildxCLI(DockerCLICaller):
         all: bool = False,
         filters: Dict[str, str] = {},
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def prune(
@@ -558,8 +557,7 @@ class BuildxCLI(DockerCLICaller):
         all: bool = False,
         filters: Dict[str, str] = {},
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def prune(
         self, all: bool = False, filters: Dict[str, str] = {}, stream_logs: bool = False

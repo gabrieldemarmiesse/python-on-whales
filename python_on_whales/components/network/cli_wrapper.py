@@ -210,12 +210,10 @@ class NetworkCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: str) -> Network:
-        ...
+    def inspect(self, x: str) -> Network: ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Network]:
-        ...
+    def inspect(self, x: List[str]) -> List[Network]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Network, List[Network]]:
         if isinstance(x, str):

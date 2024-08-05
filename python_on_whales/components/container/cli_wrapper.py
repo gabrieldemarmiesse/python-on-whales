@@ -1036,12 +1036,10 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def inspect(self, x: ValidContainer, /) -> Container:
-        ...
+    def inspect(self, x: ValidContainer, /) -> Container: ...
 
     @overload
-    def inspect(self, x: List[ValidContainer], /) -> List[Container]:
-        ...
+    def inspect(self, x: List[ValidContainer], /) -> List[Container]: ...
 
     def inspect(
         self, x: Union[ValidContainer, List[ValidContainer]], /
@@ -1219,16 +1217,14 @@ class ContainerCLI(DockerCLICaller):
         self,
         filters: Dict[str, str] = {},
         stream_logs: Literal[True] = ...,
-    ) -> Iterable[Tuple[str, bytes]]:
-        ...
+    ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
     def prune(
         self,
         filters: Dict[str, str] = {},
         stream_logs: Literal[False] = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def prune(
         self,
@@ -2040,12 +2036,10 @@ class ContainerCLI(DockerCLICaller):
         run(full_cmd)
 
     @overload
-    def wait(self, x: ValidContainer) -> int:
-        ...
+    def wait(self, x: ValidContainer) -> int: ...
 
     @overload
-    def wait(self, x: List[ValidContainer]) -> List[int]:
-        ...
+    def wait(self, x: List[ValidContainer]) -> List[int]: ...
 
     def wait(
         self, x: Union[ValidContainer, List[ValidContainer]]

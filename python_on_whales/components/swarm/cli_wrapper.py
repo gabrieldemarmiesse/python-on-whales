@@ -219,7 +219,7 @@ def format_bool_for_cli(flag: Optional[bool]) -> Optional[str]:
 
 
 def stringify_timedelta_for_docker_cli(
-    delta: Union[None, int, timedelta]
+    delta: Union[None, int, timedelta],
 ) -> Optional[str]:
     if delta is None:
         return

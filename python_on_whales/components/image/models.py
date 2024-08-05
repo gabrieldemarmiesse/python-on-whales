@@ -37,9 +37,9 @@ class ImageInspectResult(DockerCamelModel):
     ] = None
     docker_version: Optional[str] = None
     author: Optional[str] = None
-    config: Optional[
-        python_on_whales.components.container.models.ContainerConfig
-    ] = None
+    config: Optional[python_on_whales.components.container.models.ContainerConfig] = (
+        None
+    )
     architecture: Optional[str] = None
     os: Optional[str] = None
     os_version: Optional[str] = None
