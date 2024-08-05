@@ -16,7 +16,7 @@ dependencies = { file = ["requirements.txt"] }
 
 [project.optional-dependencies]
 test = ["pytest"]
-dev = ["ruff==0.5.5"]
+dev = ["ruff==0.5.6"]
 
 [project.urls]
 "Source" = "https://github.com/gabrieldemarmiesse/python-on-whales"
