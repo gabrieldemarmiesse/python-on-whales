@@ -320,7 +320,14 @@ class Container(ReloadableObjectFromJson):
         """
         return ContainerCLI(self.client_config).export(self, output)
 
-    def kill(self, signal: Optional[Union[int, str]] = None):
+    def init(self) -> None:
+        """Initialize this container.
+
+        See the [`docker.container.init`](../sub-commands/container.md#init) command.
+        """
+        return ContainerCLI(self.client_config).init(self)
+
+    def kill(self, signal: Optional[Union[int, str]] = None) -> None:
         """Kill this container
 
         See the [`docker.container.kill`](../sub-commands/container.md#kill) command for
@@ -1001,6 +1008,32 @@ class ContainerCLI(DockerCLICaller):
             raise NotImplementedError
         else:
             run(full_cmd)
+
+    def init(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
+        """Initialize one or more containers.
+
+        Note that this is only supported by podman.
+
+        Alias: `docker.init(...)`
+
+        Parameters:
+            containers: One or more containers to kill
+            output: The path of the output tar archive. Returning a generator of bytes
+                is not yet implemented.
+
+        # Raises
+            `python_on_whales.exceptions.NoSuchContainer` if any of the
+            containers do not exist.
+        """
+        containers = to_list(containers)
+        if len(containers) == 0:
+            # nothing to do
+            return
+
+        full_cmd = self.docker_cmd + ["container", "init"]
+        full_cmd += containers
+
+        run(full_cmd)
 
     @overload
     def inspect(self, x: ValidContainer, /) -> Container:
