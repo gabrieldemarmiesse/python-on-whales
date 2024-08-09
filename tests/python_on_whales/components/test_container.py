@@ -58,8 +58,8 @@ def test_simple_mistake_on_run(ctr_client: DockerClient):
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
-def test_simple_command_create_start(ctr_client: DockerClient):
-    output = ctr_client.container.create("hello-world", remove=True).start(attach=True)
+def test_simple_command_run(ctr_client: DockerClient):
+    output = ctr_client.container.run("hello-world", remove=True)
     assert "Hello from Docker!" in output
 
 
