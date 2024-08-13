@@ -146,7 +146,6 @@ def test_service_secrets(docker_client: DockerClient):
             },
             {
                 "source": "dbpass",
-                "source": "dbpass",
                 "uid": "1000",
                 "gid": "1000",
                 "mode": "0400",

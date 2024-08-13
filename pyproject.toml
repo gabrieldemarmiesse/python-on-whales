@@ -15,9 +15,8 @@ dynamic = ["dependencies"]
 dependencies = { file = ["requirements.txt"] }
 
 [project.optional-dependencies]
-test = [
-  "pytest",
-]
+test = ["pytest"]
+dev = ["ruff==0.5.6"]
 
 [project.urls]
 "Source" = "https://github.com/gabrieldemarmiesse/python-on-whales"
@@ -30,11 +29,25 @@ python-on-whales = "python_on_whales.command_line_entrypoint:main"
 [tool.setuptools.packages.find]
 exclude = ["tests*", "docs*"]
 
+[tool.ruff]
+target-version = "py38"
+
+[tool.ruff.lint]
+ignore = [
+  "E501", # Line too long
+]
+select = [
+  "I", # isort
+  "F", # Pyflakes
+  "E", # pycodestyle
+  "W", # pycodestyle
+
+]
 
 [tool.pytest.ini_options]
 markers = [
-    "docker: marks tests as needing a docker engine to run",
-    "podman: marks tests as needing a podman engine to run"
+  "docker: marks tests as needing a docker engine to run",
+  "podman: marks tests as needing a podman engine to run",
 ]
 xfail_strict = true
 pythonpath = ["./"]

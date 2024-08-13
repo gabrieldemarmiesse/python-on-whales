@@ -310,12 +310,10 @@ class ImageCLI(DockerCLICaller):
         return Image(self.client_config, run(full_cmd))
 
     @overload
-    def inspect(self, x: str) -> Image:
-        ...
+    def inspect(self, x: str) -> Image: ...
 
     @overload
-    def inspect(self, x: Iterable[str]) -> List[Image]:
-        ...
+    def inspect(self, x: Iterable[str]) -> List[Image]: ...
 
     def inspect(self, x: Union[str, Iterable[str]]) -> Union[Image, List[Image]]:
         """Creates a `python_on_whales.Image` object.

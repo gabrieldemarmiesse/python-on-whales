@@ -102,12 +102,10 @@ class ConfigCLI(DockerCLICaller):
         return Config(self.client_config, run(full_cmd), is_immutable_id=True)
 
     @overload
-    def inspect(self, x: str) -> Config:
-        ...
+    def inspect(self, x: str) -> Config: ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Config]:
-        ...
+    def inspect(self, x: List[str]) -> List[Config]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Config, List[Config]]:
         """Returns a `python_on_whales.Config` object based on its name or id.

@@ -197,17 +197,17 @@ def test_mock_create_with_systemd_mode(
     docker.container.create(
         "ubuntu", ["sleep", "infinity"], systemd=systemd_mode, pull="never"
     )
+    # fmt: off
     run_mock.assert_called_once_with(
         docker.client_config.docker_cmd
         + [
-            # fmt: off
             "create",
             "--pull", "never",
             "--systemd", systemd_mode,
             "ubuntu",
             "sleep", "infinity",
-            # fmt: on
         ]
+        # fmt: on
     )
 
 
@@ -259,6 +259,16 @@ def test_create_start_with_timezone(podman_client: DockerClient):
         output = podman_client.execute(container, ["date", "+%Z"])
         # Check the timezone in the container matches what was specified
         assert output == "GMT"
+
+
+def test_init_container(podman_client: DockerClient):
+    with podman_client.container.create("ubuntu", ["sleep", "infinity"]) as container:
+        assert not container.state.pid
+        assert container.state.status.lower() == "created"
+        container.init()
+        container.reload()
+        assert container.state.pid
+        assert container.state.status.lower() == "initialized"
 
 
 @pytest.mark.parametrize(
@@ -915,6 +925,11 @@ def test_functions_nosuchcontainer(ctr_client: DockerClient, method: str):
         pytest.xfail()
     with pytest.raises(NoSuchContainer):
         getattr(ctr_client.container, method)("DOODODGOIHURHURI")
+
+
+def test_init_nosuchcontainer(podman_client: DockerClient):
+    with pytest.raises(NoSuchContainer):
+        podman_client.container.init("DOODODGOIHURHURI")
 
 
 @pytest.mark.parametrize(

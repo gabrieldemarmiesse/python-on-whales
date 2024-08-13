@@ -72,15 +72,15 @@ class SwarmDispatcher(DockerCamelModel):
 
 class SwarmCAConfig(DockerCamelModel):
     node_cert_expiry: Optional[int] = None
-    external_ca: Annotated[
-        Optional[List[Any]], pydantic.Field(alias="ExternalCA")
-    ] = None  # TODO: set type
-    signing_ca_cert: Annotated[
-        Optional[str], pydantic.Field(alias="SigningCACert")
-    ] = None
-    signing_ca_key: Annotated[
-        Optional[str], pydantic.Field(alias="SigningCAKey")
-    ] = None
+    external_ca: Annotated[Optional[List[Any]], pydantic.Field(alias="ExternalCA")] = (
+        None  # TODO: set type
+    )
+    signing_ca_cert: Annotated[Optional[str], pydantic.Field(alias="SigningCACert")] = (
+        None
+    )
+    signing_ca_key: Annotated[Optional[str], pydantic.Field(alias="SigningCAKey")] = (
+        None
+    )
     force_rotate: Optional[int] = None
 
 
@@ -103,9 +103,9 @@ class SwarmSpec(DockerCamelModel):
     orchestration: Optional[Orchestration] = None
     raft: Optional[Raft] = None
     dispatcher: Optional[SwarmDispatcher] = None
-    ca_config: Annotated[
-        Optional[SwarmCAConfig], pydantic.Field(alias="CAConfig")
-    ] = None
+    ca_config: Annotated[Optional[SwarmCAConfig], pydantic.Field(alias="CAConfig")] = (
+        None
+    )
     encryption_config: Optional[SwarmEncryptionConfig] = None
     task_defaults: Optional[SwarmTasksDefault] = None
 

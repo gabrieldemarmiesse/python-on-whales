@@ -295,7 +295,7 @@ class PodCLI(DockerCLICaller):
         replace: bool = False,
         restart: Optional[str] = None,
         security_options: List[str] = [],
-        share: List[str] = [],
+        share: Optional[List[str]] = None,
         shm_size: Optional[Union[int, str]] = None,
         subgidname: Optional[str] = None,
         subuidname: Optional[str] = None,
@@ -441,7 +441,8 @@ class PodCLI(DockerCLICaller):
         full_cmd.add_flag("--replace", replace)
         full_cmd.add_simple_arg("--restart", restart)
         full_cmd.add_args_iterable_or_single("--security-opt", security_options)
-        full_cmd.add_args_iterable_or_single("--share", share)
+        if share is not None:
+            full_cmd.add_simple_arg("--share", ",".join(share))
         full_cmd.add_simple_arg("--shm-size", shm_size)
         full_cmd.add_simple_arg("--subgidname", subgidname)
         full_cmd.add_simple_arg("--subuidname", subuidname)
@@ -472,12 +473,10 @@ class PodCLI(DockerCLICaller):
             return True
 
     @overload
-    def inspect(self, x: ValidPod, /) -> Pod:
-        ...
+    def inspect(self, x: ValidPod, /) -> Pod: ...
 
     @overload
-    def inspect(self, x: Sequence[ValidPod], /) -> List[Pod]:
-        ...
+    def inspect(self, x: Sequence[ValidPod], /) -> List[Pod]: ...
 
     def inspect(
         self, x: Union[ValidPod, Sequence[ValidPod]], /

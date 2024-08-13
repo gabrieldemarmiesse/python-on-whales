@@ -28,13 +28,9 @@ def test_swarm_change_certificate_expiry(docker_client: DockerClient):
 
 @pytest.mark.usefixtures("swarm_mode")
 def test_swarm_update_auto_lock_managers(docker_client: DockerClient):
-    assert (
-        not docker_client.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
-    )
+    assert not docker_client.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
     docker_client.swarm.update(autolock=True)
-    assert (
-        docker_client.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
-    )
+    assert docker_client.system.info().swarm.cluster.spec.encryption_config.auto_lock_managers
 
 
 @pytest.mark.usefixtures("swarm_mode")

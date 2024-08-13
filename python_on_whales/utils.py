@@ -114,8 +114,7 @@ def run(
     env: Dict[str, str] = ...,
     tty: bool = ...,
     pass_fds: Sequence[int] = ...,
-) -> Tuple[str, str]:
-    ...
+) -> Tuple[str, str]: ...
 
 
 @overload
@@ -128,8 +127,7 @@ def run(
     env: Dict[str, str] = ...,
     tty: bool = ...,
     pass_fds: Sequence[int] = ...,
-) -> str:
-    ...
+) -> str: ...
 
 
 def run(
@@ -248,6 +246,7 @@ def post_process_stream(stream: Optional[bytes]) -> str:
 
 ValidPath = Union[str, Path]
 ValidPortMapping = Union[
+    Tuple[Union[str, int]],
     Tuple[Union[str, int], Union[str, int]],
     Tuple[Union[str, int], Union[str, int], str],
 ]

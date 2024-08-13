@@ -144,12 +144,10 @@ class VolumeCLI(DockerCLICaller):
         return Volume(self.client_config, run(full_cmd))
 
     @overload
-    def inspect(self, x: str) -> Volume:
-        ...
+    def inspect(self, x: str) -> Volume: ...
 
     @overload
-    def inspect(self, x: List[str]) -> List[Volume]:
-        ...
+    def inspect(self, x: List[str]) -> List[Volume]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Volume, List[Volume]]:
         if isinstance(x, str):

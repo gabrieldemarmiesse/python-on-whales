@@ -185,14 +185,16 @@ def test_create_replace_arg(podman_client: DockerClient):
 
 def test_create_share_arg(podman_client: DockerClient):
     pod_name = random_name()
-    with podman_client.pod.create(pod_name, share=[]) as pod:
+    with podman_client.pod.create(pod_name, share=[], infra=True) as pod:
         pod.start()  # start the infra container
+        assert not pod.shared_namespaces
         output = podman_client.container.run(
             "ubuntu", ["readlink", "/proc/self"], pod=pod
         )
         assert output == "1"
     with podman_client.pod.create(pod_name, share=["pid"]) as pod:
         pod.start()  # start the infra container (PID 1)
+        assert pod.shared_namespaces == ["pid"]
         output = podman_client.container.run(
             "ubuntu", ["readlink", "/proc/self"], pod=pod
         )
