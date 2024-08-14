@@ -1,11 +1,13 @@
 import json
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Sequence
+from typing import Iterator, Sequence, Tuple
 
 import pytest
 
-from python_on_whales import docker
+from python_on_whales import DockerClient, docker
 from python_on_whales.client_config import ClientConfig, ParsingError
+from python_on_whales.utils import PROJECT_ROOT
 
 fake_json_message = {
     "CreatedAt": "2020-10-08T18:32:55Z",
@@ -87,3 +89,89 @@ def test_compose_env_files_and_env_file():
         # Since we are operating of a list of commands, we first find the index of the `--env-file` argument, then we check that the next argument is the file name.
         index = client_config.docker_compose_cmd.index("--env-file")
         assert client_config.docker_compose_cmd[index + 1] == env_files_input
+
+
+@contextmanager
+def _create_temp_env_files() -> Iterator[Tuple[Path, Path]]:
+    """Creates two temporary env files and yields their paths. The files are deleted after the context manager is exited."""
+    path = PROJECT_ROOT / "tests/python_on_whales/components"
+    env_file_1 = path / "example1.env"
+    with env_file_1.open("w") as f:
+        f.write("A=1\n")
+        f.write("B=1\n")
+    env_file_2 = path / "example2.env"
+    with env_file_2.open("w") as f:
+        f.write("B=2\n")
+    yield env_file_1, env_file_2
+    env_file_1.unlink()
+    env_file_2.unlink()
+
+
+def test_run_compose_command_with_env_file():
+    """Test that runs the docker compose command and checks that the env files are loaded correctly
+
+    The docker compose service, `service_using_env_variables`, is defined in `dummy_compose.yml` and uses the env variables `A` and `B`.
+    If no env files are provided, the values of `A` and `B` are set to a default value of `0` in the service.
+    We check if the values of `A` and `B` are set to the values in the env files when the service is run.
+
+    The cases tested are:
+    * Single env file using the old `compose_env_file` argument
+    * Single env file using the new `compose_env_files` argument
+    * Multiple env files using the new `compose_env_files` argument
+        * Later env files should override the values of earlier env files
+        * The order of the env files should matter
+    """
+    with _create_temp_env_files() as (env_file1, env_file2):
+        COMPOSE_FILE = (
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        )
+        SERVICE = "service_using_env_variables"
+
+        # Test with no env-file to check the default values
+        client = DockerClient(compose_files=[COMPOSE_FILE])
+        container = client.compose.run(service=SERVICE, detach=True, tty=False)
+        assert "A=0" in container.config.env
+        assert "B=0" in container.config.env
+        client.compose.down(services=[SERVICE])
+
+        # Test with single env-file using the old `compose_env_file` argument
+        client = DockerClient(
+            compose_files=[COMPOSE_FILE],
+            compose_env_file=env_file1,
+        )
+        container = client.compose.run(service=SERVICE, detach=True, tty=False)
+        assert "A=1" in container.config.env
+        assert "B=1" in container.config.env
+        client.compose.down(services=[SERVICE])
+
+        # Test with single env-file using the new `compose_env_files` argument
+        client = DockerClient(
+            compose_files=[COMPOSE_FILE],
+            compose_env_files=[env_file1],
+        )
+        container = client.compose.run(service=SERVICE, detach=True, tty=False)
+        assert "A=1" in container.config.env
+        assert "B=1" in container.config.env
+        client.compose.down(services=[SERVICE])
+
+        # Test with multiple env-files using the new `compose_env_files` argument.
+        # Since `env_file2` is loaded after `env_file1`, the value of `B` should be overridden by `env_file_2`.
+        client = DockerClient(
+            compose_files=[COMPOSE_FILE],
+            compose_env_files=[env_file1, env_file2],
+        )
+        container = client.compose.run(service=SERVICE, detach=True, tty=False)
+        assert "A=1" in container.config.env
+        assert "B=2" in container.config.env
+        client.compose.down(services=[SERVICE])
+
+        # Test with multiple env-files using the new `compose_env_files` argument.
+        # Since `env_file1` is loaded after `env_file2`, the value of `B` should be overridden by `env_file_1`.
+        client = DockerClient(
+            compose_files=[COMPOSE_FILE],
+            compose_env_files=[env_file2, env_file1],
+        )
+        container = client.compose.run(service=SERVICE, detach=True, tty=False)
+        assert "A=1" in container.config.env
+        assert "B=1" in container.config.env
+        client.compose.down(services=[SERVICE])
