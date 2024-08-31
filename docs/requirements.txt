@@ -1,7 +1,8 @@
-mkdocstrings==0.25.1
-mkdocstrings-python==1.10.5
-mkdocs-autorefs==0.4.1
-mkdocs-material==9.1.14
-pymdown-extensions==10.0.1
-markdown==3.3.7
-black==24.4.2
+markdown==3.7
+markupsafe==2.1.5
+mkdocs==1.6.1
+mkdocstrings==0.25.2
+mkdocs-autorefs==1.1.0
+mkdocs-get-deps==0.2.0
+mkdocstrings==0.25.2
+pymdown-extensions==10.9
