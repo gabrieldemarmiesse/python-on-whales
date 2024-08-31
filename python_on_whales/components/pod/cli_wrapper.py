@@ -8,7 +8,6 @@ from typing import (
     List,
     Mapping,
     Optional,
-    Sequence,
     Tuple,
     TypedDict,
     Union,
@@ -473,10 +472,10 @@ class PodCLI(DockerCLICaller):
     def inspect(self, x: ValidPod, /) -> Pod: ...
 
     @overload
-    def inspect(self, x: Sequence[ValidPod], /) -> List[Pod]: ...
+    def inspect(self, x: Iterable[ValidPod], /) -> List[Pod]: ...
 
     def inspect(
-        self, x: Union[ValidPod, Sequence[ValidPod]], /
+        self, x: Union[ValidPod, Iterable[ValidPod]], /
     ) -> Union[Pod, List[Pod]]:
         """Creates a `python_on_whales.Pod` object.
 
@@ -495,7 +494,7 @@ class PodCLI(DockerCLICaller):
 
     def kill(
         self,
-        x: Union[ValidPod, Sequence[ValidPod]],
+        x: Union[ValidPod, Iterable[ValidPod]],
         /,
         *,
         signal: Optional[Union[int, str]] = None,
@@ -615,7 +614,7 @@ class PodCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def pause(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def pause(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Pauses one or more pods
 
         Parameters:
@@ -638,7 +637,7 @@ class PodCLI(DockerCLICaller):
 
     def remove(
         self,
-        x: Union[ValidPod, Sequence[ValidPod]],
+        x: Union[ValidPod, Iterable[ValidPod]],
         /,
         *,
         force: bool = False,
@@ -668,7 +667,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def restart(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def restart(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Restarts one or more pods
 
         Parameters:
@@ -684,7 +683,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def start(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def start(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Starts one or more pods
 
         Parameters:
@@ -700,7 +699,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def stats(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> List[PodStats]:
+    def stats(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> List[PodStats]:
         """Get pods resource usage statistics
 
         The data unit is the byte.
@@ -728,7 +727,7 @@ class PodCLI(DockerCLICaller):
 
     def stop(
         self,
-        x: Union[ValidPod, Sequence[ValidPod]],
+        x: Union[ValidPod, Iterable[ValidPod]],
         /,
         *,
         time: Optional[int] = None,
@@ -756,7 +755,7 @@ class PodCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def unpause(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Unpauses one or more pods
 
         Parameters:
