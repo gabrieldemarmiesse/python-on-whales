@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypeAlias, Union
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -8,6 +8,12 @@ from python_on_whales.client_config import (
 )
 from python_on_whales.components.secret.models import SecretInspectResult
 from python_on_whales.utils import ValidPath, format_mapping_for_cli, run, to_list
+
+SecretListFilter: TypeAlias = Union[
+    Tuple[Literal["id"], str],
+    Tuple[Literal["label"], str],
+    Tuple[Literal["name"], str],
+]
 
 
 class Secret(ReloadableObjectFromJson):
@@ -81,12 +87,10 @@ class SecretCLI(DockerCLICaller):
         else:
             return Secret(self.client_config, x)
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Secret]:
+    def list(self, filters: List[SecretListFilter] = []) -> List[Secret]:
         """Returns all secrets as a `List[python_on_whales.Secret]`."""
         full_cmd = self.docker_cmd + ["secret", "list", "--quiet"]
-        full_cmd.add_args_iterable_or_single(
-            "--filter", format_mapping_for_cli(filters)
-        )
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
         ids = run(full_cmd).splitlines()
         return [Secret(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 

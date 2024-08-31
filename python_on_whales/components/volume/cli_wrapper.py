@@ -5,7 +5,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, overload
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypeAlias, Union, overload
 
 import python_on_whales.components.buildx
 import python_on_whales.components.container
@@ -18,7 +18,19 @@ from python_on_whales.client_config import (
 from python_on_whales.components.volume.models import VolumeInspectResult
 from python_on_whales.exceptions import NoSuchVolume
 from python_on_whales.test_utils import random_name
-from python_on_whales.utils import ValidPath, format_mapping_for_cli, run, to_list
+from python_on_whales.utils import ValidPath, run, to_list
+
+VolumeListFilter: TypeAlias = Union[
+    Tuple[Literal["driver"], str],
+    Tuple[Literal["opt"], str],
+    Tuple[Literal["label"], str],
+    Tuple[Literal["label!"], str],
+    Tuple[Literal["name"], str],
+    Tuple[Literal["scope"], Literal["swarm", "global", "local"]],
+    Tuple[Literal["after", "since"], str],
+    Tuple[Literal["until"], str],  # TODO: allow datetime
+    Tuple[Literal["dangling"], str],  # TODO: allow bool
+]
 
 
 class Volume(ReloadableObjectFromJson):
@@ -171,22 +183,20 @@ class VolumeCLI(DockerCLICaller):
         else:
             return True
 
-    def list(self, filters: Dict[str, Union[str, int]] = {}) -> List[Volume]:
+    def list(self, filters: List[VolumeListFilter] = []) -> List[Volume]:
         """List volumes
 
         Parameters:
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
-                An example `filters=dict(dangling=1, driver="local")`.
+                An example `filters=[("dangling", "true"), ("driver", "local")]`.
 
         # Returns
             `List[python_on_whales.Volume]`
         """
 
         full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
-        full_cmd.add_args_iterable_or_single(
-            "--filter", format_mapping_for_cli(filters)
-        )
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
         volumes_names = run(full_cmd).splitlines()
 
@@ -194,22 +204,18 @@ class VolumeCLI(DockerCLICaller):
             Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
         ]
 
-    def prune(
-        self, filters: Dict[str, Union[str, int]] = {}, all: bool = False
-    ) -> None:
+    def prune(self, filters: List[VolumeListFilter] = [], all: bool = False) -> None:
         """Remove volumes
 
         Parameters:
             filters: See the [Docker documentation page about filtering
                 ](https://docs.docker.com/engine/reference/commandline/volume_ls/#filtering).
-                An example `filters=dict(dangling=1, driver="local")`.
+                An example `filters=[("dangling", "true"), ("driver", "local")]`.
             all: Remove all unused volumes, not just anonymous ones.
         """
         full_cmd = self.docker_cmd + ["volume", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-
-        for key, value in filters.items():
-            full_cmd += ["--filter", f"{key}={value}"]
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
         run(full_cmd)
 

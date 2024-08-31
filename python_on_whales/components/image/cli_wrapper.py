@@ -6,7 +6,19 @@ from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any, Iterable, Iterator, List, Mapping, Optional, Union, overload
+from typing import (
+    Any,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Tuple,
+    TypeAlias,
+    Union,
+    overload,
+)
 
 import python_on_whales.components.buildx.cli_wrapper
 from python_on_whales.client_config import (
@@ -25,6 +37,21 @@ from python_on_whales.components.image.models import (
 )
 from python_on_whales.exceptions import DockerException, NoSuchImage
 from python_on_whales.utils import ValidPath, run, stream_stdout_and_stderr, to_list
+
+ImageListFilter: TypeAlias = Union[
+    Tuple[Literal["id"], str],
+    Tuple[Literal["reference"], str],
+    Tuple[Literal["digest"], str],
+    Tuple[Literal["label"], str],
+    Tuple[Literal["label!"], str],
+    Tuple[Literal["before"], str],
+    Tuple[Literal["after", "since"], str],
+    Tuple[Literal["until"], str],  # TODO: allow datetime
+    Tuple[Literal["dangling"], str],  # TODO: allow bool
+    Tuple[Literal["intermediate"], str],  # TODO: allow bool
+    Tuple[Literal["manifest"], str],  # TODO: allow bool
+    Tuple[Literal["readonly"], str],  # TODO: allow bool
+]
 
 
 class Image(ReloadableObjectFromJson):
@@ -406,7 +433,7 @@ class ImageCLI(DockerCLICaller):
     def list(
         self,
         repository_or_tag: Optional[str] = None,
-        filters: Mapping[str, str] = {},
+        filters: Iterable[ImageListFilter] = [],
         all: bool = False,
     ) -> List[Image]:
         """Returns the list of Docker images present on the machine.
@@ -439,8 +466,8 @@ class ImageCLI(DockerCLICaller):
             "--quiet",
             "--no-trunc",
         ]
-        full_cmd.add_args_mapping("--filter", filters)
         full_cmd.add_flag("--all", all)
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
         if repository_or_tag is not None:
             full_cmd.append(repository_or_tag)
@@ -451,19 +478,19 @@ class ImageCLI(DockerCLICaller):
 
         return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def prune(self, all: bool = False, filter: Mapping[str, str] = {}) -> str:
+    def prune(self, all: bool = False, filters: List[ImageListFilter] = []) -> str:
         """Remove unused images
 
         Parameters:
             all: Remove all unused images, not just dangling ones
-            filter: Provide filter values (e.g. `{"until": "<timestamp>"}`)
+            filters: Provide filter values (e.g. `[("until", "<timestamp>")]`)
 
         Returns:
             The output of the CLI (the layers removed).
         """
         full_cmd = self.docker_cmd + ["image", "prune", "--force"]
         full_cmd.add_flag("--all", all)
-        full_cmd.add_args_mapping("--filter", filter)
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
         return run(full_cmd)
 
     def pull(

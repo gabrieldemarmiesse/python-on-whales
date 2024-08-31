@@ -7,11 +7,12 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Mapping,
     Optional,
     Sequence,
     Tuple,
-    TypedDict,
+    TypeAlias,
     Union,
     overload,
 )
@@ -44,22 +45,19 @@ from python_on_whales.utils import (
     to_list,
 )
 
-PodListFilters = TypedDict(
-    "PodListFilters",
-    {
-        "ctr-ids": str,
-        "ctr-names": str,
-        "ctr-number": int,
-        "ctr-status": str,
-        "id": str,
-        "label": str,
-        "name": str,
-        "network": str,  # TODO: allow Network
-        "status": str,
-        "until": str,  # TODO: allow datetime
-    },
-    total=False,
-)
+PodListFilter: TypeAlias = Union[
+    Tuple[Literal["ctr-ids"], str],
+    Tuple[Literal["ctr-names"], str],
+    Tuple[Literal["ctr-number"], int],
+    Tuple[Literal["ctr-status"], str],
+    Tuple[Literal["id"], str],
+    Tuple[Literal["label"], str],
+    Tuple[Literal["label!"], str],
+    Tuple[Literal["name"], str],
+    Tuple[Literal["network"], str],  # TODO: allow Network
+    Tuple[Literal["status"], str],
+    Tuple[Literal["until"], str],  # TODO: allow datetime
+]
 
 
 class Pod(ReloadableObjectFromJson):
@@ -521,7 +519,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def list(self, *, filters: PodListFilters = {}) -> List[Pod]:
+    def list(self, *, filters: List[PodListFilter] = []) -> List[Pod]:
         """List the pods on the host.
 
         Parameters:
@@ -531,9 +529,7 @@ class PodCLI(DockerCLICaller):
             A `List[python_on_whales.Pod]`
         """
         full_cmd = self.docker_cmd + ["pod", "ps", "-q", "--no-trunc"]
-        full_cmd.add_args_iterable_or_single(
-            "--filter", format_mapping_for_cli(filters)
-        )
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
         return [
             Pod(self.client_config, x, is_immutable_id=True)
