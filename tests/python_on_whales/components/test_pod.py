@@ -119,7 +119,7 @@ def test_create_devices_arg(podman_client: DockerClient):
 
 def test_create_dns_arg(podman_client: DockerClient):
     pod_name = random_name()
-    with podman_client.pod.create(pod_name, dns="1.2.3.4") as pod:
+    with podman_client.pod.create(pod_name, dns=["1.2.3.4"]) as pod:
         output = podman_client.container.run(
             "ubuntu", ["cat", "/etc/resolv.conf"], pod=pod
         )
