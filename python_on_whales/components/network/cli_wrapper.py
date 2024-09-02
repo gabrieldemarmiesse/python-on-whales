@@ -15,6 +15,7 @@ from python_on_whales.components.network.models import (
     NetworkInspectResult,
     NetworkIPAM,
 )
+from python_on_whales.exceptions import NoSuchNetwork
 from python_on_whales.utils import format_mapping_for_cli, run, to_list
 
 
@@ -103,6 +104,13 @@ class Network(ReloadableObjectFromJson):
 
     def __repr__(self):
         return f"python_on_whales.Network(id='{self.id[:12]}', name={self.name})"
+
+    def exists(self) -> bool:
+        """Returns `True` if the network exists and `False` if it doesn't exist.
+
+        If it doesn't exist, that most likely means it was removed.
+        """
+        return NetworkCLI(self.client_config).exists(self.id)
 
     def remove(self) -> None:
         """Removes this Docker network.
@@ -208,6 +216,22 @@ class NetworkCLI(DockerCLICaller):
         full_cmd.add_flag("--force", force)
         full_cmd += [network, container]
         run(full_cmd)
+
+    def exists(
+        self,
+        network: str,
+    ) -> bool:
+        """Check if a network exists
+
+        Parameters:
+            network: The name of the network.
+        """
+        try:
+            self.inspect(network)
+        except NoSuchNetwork:
+            return False
+        else:
+            return True
 
     @overload
     def inspect(self, x: str) -> Network: ...

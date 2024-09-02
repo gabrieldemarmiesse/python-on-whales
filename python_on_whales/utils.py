@@ -28,6 +28,7 @@ from python_on_whales.exceptions import (
     DockerException,
     NoSuchContainer,
     NoSuchImage,
+    NoSuchNetwork,
     NoSuchPod,
     NoSuchService,
     NoSuchVolume,
@@ -213,6 +214,13 @@ def run(
                 )
             if "no such volume" in decoded_stderr:
                 raise NoSuchVolume(
+                    args,
+                    completed_process.returncode,
+                    completed_process.stdout,
+                    completed_process.stderr,
+                )
+            if "network" in decoded_stderr and "not found" in decoded_stderr:
+                raise NoSuchNetwork(
                     args,
                     completed_process.returncode,
                     completed_process.stdout,
