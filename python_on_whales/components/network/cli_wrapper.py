@@ -216,12 +216,28 @@ class NetworkCLI(DockerCLICaller):
     def inspect(self, x: List[str]) -> List[Network]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Network, List[Network]]:
+        """Returns a `python_on_whales.Network` object from a string (id or network name).
+
+        Parameters:
+            x: One id or network name or a list of ids or network names.
+
+        # Returns
+            One or a list of `python_on_whales.Network`.
+        """
         if isinstance(x, str):
             return Network(self.client_config, x)
         else:
             return [Network(self.client_config, reference) for reference in x]
 
     def list(self, filters: Dict[str, str] = {}) -> List[Network]:
+        """List all the networks available.
+
+        Parameters:
+            filters: Filters as strings or list of strings.
+
+        # Returns
+            List of `python_on_whales.Network`.
+        """
         full_cmd = self.docker_cmd + ["network", "ls", "--no-trunc", "--quiet"]
         full_cmd.add_args_iterable_or_single(
             "--filter", format_mapping_for_cli(filters)
@@ -231,6 +247,11 @@ class NetworkCLI(DockerCLICaller):
         return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
     def prune(self, filters: Dict[str, str] = {}):
+        """Remove Docker networks which are not used by any containers.
+
+        Parameters:
+            filters: Filters as strings or list of strings.
+        """
         full_cmd = self.docker_cmd + ["network", "prune", "--force"]
         full_cmd.add_args_iterable_or_single(
             "--filter", format_mapping_for_cli(filters)
