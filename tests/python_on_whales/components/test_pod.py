@@ -119,7 +119,7 @@ def test_create_devices_arg(podman_client: DockerClient):
 
 def test_create_dns_arg(podman_client: DockerClient):
     pod_name = random_name()
-    with podman_client.pod.create(pod_name, dns="1.2.3.4") as pod:
+    with podman_client.pod.create(pod_name, dns=["1.2.3.4"]) as pod:
         output = podman_client.container.run(
             "ubuntu", ["cat", "/etc/resolv.conf"], pod=pod
         )
@@ -192,9 +192,9 @@ def test_create_share_arg(podman_client: DockerClient):
             "ubuntu", ["readlink", "/proc/self"], pod=pod
         )
         assert output == "1"
-    with podman_client.pod.create(pod_name, share=["pid"]) as pod:
+    with podman_client.pod.create(pod_name, share=["pid", "ipc"]) as pod:
         pod.start()  # start the infra container (PID 1)
-        assert pod.shared_namespaces == ["pid"]
+        assert pod.shared_namespaces == ["pid", "ipc"]
         output = podman_client.container.run(
             "ubuntu", ["readlink", "/proc/self"], pod=pod
         )

@@ -207,8 +207,8 @@ def test_mock_create_with_systemd_mode(
             "ubuntu",
             "sleep", "infinity",
         ]
-        # fmt: on
     )
+    # fmt: on
 
 
 def test_create_with_systemd_mode(podman_client: DockerClient):
