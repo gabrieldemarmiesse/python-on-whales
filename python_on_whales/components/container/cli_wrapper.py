@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import inspect
 import json
+import shlex
+import textwrap
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import (
@@ -10,7 +12,9 @@ from typing import (
     Iterable,
     List,
     Literal,
+    Mapping,
     Optional,
+    Sequence,
     Tuple,
     TypedDict,
     Union,
@@ -271,10 +275,10 @@ class Container(ReloadableObjectFromJson):
 
     def execute(
         self,
-        command: List[str],
+        command: Sequence[str],
         detach: bool = False,
         envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
+        env_files: Union[ValidPath, Iterable[ValidPath]] = (),
         interactive: bool = False,
         privileged: bool = False,
         tty: bool = False,
@@ -547,13 +551,13 @@ class ContainerCLI(DockerCLICaller):
     def create(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
-        command: List[str] = [],
+        command: Sequence[str] = (),
         *,
-        add_hosts: List[Tuple[str, str]] = [],
+        add_hosts: Iterable[Tuple[str, str]] = (),
         blkio_weight: Optional[int] = None,
-        blkio_weight_device: List[str] = [],
-        cap_add: List[str] = [],
-        cap_drop: List[str] = [],
+        blkio_weight_device: Iterable[str] = (),
+        cap_add: Iterable[str] = (),
+        cap_drop: Iterable[str] = (),
         cgroup_parent: Optional[str] = None,
         cgroupns: Optional[str] = None,
         cidfile: Optional[ValidPath] = None,
@@ -566,24 +570,24 @@ class ContainerCLI(DockerCLICaller):
         cpuset_cpus: Optional[List[int]] = None,
         cpuset_mems: Optional[List[int]] = None,
         detach: bool = False,
-        devices: List[str] = [],
-        device_cgroup_rules: List[str] = [],
-        device_read_bps: List[str] = [],
-        device_read_iops: List[str] = [],
-        device_write_bps: List[str] = [],
-        device_write_iops: List[str] = [],
+        devices: Iterable[str] = (),
+        device_cgroup_rules: Iterable[str] = (),
+        device_read_bps: Iterable[str] = (),
+        device_read_iops: Iterable[str] = (),
+        device_write_bps: Iterable[str] = (),
+        device_write_iops: Iterable[str] = (),
         content_trust: bool = False,
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
+        dns: Iterable[str] = (),
+        dns_options: Iterable[str] = (),
+        dns_search: Iterable[str] = (),
         domainname: Optional[str] = None,
         entrypoint: Optional[str] = None,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
+        envs: Mapping[str, str] = {},
+        env_files: Union[ValidPath, Iterable[ValidPath]] = [],
         env_host: bool = False,
-        expose: Union[int, List[int]] = [],
+        expose: Union[int, Iterable[int]] = (),
         gpus: Union[int, str, None] = None,
-        groups_add: List[str] = [],
+        groups_add: Iterable[str] = (),
         healthcheck: bool = True,
         health_cmd: Optional[str] = None,
         health_interval: Union[None, int, timedelta] = None,
@@ -598,23 +602,23 @@ class ContainerCLI(DockerCLICaller):
         ipc: Optional[str] = None,
         isolation: Optional[str] = None,
         kernel_memory: Union[int, str, None] = None,
-        labels: Dict[str, str] = {},
-        label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
-        link_local_ip: List[str] = [],
+        labels: Mapping[str, str] = {},
+        label_files: Iterable[ValidPath] = (),
+        link: Iterable[ValidContainer] = (),
+        link_local_ip: Iterable[str] = (),
         log_driver: Optional[str] = None,
-        log_options: List[str] = [],
+        log_options: Iterable[str] = (),
         mac_address: Optional[str] = None,
         memory: Union[int, str, None] = None,
         memory_reservation: Union[int, str, None] = None,
         memory_swap: Union[int, str, None] = None,
         memory_swappiness: Optional[int] = None,
-        mounts: List[List[str]] = [],
+        mounts: Iterable[Iterable[str]] = (),
         name: Optional[str] = None,
-        networks: List[
+        networks: Iterable[
             python_on_whales.components.network.cli_wrapper.ValidNetwork
-        ] = [],
-        network_aliases: List[str] = [],
+        ] = (),
+        network_aliases: Iterable[str] = (),
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
         pid: Optional[str] = None,
@@ -622,33 +626,33 @@ class ContainerCLI(DockerCLICaller):
         platform: Optional[str] = None,
         pod: Optional[python_on_whales.components.pod.cli_wrapper.ValidPod] = None,
         privileged: bool = False,
-        publish: List[ValidPortMapping] = [],
+        publish: Iterable[ValidPortMapping] = (),
         publish_all: bool = False,
         pull: str = "missing",
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
         runtime: Optional[str] = None,
-        security_options: List[str] = [],
+        security_options: Iterable[str] = (),
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
         stop_signal: Optional[Union[int, str]] = None,
         stop_timeout: Optional[int] = None,
-        storage_options: List[str] = [],
-        sysctl: Dict[str, str] = {},
+        storage_options: Iterable[str] = (),
+        sysctl: Mapping[str, str] = {},
         systemd: Optional[Union[bool, Literal["always"]]] = None,
-        tmpfs: List[ValidPath] = [],
+        tmpfs: Iterable[ValidPath] = (),
         tty: bool = False,
         tz: Optional[str] = None,
-        ulimit: List[str] = [],
+        ulimit: Iterable[str] = (),
         user: Optional[str] = None,
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
+        volumes: Iterable[
+            python_on_whales.components.volume.cli_wrapper.VolumeDefinition
+        ] = (),
         volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
+        volumes_from: Iterable[ValidContainer] = (),
         workdir: Optional[ValidPath] = None,
     ) -> Container:
         """Creates a container, but does not start it.
@@ -666,6 +670,17 @@ class ContainerCLI(DockerCLICaller):
 
         The arguments are the same as [`docker.run`](#run).
         """
+        if isinstance(command, str):
+            error_message = textwrap.dedent(
+                f"""\
+                When calling docker.create(), the second argument ('command') should be a sequence of strings.
+                Here are some examples:
+                 docker.create('ubuntu', ['ls'])
+                 docker.create('ubuntu', ['cat', '/some/file.txt'])
+                You can try docker.create('{image}', {shlex.split(command)}, ...).
+                """
+            )
+            raise TypeError(error_message)
 
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
@@ -677,16 +692,15 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd = self.docker_cmd + ["create"]
 
-        add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
-        full_cmd.add_args_iterable_or_single("--add-host", add_hosts)
-
-        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
-        full_cmd.add_args_iterable_or_single(
-            "--blkio-weight-device", blkio_weight_device
+        full_cmd.add_args_iterable(
+            "--add-host", (f"{host}:{ip}" for host, ip in add_hosts)
         )
 
-        full_cmd.add_args_iterable_or_single("--cap-add", cap_add)
-        full_cmd.add_args_iterable_or_single("--cap-drop", cap_drop)
+        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
+        full_cmd.add_args_iterable("--blkio-weight-device", blkio_weight_device)
+
+        full_cmd.add_args_iterable("--cap-add", cap_add)
+        full_cmd.add_args_iterable("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cgroupns", cgroupns)
@@ -703,34 +717,32 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--detach", detach)
 
-        full_cmd.add_args_iterable_or_single("--device", devices)
-        full_cmd.add_args_iterable_or_single(
-            "--device-cgroup-rule", device_cgroup_rules
-        )
-        full_cmd.add_args_iterable_or_single("--device-read-bps", device_read_bps)
-        full_cmd.add_args_iterable_or_single("--device-read-iops", device_read_iops)
-        full_cmd.add_args_iterable_or_single("--device-write-bps", device_write_bps)
-        full_cmd.add_args_iterable_or_single("--device-write-iops", device_write_iops)
+        full_cmd.add_args_iterable("--device", devices)
+        full_cmd.add_args_iterable("--device-cgroup-rule", device_cgroup_rules)
+        full_cmd.add_args_iterable("--device-read-bps", device_read_bps)
+        full_cmd.add_args_iterable("--device-read-iops", device_read_iops)
+        full_cmd.add_args_iterable("--device-write-bps", device_write_bps)
+        full_cmd.add_args_iterable("--device-write-iops", device_write_iops)
 
         if content_trust:
             full_cmd += ["--disable-content-trust", "false"]
 
-        full_cmd.add_args_iterable_or_single("--dns", dns)
-        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
-        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
+        full_cmd.add_args_iterable("--dns", dns)
+        full_cmd.add_args_iterable("--dns-option", dns_options)
+        full_cmd.add_args_iterable("--dns-search", dns_search)
         full_cmd.add_simple_arg("--domainname", domainname)
 
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
-        full_cmd.add_args_iterable_or_single("--env-file", env_files)
+        full_cmd.add_args_mapping("--env", envs)
+        full_cmd.add_args_iterable("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
         full_cmd.add_args_iterable_or_single("--expose", expose)
 
         full_cmd.add_simple_arg("--gpus", gpus)
 
-        full_cmd.add_args_iterable_or_single("--group-add", groups_add)
+        full_cmd.add_args_iterable("--group-add", groups_add)
 
         full_cmd.add_flag("--no-healthcheck", not healthcheck)
         full_cmd.add_simple_arg("--health-cmd", health_cmd)
@@ -753,14 +765,14 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
-        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
-        full_cmd.add_args_iterable_or_single("--label-file", label_files)
+        full_cmd.add_args_mapping("--label", labels)
+        full_cmd.add_args_iterable("--label-file", label_files)
 
-        full_cmd.add_args_iterable_or_single("--link", link)
-        full_cmd.add_args_iterable_or_single("--link-local-ip", link_local_ip)
+        full_cmd.add_args_iterable("--link", link)
+        full_cmd.add_args_iterable("--link-local-ip", link_local_ip)
 
         full_cmd.add_simple_arg("--log-driver", log_driver)
-        full_cmd.add_args_iterable_or_single("--log-opt", log_options)
+        full_cmd.add_args_iterable("--log-opt", log_options)
 
         full_cmd.add_simple_arg("--mac-address", mac_address)
 
@@ -769,11 +781,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
         full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
 
-        full_cmd.add_args_iterable_or_single("--mount", [",".join(x) for x in mounts])
+        full_cmd.add_args_iterable("--mount", (",".join(x) for x in mounts))
         full_cmd.add_simple_arg("--name", name)
 
-        full_cmd.add_args_iterable_or_single("--network", networks)
-        full_cmd.add_args_iterable_or_single("--network-alias", network_aliases)
+        full_cmd.add_args_iterable("--network", networks)
+        full_cmd.add_args_iterable("--network-alias", network_aliases)
 
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
         full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
@@ -785,9 +797,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--pod", pod)
         full_cmd.add_flag("--privileged", privileged)
 
-        full_cmd.add_args_iterable_or_single(
-            "-p", [format_port_arg(p) for p in publish]
-        )
+        full_cmd.add_args_iterable("-p", (format_port_arg(p) for p in publish))
         full_cmd.add_flag("--publish-all", publish_all)
 
         if pull == "never":
@@ -798,7 +808,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--rm", remove)
 
         full_cmd.add_simple_arg("--runtime", runtime)
-        full_cmd.add_args_iterable_or_single("--security-opt", security_options)
+        full_cmd.add_args_iterable("--security-opt", security_options)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
         if sig_proxy is False:
@@ -807,13 +817,13 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
-        full_cmd.add_args_iterable_or_single("--storage-opt", storage_options)
-        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
+        full_cmd.add_args_iterable("--storage-opt", storage_options)
+        full_cmd.add_args_mapping("--sysctl", sysctl)
         full_cmd.add_simple_arg("--systemd", systemd)
-        full_cmd.add_args_iterable_or_single("--tmpfs", tmpfs)
+        full_cmd.add_args_iterable("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
         full_cmd.add_simple_arg("--tz", tz)
-        full_cmd.add_args_iterable_or_single("--ulimit", ulimit)
+        full_cmd.add_args_iterable("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--userns", userns)
@@ -823,12 +833,12 @@ class ContainerCLI(DockerCLICaller):
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
-        full_cmd.add_args_iterable_or_single("--volumes-from", volumes_from)
+        full_cmd.add_args_iterable("--volumes-from", volumes_from)
 
         full_cmd.add_simple_arg("--workdir", workdir)
 
-        full_cmd.append(image)
-        full_cmd += command
+        full_cmd.append(str(image))
+        full_cmd.extend(command)
         return Container(self.client_config, run(full_cmd), is_immutable_id=True)
 
     def diff(self, container: ValidContainer) -> Dict[str, str]:
@@ -855,10 +865,10 @@ class ContainerCLI(DockerCLICaller):
     def execute(
         self,
         container: ValidContainer,
-        command: List[str],
+        command: Sequence[str],
         detach: bool = False,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
+        envs: Mapping[str, str] = {},
+        env_files: Union[ValidPath, Iterable[ValidPath]] = (),
         interactive: bool = False,
         privileged: bool = False,
         tty: bool = False,
@@ -899,29 +909,25 @@ class ContainerCLI(DockerCLICaller):
         # Raises
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
-        if not isinstance(command, list):
-            error_message = (
-                "When calling docker.execute(), the second argument ('command') "
-                "should be a list. "
-                "Here are some examples:"
-                "docker.execute('somecontainer', ['ls']), "
-                "docker.execute('somecontainer', ['cat', '/some/file.txt'])"
+        if isinstance(command, str):
+            container_name = container if isinstance(container, str) else container.name
+            error_message = textwrap.dedent(
+                f"""\
+                When calling docker.execute(), the second argument ('command') should be a sequence of strings.
+                Here are some examples:
+                  docker.execute('somecontainer', ['ls'])
+                  docker.execute('somecontainer', ['cat', '/some/file.txt'])
+                You can try docker.execute('{container_name}', {shlex.split(command)}, ...).
+                """
             )
-            if isinstance(command, str):
-                # boy this is the most common error in the world
-                if isinstance(container, str):
-                    container = self.inspect(container)
-                error_message += (
-                    f" In your case, command should not be a string. "
-                    f"You can try docker.execute('{container.name}', {command.split()}, ...)."
-                )
             raise TypeError(error_message)
+
         full_cmd = self.docker_cmd + ["exec"]
 
         full_cmd.add_flag("--detach", detach)
         full_cmd.add_simple_arg("--detach-keys", detach_keys)
 
-        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
+        full_cmd.add_args_mapping("--env", envs)
         full_cmd.add_args_iterable_or_single("--env-file", env_files)
 
         if interactive and stream:
@@ -950,8 +956,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(container)
-        for arg in to_list(command):
-            full_cmd.append(arg)
+        full_cmd.extend(command)
 
         if preserve_fds:
             # Pass through additional file descriptors (as well as 0-2,
@@ -1009,7 +1014,7 @@ class ContainerCLI(DockerCLICaller):
         else:
             run(full_cmd)
 
-    def init(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
+    def init(self, containers: Union[ValidContainer, Iterable[ValidContainer]]) -> None:
         """Initialize one or more containers.
 
         Note that this is only supported by podman.
@@ -1039,10 +1044,10 @@ class ContainerCLI(DockerCLICaller):
     def inspect(self, x: ValidContainer, /) -> Container: ...
 
     @overload
-    def inspect(self, x: List[ValidContainer], /) -> List[Container]: ...
+    def inspect(self, x: Iterable[ValidContainer], /) -> List[Container]: ...
 
     def inspect(
-        self, x: Union[ValidContainer, List[ValidContainer]], /
+        self, x: Union[ValidContainer, Iterable[ValidContainer]], /
     ) -> Union[Container, List[Container]]:
         """Returns a container object from a name or ID.
 
@@ -1058,14 +1063,14 @@ class ContainerCLI(DockerCLICaller):
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
 
-        if isinstance(x, list):
+        if isinstance(x, Iterable) and not isinstance(x, str):
             return [Container(self.client_config, reference) for reference in x]
         else:
             return Container(self.client_config, x)
 
     def kill(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[ValidContainer, Iterable[ValidContainer]],
         signal: Optional[Union[int, str]] = None,
     ) -> None:
         """Kill one or more containers.
@@ -1192,7 +1197,9 @@ class ContainerCLI(DockerCLICaller):
             for x in run(full_cmd).splitlines()
         ]
 
-    def pause(self, containers: Union[ValidContainer, List[ValidContainer]]) -> None:
+    def pause(
+        self, containers: Union[ValidContainer, Iterable[ValidContainer]]
+    ) -> None:
         """Pauses one or more containers
 
         Alias: `docker.pause(...)`
@@ -1271,7 +1278,7 @@ class ContainerCLI(DockerCLICaller):
 
     def restart(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[ValidContainer, Iterable[ValidContainer]],
         time: Optional[Union[int, timedelta]] = None,
     ) -> None:
         """Restarts one or more container.
@@ -1303,7 +1310,7 @@ class ContainerCLI(DockerCLICaller):
 
     def remove(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[ValidContainer, Iterable[ValidContainer]],
         *,
         force: bool = False,
         volumes: bool = False,
@@ -1335,13 +1342,13 @@ class ContainerCLI(DockerCLICaller):
     def run(
         self,
         image: python_on_whales.components.image.cli_wrapper.ValidImage,
-        command: List[str] = [],
+        command: Sequence[str] = (),
         *,
-        add_hosts: List[Tuple[str, str]] = [],
+        add_hosts: Iterable[Tuple[str, str]] = (),
         blkio_weight: Optional[int] = None,
-        blkio_weight_device: List[str] = [],
-        cap_add: List[str] = [],
-        cap_drop: List[str] = [],
+        blkio_weight_device: Iterable[str] = (),
+        cap_add: Iterable[str] = (),
+        cap_drop: Iterable[str] = (),
         cgroup_parent: Optional[str] = None,
         cgroupns: Optional[str] = None,
         cidfile: Optional[ValidPath] = None,
@@ -1354,24 +1361,24 @@ class ContainerCLI(DockerCLICaller):
         cpuset_cpus: Optional[List[int]] = None,
         cpuset_mems: Optional[List[int]] = None,
         detach: bool = False,
-        devices: List[str] = [],
-        device_cgroup_rules: List[str] = [],
-        device_read_bps: List[str] = [],
-        device_read_iops: List[str] = [],
-        device_write_bps: List[str] = [],
-        device_write_iops: List[str] = [],
+        devices: Iterable[str] = (),
+        device_cgroup_rules: Iterable[str] = (),
+        device_read_bps: Iterable[str] = (),
+        device_read_iops: Iterable[str] = (),
+        device_write_bps: Iterable[str] = (),
+        device_write_iops: Iterable[str] = (),
         content_trust: bool = False,
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
+        dns: Iterable[str] = (),
+        dns_options: Iterable[str] = (),
+        dns_search: Iterable[str] = (),
         domainname: Optional[str] = None,
         entrypoint: Optional[str] = None,
-        envs: Dict[str, str] = {},
-        env_files: Union[ValidPath, List[ValidPath]] = [],
+        envs: Mapping[str, str] = {},
+        env_files: Union[ValidPath, Iterable[ValidPath]] = (),
         env_host: bool = False,
-        expose: Union[int, List[int]] = [],
+        expose: Union[int, Iterable[int]] = (),
         gpus: Union[int, str, None] = None,
-        groups_add: List[str] = [],
+        groups_add: Iterable[str] = (),
         healthcheck: bool = True,
         health_cmd: Optional[str] = None,
         health_interval: Union[None, int, timedelta] = None,
@@ -1386,23 +1393,23 @@ class ContainerCLI(DockerCLICaller):
         ipc: Optional[str] = None,
         isolation: Optional[str] = None,
         kernel_memory: Union[int, str, None] = None,
-        labels: Dict[str, str] = {},
-        label_files: List[ValidPath] = [],
-        link: List[ValidContainer] = [],
-        link_local_ip: List[str] = [],
+        labels: Mapping[str, str] = {},
+        label_files: Iterable[ValidPath] = (),
+        link: Iterable[ValidContainer] = (),
+        link_local_ip: Iterable[str] = (),
         log_driver: Optional[str] = None,
-        log_options: List[str] = [],
+        log_options: Iterable[str] = (),
         mac_address: Optional[str] = None,
         memory: Union[int, str, None] = None,
         memory_reservation: Union[int, str, None] = None,
         memory_swap: Union[int, str, None] = None,
         memory_swappiness: Optional[int] = None,
-        mounts: List[List[str]] = [],
+        mounts: Iterable[List[str]] = (),
         name: Optional[str] = None,
-        networks: List[
+        networks: Iterable[
             python_on_whales.components.network.cli_wrapper.ValidNetwork
-        ] = [],
-        network_aliases: List[str] = [],
+        ] = (),
+        network_aliases: Iterable[str] = (),
         oom_kill: bool = True,
         oom_score_adj: Optional[int] = None,
         pid: Optional[str] = None,
@@ -1411,34 +1418,34 @@ class ContainerCLI(DockerCLICaller):
         pod: Optional[python_on_whales.components.pod.cli_wrapper.ValidPod] = None,
         preserve_fds: Optional[int] = None,
         privileged: bool = False,
-        publish: List[ValidPortMapping] = [],
+        publish: Iterable[ValidPortMapping] = (),
         publish_all: bool = False,
         pull: str = "missing",
         read_only: bool = False,
         restart: Optional[str] = None,
         remove: bool = False,
         runtime: Optional[str] = None,
-        security_options: List[str] = [],
+        security_options: Iterable[str] = (),
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
         stop_signal: Optional[Union[int, str]] = None,
         stop_timeout: Optional[int] = None,
-        storage_options: List[str] = [],
+        storage_options: Iterable[str] = (),
         stream: bool = False,
-        sysctl: Dict[str, str] = {},
+        sysctl: Mapping[str, str] = {},
         systemd: Optional[Union[bool, Literal["always"]]] = None,
-        tmpfs: List[ValidPath] = [],
+        tmpfs: Iterable[ValidPath] = (),
         tty: bool = False,
         tz: Optional[str] = None,
-        ulimit: List[str] = [],
+        ulimit: Iterable[str] = (),
         user: Optional[str] = None,
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: Optional[
-            List[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
-        ] = [],
+        volumes: Iterable[
+            python_on_whales.components.volume.cli_wrapper.VolumeDefinition
+        ] = (),
         volume_driver: Optional[str] = None,
-        volumes_from: List[ValidContainer] = [],
+        volumes_from: Iterable[ValidContainer] = (),
         workdir: Optional[ValidPath] = None,
     ) -> Union[Container, str, Iterable[Tuple[str, bytes]]]:
         """Runs a container
@@ -1509,8 +1516,8 @@ class ContainerCLI(DockerCLICaller):
         ```
 
         Parameters:
-            image: The docker image to use for the container
-            command: List of arguments to provide to the container.
+            image: The image to use for the container.
+            command: Sequence of arguments to provide to the container.
             add_hosts: hosts to add in the format of a tuple. For example,
                 `add_hosts=[("my_host_1", "192.168.30.31"), ("host2", "192.168.80.81")]`
             blkio_weight: Block IO (relative weight), between 10 and 1000,
@@ -1608,20 +1615,16 @@ class ContainerCLI(DockerCLICaller):
             The container output as a string if detach is `False` (the default),
             and a `python_on_whales.Container` if detach is `True`.
         """
-        if not isinstance(command, list):
-            error_message = (
-                "When calling docker.run(), the second argument ('command') "
-                "should be a list. "
-                "Here are some examples:"
-                "docker.run('ubuntu', ['ls']), "
-                "docker.run('ubuntu', ['cat', '/some/file.txt'])"
+        if isinstance(command, str):
+            error_message = textwrap.dedent(
+                f"""\
+                When calling docker.run(), the second argument ('command') should be a sequence of strings.
+                Here are some examples:
+                 docker.run('ubuntu', ['ls'])
+                 docker.run('ubuntu', ['cat', '/some/file.txt'])
+                You can try docker.run('{image}', {shlex.split(command)}, ...).
+                """
             )
-            if isinstance(command, str):
-                # boy this is the most common error in the world
-                error_message += (
-                    f" In your case, command should not be a string. "
-                    f"You can try docker.run('{image}', {command.split()}, ...)."
-                )
             raise TypeError(error_message)
 
         image_cli = python_on_whales.components.image.cli_wrapper.ImageCLI(
@@ -1634,16 +1637,15 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd = self.docker_cmd + ["container", "run"]
 
-        add_hosts = [f"{host}:{ip}" for host, ip in add_hosts]
-        full_cmd.add_args_iterable_or_single("--add-host", add_hosts)
-
-        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
-        full_cmd.add_args_iterable_or_single(
-            "--blkio-weight-device", blkio_weight_device
+        full_cmd.add_args_iterable(
+            "--add-host", (f"{host}:{ip}" for host, ip in add_hosts)
         )
 
-        full_cmd.add_args_iterable_or_single("--cap-add", cap_add)
-        full_cmd.add_args_iterable_or_single("--cap-drop", cap_drop)
+        full_cmd.add_simple_arg("--blkio-weight", blkio_weight)
+        full_cmd.add_args_iterable("--blkio-weight-device", blkio_weight_device)
+
+        full_cmd.add_args_iterable("--cap-add", cap_add)
+        full_cmd.add_args_iterable("--cap-drop", cap_drop)
 
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cgroupns", cgroupns)
@@ -1660,26 +1662,24 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_flag("--detach", detach)
 
-        full_cmd.add_args_iterable_or_single("--device", devices)
-        full_cmd.add_args_iterable_or_single(
-            "--device-cgroup-rule", device_cgroup_rules
-        )
-        full_cmd.add_args_iterable_or_single("--device-read-bps", device_read_bps)
-        full_cmd.add_args_iterable_or_single("--device-read-iops", device_read_iops)
-        full_cmd.add_args_iterable_or_single("--device-write-bps", device_write_bps)
-        full_cmd.add_args_iterable_or_single("--device-write-iops", device_write_iops)
+        full_cmd.add_args_iterable("--device", devices)
+        full_cmd.add_args_iterable("--device-cgroup-rule", device_cgroup_rules)
+        full_cmd.add_args_iterable("--device-read-bps", device_read_bps)
+        full_cmd.add_args_iterable("--device-read-iops", device_read_iops)
+        full_cmd.add_args_iterable("--device-write-bps", device_write_bps)
+        full_cmd.add_args_iterable("--device-write-iops", device_write_iops)
 
         if content_trust:
             full_cmd += ["--disable-content-trust", "false"]
 
-        full_cmd.add_args_iterable_or_single("--dns", dns)
-        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
-        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
+        full_cmd.add_args_iterable("--dns", dns)
+        full_cmd.add_args_iterable("--dns-option", dns_options)
+        full_cmd.add_args_iterable("--dns-search", dns_search)
         full_cmd.add_simple_arg("--domainname", domainname)
 
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
-        full_cmd.add_args_iterable_or_single("--env", format_mapping_for_cli(envs))
+        full_cmd.add_args_mapping("--env", envs)
         full_cmd.add_args_iterable_or_single("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
@@ -1711,14 +1711,14 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--isolation", isolation)
         full_cmd.add_simple_arg("--kernel-memory", kernel_memory)
 
-        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
-        full_cmd.add_args_iterable_or_single("--label-file", label_files)
+        full_cmd.add_args_mapping("--label", labels)
+        full_cmd.add_args_iterable("--label-file", label_files)
 
-        full_cmd.add_args_iterable_or_single("--link", link)
-        full_cmd.add_args_iterable_or_single("--link-local-ip", link_local_ip)
+        full_cmd.add_args_iterable("--link", link)
+        full_cmd.add_args_iterable("--link-local-ip", link_local_ip)
 
         full_cmd.add_simple_arg("--log-driver", log_driver)
-        full_cmd.add_args_iterable_or_single("--log-opt", log_options)
+        full_cmd.add_args_iterable("--log-opt", log_options)
 
         full_cmd.add_simple_arg("--mac-address", mac_address)
 
@@ -1727,12 +1727,11 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
         full_cmd.add_simple_arg("--memory-swappiness", memory_swappiness)
 
-        mounts = [",".join(x) for x in mounts]
-        full_cmd.add_args_iterable_or_single("--mount", mounts)
+        full_cmd.add_args_iterable("--mount", (",".join(x) for x in mounts))
         full_cmd.add_simple_arg("--name", name)
 
-        full_cmd.add_args_iterable_or_single("--network", networks)
-        full_cmd.add_args_iterable_or_single("--network-alias", network_aliases)
+        full_cmd.add_args_iterable("--network", networks)
+        full_cmd.add_args_iterable("--network-alias", network_aliases)
 
         full_cmd.add_flag("--oom-kill-disable", not oom_kill)
         full_cmd.add_simple_arg("--oom-score-adj", oom_score_adj)
@@ -1745,9 +1744,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--preserve-fds", preserve_fds)
         full_cmd.add_flag("--privileged", privileged)
 
-        full_cmd.add_args_iterable_or_single(
-            "-p", [format_port_arg(p) for p in publish]
-        )
+        full_cmd.add_args_iterable("-p", (format_port_arg(p) for p in publish))
         full_cmd.add_flag("--publish-all", publish_all)
 
         if pull == "never":
@@ -1758,7 +1755,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_flag("--rm", remove)
 
         full_cmd.add_simple_arg("--runtime", runtime)
-        full_cmd.add_args_iterable_or_single("--security-opt", security_options)
+        full_cmd.add_args_iterable("--security-opt", security_options)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
         if sig_proxy is False:
@@ -1767,13 +1764,13 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--stop-signal", format_signal_arg(stop_signal))
         full_cmd.add_simple_arg("--stop-timeout", stop_timeout)
 
-        full_cmd.add_args_iterable_or_single("--storage-opt", storage_options)
-        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
+        full_cmd.add_args_iterable("--storage-opt", storage_options)
+        full_cmd.add_args_mapping("--sysctl", sysctl)
         full_cmd.add_simple_arg("--systemd", systemd)
-        full_cmd.add_args_iterable_or_single("--tmpfs", tmpfs)
+        full_cmd.add_args_iterable("--tmpfs", tmpfs)
         full_cmd.add_flag("--tty", tty)
         full_cmd.add_simple_arg("--tz", tz)
-        full_cmd.add_args_iterable_or_single("--ulimit", ulimit)
+        full_cmd.add_args_iterable("--ulimit", ulimit)
 
         full_cmd.add_simple_arg("--user", user)
         full_cmd.add_simple_arg("--userns", userns)
@@ -1783,12 +1780,12 @@ class ContainerCLI(DockerCLICaller):
             volume_definition = tuple(str(x) for x in volume_definition)
             full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--volume-driver", volume_driver)
-        full_cmd.add_args_iterable_or_single("--volumes-from", volumes_from)
+        full_cmd.add_args_iterable("--volumes-from", volumes_from)
 
         full_cmd.add_simple_arg("--workdir", workdir)
 
         full_cmd.append(image)
-        full_cmd += command
+        full_cmd.extend(command)
 
         if detach:
             if stream:
@@ -1813,7 +1810,7 @@ class ContainerCLI(DockerCLICaller):
 
     def start(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[ValidContainer, Iterable[ValidContainer]],
         attach: bool = False,
         interactive: bool = False,
         stream: bool = False,
@@ -1857,7 +1854,7 @@ class ContainerCLI(DockerCLICaller):
 
     def stats(
         self,
-        containers: Optional[Union[ValidContainer, List[ValidContainer]]] = None,
+        containers: Optional[Union[ValidContainer, Iterable[ValidContainer]]] = None,
         all: bool = False,
     ) -> List[ContainerStats]:
         """Get containers resource usage statistics
@@ -1887,7 +1884,8 @@ class ContainerCLI(DockerCLICaller):
         # Returns
             A `List[python_on_whales.ContainerStats]`.
         """
-        if containers == []:
+        containers_list = to_list(containers) if containers else []
+        if len(containers_list) == 0 and containers is not None and not all:
             return []
 
         full_cmd = self.docker_cmd + [
@@ -1900,14 +1898,14 @@ class ContainerCLI(DockerCLICaller):
         ]
         full_cmd.add_flag("--all", all)
         if containers:
-            full_cmd.extend(to_list(containers))
+            full_cmd.extend(containers_list)
 
         stats_output = run(full_cmd)
         return [ContainerStats(json.loads(x)) for x in stats_output.splitlines()]
 
     def stop(
         self,
-        containers: Union[ValidContainer, List[ValidContainer]],
+        containers: Union[ValidContainer, Iterable[ValidContainer]],
         time: Optional[Union[int, timedelta]] = None,
     ) -> None:
         """Stops one or more running containers
@@ -1943,7 +1941,7 @@ class ContainerCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, x: Union[ValidContainer, List[ValidContainer]], /) -> None:
+    def unpause(self, x: Union[ValidContainer, Iterable[ValidContainer]], /) -> None:
         """Unpause all processes within one or more containers
 
         Alias: `docker.unpause(...)`
@@ -1965,7 +1963,7 @@ class ContainerCLI(DockerCLICaller):
 
     def update(
         self,
-        x: Union[ValidContainer, List[ValidContainer]],
+        x: Union[ValidContainer, Iterable[ValidContainer]],
         /,
         *,
         blkio_weight: Optional[int] = None,
@@ -1975,8 +1973,8 @@ class ContainerCLI(DockerCLICaller):
         cpu_rt_runtime: Optional[int] = None,
         cpu_shares: Optional[int] = None,
         cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
+        cpuset_cpus: Optional[str] = None,
+        cpuset_mems: Optional[str] = None,
         kernel_memory: Union[int, str, None] = None,
         memory: Union[int, str, None] = None,
         memory_reservation: Union[int, str, None] = None,
@@ -2032,17 +2030,17 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--memory-swap", memory_swap)
         full_cmd.add_simple_arg("--pids-limit", pids_limit)
         full_cmd.add_simple_arg("--restart", restart)
-        full_cmd += x
+        full_cmd.extend(x)
         run(full_cmd)
 
     @overload
     def wait(self, x: ValidContainer) -> int: ...
 
     @overload
-    def wait(self, x: List[ValidContainer]) -> List[int]: ...
+    def wait(self, x: Iterable[ValidContainer]) -> List[int]: ...
 
     def wait(
-        self, x: Union[ValidContainer, List[ValidContainer]]
+        self, x: Union[ValidContainer, Iterable[ValidContainer]]
     ) -> Union[int, List[int]]:
         """Block until one or more containers stop, then returns their exit codes
 
@@ -2082,16 +2080,16 @@ class ContainerCLI(DockerCLICaller):
         # Raises
             `python_on_whales.exceptions.NoSuchContainer` if the container does not exists.
         """
-        if x == []:
+        containers = to_list(x)
+        if len(containers) == 0:
             # nothing to do
             return []
-        full_cmd = self.docker_cmd + ["container", "wait"]
-        if isinstance(x, list):
-            full_cmd += x
+
+        full_cmd = self.docker_cmd + ["container", "wait", *containers]
+        if isinstance(x, Iterable) and not isinstance(x, str):
             exit_codes = run(full_cmd)
             return [int(exit_code) for exit_code in exit_codes.splitlines()]
         else:
-            full_cmd.append(x)
             return int(run(full_cmd))
 
 

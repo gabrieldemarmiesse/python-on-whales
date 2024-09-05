@@ -4,12 +4,10 @@ import json
 from datetime import datetime, timedelta
 from typing import (
     Any,
-    Dict,
     Iterable,
     List,
     Mapping,
     Optional,
-    Sequence,
     Tuple,
     TypedDict,
     Union,
@@ -259,17 +257,17 @@ class PodCLI(DockerCLICaller):
         self,
         name: Optional[str] = None,
         *,
-        add_hosts: List[Tuple[str, str]] = [],
+        add_hosts: Iterable[Tuple[str, str]] = (),
         cgroup_parent: Optional[str] = None,
         cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        devices: List[str] = [],
-        device_read_bps: List[str] = [],
-        dns: List[str] = [],
-        dns_options: List[str] = [],
-        dns_search: List[str] = [],
+        cpuset_cpus: Optional[Iterable[int]] = None,
+        devices: Iterable[str] = (),
+        device_read_bps: Iterable[str] = (),
+        dns: Iterable[str] = (),
+        dns_options: Iterable[str] = (),
+        dns_search: Iterable[str] = (),
         exit_policy: Optional[str] = None,
-        gidmaps: List[Tuple[int, int, int]] = [],
+        gidmaps: Iterable[Tuple[int, int, int]] = (),
         hostname: Optional[str] = None,
         infra: Optional[bool] = None,
         infra_command: Optional[str] = None,
@@ -280,33 +278,33 @@ class PodCLI(DockerCLICaller):
         infra_name: Optional[str] = None,
         ip: Optional[str] = None,
         ip6: Optional[str] = None,
-        labels: Dict[str, str] = {},
-        label_files: List[ValidPath] = [],
+        labels: Mapping[str, str] = {},
+        label_files: Iterable[ValidPath] = (),
         mac_address: Optional[str] = None,
         memory: Union[int, str, None] = None,
-        networks: List[
+        networks: Iterable[
             python_on_whales.components.network.cli_wrapper.ValidNetwork
-        ] = [],
-        network_aliases: List[str] = [],
+        ] = (),
+        network_aliases: Iterable[str] = (),
         no_hosts: bool = False,
         pid: Optional[str] = None,
         pod_id_file: Optional[ValidPath] = None,
-        publish: List[ValidPortMapping] = [],
+        publish: Iterable[ValidPortMapping] = (),
         replace: bool = False,
         restart: Optional[str] = None,
-        security_options: List[str] = [],
-        share: Optional[List[str]] = None,
+        security_options: Iterable[str] = (),
+        share: Optional[Iterable[str]] = None,
         shm_size: Optional[Union[int, str]] = None,
         subgidname: Optional[str] = None,
         subuidname: Optional[str] = None,
-        sysctl: Dict[str, str] = {},
-        uidmaps: List[Tuple[int, int, int]] = [],
+        sysctl: Mapping[str, str] = {},
+        uidmaps: Iterable[Tuple[int, int, int]] = (),
         userns: Optional[str] = None,
         uts: Optional[str] = None,
-        volumes: List[VolumeDefinition] = [],
-        volumes_from: List[
+        volumes: Iterable[VolumeDefinition] = (),
+        volumes_from: Iterable[
             python_on_whales.components.container.cli_wrapper.ValidContainer
-        ] = [],
+        ] = (),
     ) -> Pod:
         """Creates a pod, but does not start it.
 
@@ -401,19 +399,19 @@ class PodCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["pod", "create"]
         full_cmd.add_simple_arg("--name", name)
 
-        full_cmd.add_args_iterable_or_single(
+        full_cmd.add_args_iterable(
             "--add-host", [f"{host}:{ip}" for host, ip in add_hosts]
         )
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cpus", cpus)
         full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
-        full_cmd.add_args_iterable_or_single("--device", devices)
-        full_cmd.add_args_iterable_or_single("--device-read-bps", device_read_bps)
-        full_cmd.add_args_iterable_or_single("--dns", dns)
-        full_cmd.add_args_iterable_or_single("--dns-option", dns_options)
-        full_cmd.add_args_iterable_or_single("--dns-search", dns_search)
+        full_cmd.add_args_iterable("--device", devices)
+        full_cmd.add_args_iterable("--device-read-bps", device_read_bps)
+        full_cmd.add_args_iterable("--dns", dns)
+        full_cmd.add_args_iterable("--dns-option", dns_options)
+        full_cmd.add_args_iterable("--dns-search", dns_search)
         full_cmd.add_simple_arg("--exit-policy", exit_policy)
-        full_cmd.add_args_iterable_or_single("--gidmap", [":".join(x) for x in gidmaps])
+        full_cmd.add_args_iterable("--gidmap", [":".join(x) for x in gidmaps])
         full_cmd.add_simple_arg("--hostname", hostname)
 
         if infra is not None:
@@ -426,27 +424,25 @@ class PodCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--ip", ip)
         full_cmd.add_simple_arg("--ip6", ip6)
-        full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
+        full_cmd.add_args_mapping("--label", labels)
         full_cmd.add_args_iterable_or_single("--label-file", label_files)
         full_cmd.add_simple_arg("--mac-address", mac_address)
         full_cmd.add_simple_arg("--memory", memory)
         full_cmd.add_args_iterable_or_single("--network", networks)
-        full_cmd.add_args_iterable_or_single("--network-alias", network_aliases)
+        full_cmd.add_args_iterable("--network-alias", network_aliases)
         full_cmd.add_flag("--no-hosts", no_hosts)
         full_cmd.add_simple_arg("--pid", pid)
         full_cmd.add_simple_arg("--pod-id-file", pod_id_file)
-        full_cmd.add_args_iterable_or_single(
-            "-p", [format_port_arg(p) for p in publish]
-        )
+        full_cmd.add_args_iterable("-p", [format_port_arg(p) for p in publish])
         full_cmd.add_flag("--replace", replace)
         full_cmd.add_simple_arg("--restart", restart)
-        full_cmd.add_args_iterable_or_single("--security-opt", security_options)
+        full_cmd.add_args_iterable("--security-opt", security_options)
         if share is not None:
             full_cmd.add_simple_arg("--share", ",".join(share))
         full_cmd.add_simple_arg("--shm-size", shm_size)
         full_cmd.add_simple_arg("--subgidname", subgidname)
         full_cmd.add_simple_arg("--subuidname", subuidname)
-        full_cmd.add_args_iterable_or_single("--sysctl", format_mapping_for_cli(sysctl))
+        full_cmd.add_args_mapping("--sysctl", sysctl)
         full_cmd.add_args_iterable_or_single("--uidmap", [":".join(x) for x in uidmaps])
         full_cmd.add_simple_arg("--userns", userns)
         full_cmd.add_simple_arg("--uts", uts)
@@ -476,10 +472,10 @@ class PodCLI(DockerCLICaller):
     def inspect(self, x: ValidPod, /) -> Pod: ...
 
     @overload
-    def inspect(self, x: Sequence[ValidPod], /) -> List[Pod]: ...
+    def inspect(self, x: Iterable[ValidPod], /) -> List[Pod]: ...
 
     def inspect(
-        self, x: Union[ValidPod, Sequence[ValidPod]], /
+        self, x: Union[ValidPod, Iterable[ValidPod]], /
     ) -> Union[Pod, List[Pod]]:
         """Creates a `python_on_whales.Pod` object.
 
@@ -498,7 +494,7 @@ class PodCLI(DockerCLICaller):
 
     def kill(
         self,
-        x: Union[ValidPod, Sequence[ValidPod]],
+        x: Union[ValidPod, Iterable[ValidPod]],
         /,
         *,
         signal: Optional[Union[int, str]] = None,
@@ -618,7 +614,7 @@ class PodCLI(DockerCLICaller):
         else:
             return "".join(x[1].decode() for x in iterator)
 
-    def pause(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def pause(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Pauses one or more pods
 
         Parameters:
@@ -641,7 +637,7 @@ class PodCLI(DockerCLICaller):
 
     def remove(
         self,
-        x: Union[ValidPod, Sequence[ValidPod]],
+        x: Union[ValidPod, Iterable[ValidPod]],
         /,
         *,
         force: bool = False,
@@ -671,7 +667,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def restart(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def restart(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Restarts one or more pods
 
         Parameters:
@@ -687,7 +683,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def start(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def start(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Starts one or more pods
 
         Parameters:
@@ -703,7 +699,7 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def stats(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> List[PodStats]:
+    def stats(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> List[PodStats]:
         """Get pods resource usage statistics
 
         The data unit is the byte.
@@ -731,7 +727,7 @@ class PodCLI(DockerCLICaller):
 
     def stop(
         self,
-        x: Union[ValidPod, Sequence[ValidPod]],
+        x: Union[ValidPod, Iterable[ValidPod]],
         /,
         *,
         time: Optional[int] = None,
@@ -759,7 +755,7 @@ class PodCLI(DockerCLICaller):
         Not yet implemented"""
         raise NotImplementedError
 
-    def unpause(self, x: Union[ValidPod, Sequence[ValidPod]], /) -> None:
+    def unpause(self, x: Union[ValidPod, Iterable[ValidPod]], /) -> None:
         """Unpauses one or more pods
 
         Parameters:
