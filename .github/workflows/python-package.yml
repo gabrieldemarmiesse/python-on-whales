@@ -17,8 +17,10 @@ jobs:
           python-version: 3.8
       - name: prepare
         run: |
+          ./scripts/ci-podman-update.sh
+          pip install -U pip wheel
           pip install -r ./requirements.txt -r docs/requirements.txt -e .
-          python docs/autogen.py
+          ./docs/autogen.py
           cp -r docs/generated_sources ./generated_sources
           cp docs/mkdocs.yml ./
       - name: Render
