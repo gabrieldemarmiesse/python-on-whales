@@ -78,3 +78,17 @@ def test_swarm_service_create(docker_client: DockerClient):
             "busybox", ["sleep", "infinity"], network=my_net.name
         ):
             assert len(my_net.containers) == 2  # 1 container + 1 endpoint
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_network_exists(ctr_client: DockerClient):
+    network_name = random_name()
+    assert not ctr_client.network.exists(network_name)
+    with ctr_client.network.create(network_name) as network:
+        assert ctr_client.network.exists(network_name)
+        assert ctr_client.network.exists(network)
+        assert network.exists()
+
+    # Outside with clause, network should be removed and no longer exist
+    assert not ctr_client.network.exists(network)
+    assert not network.exists()
