@@ -219,7 +219,7 @@ class NetworkCLI(DockerCLICaller):
 
     def exists(
         self,
-        network: str,
+        network: ValidNetwork,
     ) -> bool:
         """Check if a network exists
 
@@ -227,7 +227,7 @@ class NetworkCLI(DockerCLICaller):
             network: The name of the network.
         """
         try:
-            self.inspect(network)
+            self.inspect(str(network))
         except NoSuchNetwork:
             return False
         else:

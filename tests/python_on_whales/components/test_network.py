@@ -86,7 +86,9 @@ def test_network_exists(ctr_client: DockerClient):
     assert not ctr_client.network.exists(network_name)
     with ctr_client.network.create(network_name) as network:
         assert ctr_client.network.exists(network_name)
+        assert ctr_client.network.exists(network)
         assert network.exists()
 
     # Outside with clause, network should be removed and no longer exist
+    assert not ctr_client.network.exists(network)
     assert not network.exists()
