@@ -9,11 +9,6 @@ from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Union
 
 import pydantic
 
-from python_on_whales.download_binaries import (
-    download_docker_cli,
-    get_docker_binary_path_in_cache,
-)
-
 from . import utils
 from .utils import ValidPath, run, to_list
 
@@ -92,32 +87,13 @@ class ClientConfig:
 
     def _get_docker_path(self) -> str:
         which_result = shutil.which(self.client_call[0])
-        if which_result is not None:
-            return which_result
-        if self.client_call[0] == "docker":
-            if not get_docker_binary_path_in_cache().exists():
-                warnings.warn(
-                    "The docker client binary file was not found on your system. \n"
-                    "Docker on whales will try to download it for you. \n"
-                    "Don't worry, it "
-                    "won't be in the PATH and won't have anything to do with "
-                    "the package manager of your system. \n"
-                    "Note: We are not installing the docker daemon, which is a lot "
-                    "heavier and harder to install. We're just downloading a single "
-                    "standalone binary file.\n"
-                    "If you want to trigger the download of the client binary file "
-                    "manually (for example if you want to do it in a Dockerfile), "
-                    "you can run the following command:\n "
-                    "$ python-on-whales download-cli \n"
-                )
-                download_docker_cli()
-            return get_docker_binary_path_in_cache()
-
-        raise ClientNotFoundError(
-            f"The binary '{self.client_call[0]}' could not be found on your PATH. "
-            f"Please ensure that your PATH is has the directory of the binary you're looking for. "
-            f"You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
-        )
+        if which_result is None:
+            raise ClientNotFoundError(
+                f"The binary '{self.client_call[0]}' could not be found on your PATH. "
+                "Please ensure that your PATH has the directory of the binary you're looking for. "
+                "You can use `print(os.environ['PATH'])` to verify what directories are in your PATH."
+            )
+        return which_result
 
     @property
     def docker_cmd(self) -> Command:
