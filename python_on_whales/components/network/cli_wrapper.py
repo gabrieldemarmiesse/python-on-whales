@@ -15,6 +15,7 @@ from python_on_whales.components.network.models import (
     NetworkInspectResult,
     NetworkIPAM,
 )
+from python_on_whales.exceptions import NoSuchNetwork
 from python_on_whales.utils import format_mapping_for_cli, run, to_list
 
 NetworkListFilter: TypeAlias = Union[
@@ -115,6 +116,13 @@ class Network(ReloadableObjectFromJson):
 
     def __repr__(self):
         return f"python_on_whales.Network(id='{self.id[:12]}', name={self.name})"
+
+    def exists(self) -> bool:
+        """Returns `True` if the network exists and `False` if it doesn't exist.
+
+        If it doesn't exist, that most likely means it was removed.
+        """
+        return NetworkCLI(self.client_config).exists(self.id)
 
     def remove(self) -> None:
         """Removes this Docker network.
@@ -221,6 +229,22 @@ class NetworkCLI(DockerCLICaller):
         full_cmd += [network, container]
         run(full_cmd)
 
+    def exists(
+        self,
+        network: ValidNetwork,
+    ) -> bool:
+        """Check if a network exists
+
+        Parameters:
+            network: The name of the network.
+        """
+        try:
+            self.inspect(str(network))
+        except NoSuchNetwork:
+            return False
+        else:
+            return True
+
     @overload
     def inspect(self, x: str) -> Network: ...
 
@@ -228,12 +252,28 @@ class NetworkCLI(DockerCLICaller):
     def inspect(self, x: List[str]) -> List[Network]: ...
 
     def inspect(self, x: Union[str, List[str]]) -> Union[Network, List[Network]]:
+        """Returns a `python_on_whales.Network` object from a string (id or network name).
+
+        Parameters:
+            x: One id or network name or a list of ids or network names.
+
+        # Returns
+            One or a list of `python_on_whales.Network`.
+        """
         if isinstance(x, str):
             return Network(self.client_config, x)
         else:
             return [Network(self.client_config, reference) for reference in x]
 
     def list(self, filters: List[NetworkListFilter] = []) -> List[Network]:
+        """List all the networks available.
+
+        Parameters:
+            filters: Filters as strings or list of strings.
+
+        # Returns
+            List of `python_on_whales.Network`.
+        """
         full_cmd = self.docker_cmd + ["network", "ls", "--no-trunc", "--quiet"]
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
@@ -241,6 +281,11 @@ class NetworkCLI(DockerCLICaller):
         return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
     def prune(self, filters: List[NetworkListFilter] = []) -> None:
+        """Remove Docker networks which are not used by any containers.
+
+        Parameters:
+            filters: Filters to apply when finding networks to prune.
+        """
         full_cmd = self.docker_cmd + ["network", "prune", "--force"]
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
         run(full_cmd)
