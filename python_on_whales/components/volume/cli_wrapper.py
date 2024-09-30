@@ -3,9 +3,22 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple, TypeAlias, Union, overload
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Tuple,
+    TypeAlias,
+    Union,
+    overload,
+)
 
 import python_on_whales.components.buildx
 import python_on_whales.components.container
@@ -183,7 +196,9 @@ class VolumeCLI(DockerCLICaller):
         else:
             return True
 
-    def list(self, filters: List[VolumeListFilter] = []) -> List[Volume]:
+    def list(
+        self, filters: Union[Iterable[VolumeListFilter], Mapping[str, Any]] = ()
+    ) -> List[Volume]:
         """List volumes
 
         Parameters:
@@ -194,7 +209,14 @@ class VolumeCLI(DockerCLICaller):
         # Returns
             `List[python_on_whales.Volume]`
         """
-
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["volume", "list", "--quiet"]
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
@@ -204,7 +226,11 @@ class VolumeCLI(DockerCLICaller):
             Volume(self.client_config, x, is_immutable_id=True) for x in volumes_names
         ]
 
-    def prune(self, filters: List[VolumeListFilter] = [], all: bool = False) -> None:
+    def prune(
+        self,
+        filters: Union[Iterable[VolumeListFilter], Mapping[str, Any]] = (),
+        all: bool = False,
+    ) -> None:
         """Remove volumes
 
         Parameters:
@@ -213,6 +239,14 @@ class VolumeCLI(DockerCLICaller):
                 An example `filters=[("dangling", "true"), ("driver", "local")]`.
             all: Remove all unused volumes, not just anonymous ones.
         """
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["volume", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))

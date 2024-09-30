@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from datetime import datetime, timedelta
 from typing import (
     Any,
@@ -33,7 +34,6 @@ from python_on_whales.exceptions import NoSuchPod
 from python_on_whales.utils import (
     ValidPath,
     ValidPortMapping,
-    format_mapping_for_cli,
     format_port_arg,
     format_signal_arg,
     format_time_arg,
@@ -515,7 +515,9 @@ class PodCLI(DockerCLICaller):
         full_cmd.extend([str(p) for p in pods])
         run(full_cmd)
 
-    def list(self, *, filters: List[PodListFilter] = []) -> List[Pod]:
+    def list(
+        self, *, filters: Union[Iterable[PodListFilter], Mapping[str, Any]] = ()
+    ) -> List[Pod]:
         """List the pods on the host.
 
         Parameters:
@@ -524,6 +526,14 @@ class PodCLI(DockerCLICaller):
         # Returns
             A `List[python_on_whales.Pod]`
         """
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["pod", "ps", "-q", "--no-trunc"]
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 

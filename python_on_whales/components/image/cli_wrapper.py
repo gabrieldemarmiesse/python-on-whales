@@ -433,7 +433,7 @@ class ImageCLI(DockerCLICaller):
     def list(
         self,
         repository_or_tag: Optional[str] = None,
-        filters: Iterable[ImageListFilter] = [],
+        filters: Union[Iterable[ImageListFilter], Mapping[str, Any]] = (),
         all: bool = False,
     ) -> List[Image]:
         """Returns the list of Docker images present on the machine.
@@ -445,21 +445,14 @@ class ImageCLI(DockerCLICaller):
         # Returns
             A `List[python_on_whales.Image]` object.
         """
-        # previously the signature was
-        # def list(self,filters: Dict[str, str] = {}) -> List[Image]:
-        # so to avoid breakages when people used positional arguments, we can check the types and send a warning
-        if isinstance(repository_or_tag, dict):
-            # after a while, we can convert that to an error. No hurry though.
+        if isinstance(filters, Mapping):
+            filters = filters.items()
             warnings.warn(
-                f"You are calling docker.image.list({repository_or_tag}) with the filter as the first argument."
-                f"Since Python-on-whales v0.51.0, the first argument has be changed to `repository_or_tag`."
-                f"To fix this warning, please add the filters keyword argument, "
-                f"like so: docker.image.list(filters={repository_or_tag}) ",
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
                 DeprecationWarning,
             )
-            filters = repository_or_tag
-            repository_or_tag = None
-
         full_cmd = self.docker_cmd + [
             "image",
             "list",
@@ -478,7 +471,11 @@ class ImageCLI(DockerCLICaller):
 
         return [Image(self.client_config, x, is_immutable_id=True) for x in ids]
 
-    def prune(self, all: bool = False, filters: List[ImageListFilter] = []) -> str:
+    def prune(
+        self,
+        all: bool = False,
+        filters: Union[Iterable[ImageListFilter], Mapping[str, Any]] = (),
+    ) -> str:
         """Remove unused images
 
         Parameters:
@@ -488,6 +485,14 @@ class ImageCLI(DockerCLICaller):
         Returns:
             The output of the CLI (the layers removed).
         """
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["image", "prune", "--force"]
         full_cmd.add_flag("--all", all)
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))

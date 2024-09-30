@@ -1,5 +1,17 @@
 import json
-from typing import Any, Dict, List, Literal, Optional, Tuple, TypeAlias, Union
+import warnings
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Tuple,
+    TypeAlias,
+    Union,
+)
 
 from python_on_whales.client_config import (
     ClientConfig,
@@ -87,8 +99,18 @@ class SecretCLI(DockerCLICaller):
         else:
             return Secret(self.client_config, x)
 
-    def list(self, filters: List[SecretListFilter] = []) -> List[Secret]:
+    def list(
+        self, filters: Union[Iterable[SecretListFilter], Mapping[str, Any]] = ()
+    ) -> List[Secret]:
         """Returns all secrets as a `List[python_on_whales.Secret]`."""
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["secret", "list", "--quiet"]
         full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
         ids = run(full_cmd).splitlines()
