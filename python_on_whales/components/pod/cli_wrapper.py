@@ -11,10 +11,11 @@ from typing import (
     Mapping,
     Optional,
     Tuple,
-    TypeAlias,
     Union,
     overload,
 )
+
+from typing_extensions import TypeAlias
 
 import python_on_whales.components.container.cli_wrapper
 import python_on_whales.components.image.cli_wrapper

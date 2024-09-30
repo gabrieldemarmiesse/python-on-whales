@@ -22,6 +22,7 @@ from typing import (
 )
 
 import pydantic
+from typing_extensions import TypeAlias
 
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.network.cli_wrapper
@@ -57,7 +58,7 @@ from python_on_whales.utils import (
     to_seconds,
 )
 
-ContainerListFilter = Union[
+ContainerListFilter: TypeAlias = Union[
     Tuple[Literal["id"], str],
     Tuple[Literal["name"], str],
     Tuple[Literal["label"], str],

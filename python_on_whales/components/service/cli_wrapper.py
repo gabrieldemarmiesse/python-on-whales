@@ -12,10 +12,11 @@ from typing import (
     Mapping,
     Optional,
     Tuple,
-    TypeAlias,
     Union,
     overload,
 )
+
+from typing_extensions import TypeAlias
 
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (

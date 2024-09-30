@@ -9,9 +9,10 @@ from typing import (
     Mapping,
     Optional,
     Tuple,
-    TypeAlias,
     Union,
 )
+
+from typing_extensions import TypeAlias
 
 from python_on_whales.client_config import (
     ClientConfig,
