@@ -25,6 +25,9 @@ Works on Linux, macOS and Windows, for Python 3.8 and above.
 pip install python-on-whales
 ```
 
+See <https://gabrieldemarmiesse.github.io/python-on-whales/docker_client/#the-dockerpodman-cli>
+for instructions on installing Docker/Podman.
+
 ## Some cool examples
 
 Start by doing
