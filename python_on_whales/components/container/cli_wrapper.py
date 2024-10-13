@@ -583,7 +583,7 @@ class ContainerCLI(DockerCLICaller):
         domainname: Optional[str] = None,
         entrypoint: Optional[str] = None,
         envs: Mapping[str, str] = {},
-        env_files: Union[ValidPath, Iterable[ValidPath]] = [],
+        env_files: Union[ValidPath, Iterable[ValidPath]] = (),
         env_host: bool = False,
         expose: Union[int, Iterable[int]] = (),
         gpus: Union[int, str, None] = None,
@@ -735,7 +735,7 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--entrypoint", entrypoint)
 
         full_cmd.add_args_mapping("--env", envs)
-        full_cmd.add_args_iterable("--env-file", env_files)
+        full_cmd.add_args_iterable_or_single("--env-file", env_files)
         full_cmd.add_flag("--env-host", env_host)
 
         full_cmd.add_args_iterable_or_single("--expose", expose)
