@@ -52,19 +52,7 @@ def test_multiple_volumes(ctr_client: DockerClient):
         assert v not in ctr_client.volume.list()
 
 
-@pytest.mark.parametrize(
-    "ctr_client",
-    [
-        "docker",
-        pytest.param(
-            "podman",
-            marks=pytest.mark.xfail(
-                reason="'podman volume create' does not support size option"
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_volume_drivers(ctr_client: DockerClient):
     some_volume = ctr_client.volume.create(
         driver="local",
