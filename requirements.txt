@@ -1,5 +1,2 @@
 pydantic>=2,<3,!=2.0.*
-requests
-tqdm
-typer>=0.4.1
 typing_extensions
