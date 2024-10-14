@@ -194,7 +194,7 @@ def test_create_share_arg(podman_client: DockerClient):
         assert output == "1"
     with podman_client.pod.create(pod_name, share=["pid", "ipc"]) as pod:
         pod.start()  # start the infra container (PID 1)
-        assert pod.shared_namespaces == ["pid", "ipc"]
+        assert set(pod.shared_namespaces) == {"pid", "ipc"}
         output = podman_client.container.run(
             "ubuntu", ["readlink", "/proc/self"], pod=pod
         )

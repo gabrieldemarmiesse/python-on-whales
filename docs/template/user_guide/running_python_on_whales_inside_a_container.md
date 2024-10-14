@@ -15,7 +15,7 @@ Let's give you the code example, and we'll explain afterwards where is the magic
 
 ### Example
 
-We want to run this small Python script. It uses python-on-whales. We'll call it `main.py`
+We want to run this small Python script. It uses python-on-whales. We'll call it `main.py`.
 
 ```python
 # main.py
@@ -38,21 +38,24 @@ Next to this `main.py`, make a `Dockerfile`.
 # Dockerfile
 FROM python:3.9
 
-RUN pip install python-on-whales
-RUN python-on-whales download-cli
+RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-27.3.1.tgz -O /tmp/docker-27.3.1.tgz
+RUN tar -C /tmp -xzf /tmp/docker-27.3.1.tgz
+RUN cp /tmp/docker/docker /usr/local/bin/docker
 
 # install docker buildx, this step is optional
 RUN mkdir -p ~/.docker/cli-plugins/
-RUN wget https://github.com/docker/buildx/releases/download/v0.6.3/buildx-v0.6.3.linux-amd64 -O ~/.docker/cli-plugins/docker-buildx
+RUN wget https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 -O ~/.docker/cli-plugins/docker-buildx
 RUN chmod a+x  ~/.docker/cli-plugins/docker-buildx
 
 # install docker compose, this step is optional
 RUN mkdir -p ~/.docker/cli-plugins/
-RUN wget https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -O ~/.docker/cli-plugins/docker-compose
+RUN wget https://github.com/docker/compose/releases/download/latest/docker-compose-linux-x86_64 -O ~/.docker/cli-plugins/docker-compose
 RUN chmod a+x  ~/.docker/cli-plugins/docker-compose
 
-COPY ./main.py /main.py
-CMD python /main.py
+RUN pip install python-on-whales
+RUN mkdir /app
+COPY ./main.py /app/main.py
+CMD python3 /app/main.py
 ```
 
 We're all set! Let's run this Python script, without having Python installed on the system!
@@ -98,7 +101,7 @@ compose version: Docker Compose version v2.0.0-rc.2
 The main magic here is the sharing of the docker socket between the host and the container.
 This is done with the `-v /var/run/docker.sock:/var/run/docker.sock`.
 
-With this option, the container can have access to the docker API. But it still needs the binary client in Go.
-Download it in the dockerfile with `python-no-whales download-cli`. You can then optionally install buildx and compose.
+With this option, the container can have access to the docker API. But it still needs the binary client,
+which is downloaded using `wget`, along with optionally installing the buildx and compose plugins.
 
 Then you're good to go! Simple as that.
