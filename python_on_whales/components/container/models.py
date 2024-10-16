@@ -313,3 +313,5 @@ class ContainerInspectResult(DockerCamelModel):
     mounts: Optional[List[Mount]] = None
     config: Optional[ContainerConfig] = None
     network_settings: Optional[NetworkSettings] = None
+    namespace: Optional[str] = None
+    is_infra: Optional[bool] = None

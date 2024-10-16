@@ -220,6 +220,14 @@ class Container(ReloadableObjectFromJson):
     def network_settings(self) -> NetworkSettings:
         return self._get_inspect_result().network_settings
 
+    @property
+    def namespace(self) -> Optional[str]:
+        return self._get_inspect_result().namespace
+
+    @property
+    def is_infra(self) -> Optional[bool]:
+        return self._get_inspect_result().is_infra
+
     def __repr__(self):
         return f"python_on_whales.Container(id='{self.id[:12]}', name='{self.name}')"
 

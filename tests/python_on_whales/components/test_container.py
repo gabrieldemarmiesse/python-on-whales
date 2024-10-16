@@ -223,6 +223,10 @@ def test_create_in_pod(podman_client: DockerClient):
     with podman_client.pod.create(pod_name) as pod:
         container = podman_client.container.create("ubuntu", pod=pod_name)
         assert container.pod == pod.id
+        assert container.is_infra is False
+        infra_container = podman_client.container.inspect(pod.infra_container_id)
+        assert infra_container.pod == pod.id
+        assert infra_container.is_infra is True
     assert not container.exists()
 
 
