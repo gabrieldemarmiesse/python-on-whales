@@ -97,6 +97,7 @@ class DockerCamelModel(pydantic.BaseModel):
         model_config = pydantic.ConfigDict(
             populate_by_name=True,
             alias_generator=to_docker_camel,
+            defer_build=True,
         )
     else:
 
