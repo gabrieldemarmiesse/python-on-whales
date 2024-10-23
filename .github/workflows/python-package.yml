@@ -9,7 +9,7 @@ on:
 jobs:
   render-docs:
     name: Render docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -27,7 +27,7 @@ jobs:
         run: mkdocs build
 
   build-linux-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -64,7 +64,7 @@ jobs:
           - test_system.py
           - test_task.py
           - test_volume.py
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -78,7 +78,7 @@ jobs:
           python -m pytest -vv --no-runtime-skip --durations=10 tests/python_on_whales/components/${{ matrix.component }}
 
   build-linux-test-other:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
