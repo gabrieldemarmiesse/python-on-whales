@@ -6,27 +6,27 @@ bake_file = bake_test_dir / "docker-bake.hcl"
 
 
 def test_imagetools_inspect_multiarch():
-    a = docker.buildx.imagetools.inspect("python:3.7.0")
+    a = docker.buildx.imagetools.inspect("python:3.13.0")
     assert a.media_type.startswith("application/")
 
 
 def test_imagetools_inspect_single_image():
     a = docker.buildx.imagetools.inspect(
-        "python@sha256:b48b88687b1376f3135a048c8cdaccad4e8dd1af2f345c693a39b75a5683a3eb"
+        "python@sha256:6bb74b8212b18a54d1a3cc03811beccf5497e87d13c2796ce23de76944494829"
     )
     assert a.schema_version == 2
     assert a.config.media_type.startswith("application/")
 
 
 def test_imagetools_create_single_image():
-    a = docker.buildx.imagetools.create(["python:3.7.0"], dry_run=True)
+    a = docker.buildx.imagetools.create(["python:3.13.0"], dry_run=True)
     assert a.media_type.startswith("application/")
 
 
 def test_imagetools_create_single_image_with_hash():
     a = docker.buildx.imagetools.create(
         [
-            "python@sha256:b48b88687b1376f3135a048c8cdaccad4e8dd1af2f345c693a39b75a5683a3eb"
+            "python@sha256:6bb74b8212b18a54d1a3cc03811beccf5497e87d13c2796ce23de76944494829"
         ],
         dry_run=True,
     )
