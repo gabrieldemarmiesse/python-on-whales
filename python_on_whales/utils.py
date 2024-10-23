@@ -3,7 +3,6 @@ import signal
 import subprocess
 import sys
 from datetime import datetime, timedelta
-from importlib.metadata import version
 from pathlib import Path
 from queue import Queue
 from subprocess import PIPE, Popen
@@ -36,14 +35,10 @@ from python_on_whales.exceptions import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[1]
-PYDANTIC_V2 = version("pydantic").startswith("2.")
 
 
 def custom_parse_object_as(type_, obj: Any):
-    if PYDANTIC_V2:
-        return pydantic.TypeAdapter(type_).validate_python(obj)
-    else:
-        return pydantic.parse_obj_as(type_, obj)
+    return pydantic.TypeAdapter(type_).validate_python(obj)
 
 
 def title_if_necessary(string: str):
@@ -93,16 +88,11 @@ def to_docker_camel(string):
 
 
 class DockerCamelModel(pydantic.BaseModel):
-    if PYDANTIC_V2:
-        model_config = pydantic.ConfigDict(
-            populate_by_name=True,
-            alias_generator=to_docker_camel,
-        )
-    else:
-
-        class Config:
-            alias_generator = to_docker_camel
-            allow_population_by_field_name = True
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True,
+        alias_generator=to_docker_camel,
+        defer_build=True,
+    )
 
 
 @overload
