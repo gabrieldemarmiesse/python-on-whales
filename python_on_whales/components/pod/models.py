@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Annotated, List, Mapping, Optional
+from typing import List, Mapping, Optional
 
 import pydantic
+from typing_extensions import Annotated
 
 from python_on_whales.components.container.models import PortBinding
 from python_on_whales.utils import DockerCamelModel
