@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Mapping, Optional
 
 import pydantic
+from pydantic import AliasChoices
 from typing_extensions import Annotated
 
 from python_on_whales.components.container.models import PortBinding
@@ -35,7 +36,10 @@ class PodContainer(DockerCamelModel):
 class PodInspectResult(DockerCamelModel):
     id: Optional[str] = None
     name: Optional[str] = None
-    created: Annotated[Optional[datetime], pydantic.Field(alias="CreatedAt")] = None
+    created: Annotated[
+        Optional[datetime],
+        pydantic.Field(validation_alias=AliasChoices("Created", "CreatedAt")),
+    ] = None
     create_command: Optional[List[str]] = None
     exit_policy: Optional[str] = None
     state: Optional[str] = None
