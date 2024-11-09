@@ -96,19 +96,19 @@ class Pod(ReloadableObjectFromJson):
         return self._get_inspect_result().created
 
     @property
-    def create_command(self) -> List[str]:
+    def create_command(self) -> Optional[List[str]]:
         return self._get_inspect_result().create_command
 
     @property
-    def exit_policy(self) -> str:
+    def exit_policy(self) -> Optional[str]:
         return self._get_inspect_result().exit_policy
 
     @property
-    def state(self) -> str:
+    def state(self) -> Optional[str]:
         return self._get_inspect_result().state
 
     @property
-    def hostname(self) -> str:
+    def hostname(self) -> Optional[str]:
         return self._get_inspect_result().hostname
 
     @property
@@ -116,39 +116,39 @@ class Pod(ReloadableObjectFromJson):
         return self._get_inspect_result().labels
 
     @property
-    def create_cgroup(self) -> bool:
+    def create_cgroup(self) -> Optional[bool]:
         return self._get_inspect_result().create_cgroup
 
     @property
-    def cgroup_parent(self) -> str:
+    def cgroup_parent(self) -> Optional[str]:
         return self._get_inspect_result().cgroup_parent
 
     @property
-    def cgroup_path(self) -> str:
+    def cgroup_path(self) -> Optional[str]:
         return self._get_inspect_result().cgroup_path
 
     @property
-    def create_infra(self) -> bool:
+    def create_infra(self) -> Optional[bool]:
         return self._get_inspect_result().create_infra
 
     @property
-    def infra_container_id(self) -> str:
+    def infra_container_id(self) -> Optional[str]:
         return self._get_inspect_result().infra_container_id
 
     @property
-    def infra_config(self) -> PodInfraConfig:
+    def infra_config(self) -> Optional[PodInfraConfig]:
         return self._get_inspect_result().infra_config
 
     @property
-    def shared_namespaces(self) -> List[str]:
+    def shared_namespaces(self) -> Optional[List[str]]:
         return self._get_inspect_result().shared_namespaces
 
     @property
-    def num_containers(self) -> int:
+    def num_containers(self) -> Optional[int]:
         return self._get_inspect_result().num_containers
 
     @property
-    def containers(self) -> List[PodContainer]:
+    def containers(self) -> Optional[List[PodContainer]]:
         return self._get_inspect_result().containers
 
     def __repr__(self):
