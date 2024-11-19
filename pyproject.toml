@@ -17,7 +17,9 @@ dependencies = { file = ["requirements.txt"] }
 [dependency-groups]
 dev = [
     "ruff>=0.5.6",
-    "pytest"
+    "pytest==7.*",
+    "pytest-mock>=3.14.0",
+    "pytz>=2024.2",
 ]
 
 [project.urls]
