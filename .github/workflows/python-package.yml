@@ -90,6 +90,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup uv
         run: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+      - name: Setup
+        run: |
+          docker info
+          docker run hello-world
       - name: Run single test
         run: |
           uv run python -m pytest -vv --no-runtime-skip -m "not podman" tests/python_on_whales/components/test_volume.py::test_simple_volume
