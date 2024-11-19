@@ -1,0 +1,11 @@
+astunparse==1.6.3
+griffe==1.2.0
+markdown==3.7
+markupsafe==2.1.5
+mkdocs==1.6.1
+mkdocs-autorefs==1.1.0
+mkdocs-get-deps==0.2.0
+mkdocs-material==9.5.34
+mkdocstrings==0.25.2
+mkdocstrings-python==1.10.9
+pymdown-extensions==10.9
