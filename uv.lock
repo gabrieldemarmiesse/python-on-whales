@@ -202,20 +202,24 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-dev = [
-    { name = "ruff" },
-]
 test = [
     { name = "pytest" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pydantic", specifier = "!=2.0.*,>=2,<3" },
     { name = "pytest", marker = "extra == 'test'" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.5.6" },
     { name = "typing-extensions" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.5.6" }]
 
 [[package]]
 name = "ruff"

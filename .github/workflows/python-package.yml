@@ -30,17 +30,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.8
-      - name: Setup
-        run: |
-          pip install -U pip wheel
-          pip install -e ./[dev]
+      - name: Setup uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
       - name: Run all checks
         run: |
-          ruff check ./
-          ruff format --check ./
+          uv run ruff check ./
+          uv run ruff format --check ./
 
   build-linux-test-component:
     strategy:
