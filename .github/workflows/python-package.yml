@@ -75,33 +75,24 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.8
-      - name: Setup
+      - name: Setup uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Setup Podman and Docker
         run: |
           ./scripts/ci-setup.sh
       - name: Run tests
         run: |
-          python -m pytest -vv --no-runtime-skip --durations=10 --ignore=tests/python_on_whales/components/
+          uv run python -m pytest -vv --no-runtime-skip --durations=10 --ignore=tests/python_on_whales/components/
 
   build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.8
-      - name: Setup
-        run: |
-          docker info
-          docker run hello-world
-          pip install -U pip wheel
-          pip install -e ./
-          pip install -r tests/test-requirements.txt
+      - name: Setup uv
+        run: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
       - name: Run single test
         run: |
-          python -m pytest -vv --no-runtime-skip -m "not podman" tests/python_on_whales/components/test_volume.py::test_simple_volume
+          uv run python -m pytest -vv --no-runtime-skip -m "not podman" tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:
