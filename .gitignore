@@ -129,3 +129,5 @@ docs/generated_sources
 docs/site
 generated_sources/
 mkdocs.yml
+
+docs/README.md
