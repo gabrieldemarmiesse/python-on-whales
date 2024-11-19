@@ -12,19 +12,16 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
+      - name: Setup uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
       - name: prepare
         run: |
           ./scripts/ci-podman-update.sh
-          pip install -U pip wheel
-          pip install -r ./requirements.txt -r docs/requirements.txt -e .
-          ./docs/autogen.py
+          uv run ./docs/autogen.py
           cp -r docs/generated_sources ./generated_sources
           cp docs/mkdocs.yml ./
       - name: Render
-        run: mkdocs build
+        run: uv run mkdocs build
 
   build-linux-lint:
     runs-on: ubuntu-24.04
