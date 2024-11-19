@@ -23,6 +23,9 @@ with the help of [mkdocstrings](https://mkdocstrings.github.io/) and
 [mkdocs](https://www.mkdocs.org/).
 
 #### Generate the documentation files and serve them
+
+With `uv`, you don't need to manually install the dependencies. 
+
 ```
 cd ./docs/
 uv run autogen.py && cp ../README.md ./ && uv run mkdocs serve
