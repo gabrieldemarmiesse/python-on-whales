@@ -62,15 +62,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.8
-      - name: Setup
+      - name: Setup uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Setup Podman and Docker
         run: |
           ./scripts/ci-setup.sh
       - name: Run tests
         run: |
-          python -m pytest -vv --no-runtime-skip --durations=10 tests/python_on_whales/components/${{ matrix.component }}
+          uv run pytest -vv --no-runtime-skip --durations=10 tests/python_on_whales/components/${{ matrix.component }}
 
   build-linux-test-other:
     runs-on: ubuntu-24.04
