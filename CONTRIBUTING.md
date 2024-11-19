@@ -59,6 +59,8 @@ Install the pre-commit by running:
 uvx --with=pre-commit pre-commit install
 ```
 
+It will run automatically every time you call `git commit`.
+
 ## Exploring the codebase
 
 The sources are in the `python_on_whales` directory. Everytime a class has something to 
