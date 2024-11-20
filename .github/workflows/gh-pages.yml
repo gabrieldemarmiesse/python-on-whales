@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        run: ./scripts/install-uv.sh
       - name: prepare
         run: |
           uv run docs/autogen.py

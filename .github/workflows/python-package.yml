@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        run: ./scripts/install-uv.sh
       - name: prepare
         run: |
           ./scripts/ci-podman-update.sh
@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        run: ./scripts/install-uv.sh
       - name: Run all checks
         run: |
           uv run ruff check ./
@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        run: ./scripts/install-uv.sh
       - name: Setup Podman and Docker
         run: |
           ./scripts/ci-setup.sh
@@ -73,13 +73,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        run: ./scripts/install-uv.sh
       - name: Setup Podman and Docker
         run: |
           ./scripts/ci-setup.sh
       - name: Run tests
         run: |
-          uv run python -m pytest -vv --no-runtime-skip --durations=10 --ignore=tests/python_on_whales/components/
+          uv run pytest -vv --no-runtime-skip --durations=10 --ignore=tests/python_on_whales/components/
 
   build-windows:
     runs-on: windows-latest
@@ -93,7 +93,7 @@ jobs:
           docker run hello-world
       - name: Run single test
         run: |
-          uv run python -m pytest -vv --no-runtime-skip -m "not podman" tests/python_on_whales/components/test_volume.py::test_simple_volume
+          uv run pytest -vv --no-runtime-skip -m "not podman" tests/python_on_whales/components/test_volume.py::test_simple_volume
 
 #  cost too much at the moment.
 #  build-macos:

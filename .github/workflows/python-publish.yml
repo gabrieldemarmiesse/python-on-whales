@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      run: ./scripts/install-uv.sh
     - name: Build and publish
       env:
         UV_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
