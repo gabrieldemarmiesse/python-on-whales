@@ -14,9 +14,24 @@ dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
 
-[project.optional-dependencies]
-test = ["pytest"]
-dev = ["ruff==0.5.6"]
+[dependency-groups]
+dev = [
+    "ruff>=0.5.6",
+    "pytest==7.*",
+    "pytest-mock>=3.14.0",
+    "pytz>=2024.2",
+    "astunparse==1.6.3",
+    "griffe==1.2.0",
+    "markdown==3.7",
+    "markupsafe==2.1.5",
+    "mkdocs==1.6.1",
+    "mkdocs-autorefs==1.1.0",
+    "mkdocs-get-deps==0.2.0",
+    "mkdocs-material==9.5.34",
+    "mkdocstrings==0.25.2",
+    "mkdocstrings-python==1.10.9",
+    "pymdown-extensions==10.9",
+]
 
 [project.urls]
 "Source" = "https://github.com/gabrieldemarmiesse/python-on-whales"
@@ -51,3 +66,4 @@ markers = [
 ]
 xfail_strict = true
 pythonpath = ["./"]
+

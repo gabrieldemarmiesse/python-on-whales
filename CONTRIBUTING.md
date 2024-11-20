@@ -9,23 +9,31 @@ First things first, if it's your first pull request to an open-source project, h
 https://github.com/firstcontributions/first-contributions. This guide will explain 
 how to open a pull request in a github repository that you don't own.
 
+This guide will assume that you are using [uv](https://docs.astral.sh/uv/) as your Package
+manager, because this is the simplest way to get started. If you are using any other tool,
+like pip, conda, rye, or poetry, refer to the documentation of your package manager, and take
+a look at uv nonetheless, you might like it :)
+
+Instructions to install uv can be found on [this page](https://docs.astral.sh/uv/getting-started/installation/).
+
 ## Building the docs
 
 All docstring are fetched and put in templates. Everything is done in markdown, 
 with the help of [mkdocstrings](https://mkdocstrings.github.io/) and
 [mkdocs](https://www.mkdocs.org/).
 
-#### First install the dependencies:
-
-```
-pip install -r docs/requirements.txt
-```
-
 #### Generate the documentation files and serve them
+
+With `uv`, you don't need to manually install the dependencies. 
+
 ```
 cd ./docs/
-python autogen.py && mkdocs serve
+uv run autogen.py && cp ../README.md ./ && uv run mkdocs serve
 ```
+
+Note that if you don't have podman installed, you will end up with an error when
+generating the docs for `podman pods`. To bypass this, you can comment the last line
+of the file `docs/docs_utils.py` which is responsible for generating the part of the documentation.
 
 #### Open your browser
 
@@ -34,18 +42,27 @@ http://localhost:8000
 
 ## Running the tests
 
-Install all dependencies and install python-on-whales in editable mode:
-```
-pip install -r requirements.txt -r tests/test-requirements.txt
-pip install -e ./
-```
-
+Same as before, using `uv` means that you don't need to install anything. Just run
 Then:
 
 ```bash
-pytest -v ./tests/
+uv run pytest -v ./tests/
 ```
 
+Feel free to explore the [pytes documentation](https://docs.pytest.org/en/6.2.x/usage.html) to 
+learn how to run a subset of the test suite.
+
+
+## Pre-commit
+
+We use a pre-commit to make sure the formatting and linting are correct before pushing changes.
+
+Install the pre-commit by running:
+```bash
+uvx --with=pre-commit pre-commit install
+```
+
+It will run automatically every time you call `git commit`.
 
 ## Exploring the codebase
 

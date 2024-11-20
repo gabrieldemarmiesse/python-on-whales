@@ -10,17 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
+      - name: Setup uv
+        run: ./scripts/install-uv.sh
       - name: prepare
         run: |
-          pip install -r ./requirements.txt -r docs/requirements.txt -e .
-          python docs/autogen.py
+          uv run docs/autogen.py
           cp -r docs/generated_sources ./generated_sources
           cp docs/mkdocs.yml ./
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@1.26
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REQUIREMENTS: docs/requirements.txt
+          REQUIREMENTS: docs/requirements.txt  # TODO: use pyproject.toml

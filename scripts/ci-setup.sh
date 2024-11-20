@@ -10,7 +10,3 @@ THIS_DIR=$(dirname "${BASH_SOURCE[0]}")
 
 docker info
 podman info
-
-pip install -U pip wheel
-pip install -e ./
-pip install -r tests/test-requirements.txt
