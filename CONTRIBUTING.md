@@ -40,6 +40,16 @@ of the file `docs/docs_utils.py` which is responsible for generating the part of
 http://localhost:8000
 
 
+### Use CI-generated docs
+
+The GitHub workflows automatically generate the docs and save them as artifacts. These can be accessed from the Artifacts section of the worfklow view (as [documented here](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts)).
+
+To view them:
+
+1. Download the artifact labeled `Docs`.
+1. Extract the contents of the resulting `Docs.zip` file.
+1. Open the `index.html` file in a browser.
+
 ## Running the tests
 
 Same as before, using `uv` means that you don't need to install anything. Just run
