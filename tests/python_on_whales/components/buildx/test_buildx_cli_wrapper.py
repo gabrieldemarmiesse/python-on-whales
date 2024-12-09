@@ -656,6 +656,55 @@ def test_bake_with_variables_2(only_print, monkeypatch):
 
 @pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_with_remote_definition(only_print):
+    config = docker.buildx.bake(
+        print=only_print,
+        remote_definition="https://github.com/gabrieldemarmiesse/python-on-whales.git#v0.74.0:tests/python_on_whales/components/bake_tests",
+    )
+    assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
+        "target": {
+            "my_out1": {
+                "context": "https://github.com/gabrieldemarmiesse/python-on-whales.git#v0.74.0:tests/python_on_whales/components/bake_tests",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image1:1.0.0"],
+                "target": "out1",
+            },
+            "my_out2": {
+                "context": "https://github.com/gabrieldemarmiesse/python-on-whales.git#v0.74.0:tests/python_on_whales/components/bake_tests",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:1.0.0"],
+                "target": "out2",
+            },
+        },
+    }
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_with_remote_definition_and_target(only_print):
+    config = docker.buildx.bake(
+        print=only_print,
+        targets=["my_out2"],
+        remote_definition="https://github.com/gabrieldemarmiesse/python-on-whales.git#v0.74.0:tests/python_on_whales/components/bake_tests",
+    )
+    assert config == {
+        "group": {"default": {"targets": ["my_out2"]}},
+        "target": {
+            "my_out2": {
+                "context": "https://github.com/gabrieldemarmiesse/python-on-whales.git#v0.74.0:tests/python_on_whales/components/bake_tests",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:1.0.0"],
+                "target": "out2",
+            },
+        },
+    }
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
 def test_bake_stream_logs(monkeypatch):
     monkeypatch.setenv("IMAGE_NAME_1", "dodo")
     output = docker.buildx.bake(
