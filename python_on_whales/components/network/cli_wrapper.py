@@ -1,8 +1,22 @@
 from __future__ import annotations
 
 import json
+import warnings
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, overload
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+    overload,
+)
+
+from typing_extensions import TypeAlias
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import (
@@ -17,6 +31,18 @@ from python_on_whales.components.network.models import (
 )
 from python_on_whales.exceptions import NoSuchNetwork
 from python_on_whales.utils import format_mapping_for_cli, run, to_list
+
+NetworkListFilter: TypeAlias = Union[
+    Tuple[Literal["driver"], str],
+    Tuple[Literal["id"], str],
+    Tuple[Literal["label"], str],
+    Tuple[Literal["label!"], str],
+    Tuple[Literal["name"], str],
+    Tuple[Literal["scope"], Literal["swarm", "global", "local"]],
+    Tuple[Literal["type"], Literal["custom", "builtin"]],
+    Tuple[Literal["until"], str],  # TODO: allow datetime
+    Tuple[Literal["dangling"], str],  # TODO: allow bool
+]
 
 
 class Network(ReloadableObjectFromJson):
@@ -253,33 +279,49 @@ class NetworkCLI(DockerCLICaller):
         else:
             return [Network(self.client_config, reference) for reference in x]
 
-    def list(self, filters: Dict[str, str] = {}) -> List[Network]:
+    def list(
+        self, filters: Union[Iterable[NetworkListFilter], Mapping[str, Any]] = ()
+    ) -> List[Network]:
         """List all the networks available.
 
         Parameters:
-            filters: Filters as strings or list of strings.
+            filters: Filters to apply when listing networks.
 
         # Returns
             List of `python_on_whales.Network`.
         """
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["network", "ls", "--no-trunc", "--quiet"]
-        full_cmd.add_args_iterable_or_single(
-            "--filter", format_mapping_for_cli(filters)
-        )
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
 
         ids = run(full_cmd).splitlines()
         return [Network(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
-    def prune(self, filters: Dict[str, str] = {}):
+    def prune(
+        self, filters: Union[Iterable[NetworkListFilter], Mapping[str, Any]] = ()
+    ) -> None:
         """Remove Docker networks which are not used by any containers.
 
         Parameters:
-            filters: Filters as strings or list of strings.
+            filters: Filters to apply when finding networks to prune.
         """
+        if isinstance(filters, Mapping):
+            filters = filters.items()
+            warnings.warn(
+                "Passing filters as a mapping is deprecated, replace with an "
+                "iterable of tuples instead, as so:\n"
+                f"filters={list(filters)}",
+                DeprecationWarning,
+            )
         full_cmd = self.docker_cmd + ["network", "prune", "--force"]
-        full_cmd.add_args_iterable_or_single(
-            "--filter", format_mapping_for_cli(filters)
-        )
+        full_cmd.add_args_iterable("--filter", (f"{f[0]}={f[1]}" for f in filters))
         run(full_cmd)
 
     def remove(self, networks: Union[ValidNetwork, List[ValidNetwork]]):
