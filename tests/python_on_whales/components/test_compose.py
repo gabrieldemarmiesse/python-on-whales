@@ -753,6 +753,30 @@ def test_docker_compose_run_labels():
     docker.compose.down(timeout=1)
 
 
+def test_compose_run_entrypoint():
+    result = docker.compose.run(
+        "dodo",
+        ["cmd-is-argument-for-echo"],
+        entrypoint="/bin/echo",
+        remove=True,
+        tty=False,
+    )
+
+    assert result == "cmd-is-argument-for-echo"
+
+
+def test_compose_run_envs():
+    result = docker.compose.run(
+        "dodo",
+        ["-c", "echo $VAR1,$VAR2"],
+        envs={"VAR1": "hello", "VAR2": "world"},
+        remove=True,
+        tty=False,
+    )
+
+    assert result == "hello,world"
+
+
 def test_compose_version():
     assert "Docker Compose version v2" in docker.compose.version()
 
