@@ -663,7 +663,7 @@ class ComposeCLI(DockerCLICaller):
         command: List[str] = [],
         build: bool = False,
         detach: bool = False,
-        # entrypoint: Optional[List[str]] = None,
+        entrypoint: Optional[str] = None,
         # envs: Dict[str, str] = {},
         labels: Dict[str, str] = {},
         name: Optional[str] = None,
@@ -691,6 +691,7 @@ class ComposeCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with the Container.
                     If `False`, returns the command stdout as string.
+            entrypoint: The entrypoint to execute.
             labels: Add or override labels
             name: Assign a name to the container.
             dependencies: Also start linked services.
@@ -728,6 +729,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd = self.docker_compose_cmd + ["run"]
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_simple_arg("--entrypoint", entrypoint)
         full_cmd.add_simple_arg("--name", name)
         full_cmd.add_flag("--no-TTY", not tty)
         full_cmd.add_flag("--no-deps", not dependencies)
