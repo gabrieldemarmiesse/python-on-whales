@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 from typing_extensions import Literal
 
 import python_on_whales.components.container.cli_wrapper
+import python_on_whales.components.volume.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
@@ -677,7 +678,9 @@ class ComposeCLI(DockerCLICaller):
         service_ports: bool = False,
         use_aliases: bool = False,
         user: Optional[str] = None,
-        # volumes: bool = "todo",
+        volumes: Iterable[
+            python_on_whales.components.volume.cli_wrapper.VolumeDefinition
+        ] = (),
         workdir: Union[None, str, Path] = None,
     ) -> Union[
         str,
@@ -703,6 +706,8 @@ class ComposeCLI(DockerCLICaller):
                 to write on it.
             stream: Similar to `docker.run(..., stream=True)`.
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
+            volumes:  Bind mount a volume. Some examples:
+                `[("/", "/host"), ("/etc/hosts", "/etc/hosts", "rw")]`.
             workdir: Working directory inside the container
 
         Returns:
@@ -746,6 +751,9 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--service-ports", service_ports)
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
+        for volume_definition in volumes:
+            volume_definition = tuple(str(x) for x in volume_definition)
+            full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--workdir", workdir)
         full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.append(service)
