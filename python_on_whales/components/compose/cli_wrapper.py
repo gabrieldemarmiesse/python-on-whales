@@ -663,7 +663,7 @@ class ComposeCLI(DockerCLICaller):
         command: List[str] = [],
         build: bool = False,
         detach: bool = False,
-        entrypoint: Optional[List[str]] = None,
+        entrypoint: Optional[str] = None,
         # envs: Dict[str, str] = {},
         labels: Dict[str, str] = {},
         name: Optional[str] = None,
