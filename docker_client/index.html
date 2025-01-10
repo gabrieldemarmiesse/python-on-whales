@@ -1,0 +1,2205 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Python on whales docs">
+      
+      
+      
+      
+      
+        <link rel="next" href="../sub-commands/buildx/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>Docker client - Python on whales</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.35f28582.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-docker-client-object" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Python on whales" class="md-header__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Python on whales
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Docker client
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Python on whales" class="md-nav__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Python on whales
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Docker client
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Docker client
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient" class="md-nav__link">
+    <span class="md-ellipsis">
+      DockerClient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DockerClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.login" class="md-nav__link">
+    <span class="md-ellipsis">
+      login
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.login_ecr" class="md-nav__link">
+    <span class="md-ellipsis">
+      login_ecr
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      logout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="version">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.version--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sub-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sub-commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Other commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about-multithreading-and-multiprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      About multithreading and multiprocessing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-dockerpodman-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Docker/Podman CLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Docker/Podman CLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handling-an-unavailable-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling an unavailable client
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Sub-commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Sub-commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/buildx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker buildx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/compose/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker config
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/context/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker context
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/image/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker image
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/manifest/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker manifest
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/network/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker network
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/node/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker node
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/secret/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker secret
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/service/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker service
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/swarm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker swarm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/system/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker system
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/task/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker task
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/trust/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker trust
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/volume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker volume
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-commands/pod/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    podman pod
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Objects
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Objects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/configs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/containers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Containers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Images
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/networks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/nodes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nodes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plugins
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/pods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/services/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Services
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/stacks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stacks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tasks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objects/volumes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Volumes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user_guide/docker_run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker.run() guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user_guide/generic_resources/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Swarm generic resources
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user_guide/running_python_on_whales_inside_a_container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Running python-on-whales inside a container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user_guide/exceptions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    dealing with exceptions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient" class="md-nav__link">
+    <span class="md-ellipsis">
+      DockerClient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DockerClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.login" class="md-nav__link">
+    <span class="md-ellipsis">
+      login
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.login_ecr" class="md-nav__link">
+    <span class="md-ellipsis">
+      login_ecr
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      logout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="version">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.docker_client.DockerClient.version--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sub-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sub-commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Other commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about-multithreading-and-multiprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      About multithreading and multiprocessing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-dockerpodman-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Docker/Podman CLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Docker/Podman CLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handling-an-unavailable-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling an unavailable client
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="the-docker-client-object">The Docker client object</h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="python_on_whales.docker_client.DockerClient" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">DockerClient</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+      <p>Creates a Docker client</p>
+<p>Note that</p>
+<pre><code class="language-python">from python_on_whales import docker
+print(docker.run(&quot;hello-world&quot;))
+</code></pre>
+<p>is equivalent to</p>
+<pre><code class="language-python">from python_on_whales import DockerClient
+docker = DockerClient()
+print(docker.run(&quot;hello-world&quot;)
+</code></pre>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Location of client config files (default "~/.docker")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>context</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the context to use to connect to the
+daemon (overrides DOCKER_HOST env var
+and default context set with "docker context use")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>debug</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Enable debug mode</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[bool]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>host</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Daemon socket(s) to connect to</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>log_level</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set the logging level ("debug"|"info"|"warn"|"error"|"fatal")
+(default "info")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tls</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Use TLS; implied by <code>tlsverify</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[bool]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tlscacert</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Trust certs signed only by this CA (default "~/.docker/ca.pem")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compose_files</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Docker compose yaml file</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compose_profiles</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>List of compose profiles to use. Take a look at
+the <a href="https://docs.docker.com/compose/profiles/">documentation for profiles</a>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compose_env_file</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>.env file containing the environments variables to inject
+into the compose project. By default, it uses <code>./.env</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compose_project_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the compose project. It will be prefixed to
+networks, volumes and containers created by compose.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compose_project_directory</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Use an alternate working directory. By default, it
+uses the path of the compose file.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compose_compatibility</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Use docker compose in compatibility mode.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[bool]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>client_call</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Client binary to use and how to call it. Default is <code>["docker"]</code>. You can try with
+for example <code>["podman"]</code> or <code>["nerdctl"]</code>. The client must have the same commands and
+outputs as Docker to work. Some best effort support is done in case of divergences,
+meaning you can report issues occuring on some other binary than Docker, but
+we don't guarantee that it will be fixed.
+This option is a list because you can provide a list of command line arguments to be placed after <code>"docker"</code>.
+For exemple <code>host="ssh://my_user@host.com"</code> is equivalent
+to <code>client_call=["docker", "--host=ssh://my_user@host.com"]</code>.
+This will allow you to use some exotic options that are not explicitly supported by Python-on-whales.
+Let's say you want to use estargz to run a container immediately, without waiting for the "pull"
+to finish (yes it's possible!), you can
+do <code>nerdctl = DockerClient(client_call=["nerdctl", "--snapshotter=stargz"])</code>
+and then <code>nerdctl.run("ghcr.io/stargz-containers/python:3.7-org", ["-c", "print('hi')"])</code>.
+You can also use this system to call Docker with sudo with <code>client_call=["sudo", "docker"]</code>
+(note that it won't ask for your password, so sudo should be passwordless during the python
+program execution).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[&#39;docker&#39;]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>client_binary</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Deprecated, use <code>client_call</code>. If you used before <code>client_binary="podman"</code>, now use
+<code>client_call=["podman"]</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;docker&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>client_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The kind of client that is called by the Python process. It allows Python-on-whales to
+adapt to the client's behavior if two client have a different behavior. The <code>client_call</code> is not
+enough for Python-on-whales to know what kind of client you're using. For example, if you use
+a symlink to call Docker, Python-on-whales will not know that you're using Docker.
+Default is "unknown". If at some point, Python-on-whales has to choose
+a behavior and <code>client_type</code> is <code>"unknown"</code>, it will raise an exception and ask you to specify
+what kind of client you're working with. Valid values are <code>"docker"</code>, <code>"podman"</code>, "<code>nerdctl"</code> and <code>"unknown"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Literal">Literal</span>[&#39;docker&#39;, &#39;podman&#39;, &#39;nerdctl&#39;, &#39;unknown&#39;]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;unknown&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.docker_client.DockerClient.login" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">login</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">login</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Log in to a Docker registry.</p>
+<p>If no server is specified, the default is defined by the daemon.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>server</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The server to log into. For example, with a self-hosted registry
+it might be something like <code>server="192.168.0.10:5000"</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>username</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The username</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>password</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The password</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.docker_client.DockerClient.login_ecr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">login_ecr</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">login_ecr</span><span class="p">(</span><span class="n">aws_access_key_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Login to the aws ECR registry. Credentials are taken from the
+environment variables as defined in
+<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html">the aws docs</a>.</p>
+<p>If you don't have a profile or your environment variables configured, you can also
+use the function arguments <code>aws_access_key_id</code>, <code>aws_secret_access_key</code>, <code>region_name</code>.</p>
+<p>Behind the scenes, those arguments are passed directly to</p>
+<pre><code class="language-python">botocore.session.get_session().create_client(...)
+</code></pre>
+<p>You need botocore to run this function. Use <code>pip install botocore</code> to install it.</p>
+<p>The <code>registry</code> parameter can be used to override the registry that is guessed from the authorization token
+request's response.
+In other words: If the registry is <code>None</code> (the default) then it will be assumed that it's the ECR registry linked to the credentials provided.
+It is especially useful if the aws account you use can access several repositories and you
+need to explicitly define the one you want to use</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.docker_client.DockerClient.logout" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">logout</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">logout</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Logout from a Docker registry</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>server</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The server to logout from. For example, with a self-hosted registry
+it might be something like <code>server="192.168.0.10:5000"</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.docker_client.DockerClient.version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">version</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">version</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get version information about the container client and server.</p>
+<h4 id="python_on_whales.docker_client.DockerClient.version--returns">Returns</h4>
+<pre><code>A `python_on_whales.Version` object
+</code></pre>
+<p>As an example:</p>
+<pre><code class="language-python">from python_on_whales import docker
+
+version_info = docker.version()
+print(version_info.client.version)
+# 3.4.2
+print(version_info.server.kernel_version)
+# 5.15.133.1-microsoft-standard-WSL2
+...
+</code></pre>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="sub-commands">Sub-commands</h2>
+<ul>
+<li><a href="../sub-commands/buildx/"><code>docker.buildx</code></a></li>
+<li><a href="../sub-commands/compose/"><code>docker.compose</code></a></li>
+<li><a href="../sub-commands/config/"><code>docker.config</code></a></li>
+<li><a href="../sub-commands/container/"><code>docker.container</code></a></li>
+<li><a href="../sub-commands/context/"><code>docker.context</code></a></li>
+<li><a href="../sub-commands/image/"><code>docker.image</code></a></li>
+<li><a href="../sub-commands/manifest/"><code>docker.manifest</code></a></li>
+<li><a href="../sub-commands/network/"><code>docker.network</code></a></li>
+<li><a href="../sub-commands/node/"><code>docker.node</code></a></li>
+<li><a href="../sub-commands/secret/"><code>docker.secret</code></a></li>
+<li><a href="../sub-commands/service/"><code>docker.service</code></a></li>
+<li><a href="../sub-commands/stack/"><code>docker.stack</code></a></li>
+<li><a href="../sub-commands/swarm/"><code>docker.swarm</code></a></li>
+<li><a href="../sub-commands/system/"><code>docker.system</code></a></li>
+<li><a href="../sub-commands/trust/"><code>docker.trust</code></a></li>
+<li><a href="../sub-commands/volume/"><code>docker.volume</code></a></li>
+<li><a href="../sub-commands/pod/"><code>podman.pod</code></a></li>
+</ul>
+<h2 id="other-commands">Other commands</h2>
+<p>They're actually aliases</p>
+<ul>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.attach"><code>docker.attach</code></a></li>
+<li><a href="../sub-commands/buildx/#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build"><code>docker.build</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.commit"><code>docker.commit</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.copy"><code>docker.copy</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.create"><code>docker.create</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.diff"><code>docker.diff</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.execute"><code>docker.execute</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.image.cli_wrapper.ImageCLI.export"><code>docker.export</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.list"><code>docker.images</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.import_"><code>docker.import_</code></a></li>
+<li><a href="../sub-commands/system/#python_on_whales.components.system.cli_wrapper.SystemCLI.info"><code>docker.info</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.kill"><code>docker.kill</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.load"><code>docker.load</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.logs"><code>docker.logs</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.pause"><code>docker.pause</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.list"><code>docker.ps</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.pull"><code>docker.pull</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.push"><code>docker.push</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.rename"><code>docker.rename</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.rename"><code>docker.restart</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.rename"><code>docker.remove</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.rename"><code>docker.run</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.save"><code>docker.save</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.start"><code>docker.start</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.stats"><code>docker.stats</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.stop"><code>docker.stop</code></a></li>
+<li><a href="../sub-commands/image/#python_on_whales.components.image.cli_wrapper.ImageCLI.tag"><code>docker.tag</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.top"><code>docker.top</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.unpause"><code>docker.unpause</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.update"><code>docker.update</code></a></li>
+<li><a href="../sub-commands/container/#python_on_whales.components.container.cli_wrapper.ContainerCLI.wait"><code>docker.wait</code></a></li>
+</ul>
+<h2 id="about-multithreading-and-multiprocessing">About multithreading and multiprocessing</h2>
+<p>Behind the scenes, Python on whales calls the Docker command line interface with
+subprocess. The Python on whales client does not store any intermediate state so it's safe 
+to use with multithreading. </p>
+<p>The Docker objects store some intermediate states (the attributes 
+that you would normally get with <code>docker ... inspect</code>but no logic in 
+the codebase depends on those attributes. They're just here so that users can look at them. 
+So you can share them between process/threads and pickle containers, images, networks...</p>
+<p>The Docker daemon works with its own objects internally and handles concurrent and conflicting requests. 
+For example, if you create two containers with the same name from different threads, only one will 
+succeed. If you pull the same docker image from multiple processes/threads, the Docker daemon will 
+only pull the image and layers once.</p>
+<p>Just be careful with some scenario similar to this one</p>
+<pre><code>Thread 1: my_container = docker.run(..., detach=True)
+...
+# my_container finishes
+...
+Thread 2: docker.container.prune()
+...
+Thread 1: docker.logs(my_container)  # will fail because the container was removed by thread 2
+</code></pre>
+<p>In the end, unless you use this type of logic in your code, 
+Python-on-whales is safe to use with multithreading and multiprocessing.</p>
+<h2 id="the-dockerpodman-cli">The Docker/Podman CLI</h2>
+<p>Python-on-whales needs the Docker or Podman CLI to work (unlike docker-py).
+Most of the time, users already have the CLI installed on their machines. It's possible to 
+verify that the CLI is there by doing <code>docker --help</code> (or <code>podman --help</code>) in the command line.</p>
+<p>Sometimes, the CLI might not be available on the system, it can happen if you want to control
+Docker from within a container with <code>-v /var/run/docker.sock:/var/run/docker.sock</code>, or if you
+want to connect to a remote daemon with the <code>host</code> argument.</p>
+<p>Instructions for installing Docker can be found at <a href="https://docs.docker.com/engine/install/">https://docs.docker.com/engine/install/</a>,
+and Podman at <a href="https://podman.io/docs/installation/">https://podman.io/docs/installation/</a>. Note that if connecting to Docker/Podman
+remotely then the Docker daemon (<code>dockerd</code>) is not needed, and similarly for Podman it is
+possible to use <code>podman-remote</code> (available as a static binary from
+<a href="https://github.com/containers/podman/releases/latest">https://github.com/containers/podman/releases/latest</a>).</p>
+<p>Previously, when using python-on-whales, the Docker CLI was downloaded automatically, but
+this functionality was removed under <a href="https://github.com/gabrieldemarmiesse/python-on-whales/pull/633">https://github.com/gabrieldemarmiesse/python-on-whales/pull/633</a>.</p>
+<h3 id="handling-an-unavailable-client">Handling an unavailable client</h3>
+<p>Trying to use Python-on-whales when it cannot find or download a Docker client binary
+will trigger a <code>python_on_whales.ClientNotFoundError</code>. You can use a try-except around 
+a first <code>docker.ps()</code> call to handle the case when Python-on-whales won't work.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+    
+  </body>
+</html>
