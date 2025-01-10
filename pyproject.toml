@@ -11,6 +11,10 @@ license = { file = "LICENSE" }
 requires-python = ">=3.8, <4"
 dynamic = ["dependencies"]
 
+# Temporary workaround for https://github.com/astral-sh/uv/issues/9513, https://github.com/pypa/setuptools/issues/4759
+[tool.setuptools]
+license-files = []
+
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
 
