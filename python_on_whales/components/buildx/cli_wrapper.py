@@ -41,6 +41,7 @@ class GetImageMethod(Enum):
     TAG = 1
     IIDFILE = 2
 
+
 class Builder(ReloadableObject):
     def __init__(
         self,
@@ -82,7 +83,7 @@ class Builder(ReloadableObject):
         result_str = "Status:\n"
         for node in self.nodes:
             result_str += "  " + node.name + ": " + node.status + "\n"
-        return result_str.strip('\n')
+        return result_str.strip("\n")
 
     @property
     def platforms(self) -> List[str]:
