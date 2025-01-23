@@ -8,7 +8,7 @@ from typing import List
 class BuilderInspectResult:
     name: str
     driver: str
-    nodes: List[BuilderNode] field(default_factory=lambda: [])
+    nodes: List[BuilderNode] = field(default_factory=lambda: [])
 
     @classmethod
     def from_str(cls, string: str) -> BuilderInspectResult:
