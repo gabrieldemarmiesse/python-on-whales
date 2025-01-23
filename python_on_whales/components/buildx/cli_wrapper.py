@@ -24,7 +24,10 @@ from python_on_whales.client_config import (
     ReloadableObject,
 )
 from python_on_whales.components.buildx.imagetools.cli_wrapper import ImagetoolsCLI
-from python_on_whales.components.buildx.models import BuilderInspectResult
+from python_on_whales.components.buildx.models import (
+    BuilderInspectResult,
+    BuilderNode,
+)
 from python_on_whales.utils import (
     ValidPath,
     format_mapping_for_cli,
@@ -37,7 +40,6 @@ from python_on_whales.utils import (
 class GetImageMethod(Enum):
     TAG = 1
     IIDFILE = 2
-
 
 class Builder(ReloadableObject):
     def __init__(
@@ -72,12 +74,22 @@ class Builder(ReloadableObject):
         return self._get_inspect_result().driver
 
     @property
+    def nodes(self) -> List[BuilderNode]:
+        return self._get_inspect_result().nodes
+
+    @property
     def status(self) -> str:
-        return self._get_inspect_result().status
+        result_str = "Status:\n"
+        for node in self.nodes:
+            result_str += "  " + node.name + ": " + node.status + "\n"
+        return result_str.strip('\n')
 
     @property
     def platforms(self) -> List[str]:
-        return self._get_inspect_result().platforms
+        result_list = []
+        for node in self.nodes:
+            result_list.extend(node.platforms)
+        return list(set(result_list))
 
     def __repr__(self):
         return f"python_on_whales.Builder(name='{self.name}', driver='{self.driver}')"
@@ -466,6 +478,7 @@ class BuildxCLI(DockerCLICaller):
         driver_options: Dict[str, str] = {},
         name: Optional[str] = None,
         use: bool = False,
+        append: bool = False,
     ) -> Builder:
         """Create a new builder instance
 
@@ -481,6 +494,7 @@ class BuildxCLI(DockerCLICaller):
                 e.g `driver_options=dict(network="host")`
             name: Builder instance name
             use: Set the current builder instance to this builder
+            append: Append a node to builder instead of changing it
 
         # Returns
             A `python_on_whales.Builder` object.
@@ -488,6 +502,7 @@ class BuildxCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "create"]
 
         full_cmd.add_flag("--bootstrap", bootstrap)
+        full_cmd.add_flag("--append", append)
         full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
         full_cmd.add_simple_arg("--config", config)
         if platforms is not None:
