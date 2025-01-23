@@ -370,7 +370,8 @@ def test_buildx_inspect_bootstrap():
     my_builder = docker.buildx.create()
     with my_builder:
         docker.buildx.inspect(my_builder.name, bootstrap=True)
-        assert my_builder.status == "running"
+        for node in my_builder.nodes:
+            assert node.status == "running"
         # Must contain at least the host native platform
         assert my_builder.platforms
 
@@ -487,15 +488,16 @@ def test_buildx_create_remove():
 def test_buildx_create_bootstrap():
     my_builder = docker.buildx.create(bootstrap=True)
     with my_builder:
-        assert my_builder.status == "running"
+        for node in my_builder.nodes:
+            assert node.status == "running"
         # Must contain at least the host native platform
         assert my_builder.platforms
 
 
 def test_buildx_create_remove_with_platforms():
     builder = docker.buildx.create(platforms=["linux/amd64", "linux/arm64"])
-
-    assert builder.platforms == ["linux/amd64*", "linux/arm64*"]
+    for platform in builder.platforms:
+        assert platform in ["linux/amd64*", "linux/arm64*"]
 
     docker.buildx.remove(builder)
 
@@ -527,16 +529,18 @@ def test_builder_inspect_result_from_string():
     a = BuilderInspectResult.from_str(some_builder_info)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
-    assert a.status == "inactive"
-    assert a.platforms == []
+    for node in a.nodes:
+        assert node.status == "inactive"
+        assert node.platforms == []
 
 
 def test_builder_inspect_result_platforms_from_string():
     a = BuilderInspectResult.from_str(some_builder_info_with_platforms)
     assert a.name == "blissful_swartz"
     assert a.driver == "docker-container"
-    assert a.status == "running"
-    assert a.platforms == ["linux/amd64", "linux/arm64"]
+    for node in a.nodes:
+        assert node.status == "running"
+        assert node.platforms == ["linux/amd64", "linux/arm64"]
 
 
 bake_test_dir = PROJECT_ROOT / "tests/python_on_whales/components/bake_tests"
