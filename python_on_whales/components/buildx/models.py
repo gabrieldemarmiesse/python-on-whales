@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from typing import List
 
 
-
 @dataclass
 class BuilderInspectResult:
     name: str
@@ -41,6 +40,7 @@ class BuilderInspectResult:
                     result_dict["nodes"].append(node)
                     node = BuilderNode()
         return cls(**result_dict)
+
 
 class BuilderNode:
     name: str = ""
