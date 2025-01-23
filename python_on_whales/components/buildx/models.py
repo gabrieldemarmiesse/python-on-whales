@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import List
 
@@ -9,7 +8,7 @@ from typing import List
 class BuilderInspectResult:
     name: str
     driver: str
-    nodes: List[BuilderNode]
+    nodes: List[BuilderNode] field(default_factory=lambda: [])
 
     @classmethod
     def from_str(cls, string: str) -> BuilderInspectResult:
