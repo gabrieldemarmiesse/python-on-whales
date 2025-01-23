@@ -16,7 +16,6 @@ from typing import (
     Union,
     overload,
 )
-
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
     ClientConfig,
