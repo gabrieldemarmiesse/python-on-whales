@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 from typing import Any, Dict, List, Optional, Union
 
@@ -6,7 +7,7 @@ from python_on_whales.client_config import (
     DockerCLICaller,
     ReloadableObjectFromJson,
 )
-from python_on_whales.components.secret.models import SecretInspectResult
+from python_on_whales.components.secret.models import SecretInspectResult, SecretSpec
 from python_on_whales.utils import ValidPath, format_mapping_for_cli, run, to_list
 
 
@@ -14,6 +15,7 @@ class Secret(ReloadableObjectFromJson):
     def __init__(
         self, client_config: ClientConfig, reference: str, is_immutable_id=False
     ):
+        print("reference: ", reference)
         super().__init__(client_config, "id", reference, is_immutable_id)
 
     def __enter__(self):
@@ -36,6 +38,18 @@ class Secret(ReloadableObjectFromJson):
     @property
     def id(self) -> str:
         return self._get_immutable_id()
+
+    @property
+    def created_at(self) -> dt.datetime:
+        return self._get_inspect_result().created_at
+
+    @property
+    def updated_at(self) -> dt.datetime:
+        return self._get_inspect_result().updated_at
+
+    @property
+    def spec(self) -> SecretSpec:
+        return self._get_inspect_result().spec
 
     def remove(self):
         """Remove this Docker secret.
