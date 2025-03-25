@@ -369,9 +369,9 @@ def test_buildx_inspect_bootstrap():
     my_builder = docker.buildx.create()
     with my_builder:
         docker.buildx.inspect(my_builder.name, bootstrap=True)
-        assert my_builder.status == "running"
+        assert my_builder.nodes[0].status == "running"
         # Must contain at least the host native platform
-        assert my_builder.platforms
+        assert my_builder.nodes[0].platforms
 
 
 def test_builder_name():
@@ -488,13 +488,13 @@ def test_buildx_create_bootstrap():
     with my_builder:
         assert my_builder.nodes[0].status == "running"
         # Must contain at least the host native platform
-        assert my_builder.platforms
+        assert my_builder.node[0].platforms
 
 
 def test_buildx_create_remove_with_platforms():
     builder = docker.buildx.create(platforms=["linux/amd64", "linux/arm64"])
 
-    assert builder.platforms == ["linux/amd64*", "linux/arm64*"]
+    assert builder.node[0].platforms == ["linux/amd64*", "linux/arm64*"]
 
     docker.buildx.remove(builder)
 
