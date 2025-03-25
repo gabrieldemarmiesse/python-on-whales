@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 import json
 import tempfile
 from enum import Enum
@@ -24,7 +25,7 @@ from python_on_whales.client_config import (
     ReloadableObject,
 )
 from python_on_whales.components.buildx.imagetools.cli_wrapper import ImagetoolsCLI
-from python_on_whales.components.buildx.models import BuilderInspectResult
+from python_on_whales.components.buildx.models import BuilderInspectResult, BuilderNode
 from python_on_whales.utils import (
     ValidPath,
     format_mapping_for_cli,
@@ -43,7 +44,7 @@ class Builder(ReloadableObject):
     def __init__(
         self,
         client_config: ClientConfig,
-        reference: Optional[str],
+        reference: str,
         is_immutable_id=False,
     ):
         super().__init__(client_config, "name", reference, is_immutable_id)
@@ -54,30 +55,39 @@ class Builder(ReloadableObject):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.remove()
 
-    def _fetch_and_parse_inspect_result(
-        self, reference: Optional[str]
-    ) -> BuilderInspectResult:
-        full_cmd = self.docker_cmd + ["buildx", "inspect"]
-        if reference is not None:
-            full_cmd.append(reference)
+    def _fetch_and_parse_inspect_result(self, reference: str) -> BuilderInspectResult:
+        full_cmd = self.docker_cmd + ["buildx", "ls", "--format", "{{json . }}"]
         inspect_str = run(full_cmd)
-        return BuilderInspectResult.from_str(inspect_str)
+        lines = inspect_str.splitlines()
+        for line in lines:
+            builder_inspect_result = BuilderInspectResult(**json.loads(line))
+            if builder_inspect_result.name == reference:
+                return builder_inspect_result
+        raise ValueError(
+            f"Could not find a builder with the name {reference}, this should "
+            f"never happen unless you are quickly creating and deleting builders. "
+            f"Please open an issue at https://github.com/gabrieldemarmiesse/python-on-whales/issues"
+        )
 
     @property
-    def name(self) -> str:
+    def name(self) -> str | None:
         return self._get_immutable_id()
 
     @property
-    def driver(self) -> str:
+    def driver(self) -> str | None:
         return self._get_inspect_result().driver
 
     @property
-    def status(self) -> str:
-        return self._get_inspect_result().status
+    def last_activity(self) -> dt.datetime | None:
+        return self._get_inspect_result().last_activity
 
     @property
-    def platforms(self) -> List[str]:
-        return self._get_inspect_result().platforms
+    def dynamic(self) -> bool | None:
+        return self._get_inspect_result().dynamic
+
+    @property
+    def nodes(self) -> List[BuilderNode] | None:
+        return self._get_inspect_result().nodes
 
     def __repr__(self):
         return f"python_on_whales.Builder(name='{self.name}', driver='{self.driver}')"
@@ -466,6 +476,7 @@ class BuildxCLI(DockerCLICaller):
         driver_options: Dict[str, str] = {},
         name: Optional[str] = None,
         use: bool = False,
+        append: bool = False,
     ) -> Builder:
         """Create a new builder instance
 
@@ -481,6 +492,8 @@ class BuildxCLI(DockerCLICaller):
                 e.g `driver_options=dict(network="host")`
             name: Builder instance name
             use: Set the current builder instance to this builder
+            append: Append a node to the current builder instance, in this case
+                `name` must be provided.
 
         # Returns
             A `python_on_whales.Builder` object.
@@ -490,6 +503,7 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_flag("--bootstrap", bootstrap)
         full_cmd.add_simple_arg("--buildkitd-flags", buildkitd_flags)
         full_cmd.add_simple_arg("--config", config)
+        full_cmd.add_flag("--append", append)
         if platforms is not None:
             full_cmd += ["--platform", ",".join(platforms)]
         full_cmd.add_simple_arg("--driver", driver)
@@ -523,29 +537,40 @@ class BuildxCLI(DockerCLICaller):
         # Returns
             A `python_on_whales.Builder` object.
         """
-        if bootstrap:
-            full_cmd = self.docker_cmd + ["buildx", "inspect"]
-            if x is not None:
-                full_cmd.append(x)
-            full_cmd.add_flag("--bootstrap", bootstrap)
-            run(full_cmd)
-        return Builder(self.client_config, x, is_immutable_id=False)
+        # Sadly, docker buildx inspect has no json support,
+        # so, it's ugly, but we grab the name from the first line and
+        # then filter "docker buildx ls".
+        full_cmd = self.docker_cmd + ["buildx", "inspect"]
+        if x is not None:
+            full_cmd.append(x)
+        full_cmd.add_flag("--bootstrap", bootstrap)
+        output = run(full_cmd)
+        name = output.splitlines()[0].split(":")[1].strip()
+        for builder in self.list():
+            if builder.name == name:
+                return builder
+        raise ValueError(
+            f"Could not find a builder with the name {name}, this should "
+            f"never happen unless you are quickly creating and deleting builders. "
+            f"Please open an issue at https://github.com/gabrieldemarmiesse/python-on-whales/issues."
+        )
 
     def list(self) -> List[Builder]:
         """Returns the list of `python_on_whales.Builder` available."""
-        full_cmd = self.docker_cmd + ["buildx", "ls"]
+        full_cmd = self.docker_cmd + ["buildx", "ls", "--format", "{{json . }}"]
         output = run(full_cmd)
         lines = output.splitlines()
-        # the first line have the headers
-        lines = lines[1:]
-        # if the line starts by a " ", it's not a builder, it's a node
-        lines = list(filter(lambda x: not x.startswith(" "), lines))
-        builders_names = [x.split(" ")[0] for x in lines]
-        # in buildx 0.13.0, the "*" is added to the name, without whitespace
-        builders_names = [removesuffix(x, "*") for x in builders_names]
-        return [
-            Builder(self.client_config, x, is_immutable_id=True) for x in builders_names
-        ]
+        lines = set(lines)
+
+        inpect_results = [BuilderInspectResult(**json.loads(line)) for line in lines]
+        result = []
+        for inspect_result in inpect_results:
+            builder = Builder(
+                self.client_config, inspect_result.name, is_immutable_id=True
+            )
+            builder._set_inspect_result(inspect_result)
+            result.append(builder)
+        return result
 
     @overload
     def prune(
