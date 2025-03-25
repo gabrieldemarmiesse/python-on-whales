@@ -16,18 +16,18 @@ def test_swarm_update_auto_lock_managers(docker_client: DockerClient, tmp_path):
 
     assert my_secret == my_secret2
     assert my_secret.spec.name == "my_secret"
-    assert my_secret.spec.Labels == {}
+    assert my_secret.spec.labels == {}
     assert my_secret.created_at <= date_after_creation
 
     assert my_secret2.spec.name == "my_secret"
-    assert my_secret2.spec.Labels == {}
+    assert my_secret2.spec.labels == {}
     assert my_secret2.created_at <= date_after_creation
 
     my_secret3 = docker_client.secret.inspect("my_secret")
 
     assert my_secret == my_secret3
     assert my_secret3.spec.name == "my_secret"
-    assert my_secret3.spec.Labels == {}
+    assert my_secret3.spec.labels == {}
     assert my_secret3.created_at <= date_after_creation
 
     docker_client.secret.remove(my_secret.id)

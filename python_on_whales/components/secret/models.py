@@ -7,8 +7,8 @@ from python_on_whales.utils import DockerCamelModel
 
 
 class SecretSpec(DockerCamelModel):
-    name: str
-    Labels: Dict[str, Any]
+    name: Optional[str] = None
+    labels: Optional[Dict[str, Any]] = None
 
 
 class SecretInspectResult(DockerCamelModel):
