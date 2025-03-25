@@ -206,7 +206,6 @@ class ReloadableObject(DockerCLICaller):
         )
 
     def reload(self):
-        print("fetching and parsing inspect result", self._immutable_id)
         self._set_inspect_result(
             self._fetch_and_parse_inspect_result(self._immutable_id)
         )

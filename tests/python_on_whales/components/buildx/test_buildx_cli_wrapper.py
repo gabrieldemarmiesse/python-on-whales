@@ -4,7 +4,6 @@ import tarfile
 import pytest
 
 from python_on_whales import docker
-from python_on_whales.components.buildx.models import BuilderInspectResult
 from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import set_cache_validity_period
 from python_on_whales.utils import PROJECT_ROOT
@@ -370,9 +369,9 @@ def test_buildx_inspect_bootstrap():
     my_builder = docker.buildx.create()
     with my_builder:
         docker.buildx.inspect(my_builder.name, bootstrap=True)
-        assert my_builder.status == "running"
+        assert my_builder.nodes[0].status == "running"
         # Must contain at least the host native platform
-        assert my_builder.platforms
+        assert my_builder.nodes[0].platforms
 
 
 def test_builder_name():
@@ -487,56 +486,17 @@ def test_buildx_create_remove():
 def test_buildx_create_bootstrap():
     my_builder = docker.buildx.create(bootstrap=True)
     with my_builder:
-        assert my_builder.status == "running"
+        assert my_builder.nodes[0].status == "running"
         # Must contain at least the host native platform
-        assert my_builder.platforms
+        assert my_builder.nodes[0].platforms
 
 
 def test_buildx_create_remove_with_platforms():
     builder = docker.buildx.create(platforms=["linux/amd64", "linux/arm64"])
 
-    assert builder.platforms == ["linux/amd64*", "linux/arm64*"]
+    assert builder.nodes[0].platforms == ["linux/amd64", "linux/arm64"]
 
     docker.buildx.remove(builder)
-
-
-some_builder_info = """
-Name:   blissful_swartz
-Driver: docker-container
-
-Nodes:
-Name:      blissful_swartz0
-Endpoint:  unix:///var/run/docker.sock
-Status:    inactive
-Platforms:
-"""
-
-some_builder_info_with_platforms = """
-Name:   blissful_swartz
-Driver: docker-container
-
-Nodes:
-Name:      blissful_swartz0
-Endpoint:  unix:///var/run/docker.sock
-Status:    running
-Platforms: linux/amd64, linux/arm64
-"""
-
-
-def test_builder_inspect_result_from_string():
-    a = BuilderInspectResult.from_str(some_builder_info)
-    assert a.name == "blissful_swartz"
-    assert a.driver == "docker-container"
-    assert a.status == "inactive"
-    assert a.platforms == []
-
-
-def test_builder_inspect_result_platforms_from_string():
-    a = BuilderInspectResult.from_str(some_builder_info_with_platforms)
-    assert a.name == "blissful_swartz"
-    assert a.driver == "docker-container"
-    assert a.status == "running"
-    assert a.platforms == ["linux/amd64", "linux/arm64"]
 
 
 bake_test_dir = PROJECT_ROOT / "tests/python_on_whales/components/bake_tests"
