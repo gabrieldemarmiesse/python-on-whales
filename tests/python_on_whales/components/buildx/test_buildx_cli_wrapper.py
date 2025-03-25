@@ -494,7 +494,7 @@ def test_buildx_create_bootstrap():
 def test_buildx_create_remove_with_platforms():
     builder = docker.buildx.create(platforms=["linux/amd64", "linux/arm64"])
 
-    assert builder.nodes[0].platforms == ["linux/amd64*", "linux/arm64*"]
+    assert builder.nodes[0].platforms == ["linux/amd64", "linux/arm64"]
 
     docker.buildx.remove(builder)
 
