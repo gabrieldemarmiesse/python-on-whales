@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime as dt
 from typing import Dict, List, Optional
-from uuid import UUID
 
 from pydantic import Field
 from typing_extensions import Annotated
@@ -16,7 +15,7 @@ class BuilderNode(DockerCamelModel):
     flags: Optional[List[str]] = None
     status: Optional[str] = None
     version: Optional[str] = None
-    ids: Annotated[Optional[List[UUID]], Field(alias="IDs")] = None
+    ids: Annotated[Optional[List[str]], Field(alias="IDs")] = None
     platforms: Optional[List[str]] = None
     labels: Optional[Dict[str, str]] = None
 
