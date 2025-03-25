@@ -669,7 +669,7 @@ wheels = [
 
 [[package]]
 name = "python-on-whales"
-version = "0.75.1"
+version = "0.76.0"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
