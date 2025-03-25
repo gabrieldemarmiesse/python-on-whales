@@ -487,7 +487,7 @@ def test_buildx_create_remove():
 def test_buildx_create_bootstrap():
     my_builder = docker.buildx.create(bootstrap=True)
     with my_builder:
-        assert my_builder.status == "running"
+        assert my_builder.nodes[0].status == "running"
         # Must contain at least the host native platform
         assert my_builder.platforms
 
