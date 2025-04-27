@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 from typing_extensions import Literal
 
 import python_on_whales.components.container.cli_wrapper
+import python_on_whales.components.volume.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
 from python_on_whales.utils import (
@@ -663,8 +664,8 @@ class ComposeCLI(DockerCLICaller):
         command: List[str] = [],
         build: bool = False,
         detach: bool = False,
-        # entrypoint: Optional[List[str]] = None,
-        # envs: Dict[str, str] = {},
+        entrypoint: Optional[str] = None,
+        envs: Dict[str, str] = {},
         labels: Dict[str, str] = {},
         name: Optional[str] = None,
         tty: bool = True,
@@ -677,7 +678,9 @@ class ComposeCLI(DockerCLICaller):
         service_ports: bool = False,
         use_aliases: bool = False,
         user: Optional[str] = None,
-        # volumes: bool = "todo",
+        volumes: Iterable[
+            python_on_whales.components.volume.cli_wrapper.VolumeDefinition
+        ] = (),
         workdir: Union[None, str, Path] = None,
     ) -> Union[
         str,
@@ -691,6 +694,8 @@ class ComposeCLI(DockerCLICaller):
             command: The command to execute.
             detach: if `True`, returns immediately with the Container.
                     If `False`, returns the command stdout as string.
+            entrypoint: The entrypoint to execute.
+            envs: A dictionary of environment variables to set in the container.
             labels: Add or override labels
             name: Assign a name to the container.
             dependencies: Also start linked services.
@@ -702,6 +707,8 @@ class ComposeCLI(DockerCLICaller):
                 to write on it.
             stream: Similar to `docker.run(..., stream=True)`.
             user: Username or UID, format: `"<name|uid>[:<group|gid>]"`
+            volumes:  Bind mount a volume. Some examples:
+                `[("/", "/host"), ("/etc/hosts", "/etc/hosts", "rw")]`.
             workdir: Working directory inside the container
 
         Returns:
@@ -728,6 +735,9 @@ class ComposeCLI(DockerCLICaller):
         full_cmd = self.docker_compose_cmd + ["run"]
         full_cmd.add_flag("--build", build)
         full_cmd.add_flag("--detach", detach)
+        full_cmd.add_simple_arg("--entrypoint", entrypoint)
+        for key, value in envs.items():
+            full_cmd.add_simple_arg("--env", f"{key}={value}")
         full_cmd.add_simple_arg("--name", name)
         full_cmd.add_flag("--no-TTY", not tty)
         full_cmd.add_flag("--no-deps", not dependencies)
@@ -744,6 +754,9 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--service-ports", service_ports)
         full_cmd.add_flag("--use-aliases", use_aliases)
         full_cmd.add_simple_arg("--user", user)
+        for volume_definition in volumes:
+            volume_definition = tuple(str(x) for x in volume_definition)
+            full_cmd += ["--volume", ":".join(volume_definition)]
         full_cmd.add_simple_arg("--workdir", workdir)
         full_cmd.add_args_iterable_or_single("--label", format_mapping_for_cli(labels))
         full_cmd.append(service)

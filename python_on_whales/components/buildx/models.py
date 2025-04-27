@@ -1,30 +1,28 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import List
+import datetime as dt
+from typing import Dict, List, Optional
+
+from pydantic import Field
+from typing_extensions import Annotated
+
+from python_on_whales.utils import DockerCamelModel
 
 
-@dataclass
-class BuilderInspectResult:
-    name: str
-    driver: str
-    status: str
-    platforms: List[str] = field(default_factory=lambda: [])
+class BuilderNode(DockerCamelModel):
+    name: Optional[str] = None
+    endpoint: Optional[str] = None
+    flags: Optional[List[str]] = None
+    status: Optional[str] = None
+    version: Optional[str] = None
+    ids: Annotated[Optional[List[str]], Field(alias="IDs")] = None
+    platforms: Optional[List[str]] = None
+    labels: Optional[Dict[str, str]] = None
 
-    @classmethod
-    def from_str(cls, string: str) -> BuilderInspectResult:
-        string = string.strip()
-        result_dict = {}
-        for line in string.splitlines():
-            if line.startswith("Name:") and "name" not in result_dict:
-                result_dict["name"] = line.split(":")[1].strip()
-            if line.startswith("Driver:"):
-                result_dict["driver"] = line.split(":")[1].strip()
-            if line.startswith("Status:"):
-                result_dict["status"] = line.split(":")[1].strip()
-            if line.startswith("Platforms:"):
-                platforms = line.split(":")[1].strip()
-                if platforms:
-                    result_dict["platforms"] = platforms.split(", ")
 
-        return cls(**result_dict)
+class BuilderInspectResult(DockerCamelModel):
+    name: Optional[str] = None
+    driver: Optional[str] = None
+    last_activity: Optional[dt.datetime] = None
+    dynamic: Optional[bool] = None
+    nodes: Optional[List[BuilderNode]] = None

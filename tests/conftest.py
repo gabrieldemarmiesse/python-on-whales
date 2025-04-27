@@ -120,7 +120,7 @@ def _docker_registry(docker_client: DockerClient, login=True) -> str:
 
 @pytest.fixture(scope="function")
 def swarm_mode(docker_client: DockerClient) -> Generator[None, None, None]:
-    docker_client.swarm.init()
+    docker_client.swarm.init(advertise_address="172.31.155.129")
     yield
     docker_client.swarm.leave(force=True)
     time.sleep(1)

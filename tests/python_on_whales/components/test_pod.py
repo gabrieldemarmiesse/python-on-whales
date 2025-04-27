@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import re
 from pathlib import Path
@@ -23,6 +24,11 @@ def test_create_simple(podman_client: DockerClient):
         assert pod.exists()
         assert pod.name == pod_name
         assert pod.state.lower() == "created"
+        assert (
+            dt.datetime.now().astimezone() - dt.timedelta(minutes=1)
+            < pod.created
+            < dt.datetime.now().astimezone()
+        )
     assert not pod.exists()
 
 
@@ -31,6 +37,11 @@ def test_start_simple(podman_client: DockerClient):
     with podman_client.pod.create(pod_name) as pod:
         pod.start()
         assert pod.state.lower() == "running"
+        assert (
+            dt.datetime.now().astimezone() - dt.timedelta(minutes=1)
+            < pod.created
+            < dt.datetime.now().astimezone()
+        )
     assert not pod.exists()
 
 
@@ -41,6 +52,11 @@ def test_stop_simple(podman_client: DockerClient):
         assert pod.state.lower() == "running"
         pod.stop()
         assert pod.state.lower() == "exited"
+        assert (
+            dt.datetime.now().astimezone() - dt.timedelta(minutes=1)
+            < pod.created
+            < dt.datetime.now().astimezone()
+        )
     assert not pod.exists()
 
 

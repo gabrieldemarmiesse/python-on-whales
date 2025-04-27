@@ -753,6 +753,69 @@ def test_docker_compose_run_labels():
     docker.compose.down(timeout=1)
 
 
+def test_compose_run_entrypoint():
+    result = docker.compose.run(
+        "dodo",
+        ["cmd-is-argument-for-echo"],
+        entrypoint="/bin/echo",
+        remove=True,
+        tty=False,
+    )
+
+    assert result == "cmd-is-argument-for-echo"
+
+
+def test_compose_run_envs():
+    result = docker.compose.run(
+        "dodo",
+        ["-c", "echo $VAR1 $VAR2"],
+        envs={"VAR1": "hello", "VAR2": "world"},
+        remove=True,
+        tty=False,
+    )
+
+    assert result == "hello world"
+
+
+def test_compose_run_volume():
+    with tempfile.NamedTemporaryFile() as fst, tempfile.NamedTemporaryFile() as snd:
+        fst.write(b"Hello ")
+        snd.write(b" Year")
+        fst.flush()
+        snd.flush()
+
+        result = docker.compose.run(
+            "dodo",
+            [
+                "-c",
+                "echo New >> /mounted/fst.txt"
+                "&& echo $(cat /mounted/fst.txt)$(cat /mounted/snd.txt)",
+            ],
+            volumes=[
+                (f"{fst.name}", "/mounted/fst.txt"),
+                (f"{snd.name}", "/mounted/snd.txt", "ro"),
+            ],
+            remove=True,
+            tty=False,
+        )
+
+        assert result == "Hello New Year"
+
+
+def test_compose_run_volume_with_parameter():
+    with tempfile.NamedTemporaryFile() as read_only_file, pytest.raises(
+        DockerException,
+        match=".*can't create /mounted/read_only_file.txt: Read-only file system.*",
+    ):
+        docker.compose.run(
+            "dodo",
+            ["-c", "echo test > /mounted/read_only_file.txt"],
+            volumes=[(f"{read_only_file.name}", "/mounted/read_only_file.txt", "ro")],
+            remove=True,
+            tty=False,
+        )
+
+
 def test_compose_version():
     assert "Docker Compose version v2" in docker.compose.version()
 

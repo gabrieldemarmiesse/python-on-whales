@@ -206,6 +206,16 @@ def generate_code_demo_builders() -> str:
         to_evaluate = [
             "builder.name",
             "builder.driver",
+            "builder.last_activity",
+            "builder.dynamic",
+            "builder.nodes[0].name",
+            "builder.nodes[0].endpoint",
+            "builder.nodes[0].flags",
+            "builder.nodes[0].status",
+            "builder.nodes[0].version",
+            "builder.nodes[0].ids",
+            "builder.nodes[0].platforms",
+            "builder.nodes[0].labels",
         ]
 
         for i, attribute_access in enumerate(to_evaluate):
