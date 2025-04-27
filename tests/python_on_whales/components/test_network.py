@@ -92,3 +92,25 @@ def test_network_exists(ctr_client: DockerClient):
     # Outside with clause, network should be removed and no longer exist
     assert not ctr_client.network.exists(network)
     assert not network.exists()
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_list_filters(ctr_client: DockerClient):
+    name = random_name()
+    with ctr_client.network.create(name) as network:
+        networks_listed = ctr_client.network.list(filters=[("name", name)])
+    assert networks_listed == [network]
+
+
+def test_list_filters_old_signature(docker_client: DockerClient):
+    """Check backward compatibility of the DockerClient.network.list() API."""
+    name = random_name()
+    expected_warning = (
+        r"Passing filters as a mapping is deprecated, replace with an iterable "
+        r"of tuples instead, as so:\n"
+        r"filters=\[\(.*\)\]"
+    )
+    with docker_client.network.create(name) as network:
+        with pytest.warns(DeprecationWarning, match=expected_warning):
+            networks_listed = docker_client.network.list(filters={"name": name})
+    assert networks_listed == [network]

@@ -78,6 +78,31 @@ def test_list_multiple(podman_client: DockerClient):
         assert pod2_name in listed_pod_names
 
 
+def test_list_filters(podman_client: DockerClient):
+    pod1_name = random_name()
+    pod2_name = random_name()
+    select_label = random_name()
+    with podman_client.pod.create(pod1_name), podman_client.pod.create(
+        pod2_name, labels={select_label: None}
+    ):
+        listed_pods = podman_client.pod.list(filters=[("label", select_label)])
+        assert [p.name for p in listed_pods] == [pod2_name]
+
+
+def test_list_filters_old_signature(podman_client: DockerClient):
+    """Check backward compatibility of the DockerClient.pod.list() API."""
+    pod_name = random_name()
+    expected_warning = (
+        r"Passing filters as a mapping is deprecated, replace with an iterable "
+        r"of tuples instead, as so:\n"
+        r"filters=\[\(.*\)\]"
+    )
+    with podman_client.pod.create(pod_name):
+        with pytest.warns(DeprecationWarning, match=expected_warning):
+            listed_pods = podman_client.pod.list(filters={"name": pod_name})
+        assert [p.name for p in listed_pods] == [pod_name]
+
+
 def test_does_not_exist(podman_client: DockerClient):
     assert podman_client.pod.exists("pod-that-does-not-exist") is False
 
