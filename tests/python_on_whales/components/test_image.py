@@ -110,32 +110,30 @@ def test_save_iterator_bytes_and_load_from_iterator_list_of_images(
         pytest.param(
             "podman",
             marks=pytest.mark.xfail(
-                reason="podman lists images with registry in image name"
+                reason="podman includes all repo tags matching images ref"
             ),
         ),
     ],
     indirect=True,
 )
-def test_filter_when_listing(ctr_client: DockerClient):
+def test_list_filters(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
-    images_listed = ctr_client.image.list(filters=dict(reference="hello-world"))
+    images_listed = ctr_client.image.list(filters=[("reference", "hello-world")])
     tags = {tag.split("/")[-1] for image in images_listed for tag in image.repo_tags}
     assert tags == {"hello-world:latest"}
 
 
-def test_filter_when_listing_old_signature(docker_client: DockerClient):
+def test_list_filters_old_signature(docker_client: DockerClient):
     """Check backward compatibility of the DockerClient.image.list() API."""
     docker_client.pull(["hello-world", "busybox"])
-    with pytest.warns(DeprecationWarning) as warnings_emmitted:
-        images_listed = docker_client.image.list({"reference": "hello-world"})
-
-    warning_message = str(warnings_emmitted.list[0].message)
-    assert "docker.image.list({'reference': 'hello-world'}" in warning_message
-    assert "docker.image.list(filters={'reference': 'hello-world'}" in warning_message
-    tags = set()
-    for image in images_listed:
-        for tag in image.repo_tags:
-            tags.add(tag)
+    expected_warning = (
+        r"Passing filters as a mapping is deprecated, replace with an iterable "
+        r"of tuples instead, as so:\n"
+        r"filters=\[\(.*\)\]"
+    )
+    with pytest.warns(DeprecationWarning, match=expected_warning):
+        images_listed = docker_client.image.list(filters={"reference": "hello-world"})
+    tags = {tag.split("/")[-1] for image in images_listed for tag in image.repo_tags}
     assert tags == {"hello-world:latest"}
 
 
@@ -146,13 +144,13 @@ def test_filter_when_listing_old_signature(docker_client: DockerClient):
         pytest.param(
             "podman",
             marks=pytest.mark.xfail(
-                reason="podman lists images with registry in image name"
+                reason="podman includes all repo tags matching images ref"
             ),
         ),
     ],
     indirect=True,
 )
-def test_use_first_argument_to_filter(ctr_client: DockerClient):
+def test_list_filter_by_name(ctr_client: DockerClient):
     ctr_client.pull(["hello-world", "busybox"])
     images_listed = ctr_client.image.list("hello-world")
     tags = {tag.split("/")[-1] for image in images_listed for tag in image.repo_tags}

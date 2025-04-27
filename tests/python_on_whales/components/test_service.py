@@ -46,7 +46,7 @@ def test_get_list_of_services(docker_client: DockerClient):
 
 
 @pytest.mark.usefixtures("swarm_mode")
-def test_filters(docker_client: DockerClient):
+def test_list_filters(docker_client: DockerClient):
     random_label_value = random_name()
     with docker_client.service.create(
         "busybox",
@@ -59,11 +59,11 @@ def test_filters(docker_client: DockerClient):
             labels=dict(dodo="something"),
         ):
             expected_services = docker_client.service.list(
-                filters=dict(label=f"dodo={random_label_value}")
+                filters=[("label", f"dodo={random_label_value}")]
             )
             assert expected_services == [my_service]
             no_expected_services = docker_client.service.list(
-                filters=dict(label=f"dodo={random_name()}")
+                filters=[("label", f"dodo={random_name()}")]
             )
             assert len(no_expected_services) == 0
 

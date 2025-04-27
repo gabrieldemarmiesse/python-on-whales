@@ -7,7 +7,7 @@ import pytest
 from python_on_whales import DockerClient
 from python_on_whales.components.volume.models import VolumeInspectResult
 from python_on_whales.exceptions import NoSuchVolume
-from python_on_whales.test_utils import get_all_jsons
+from python_on_whales.test_utils import get_all_jsons, random_name
 
 
 @pytest.mark.parametrize("json_file", get_all_jsons("volumes"))
@@ -82,6 +82,32 @@ def test_list(ctr_client: DockerClient):
     all_volumes = ctr_client.volume.list()
     for v in volumes:
         assert v in all_volumes
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_list_filters(ctr_client: DockerClient):
+    select_label = random_name()
+    with ctr_client.volume.create(), ctr_client.volume.create(
+        labels={select_label: None}
+    ) as vol2:
+        listed_volumes = ctr_client.volume.list(filters=[("label", select_label)])
+        assert listed_volumes == [vol2]
+
+
+def test_list_filters_old_signature(docker_client: DockerClient):
+    """Check backward compatibility of the DockerClient.pod.list() API."""
+    expected_warning = (
+        r"Passing filters as a mapping is deprecated, replace with an iterable "
+        r"of tuples instead, as so:\n"
+        r"filters=\[\(.*\)\]"
+    )
+    select_label = random_name()
+    with docker_client.volume.create(), docker_client.volume.create(
+        labels={select_label: None}
+    ) as vol2:
+        with pytest.warns(DeprecationWarning, match=expected_warning):
+            listed_volumes = docker_client.volume.list(filters={"label": select_label})
+        assert listed_volumes == [vol2]
 
 
 @pytest.mark.parametrize(

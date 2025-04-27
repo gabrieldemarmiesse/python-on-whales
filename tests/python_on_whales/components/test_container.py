@@ -585,7 +585,7 @@ def test_context_manager_with_create(ctr_client: DockerClient):
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
-def test_filters(ctr_client: DockerClient):
+def test_list_filters(ctr_client: DockerClient):
     random_label_value = random_name()
 
     containers_with_labels = []
@@ -614,8 +614,52 @@ def test_filters(ctr_client: DockerClient):
         )
 
     expected_containers_with_labels = ctr_client.container.list(
-        filters=dict(label=f"dodo={random_label_value}")
+        filters=[("label", f"dodo={random_label_value}")]
     )
+
+    assert set(expected_containers_with_labels) == set(containers_with_labels)
+
+    for container in containers_with_labels + containers_with_wrong_labels:
+        container.kill()
+
+
+def test_list_filters_old_signature(docker_client: DockerClient):
+    """Test backwards compatibility of DockerClient.container.list()."""
+    random_label_value = random_name()
+
+    containers_with_labels = []
+    for _ in range(3):
+        containers_with_labels.append(
+            docker_client.run(
+                "busybox",
+                ["sleep", "infinity"],
+                remove=True,
+                detach=True,
+                labels=dict(dodo=random_label_value),
+            )
+        )
+
+    containers_with_wrong_labels = []
+    for _ in range(3):
+        containers_with_wrong_labels.append(
+            docker_client.run(
+                "busybox",
+                ["sleep", "infinity"],
+                remove=True,
+                detach=True,
+                labels=dict(dodo="something"),
+            )
+        )
+
+    expected_warning = (
+        r"Passing filters as a mapping is deprecated, replace with an iterable "
+        r"of tuples instead, as so:\n"
+        r"filters=\[\(.*\)\]"
+    )
+    with pytest.warns(DeprecationWarning, match=expected_warning):
+        expected_containers_with_labels = docker_client.container.list(
+            filters=dict(label=f"dodo={random_label_value}")
+        )
 
     assert set(expected_containers_with_labels) == set(containers_with_labels)
 
