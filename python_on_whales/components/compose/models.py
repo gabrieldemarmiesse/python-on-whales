@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -123,3 +124,12 @@ class ComposeProject(BaseModel):
     paused: Optional[int] = 0
     dead: Optional[int] = 0
     config_files: Optional[List[Path]] = None
+
+
+class ComposeEvent(BaseModel):
+    action: Annotated[Optional[str], Field(alias="action")] = None
+    attributes: Annotated[Optional[Dict[str, str]], Field(alias="attributes")] = None
+    id: Annotated[Optional[str], Field(alias="id")] = None
+    service: Annotated[Optional[str], Field(alias="service")] = None
+    time: Annotated[Optional[datetime], Field(alias="time")] = None
+    type: Annotated[Optional[str], Field(alias="type")] = None
