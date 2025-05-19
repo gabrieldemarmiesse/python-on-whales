@@ -12,7 +12,7 @@ import pytz
 
 import python_on_whales
 from python_on_whales import DockerClient, DockerException
-from python_on_whales.components.compose.models import ComposeConfig
+from python_on_whales.components.compose.models import ComposeConfig, ComposeEvent
 from python_on_whales.exceptions import NoSuchImage
 from python_on_whales.test_utils import get_all_jsons
 from python_on_whales.utils import PROJECT_ROOT
@@ -890,6 +890,36 @@ def test_compose_logs_follow():
 
     assert "error with my_other_service" in full_output
     assert "--- www.google.com ping statistics ---" in full_output
+
+    docker.compose.down(timeout=1)
+
+
+def test_compose_events():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/compose-with-healthcheck.yml"
+        ],
+        compose_compatibility=True,
+    )
+
+    docker.compose.up(["unhealthy_service"], detach=True)
+
+    events_iterator = docker.compose.events(["unhealthy_service"])
+
+    events = []
+    for event in events_iterator:
+        events.append(event)
+        if len(events) >= 3:  # Collect a few events for testing
+            break
+
+    assert len(events) >= 3
+    for event in events:
+        assert isinstance(event, ComposeEvent)
+        assert event.service == "unhealthy_service"
+        assert event.action is not None
+        assert event.time is not None
+        assert event.id is not None
 
     docker.compose.down(timeout=1)
 

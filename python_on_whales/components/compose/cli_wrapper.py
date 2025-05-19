@@ -3,14 +3,18 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union, overload
 
 from typing_extensions import Literal
 
 import python_on_whales.components.container.cli_wrapper
 import python_on_whales.components.volume.cli_wrapper
 from python_on_whales.client_config import DockerCLICaller
-from python_on_whales.components.compose.models import ComposeConfig, ComposeProject
+from python_on_whales.components.compose.models import (
+    ComposeConfig,
+    ComposeEvent,
+    ComposeProject,
+)
 from python_on_whales.utils import (
     format_mapping_for_cli,
     format_signal_arg,
@@ -866,6 +870,55 @@ class ComposeCLI(DockerCLICaller):
     def top(self):
         """Not yet implemented"""
         raise NotImplementedError
+
+    def events(
+        self,
+        services: List[str] = [],
+    ) -> Iterator[ComposeEvent]:
+        """Return Docker Compose events for the specified services.
+
+        This function streams events related to the specified services in real-time.
+        If no services are specified, it streams events for all services in the current Compose project.
+
+        Example usage:
+        ```python
+        from python_on_whales import docker
+
+        # Stream events for a specific service
+        for event in docker.compose.events(["my_service"]):
+            print(event)
+            # This will keep streaming events indefinitely.
+            # Use 'break' to exit the loop if needed.
+
+        # Stream events for all services in the Compose project
+        for event in docker.compose.events():
+            print(event)
+        ```
+
+        Parameters:
+            services: A list of service names to filter events. If empty, events for all services are streamed.
+
+        Returns:
+            An iterator that yields `ComposeEvent` objects representing the events.
+
+        Note:
+            This function streams events indefinitely unless interrupted. Use it carefully in long-running processes.
+
+        [reference page for docker events](https://docs.docker.com/reference/cli/docker/compose/events)
+        """
+        full_cmd = (
+            self.docker_compose_cmd
+            + [
+                "events",
+                "--json",
+            ]
+            + services
+        )
+
+        iterator = stream_stdout_and_stderr(full_cmd)
+        for stream_origin, stream_content in iterator:
+            if stream_origin == "stdout":
+                yield ComposeEvent(**json.loads(stream_content))
 
     def unpause(self, services: Union[str, List[str], None] = None):
         """Unpause one or more services
