@@ -1,0 +1,3432 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Python on whales docs">
+      
+      
+      
+      
+        <link rel="prev" href="../../docker_client/">
+      
+      
+        <link rel="next" href="../compose/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>docker buildx - Python on whales</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Python on whales" class="md-header__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Python on whales
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              docker buildx
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Python on whales" class="md-nav__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Python on whales
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docker_client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Sub-commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Sub-commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    docker buildx
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    docker buildx
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI" class="md-nav__link">
+    <span class="md-ellipsis">
+      BuildxCLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BuildxCLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.bake" class="md-nav__link">
+    <span class="md-ellipsis">
+      bake
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="bake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.bake--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      build
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="create">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.create--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.disk_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      disk_usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.inspect" class="md-nav__link">
+    <span class="md-ellipsis">
+      inspect
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="inspect">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.inspect--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.is_installed" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_installed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.list" class="md-nav__link">
+    <span class="md-ellipsis">
+      list
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.prune" class="md-nav__link">
+    <span class="md-ellipsis">
+      prune
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      remove
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.use" class="md-nav__link">
+    <span class="md-ellipsis">
+      use
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImagetoolsCLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ImagetoolsCLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI.inspect" class="md-nav__link">
+    <span class="md-ellipsis">
+      inspect
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-about-the-transition-between-the-legacy-builder-and-buildx" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes about the transition between the legacy builder and buildx
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compose/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker config
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../context/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker context
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker image
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifest/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker manifest
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../network/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker network
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../node/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker node
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../secret/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker secret
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../service/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker service
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../swarm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker swarm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker system
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../task/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker task
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker trust
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../volume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker volume
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pod/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    podman pod
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Objects
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Objects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/configs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/containers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Containers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Images
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/networks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/nodes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nodes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plugins
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/pods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/services/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Services
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/stacks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stacks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tasks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/volumes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Volumes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/docker_run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker.run() guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/generic_resources/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Swarm generic resources
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/running_python_on_whales_inside_a_container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Running python-on-whales inside a container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/exceptions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    dealing with exceptions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI" class="md-nav__link">
+    <span class="md-ellipsis">
+      BuildxCLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BuildxCLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.bake" class="md-nav__link">
+    <span class="md-ellipsis">
+      bake
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="bake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.bake--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      build
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="create">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.create--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.disk_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      disk_usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.inspect" class="md-nav__link">
+    <span class="md-ellipsis">
+      inspect
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="inspect">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.inspect--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.is_installed" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_installed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.list" class="md-nav__link">
+    <span class="md-ellipsis">
+      list
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.prune" class="md-nav__link">
+    <span class="md-ellipsis">
+      prune
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      remove
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.use" class="md-nav__link">
+    <span class="md-ellipsis">
+      use
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.cli_wrapper.BuildxCLI.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImagetoolsCLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ImagetoolsCLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI.inspect" class="md-nav__link">
+    <span class="md-ellipsis">
+      inspect
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-about-the-transition-between-the-legacy-builder-and-buildx" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes about the transition between the legacy builder and buildx
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>docker buildx</h1>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">BuildxCLI</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.bake" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">bake</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">bake</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[],</span> <span class="n">builder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">[],</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">print</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">pull</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">push</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">set</span><span class="o">=</span><span class="p">{},</span> <span class="n">variables</span><span class="o">=</span><span class="p">{},</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remote_definition</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Bake is similar to make, it allows you to build things declared in a file.</p>
+<p>For example it allows you to build multiple docker image in parallel.</p>
+<p>The CLI docs is <a href="https://github.com/docker/buildx#buildx-bake-options-target">here</a>
+and it contains a lot more information.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>targets</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Targets or groups of targets to build.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>builder</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The builder to use.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.components.buildx.cli_wrapper.ValidBuilder">ValidBuilder</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>files</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Build definition file(s)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>, <span title="typing.List">List</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>load</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Shorthand for <code>set=["*.output=type=docker"]</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to use the cache or not.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>print</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Do nothing, just returns the config.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>progress</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set type of progress output (<code>"auto"</code>, <code>"plain"</code>, <code>"tty"</code>,
+or <code>False</code>). Use plain to keep the container output on screen</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Literal">Literal</span>[&#39;auto&#39;, &#39;plain&#39;, &#39;tty&#39;, False]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;auto&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>pull</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Always try to pull the newer version of the image</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>push</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Shorthand for <code>set=["*.output=type=registry"]</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>set</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of overrides in the form <code>"targetpattern.key=value"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A dict containing the values of the variables defined in the
+hcl file. See <a href="https://github.com/docker/buildx#hcl-variables-and-functions">https://github.com/docker/buildx#hcl-variables-and-functions</a></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>remote_definition</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remote context in which to find bake files</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.bake--returns">Returns</h4>
+<pre><code>The configuration used for the bake (files merged + override with
+the arguments used in the function). It's the loaded json you would
+obtain by running `docker buildx bake --print --load my_target` if
+your command was `docker buildx bake --load my_target`. Some example here.
+</code></pre>
+<pre><code class="language-python">from python_on_whales import docker
+
+# returns the config used and runs the builds
+config = docker.buildx.bake([&quot;my_target1&quot;, &quot;my_target2&quot;], load=True)
+assert config == {
+    &quot;target&quot;: {
+        &quot;my_target1&quot;: {
+            &quot;context&quot;: &quot;./&quot;,
+            &quot;dockerfile&quot;: &quot;Dockerfile&quot;,
+            &quot;tags&quot;: [&quot;pretty_image1:1.0.0&quot;],
+            &quot;target&quot;: &quot;out1&quot;,
+            &quot;output&quot;: [&quot;type=docker&quot;]
+        },
+        &quot;my_target2&quot;: {
+            &quot;context&quot;: &quot;./&quot;,
+            &quot;dockerfile&quot;: &quot;Dockerfile&quot;,
+            &quot;tags&quot;: [&quot;pretty_image2:1.0.0&quot;],
+            &quot;target&quot;: &quot;out2&quot;,
+            &quot;output&quot;: [&quot;type=docker&quot;]
+        }
+    }
+}
+
+# returns the config only, doesn't run the builds
+config = docker.buildx.bake([&quot;my_target1&quot;, &quot;my_target2&quot;], load=True, print=True)
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build</span><span class="p">(</span><span class="n">context_path</span><span class="p">,</span> <span class="n">add_hosts</span><span class="o">=</span><span class="p">{},</span> <span class="n">allow</span><span class="o">=</span><span class="p">[],</span> <span class="n">attest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">build_contexts</span><span class="o">=</span><span class="p">{},</span> <span class="n">builder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">{},</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="p">{},</span> <span class="n">platforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">provenance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pull</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">push</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sbom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secrets</span><span class="o">=</span><span class="p">[],</span> <span class="n">ssh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[],</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Build a Docker image with builkit as backend.</p>
+<p>Alias: <code>docker.build(...)</code></p>
+<p>A <code>python_on_whales.Image</code> is returned, even when using multiple tags.
+That is because it will produce a single image with multiple tags.
+If no image is loaded into the Docker daemon (if <code>push=True</code> for ex),
+then <code>None</code> is returned.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>context_path</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The path of the build context.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="python_on_whales.utils.ValidPath">ValidPath</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>add_hosts</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Hosts to add. <code>add_hosts={"my_host1": "192.168.32.35"}</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>allow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>List of extra privileges.
+Eg <code>allow=["network.host", "security.insecure"]</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>attest</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Attestation parameters. Eg <code>attest={"type": "sbom", "generator": "my_image"}</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>build_args</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The build arguments.
+ex <code>build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>build_contexts</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Additional build contexts.
+<code>build_contexts={[name]: [value], ...}</code>
+Supports local directories, git repositories, HTTP URL to a tarball, a docker
+image defined with a <code>docker-image://</code> prefix, and the <code>oci-layout://</code> protocol.
+ex <code>build_contexts={"project2": "../path/to/project2/src", "qumu-src": "https://github.com/qemu/qemu.git"}</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Union">Union</span>[str, <span title="python_on_whales.utils.ValidPath">ValidPath</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>builder</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Specify which builder to use.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.components.buildx.cli_wrapper.ValidBuilder">ValidBuilder</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether or not to use the cache</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache_from</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Works only with the container driver. Loads the cache
+(if needed) from a registry <code>cache_from="user/app:cache"</code>  or
+a directory on the client <code>cache_from="type=local,src=path/to/dir"</code>.
+It's also possible to use a dict or list of dict form for this
+argument. e.g.
+<code>cache_from=dict(type="local", src="path/to/dir")</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.Dict">Dict</span>[str, str], <span title="typing.List">List</span>[<span title="typing.Dict">Dict</span>[str, str]], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache_to</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Works only with the container driver. Sends the resulting
+docker cache either to a registry <code>cache_to="user/app:cache"</code>,
+or to a local directory <code>cache_to="type=local,dest=path/to/dir"</code>.
+It's also possible to use a dict form for this argument. e.g.
+<code>cache_to=dict(type="local", dest="path/to/dir", mode="max")</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.Dict">Dict</span>[str, str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>file</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The path of the Dockerfile</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>labels</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Dict of labels to add to the image.
+<code>labels={"very-secure": "1", "needs-gpu": "0"}</code> for example.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>load</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Shortcut for <code>output=dict(type="docker")</code> If <code>True</code>,
+<code>docker.buildx.build</code> will return a <code>python_on_whales.Image</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>network</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>which network to use when building the Docker image</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Output destination
+(format: <code>output={"type": "local", "dest": "path"}</code>
+Possible output types are
+<code>["local", "tar", "oci", "docker", "image", "registry"]</code>.
+See <a href="https://github.com/docker/buildx#-o---outputpath-typetypekeyvalue">this link</a>
+for more details about each exporter.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>platforms</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>List of target platforms when building the image. Ex:
+<code>platforms=["linux/amd64", "linux/arm64"]</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>progress</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set type of progress output (auto, plain, tty, or False).
+Use plain to keep the container output on screen</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Literal">Literal</span>[&#39;auto&#39;, &#39;plain&#39;, &#39;tty&#39;, False]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;auto&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>provenance</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Shortand for <code>attest={"type": "provenance"}</code>.
+Eg <code>provenance=True</code> or <code>provenance=dict(mode="max")</code>. <code>provenance=False</code> might be needed
+if you are having the
+issue <a href="https://github.com/docker/buildx/issues/1533">Default image output from buildx v0.10 cannot run on Google Cloud Run or AWS Lambda</a></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[bool, <span title="typing.Dict">Dict</span>[str, str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>pull</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Always attempt to pull a newer version of the image</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>push</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Shorthand for <code>output=dict(type="registry")</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sbom</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Shorthand for <code>attest={"type": "sbom"}</code>. Eg <code>sbom=True</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[bool, <span title="typing.Dict">Dict</span>[str, str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>secrets</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>One or more secrets passed as string(s). For example
+<code>secrets="id=aws,src=/home/my_user/.aws/credentials"</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ssh</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>SSH agent socket or keys to expose to the build
+(format is <code>default|&lt;id&gt;[=&lt;socket&gt;|&lt;key&gt;[,&lt;key&gt;]]</code> as a string)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag or tags to put on the resulting image.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>target</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set the target build stage to build.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code> this function will return an iterator of strings.
+You can then read the logs as they arrive.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.build--returns">Returns</h4>
+<pre><code>A `python_on_whales.Image` if a Docker image is loaded
+in the daemon after the build (the default behavior when
+calling `docker.build(...)`). Otherwise, `None`.
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.create" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">create</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">create</span><span class="p">(</span><span class="n">context_or_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bootstrap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">buildkitd_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">platforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">driver_options</span><span class="o">=</span><span class="p">{},</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Create a new builder instance</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>context_or_endpoint</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bootstrap</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Boot builder after creation</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>buildkitd_flags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Flags for buildkitd daemon</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>BuildKit config file</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.utils.ValidPath">ValidPath</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>platforms</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Comma-separated list of platforms of the form OS/architecture/variant. Ex:
+<code>platforms=["linux/amd64", "linux/arm64"]</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>driver</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Driver to use (available: [kubernetes docker docker-container])</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>driver_options</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Options for the driver.
+e.g <code>driver_options=dict(network="host")</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Builder instance name</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set the current builder instance to this builder</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>append</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Append a node to the current builder instance, in this case
+<code>name</code> must be provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.create--returns">Returns</h4>
+<pre><code>A `python_on_whales.Builder` object.
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.disk_usage" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">disk_usage</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">disk_usage</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Not yet implemented</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.inspect" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">inspect</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">inspect</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bootstrap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a builder instance from the name.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>x</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>None</code> (the default), returns the current builder. If a string is provided,
+the builder that has this name is returned.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bootstrap</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If set to True, ensure builder has booted before inspecting.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.inspect--returns">Returns</h4>
+<pre><code>A `python_on_whales.Builder` object.
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.is_installed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">is_installed</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_installed</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns <code>True</code> if docker buildx is installed and working.</p>
+<p>If it's not installed, head
+to <a href="https://github.com/docker/buildx#installing">the installation page</a>
+and follow the instructions.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.list" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">list</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nb">list</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the list of <code>python_on_whales.Builder</code> available.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.prune" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">prune</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">prune</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{},</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Remove build cache on the current builder.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>all</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remove all cache, not just dangling layers</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filters</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Filters to use, for example <code>filters=dict(until="24h")</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code> this function will return an iterator of strings.
+You can then read the logs as they arrive. If <code>False</code> (the default value), then
+the function returns <code>None</code>, but when it returns, then the prune operation has already been
+done.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.remove" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">remove</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">remove</span><span class="p">(</span><span class="n">builder</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Remove a builder</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>builder</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The builder to remove</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="python_on_whales.components.buildx.cli_wrapper.Builder" href="../../objects/builders/#python_on_whales.Builder">Builder</a>, str]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.stop" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">stop</span><span class="p">(</span><span class="n">builder</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Stop the builder instance</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>builder</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The builder to stop. If <code>None</code> (the default value),
+the current builder is stopped.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="python_on_whales.components.buildx.cli_wrapper.ValidBuilder">ValidBuilder</span>]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.use" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">use</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">use</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">global_</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the current builder instance</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>builder</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The builder to use</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="python_on_whales.components.buildx.cli_wrapper.Builder" href="../../objects/builders/#python_on_whales.Builder">Builder</a>, str]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>default</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set builder as default for the current context</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>global_</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Builder will be used even when changing contexts</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.cli_wrapper.BuildxCLI.version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">version</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">version</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the docker buildx version as a string.</p>
+<pre><code class="language-python">from python_on_whales import docker
+
+version = docker.buildx.version()
+print(version)
+# &quot;github.com/docker/buildx v0.4.2 fb7b670b764764dc4716df3eba07ffdae4cc47b2&quot;
+</code></pre>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ImagetoolsCLI</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI.create" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">create</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">create</span><span class="p">(</span><span class="n">sources</span><span class="o">=</span><span class="p">[],</span> <span class="n">tags</span><span class="o">=</span><span class="p">[],</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">[],</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">builder</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Create a new manifest list based on source manifests.
+The source manifests can be manifest lists or single platform distribution manifests and
+must already exist in the registry where the new manifest is created.
+If only one source is specified, create performs a carbon copy.</p>
+<p>The CLI docs is <a href="https://docs.docker.com/engine/reference/commandline/buildx_imagetools_create/">here</a>
+and it contains a lot more information.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>sources</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The sources manifest to create, change</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>append</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Append to existing manifest</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dry_run</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Show final image instead of pushing</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>files</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Read source descriptor from file</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>builder</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The builder to use.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.buildx.imagetools.cli_wrapper.ImagetoolsCLI.inspect" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">inspect</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">inspect</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the manifest of a Docker image in a registry without pulling it</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="notes-about-the-transition-between-the-legacy-builder-and-buildx">Notes about the transition between the legacy builder and buildx</h2>
+<p>Users are encouraged to use buildx in Python-on-whales through the
+<a href="./#build"><code>docker.build()</code></a> function.</p>
+<p>Buildx is the next gen Docker builder and a transition is underway to make
+the <code>docker build</code> shell command use buildx. Python-on-whales has had an opinionated
+answer on the matter as <code>docker.build()</code> will always use buildx. This is because Python-on-whales was created 
+during the transition and doesn't have an existing user codebase to support.</p>
+<p>The legacy builder is still available by calling <a href="../image/#legacy_build"><code>docker.legacy_build()</code></a>, but note that</p>
+<ul>
+<li>It won't work if you use Docker 22.06 or above </li>
+<li>It won't work if you used <code>docker.buildx.install()</code> or <code>docker buildx install</code> previously </li>
+<li>It won't work if you had set the environment variable <code>DOCKER_BUILDKIT</code> to <code>1</code></li>
+</ul>
+<p>Some resources on the matter:</p>
+<ul>
+<li><a href="https://github.com/gabrieldemarmiesse/python-on-whales/issues/345">Discussion about supporting the legacy builder in Python-on-whales</a></li>
+<li><a href="https://github.com/moby/moby/issues/40379">Proposal: make BuildKit the default builder on Linux</a></li>
+<li><a href="https://github.com/docker/cli/blob/master/docs/deprecated.md#legacy-builder-for-linux-images">Deprecated Engine Features: Legacy builder for Linux images</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+    
+  </body>
+</html>

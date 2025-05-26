@@ -1,0 +1,4757 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Python on whales docs">
+      
+      
+      
+      
+        <link rel="prev" href="../buildx/">
+      
+      
+        <link rel="next" href="../config/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>docker compose - Python on whales</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#some-notes-about-the-compose-functions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Python on whales" class="md-header__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Python on whales
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              docker compose
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Python on whales" class="md-nav__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Python on whales
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docker_client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Sub-commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Sub-commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../buildx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker buildx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    docker compose
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    docker compose
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#some-notes-about-the-compose-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Some notes about the compose functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Some notes about the compose functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#about-dockercomposeimages" class="md-nav__link">
+    <span class="md-ellipsis">
+      About docker.compose.images().
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI" class="md-nav__link">
+    <span class="md-ellipsis">
+      ComposeCLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ComposeCLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      build
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      config
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.config--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.down" class="md-nav__link">
+    <span class="md-ellipsis">
+      down
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.events" class="md-nav__link">
+    <span class="md-ellipsis">
+      events
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.is_installed" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_installed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.kill" class="md-nav__link">
+    <span class="md-ellipsis">
+      kill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      logs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.logs--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ls" class="md-nav__link">
+    <span class="md-ellipsis">
+      ls
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ls--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.pause" class="md-nav__link">
+    <span class="md-ellipsis">
+      pause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.port" class="md-nav__link">
+    <span class="md-ellipsis">
+      port
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="port">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.port--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ps" class="md-nav__link">
+    <span class="md-ellipsis">
+      ps
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ps--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      pull
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.push" class="md-nav__link">
+    <span class="md-ellipsis">
+      push
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.restart" class="md-nav__link">
+    <span class="md-ellipsis">
+      restart
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      rm
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.top" class="md-nav__link">
+    <span class="md-ellipsis">
+      top
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.unpause" class="md-nav__link">
+    <span class="md-ellipsis">
+      unpause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.up" class="md-nav__link">
+    <span class="md-ellipsis">
+      up
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker config
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../context/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker context
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker image
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifest/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker manifest
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../network/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker network
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../node/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker node
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../secret/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker secret
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../service/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker service
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../swarm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker swarm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker system
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../task/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker task
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker trust
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../volume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker volume
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pod/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    podman pod
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Objects
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Objects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/configs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/containers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Containers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Images
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/networks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/nodes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nodes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plugins
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/pods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/services/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Services
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/stacks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stacks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tasks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../objects/volumes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Volumes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/docker_run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker.run() guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/generic_resources/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Swarm generic resources
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/running_python_on_whales_inside_a_container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Running python-on-whales inside a container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/exceptions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    dealing with exceptions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#some-notes-about-the-compose-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Some notes about the compose functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Some notes about the compose functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#about-dockercomposeimages" class="md-nav__link">
+    <span class="md-ellipsis">
+      About docker.compose.images().
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI" class="md-nav__link">
+    <span class="md-ellipsis">
+      ComposeCLI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ComposeCLI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      build
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      config
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.config--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.down" class="md-nav__link">
+    <span class="md-ellipsis">
+      down
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.events" class="md-nav__link">
+    <span class="md-ellipsis">
+      events
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.is_installed" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_installed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.kill" class="md-nav__link">
+    <span class="md-ellipsis">
+      kill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      logs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.logs--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ls" class="md-nav__link">
+    <span class="md-ellipsis">
+      ls
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ls--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.pause" class="md-nav__link">
+    <span class="md-ellipsis">
+      pause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.port" class="md-nav__link">
+    <span class="md-ellipsis">
+      port
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="port">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.port--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ps" class="md-nav__link">
+    <span class="md-ellipsis">
+      ps
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.ps--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      pull
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.push" class="md-nav__link">
+    <span class="md-ellipsis">
+      push
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.restart" class="md-nav__link">
+    <span class="md-ellipsis">
+      restart
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      rm
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.top" class="md-nav__link">
+    <span class="md-ellipsis">
+      top
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.unpause" class="md-nav__link">
+    <span class="md-ellipsis">
+      unpause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.up" class="md-nav__link">
+    <span class="md-ellipsis">
+      up
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.components.compose.cli_wrapper.ComposeCLI.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>docker compose</h1>
+
+<h2 id="some-notes-about-the-compose-functions">Some notes about the compose functions</h2>
+<p>Behind the scenes, 
+the <a href="https://github.com/docker/compose-cli">Go implementation of Docker compose</a>
+is called a.k.a. Compose v2, not the <a href="https://github.com/docker/compose">Python implementation</a>.</p>
+<p>You can verify that <code>docker compose</code> is installed by running</p>
+<pre><code class="language-bash">docker compose --help
+</code></pre>
+<p>Be careful! it's different from <code>docker-compose --help</code>! Notice the <code>-</code> between 'docker' and 'compose'.
+Compose v2 has no <code>-</code> in the command.</p>
+<p>If that doesn't work, then <a href="https://github.com/docker/compose-cli#compose-v2-aka-local-docker-compose">install the cli plugin</a>.
+it's just a single binary to download.</p>
+<p>The Go implementation of compose is still experimental, so take the appropriate precautions.</p>
+<p>If you don't need to set any project-wide options, like the project name or 
+the compose file path, you can just import <code>docker</code> and start working.</p>
+<pre><code class="language-python">from python_on_whales import docker
+
+docker.compose.build()
+docker.compose.up()
+...
+docker.compose.down()
+</code></pre>
+<p>Otherwise, you have to define your project-wide options only once, when creating the Docker client.</p>
+<pre><code class="language-python">from python_on_whales import DockerClient
+
+docker = DockerClient(compose_files=[&quot;./my-compose-file.yml&quot;])
+
+docker.compose.build()
+docker.compose.up()
+...
+docker.compose.down()
+</code></pre>
+<p>You have multiple compose options available (like profiles, env_files, project name) when creating the Docker client. You can check them out 
+in the <code>DockerClient</code> <a href="https://gabrieldemarmiesse.github.io/python-on-whales/docker_client/#dockerclient">documentation</a>.</p>
+<h4 id="about-dockercomposeimages">About <code>docker.compose.images()</code>.</h4>
+<p>The Docker command line has a <code>docker compose images</code> command. Python-on-whales doesn't have
+an equivalent because it's trivial to do so with existing functions.</p>
+<pre><code>images = [docker.image.inspect(container.image) for container in docker.compose.ps()]
+</code></pre>
+<ul>
+<li><code>docker.compose.ps()</code> returns the list of all containers in the compose stack.</li>
+<li><code>container.image</code> gives you the id of the Docker image of the container as a <code>str</code>.</li>
+<li><code>docker.image.inspect()</code> gives you a <code>python_on_whales.Image</code> from a <code>str</code>.</li>
+</ul>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ComposeCLI</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.build" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pull</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Build services declared in a yaml compose file.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The services to build (as list of strings).
+If <code>None</code> (default), all services are built.
+An empty list means that nothing will be built.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[str], str, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>build_args</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set build-time variables for services. For example
+ <code>build_args={"PY_VERSION": "3.7.8", "UBUNTU_VERSION": "20.04"}</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set to <code>False</code> if you don't want to use the cache to build your images</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>progress</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set type of progress output (auto, tty, plain, quiet) (default "auto")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>pull</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set to <code>True</code> to always attempt to pull a newer version of the
+image (in the <code>FROM</code> statements for example).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>quiet</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Don't print anything</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ssh</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Set SSH authentications used when building service images.
+(use <code>'default'</code> for using your default SSH Agent)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code> this function returns None. If <code>True</code>, this
+function returns an Iterable of <code>Tuple[str, bytes]</code> where the first element
+is the type of log (<code>"stdin"</code> or <code>"stdout"</code>). The second element is the log itself,
+as bytes, you'll need to call <code>.decode()</code> if you want the logs as <code>str</code>.
+See <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the streaming guide</a> if you are
+not familiar with the streaming of logs in Python-on-whales.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.config" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">config</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">config</span><span class="p">(</span><span class="n">return_json</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the configuration of the compose stack for further inspection.</p>
+<p>For example</p>
+<pre><code class="language-python">from python_on_whales import docker
+project_config = docker.compose.config()
+print(project_config.services[&quot;my_first_service&quot;].image)
+&quot;redis&quot;
+</code></pre>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>return_json</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code>, a <code>ComposeConfig</code> object will be returned, and you
+'ll be able to take advantage of your IDE autocompletion. If you want the
+full json output, you may use <code>return_json</code>. In this case, you'll get
+lists and dicts corresponding to the json response, unmodified.
+It may be useful if you just want to print the config or want to access
+a field that was not in the <code>ComposeConfig</code> class.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.config--returns">Returns</h4>
+<pre><code>A `ComposeConfig` object if `return_json` is `False`, and a `dict` otherwise.
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.create" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">create</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">create</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force_recreate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_recreate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Creates containers for a service.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the services for which the containers will
+be created. The default <code>None</code> means that the containers for all
+services will be created. A single string means we will create the
+container for a single service. A list of string means we will create
+the containers for each service in the list. An empty list means nothing
+will be created, the function call is then a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>build</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Build images before starting containers.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>force_recreate</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Recreate containers even if their configuration and
+image haven't changed.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>no_build</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Don't build an image, even if it's missing.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>no_recreate</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If containers already exist, don't recreate them.
+Incompatible with <code>force_recreate=True</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code> this function returns None. If <code>True</code>, this
+function returns an Iterable of <code>Tuple[str, bytes]</code> where the first element
+is the type of log (<code>"stdin"</code> or <code>"stdout"</code>). The second element is the log itself,
+as bytes, you'll need to call <code>.decode()</code> if you want the logs as <code>str</code>.
+See <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the streaming guide</a> if you are
+not familiar with the streaming of logs in Python-on-whales.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.down" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">down</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">down</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_orphans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_images</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">volumes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Stops and removes the containers</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The services to stop. If <code>None</code> (default), all services are
+stopped. If an empty list is provided, the function call does nothing, it's
+a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[str], str, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>remove_orphans</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remove containers for services not defined in
+the Compose file.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>remove_images</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remove images used by services.
+<code>"local"</code> remove only images that don't have a custom
+tag. Possible values are <code>"local"</code> and <code>"all"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>timeout</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Specify a shutdown timeout in seconds (default 10).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>volumes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remove named volumes declared in the
+volumes section of the Compose file and anonymous
+volumes attached to containers.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>quiet</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code>, send to stderr and stdout the progress spinners with
+the messages. If <code>True</code>, do not display anything.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.events" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">events</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">events</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Return Docker Compose events for the specified services.</p>
+<p>This function streams events related to the specified services in real-time.
+If no services are specified, it streams events for all services in the current Compose project.</p>
+<p>Example usage:</p>
+<pre><code class="language-python">from python_on_whales import docker
+
+# Stream events for a specific service
+for event in docker.compose.events([&quot;my_service&quot;]):
+    print(event)
+    # This will keep streaming events indefinitely.
+    # Use 'break' to exit the loop if needed.
+
+# Stream events for all services in the Compose project
+for event in docker.compose.events():
+    print(event)
+</code></pre>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of service names to filter events. If empty, events for all services are streamed.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="typing.Iterator">Iterator</span>[<span title="python_on_whales.components.compose.models.ComposeEvent">ComposeEvent</span>]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>An iterator that yields <code>ComposeEvent</code> objects representing the events.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>This function streams events indefinitely unless interrupted. Use it carefully in long-running processes.</p>
+</details>      <p><a href="https://docs.docker.com/reference/cli/docker/compose/events">reference page for docker events</a></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.execute" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">execute</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">execute</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">detach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">envs</span><span class="o">=</span><span class="p">{},</span> <span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">privileged</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute a command in a running container.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>service</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the service.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>command</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The command to execute.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>detach</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code>, detach from the container after the command exits. In this case,
+ nothing is returned by the function. By default, the execute command returns only when the
+ command has finished running, and the function will raise an exception <code>DockerException</code> if the command
+ exits with a non-zero exit code. If <code>False</code>, the command is executed and the stdout is returned.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>envs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A dictionary of environment variables to set in the container.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>index</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The index of the container to execute the command in (default 1) if there are multiple containers for this service.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>1</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tty</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code>, allocate a pseudo-TTY. Use <code>False</code> to get the output of the command.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>privileged</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code>, run the command in privileged mode.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>user</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The username to use inside the container.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>workdir</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The working directory inside the container.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.is_installed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">is_installed</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_installed</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns <code>True</code> if docker compose (the one written in Go)
+is installed and working.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.kill" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">kill</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">kill</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Kills the container(s) of a service</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>One or more service(s) to kill. The default (<code>None</code>) is to kill all services.
+A string means the call will kill one single service. A list of service names can
+be provided to kill multiple services in one function call.
+An empty list means that no services are going to be killed, the function is then
+a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>signal</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the signal to send to the container. Default is <code>"SIGKILL"</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[int, str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.logs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">logs</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">logs</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[],</span> <span class="n">tail</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">follow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_log_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>View output from containers</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>One or more service(s) to view</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tail</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Number of lines to show from the end of the logs for each container. (default "all")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>follow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Follow log output <strong><em>WARNING</em></strong>: With this
+option, <code>docker.compose.logs()</code> will not return at all. Use it exclusively with
+<code>stream=True</code>. You can loop on the logs but the loop will never end.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>no_log_prefix</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Don't print prefix in logs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>timestamps</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Show timestamps</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>since</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>until</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Similar to the <code>stream</code> argument of <code>docker.run()</code>.
+This function will then return and iterator that will yield a
+tuple <code>(source, content)</code> with <code>source</code> being <code>"stderr"</code> or
+<code>"stdout"</code>. <code>content</code> is the content of the line as bytes.
+Take a look at <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the user guide</a>
+to have an example of the output.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.logs--returns">Returns</h4>
+<pre><code>`str` if `stream=False` (the default), `Iterable[Tuple[str, bytes]]`
+if `stream=True`.
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.ls" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ls</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ls</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{})</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a list of docker compose projects</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>all</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Results include all stopped compose projects.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filters</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Filter results based on conditions provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.ls--returns">Returns</h4>
+<pre><code>A `List[python_on_whales.ComposeProject]`
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.pause" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pause</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">pause</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Pause one or more services</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p><code>None</code> (the default) means pause all containers of all
+compose services. A string means that the call will pause the container
+of a specific service. A list of string means the call will pause
+the containers of all the services specified. So if an empty list
+is provided, then this function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.port" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">port</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">port</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">private_port</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s1">&#39;tcp&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the public port for a port binding.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>service</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the service.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>private_port</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The private port.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, int]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>index</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Index of the container if service has multiple replicas (default 1)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>1</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>protocol</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>tcp or udp (default "tcp").</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;tcp&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <h4 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.port--returns">Returns</h4>
+<pre><code>tuple with (host, port). If port is unknown, then host and port are None.
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.ps" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ps</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ps</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">all</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the containers that were created by the current project.</p>
+<h4 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.ps--returns">Returns</h4>
+<pre><code>A `List[python_on_whales.Container]`
+</code></pre>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.pull" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pull</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">pull</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_pull_failures</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_deps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Pull service images</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The list of services to select. Only the images of those
+services will be pulled. If no services are specified (<code>None</code>) (the default
+behavior) all images of all services are pulled.
+If an empty list is provided, then the function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[str], str, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_pull_failures</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Pull what it can and ignores images with pull failures</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>include_deps</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Also pull services declared as dependencies</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>quiet</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>By default, the progress bars are printed in stdout and stderr (both).
+To disable all output, use <code>quiet=True</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code> this function returns None. If <code>True</code>, this
+function returns an Iterable of <code>Tuple[str, bytes]</code> where the first element
+is the type of log (<code>"stdin"</code> or <code>"stdout"</code>). The second element is the log itself,
+as bytes, you'll need to call <code>.decode()</code> if you want the logs as <code>str</code>.
+See <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the streaming guide</a> if you are
+not familiar with the streaming of logs in Python-on-whales.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.push" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">push</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">push</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Push service images</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The list of services to select. Only the images of those
+services will be pushed. If no services are specified (<code>None</code>, the default
+behavior) all images of all services are pushed.
+If an empty list is provided, then the function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[str]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.restart" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">restart</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">restart</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Restart containers</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The names of one or more services to restart (str or list of str).
+If the argument is not specified, <code>services</code> is <code>None</code> and all services are restarted.
+If <code>services</code> is an empty list, then the function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>timeout</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The shutdown timeout (<code>int</code> are interpreted as seconds).
+<code>None</code> means the CLI default value (10s).
+See <a href="https://docs.docker.com/engine/reference/commandline/stop/">the docker stop docs</a>
+for more details about this argument.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[int, <span title="datetime.timedelta">timedelta</span>, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.rm" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">rm</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">rm</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">volumes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Removes stopped service containers</p>
+<p>By default, anonymous volumes attached to containers will not be removed. You
+can override this with <code>volumes=True</code>.</p>
+<p>Any data which is not in a volume will be lost.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The names of one or more services to remove (str or list of str).
+If <code>None</code> (the default) then all services are removed.
+If an empty list is provided, this function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stop</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Stop the containers, if required, before removing</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>volumes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remove any anonymous volumes attached to containers</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.run" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">run</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">run</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="p">[],</span> <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">entrypoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">envs</span><span class="o">=</span><span class="p">{},</span> <span class="n">labels</span><span class="o">=</span><span class="p">{},</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dependencies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">publish</span><span class="o">=</span><span class="p">[],</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">service_ports</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_aliases</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">volumes</span><span class="o">=</span><span class="p">(),</span> <span class="n">workdir</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Run a one-off command on a service.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>service</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the service.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>command</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The command to execute.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>detach</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>if <code>True</code>, returns immediately with the Container.
+    If <code>False</code>, returns the command stdout as string.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>entrypoint</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The entrypoint to execute.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>envs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A dictionary of environment variables to set in the container.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>labels</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Add or override labels</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Assign a name to the container.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dependencies</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Also start linked services.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>publish</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Publish a container's port(s) to the host.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[<span title="python_on_whales.components.container.cli_wrapper.ValidPortMapping">ValidPortMapping</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>[]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>service_ports</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Enable service's ports and map them to the host.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>remove</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Automatically remove the container when it exits.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_aliases</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Use the service's network aliases in the connected network(s).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tty</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Allocate a pseudo-TTY. Allow the process to access your terminal
+to write on it.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Similar to <code>docker.run(..., stream=True)</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>user</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Username or UID, format: <code>"&lt;name|uid&gt;[:&lt;group|gid&gt;]"</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>volumes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Bind mount a volume. Some examples:
+<code>[("/", "/host"), ("/etc/hosts", "/etc/hosts", "rw")]</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Iterable">Iterable</span>[<span title="python_on_whales.components.volume.cli_wrapper.VolumeDefinition">VolumeDefinition</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>()</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>workdir</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Working directory inside the container</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[None, str, <span title="pathlib.Path">Path</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="typing.Union">Union</span>[str, <a class="autorefs autorefs-internal" title="python_on_whales.components.container.cli_wrapper.Container" href="../../objects/containers/#python_on_whales.Container">Container</a>, <span title="typing.Iterable">Iterable</span>[<span title="typing.Tuple">Tuple</span>[str, bytes]]]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>Optional[str]</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.start" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">start</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">start</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Start the specified services.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The names of one or more services to start.
+If <code>None</code> (the default), it means all services will start.
+If an empty list is provided, this function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code> this function returns None. If <code>True</code>, this
+function returns an Iterable of <code>Tuple[str, bytes]</code> where the first element
+is the type of log (<code>"stdin"</code> or <code>"stdout"</code>). The second element is the log itself,
+as bytes, you'll need to call <code>.decode()</code> if you want the logs as <code>str</code>.
+See <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the streaming guide</a> if you are
+not familiar with the streaming of logs in Python-on-whales.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.stop" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">stop</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Stop services</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The names of one or more services to stop (str or list of str).
+If <code>None</code> (the default), it means all services will stop.
+If an empty list is provided, this function call is a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>timeout</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Number of seconds or timedelta (will be converted to seconds).
+Specify a shutdown timeout. Default is 10s.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[int, <span title="datetime.timedelta">timedelta</span>, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code> this function returns None. If <code>True</code>, this
+function returns an Iterable of <code>Tuple[str, bytes]</code> where the first element
+is the type of log (<code>"stdin"</code> or <code>"stdout"</code>). The second element is the log itself,
+as bytes, you'll need to call <code>.decode()</code> if you want the logs as <code>str</code>.
+See <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the streaming guide</a> if you are
+not familiar with the streaming of logs in Python-on-whales.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.top" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">top</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">top</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Not yet implemented</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.unpause" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">unpause</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">unpause</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Unpause one or more services</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>One or more service to unpause.
+If <code>None</code> (the default), all services are unpaused.
+If services is an empty list, the function call does nothing,
+it's a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str], None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.up" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">up</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">up</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">abort_on_container_exit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="p">{},</span> <span class="n">attach_dependencies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force_recreate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">recreate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">no_build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_orphans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renew_anon_volumes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_attach_services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pull</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wait_timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Start the containers.</p>
+<p>Reading the logs of the containers is not yet implemented.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The services to start. If <code>None</code> (default), all services are
+started. If an empty list is provided, the function call does nothing, it's
+a no-op.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[str], str, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>build</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code>, build the docker images before starting the containers
+even if a docker image with this name already exists.
+If <code>False</code> (the default), build only the docker images that do not already
+exist.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>detach</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code>, run the containers in the background. If <code>False</code> this
+function returns only when all containers have stopped.
+Incompatible with <code>abort_on_container_exit=True</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>abort_on_container_exit</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code> stops all containers if any container was
+stopped. Incompatible with <code>detach=True</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>scales</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Scale SERVICE to NUM instances. Overrides
+the scale setting in the Compose file if present. For example:
+<code>scales={"my_service": 2, "my_other_service": 5}</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Dict">Dict</span>[str, int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>attach_dependencies</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Attach to dependent containers.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>force_recreate</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Recreate containers even if their configuration and image
+haven't changed.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>recreate</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Recreate the containers if already exist.
+<code>recreate=False</code> and <code>force_recreate=True</code> are incompatible.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>no_build</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Don't build an image, even if it's missing.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>remove_orphans</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Remove containers for services not defined in the Compose file.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>renew_anon_volumes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Recreate anonymous volumes instead of retrieving
+data from the previous containers.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>color</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code>, it will produce monochrome output.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>log_prefix</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code>, will not display the prefix in the logs.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>start</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Start the service after creating them.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>quiet</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>By default, some progress bars and logs are sent to stderr and stdout.
+Set <code>quiet=True</code> to avoid having any output.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>wait</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Wait for services to be running|healthy. Implies detached mode.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>no_attach_services</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The services not to attach to.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[str], str, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>pull</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Pull image before running (“always”|”missing”|”never”).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing_extensions.Literal">Literal</span>[&#39;always&#39;, &#39;missing&#39;, &#39;never&#39;, None]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>stream_logs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code> this function returns None. If <code>True</code>, this
+function returns an Iterable of <code>Tuple[str, bytes]</code> where the first element
+is the type of log (<code>"stdin"</code> or <code>"stdout"</code>). The second element is the log itself,
+as bytes, you'll need to call <code>.decode()</code> if you want the logs as <code>str</code>.
+See <a href="https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output">the streaming guide</a> if you are
+not familiar with the streaming of logs in Python-on-whales.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>wait_timeout</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Maximum duration to wait for the project to be running|healthy</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.components.compose.cli_wrapper.ComposeCLI.version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">version</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">version</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the version of docker compose as a <code>str</code>.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+    
+  </body>
+</html>
