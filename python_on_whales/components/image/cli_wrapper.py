@@ -558,7 +558,12 @@ class ImageCLI(DockerCLICaller):
         run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
         return Image(self.client_config, image_name)
 
-    def push(self, x: Union[str, Iterable[str]], quiet: bool = False) -> None:
+    def push(
+        self,
+        x: Union[str, Iterable[str]],
+        quiet: bool = False,
+        stream_logs: bool = False,
+    ) -> Optional[Iterable[Tuple[str, bytes]]]:
         """Push a tag or a repository to a registry
 
         Alias: `docker.push(...)`
@@ -566,33 +571,58 @@ class ImageCLI(DockerCLICaller):
         Parameters:
             x: Tag(s) or repo(s) to push. Can be a string or an iterable of strings.
                 If it's an iterable, python-on-whales will push all the images with
-                multiple threads. The progress bars might look strange as multiple
-                processes are drawing on the terminal at the same time.
-            quiet: If you don't want to see the progress bars.
+                multiple threads.
+            quiet: Don't print anything.
+            stream_logs: If `False` this function returns None. If `True`, this
+                function returns an `Iterable` of `Tuple[str, bytes]` where the first element
+                corresponds to the image or repository name that a push is being done for.
+                The second element is the log statement related to push progress, as `bytes`.
+                You'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
+                if you are not familiar with the streaming of logs in Python-on-whales.
 
         # Raises
             `python_on_whales.exceptions.NoSuchImage` if one of the images does not exist.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
+
         images = to_list(x)
 
         # this is just to raise a correct exception if the images don't exist
         self.inspect(images)
 
         if images == []:
-            return
+            return None
         elif len(images) == 1:
-            self._push_single_tag(images[0], quiet)
-        elif len(images) >= 2:
+            return self._push_single_tag(images[0], quiet, stream_logs)
+        else:
             pool = ThreadPool(4)
-            pool.starmap(self._push_single_tag, ((img, quiet) for img in images))
+            # TODO: Can we stream logs for multiple image pushes?
+            pool.starmap(self._push_single_tag, ((img, quiet, False) for img in images))
             pool.close()
             pool.join()
+            return None
 
-    def _push_single_tag(self, tag_or_repo: str, quiet: bool):
+    def _push_single_tag(
+        self,
+        tag_or_repo: str,
+        quiet: bool,
+        stream_logs: bool,
+    ) -> Optional[Iterable[Tuple[str, bytes]]]:
         full_cmd = self.docker_cmd + ["image", "push"]
         full_cmd.add_flag("--quiet", quiet)
         full_cmd.append(tag_or_repo)
-        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+        if stream_logs:
+            return (
+                (tag_or_repo, line) for _, line in stream_stdout_and_stderr(full_cmd)
+            )
+        else:
+            run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+            return None
 
     def remove(
         self,
