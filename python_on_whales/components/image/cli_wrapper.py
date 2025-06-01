@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import json
 import warnings
+from concurrent.futures.thread import ThreadPoolExecutor
 from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
+from queue import Empty as EmptyQueue
+from queue import Queue
 from subprocess import PIPE, Popen
 from typing import (
     Any,
@@ -595,17 +598,77 @@ class ImageCLI(DockerCLICaller):
         # this is just to raise a correct exception if the images don't exist
         self.inspect(images)
 
-        if images == []:
+        if len(images) == 0:
             return None
         elif len(images) == 1:
-            return self._push_single_tag(images[0], quiet, stream_logs)
+            image, *_ = images
+            return self._push_single_tag(
+                tag_or_repo=image,
+                quiet=quiet,
+                stream_logs=stream_logs,
+            )
+        else:
+            return self._push_multiple_tags(
+                tags_or_repos=images,
+                quiet=quiet,
+                stream_logs=stream_logs,
+            )
+
+    def _push_multiple_tags(
+        self,
+        tags_or_repos: List[str],
+        quiet: bool,
+        stream_logs: bool,
+    ) -> Optional[Iterable[Tuple[str, bytes]]]:
+        if stream_logs:
+            return self._push_multiple_tags_stream(
+                tags_or_repos=tags_or_repos,
+                quiet=quiet,
+                stream_logs=stream_logs,
+            )
         else:
             pool = ThreadPool(4)
-            # TODO: Can we stream logs for multiple image pushes?
-            pool.starmap(self._push_single_tag, ((img, quiet, False) for img in images))
+            pool.starmap(
+                func=self._push_single_tag,
+                iterable=(
+                    (tags_or_repo, quiet, stream_logs) for tags_or_repo in tags_or_repos
+                ),
+            )
             pool.close()
             pool.join()
             return None
+
+    def _push_multiple_tags_stream(
+        self,
+        tags_or_repos: List[str],
+        quiet: bool,
+        stream_logs: bool,
+    ) -> Iterator[Tuple[str, bytes]]:
+        queue = Queue()
+
+        def _push_and_queue_logs(tag_or_repo: str):
+            if generator := self._push_single_tag(tag_or_repo, quiet, stream_logs):
+                for value in generator:
+                    queue.put(value)
+            queue.put(None)  # Signal completion
+
+        with ThreadPoolExecutor(4) as executor:
+            futures = [
+                executor.submit(_push_and_queue_logs, tag_or_repo)
+                for tag_or_repo in tags_or_repos
+            ]
+
+            completed = 0
+            while completed < len(tags_or_repos):
+                try:
+                    if item := queue.get(timeout=0.1):
+                        yield item
+                    else:
+                        completed += 1
+                except EmptyQueue:
+                    continue
+
+            [future.result() for future in futures]
 
     def _push_single_tag(
         self,
