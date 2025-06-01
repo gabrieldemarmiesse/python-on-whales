@@ -593,7 +593,7 @@ class ImageCLI(DockerCLICaller):
                 "Only one can be activated at a time."
             )
 
-        images = to_list(x)
+        images = list(dict.fromkeys(to_list(x)))
 
         # this is just to raise a correct exception if the images don't exist
         self.inspect(images)
