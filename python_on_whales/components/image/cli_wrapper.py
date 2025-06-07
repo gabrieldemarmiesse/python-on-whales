@@ -506,49 +506,131 @@ class ImageCLI(DockerCLICaller):
         self,
         x: Union[str, Iterable[str]],
         quiet: bool = False,
+        stream_logs: bool = False,
         platform: Optional[str] = None,
-    ) -> Union[Image, List[Image]]:
+    ) -> Union[Image, List[Image], Iterable[Tuple[str, bytes]]]:
         """Pull one or more docker image(s)
 
         Alias: `docker.pull(...)`
 
         Parameters:
-            x: The image name(s) . Can be a string or a list of strings. In case of
-                list, multithreading is used to pull the images.
-                The progress bars might look strange as multiple
-                processes are drawing on the terminal at the same time.
+            x: Image name(s), can be a string or a list of strings.
+                In case a list is passed, multithreading is used to pull
+                the images.
             quiet: If you don't want to see the progress bars.
+            stream_logs: If `False` this function returns the pulled image(s).
+                If `True`, this function returns an `Iterable` of `Tuple[str, bytes]`
+                where the first element corresponds to the image name that a pull is being done for.
+                The second element is the log statement related to pull progress, as `bytes`.
+                You'll need to call `.decode()` if you want the logs as `str`.
+                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
+                if you are not familiar with the streaming of logs in Python-on-whales.
             platform: If you want to enforce a platform.
-
-        Returns:
-            The Docker image loaded (`python_on_whales.Image` object).
-            If a list was passed as input, then a `List[python_on_whales.Image]` will
-            be returned.
         """
+        if quiet and stream_logs:
+            raise ValueError(
+                "It's not possible to have stream_logs=True and quiet=True at the same time. "
+                "Only one can be activated at a time."
+            )
+
         if isinstance(x, str):
-            return self._pull_single_tag(x, quiet=quiet, platform=platform)
-        x = list(x)
-        if not x:
-            return []
-        if len(x) == 1:
-            return [self._pull_single_tag(x[0], quiet=quiet, platform=platform)]
+            result = self._pull_single_tag(
+                image_name=x,
+                quiet=quiet,
+                stream_logs=stream_logs,
+                platform=platform,
+            )
+            return result if stream_logs else Image(self.client_config, x)
+
+        images = list(dict.fromkeys(x))
+        if len(images) == 0:
+            return () if stream_logs else []
+        if len(images) == 1:
+            image, *_ = images
+            result = self._pull_single_tag(
+                image_name=image,
+                quiet=quiet,
+                stream_logs=stream_logs,
+                platform=platform,
+            )
+            return result if stream_logs else [Image(self.client_config, image)]
+        else:
+            return self._pull_multiple_tags(
+                image_names=images,
+                quiet=quiet,
+                stream_logs=stream_logs,
+                platform=platform,
+            )
+
+    def _pull_multiple_tags(
+        self,
+        image_names: List[str],
+        quiet: bool,
+        stream_logs: bool = False,
+        platform: Optional[str] = None,
+    ) -> Union[List[Image], Iterable[Tuple[str, bytes]]]:
+        if stream_logs:
+            return self._pull_multiple_tags_stream(
+                image_names=image_names,
+                quiet=quiet,
+                stream_logs=stream_logs,
+                platform=platform,
+            )
         else:
             pool = ThreadPool(4)
-            generator = self._generate_args_pull(x, quiet, platform)
-            all_images = pool.starmap(self._pull_single_tag, generator)
+            pool.starmap(
+                func=self._pull_single_tag,
+                iterable=(
+                    (image_name, quiet, stream_logs, platform)
+                    for image_name in image_names
+                ),
+            )
             pool.close()
             pool.join()
-            return all_images
+            return [Image(self.client_config, image_name) for image_name in image_names]
 
-    def _generate_args_pull(
-        self, _list: Iterable[str], quiet: bool, platform: Optional[str] = None
+    def _pull_multiple_tags_stream(
+        self,
+        image_names: List[str],
+        quiet: bool,
+        stream_logs: bool = False,
+        platform: Optional[str] = None,
     ):
-        for tag in _list:
-            yield tag, quiet, platform
+        queue = Queue()
+
+        def _pull_and_queue_logs(image_name: str):
+            if generator := self._pull_single_tag(
+                image_name, quiet, stream_logs, platform
+            ):
+                for value in generator:
+                    queue.put(value)
+            queue.put(None)  # Signal completion
+
+        with ThreadPoolExecutor(4) as executor:
+            futures = [
+                executor.submit(_pull_and_queue_logs, image_name)
+                for image_name in image_names
+            ]
+
+            completed = 0
+            while completed < len(image_names):
+                try:
+                    if item := queue.get(timeout=0.1):
+                        yield item
+                    else:
+                        completed += 1
+                except EmptyQueue:
+                    continue
+
+            [future.result() for future in futures]
 
     def _pull_single_tag(
-        self, image_name: str, quiet: bool, platform: Optional[str] = None
-    ):
+        self,
+        image_name: str,
+        quiet: bool,
+        stream_logs: bool = False,
+        platform: Optional[str] = None,
+    ) -> Optional[Iterable[Tuple[str, bytes]]]:
         full_cmd = self.docker_cmd + ["image", "pull"]
 
         if quiet:
@@ -558,8 +640,14 @@ class ImageCLI(DockerCLICaller):
             full_cmd.append(f"--platform={platform}")
 
         full_cmd.append(image_name)
-        run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
-        return Image(self.client_config, image_name)
+
+        if stream_logs:
+            return (
+                (image_name, line) for _, line in stream_stdout_and_stderr(full_cmd)
+            )
+        else:
+            run(full_cmd, capture_stdout=quiet, capture_stderr=quiet)
+            return None
 
     def push(
         self,
