@@ -599,12 +599,14 @@ class ImageCLI(DockerCLICaller):
         queue = Queue()
 
         def _pull_and_queue_logs(image_name: str):
-            if generator := self._pull_single_tag(
-                image_name, quiet, stream_logs, platform
-            ):
-                for value in generator:
-                    queue.put(value)
-            queue.put(None)  # Signal completion
+            try:
+                if generator := self._pull_single_tag(
+                    image_name, quiet, stream_logs, platform
+                ):
+                    for value in generator:
+                        queue.put(value)
+            finally:
+                queue.put(None)  # Signal completion
 
         with ThreadPoolExecutor(4) as executor:
             futures = [
@@ -735,10 +737,12 @@ class ImageCLI(DockerCLICaller):
         queue = Queue()
 
         def _push_and_queue_logs(tag_or_repo: str):
-            if generator := self._push_single_tag(tag_or_repo, quiet, stream_logs):
-                for value in generator:
-                    queue.put(value)
-            queue.put(None)  # Signal completion
+            try:
+                if generator := self._push_single_tag(tag_or_repo, quiet, stream_logs):
+                    for value in generator:
+                        queue.put(value)
+            finally:
+                queue.put(None)  # Signal completion
 
         with ThreadPoolExecutor(4) as executor:
             futures = [
