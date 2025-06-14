@@ -544,7 +544,7 @@ class ImageCLI(DockerCLICaller):
 
         images = list(dict.fromkeys(x))
         if len(images) == 0:
-            return () if stream_logs else []
+            return (_ for _ in []) if stream_logs else []
         if len(images) == 1:
             image, *_ = images
             result = self._pull_single_tag(
