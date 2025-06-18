@@ -252,6 +252,7 @@ class ImageCLI(DockerCLICaller):
         tags: Union[str, Iterable[str]] = (),
         target: Optional[str] = None,
         isolation: Optional[str] = None,
+        quiet: bool = True,
     ) -> python_on_whales.components.image.cli_wrapper.Image:
         """Build a Docker image with the old Docker builder (meaning not using buildx/buildkit)
 
@@ -284,14 +285,15 @@ class ImageCLI(DockerCLICaller):
             tags: Tag or tags to put on the resulting image.
             target: Set the target build stage to build.
             isolation: Specify isolation technology for container (useful for Windows).
+            quiet: If you don't want to display the progress bars.
 
         # Returns
             A `python_on_whales.Image`
         """
         # to make it easier to write and read tests, the tests of this function
         # are also grouped with the tests of "docker.build()".
-        full_cmd = self.docker_cmd + ["build", "--quiet"]
-
+        full_cmd = self.docker_cmd + ["build"]
+        full_cmd.add_flag("--quiet", quiet)
         full_cmd.add_args_mapping("--add-host", add_hosts, separator=":")
         full_cmd.add_args_mapping("--build-arg", build_args)
         full_cmd.add_args_mapping("--label", labels)
@@ -307,8 +309,19 @@ class ImageCLI(DockerCLICaller):
             self.client_config
         )
         full_cmd.append(context_path)
-        image_id = run(full_cmd).splitlines()[-1].strip()
-        return docker_image.inspect(image_id)
+        if quiet:
+            image_id = run(full_cmd).splitlines()[-1].strip()
+            return docker_image.inspect(image_id)
+        else:
+            for (_, line) in stream_stdout_and_stderr(full_cmd):
+                try:
+                    line = line.decode().rstrip()
+                except UnicodeDecodeError:
+                    line = str(line)
+                print(line)
+                if "Successfully built" in line:
+                    image_id = line.split(" ")[-1]
+            return docker_image.inspect(image_id)
 
     def history(self):
         """Not yet implemented"""
