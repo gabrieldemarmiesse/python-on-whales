@@ -313,7 +313,7 @@ class ImageCLI(DockerCLICaller):
             image_id = run(full_cmd).splitlines()[-1].strip()
             return docker_image.inspect(image_id)
         else:
-            for (_, line) in stream_stdout_and_stderr(full_cmd):
+            for _, line in stream_stdout_and_stderr(full_cmd):
                 try:
                     line = line.decode().rstrip()
                 except UnicodeDecodeError:
