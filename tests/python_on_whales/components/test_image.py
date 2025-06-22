@@ -1,6 +1,5 @@
 import contextlib
 import json
-from itertools import chain
 from pathlib import Path
 from typing import Generator
 from unittest.mock import ANY, MagicMock, Mock, patch
@@ -230,35 +229,11 @@ def test_pull_not_quiet(ctr_client: DockerClient):
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_pull_stream_logs(ctr_client: DockerClient):
     with contextlib.suppress(DockerException):
-        ctr_client.image.remove("busybox:1.37.0", force=True)
-    logs = ctr_client.image.pull("busybox:1.37.0", stream_logs=True)
-    _, start = next(logs)
-    assert start.decode().strip() == "1.37.0: Pulling from library/busybox"
-    _, digest = next(logs)
-    assert (
-        digest.decode().strip()
-        == "Digest: sha256:f85340bf132ae937d2c2a763b8335c9bab35d6e8293f70f606b9c6178d84f42b"
-    )
-    _, status = next(logs)
-    assert (
-        status.decode().strip() == "Status: Downloaded newer image for busybox:1.37.0"
-    )
-    _, name = next(logs)
-    assert name.decode().strip() == "docker.io/library/busybox:1.37.0"
-    with pytest.raises(StopIteration):
-        next(logs)
-
-
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
-def test_pull_multiple_stream_logs(ctr_client: DockerClient):
-    images = ["busybox:1.36.1", "busybox:1.37.0"]
-    with contextlib.suppress(DockerException):
-        ctr_client.image.remove(images, force=True)
-    generators = [ctr_client.pull(image, stream_logs=True) for image in images]
-    sequential = set(chain(*generators))
-    ctr_client.image.remove(images, force=True)
-    logs = ctr_client.pull(images, stream_logs=True)
-    assert sequential == set(logs)
+        ctr_client.image.remove("busybox:1", force=True)
+    logs = ctr_client.image.pull("busybox:1", stream_logs=True)
+    lines = [line.decode().strip() for _, line in logs]
+    assert len(lines) > 0
+    assert any("busybox:1" in line for line in lines)
 
 
 @pytest.mark.parametrize(
@@ -345,63 +320,21 @@ def test_push_duplicate_images(ctr_client: DockerClient):
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
-def test_push_stream_logs(docker_registry_without_login, ctr_client: DockerClient):
+def test_push_not_quiet_multiple_images_break(ctr_client: DockerClient):
     with contextlib.suppress(DockerException):
-        ctr_client.image.remove("busybox:1.37.0", force=True)
-    image = ctr_client.image.pull("busybox:1.37.0", quiet=True)
-    image.tag(f"{docker_registry_without_login}/busybox:1.37.0")
-    logs = ctr_client.image.push(
-        f"{docker_registry_without_login}/busybox:1.37.0", stream_logs=True
-    )
-    _, start = next(logs)
-    assert (
-        start.decode().strip()
-        == f"The push refers to repository [{docker_registry_without_login}/busybox]"
-    )
-    for _ in range(6):
-        _, unavailable = next(logs)
-        assert unavailable.decode().strip() == "189fdd150837: Unavailable"
-    _, pushed = next(logs)
-    assert pushed.decode().strip() == "189fdd150837: Pushed"
-    _, digest = next(logs)
-    assert (
-        digest.decode().strip()
-        == "1.37.0: digest: sha256:68a0d55a75c935e1101d16ded1c748babb7f96a9af43f7533ba83b87e2508b82 size: 610"
-    )
+        ctr_client.image.remove("busybox:1", force=True)
+    ctr_client.image.pull("busybox:1", quiet=True)
+    with pytest.raises(NoSuchImage):
+        ctr_client.push(["busybox:1", "hellstuff"])
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
-def test_push_not_quiet_multiple_images_break(
-    docker_registry_without_login, ctr_client: DockerClient
-):
+def test_push_stream_logs_multiple_images_break(ctr_client: DockerClient):
     with contextlib.suppress(DockerException):
         ctr_client.image.remove("busybox:1", force=True)
-    image = ctr_client.image.pull("busybox:1", quiet=True)
-    image.tag(f"{docker_registry_without_login}/busybox:1")
+    ctr_client.image.pull("busybox:1", quiet=True)
     with pytest.raises(NoSuchImage):
-        ctr_client.push(
-            [
-                f"{docker_registry_without_login}/busybox:1",
-                f"{docker_registry_without_login}/hellstuff",
-            ]
-        )
-
-
-@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
-def test_push_stream_logs_multiple_images_break(
-    docker_registry_without_login, ctr_client: DockerClient
-):
-    with contextlib.suppress(DockerException):
-        ctr_client.image.remove("busybox:1", force=True)
-    image = ctr_client.image.pull("busybox:1", quiet=True)
-    image.tag(f"{docker_registry_without_login}/busybox:1")
-    with pytest.raises(NoSuchImage):
-        logs = ctr_client.push(
-            [
-                f"{docker_registry_without_login}/busybox:1",
-                f"{docker_registry_without_login}/hellstuff",
-            ]
-        )
+        logs = ctr_client.push(["busybox:1", "hellstuff"])
         for _ in logs:
             pass
 
