@@ -1,7 +1,8 @@
 import contextlib
 import json
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from typing import Generator
+from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
 
@@ -175,11 +176,64 @@ def test_image_list_tags(ctr_client: DockerClient):
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_pull_validation_error(ctr_client: DockerClient):
+    with pytest.raises(ValueError) as err:
+        ctr_client.image.pull(ANY, quiet=True, stream_logs=True)
+    assert (
+        "It's not possible to have stream_logs=True and quiet=True at the same time"
+        in str(err.value)
+    )
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_pull_nothing(ctr_client: DockerClient):
+    result = ctr_client.image.pull([], quiet=True)
+    assert isinstance(result, list)
+    assert len(result) == 0
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_pull_nothing_stream_logs(ctr_client: DockerClient):
+    result = ctr_client.image.pull([], stream_logs=True)
+    assert isinstance(result, Generator)
+    assert len(list(result)) == 0
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_pull_duplicate_images(ctr_client: DockerClient):
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove("busybox:1", force=True)
+    images = ["busybox:1", "busybox:1", "busybox:1"]
+    with patch(
+        "python_on_whales.components.image.cli_wrapper.Image"
+    ) as image, patch.object(
+        ctr_client.image, "_pull_single_tag"
+    ) as pull_single_tag, patch.object(
+        ctr_client.image, "_pull_multiple_tags"
+    ) as pull_multiple_tags:
+        image.return_value = MagicMock()
+        pull_single_tag.return_value = None
+        ctr_client.image.pull(images, quiet=True)
+        pull_multiple_tags.assert_not_called()
+        pull_single_tag.assert_called_once()
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_pull_not_quiet(ctr_client: DockerClient):
     with contextlib.suppress(DockerException):
         ctr_client.image.remove("busybox:1", force=True)
     image = ctr_client.image.pull("busybox:1")
     assert "busybox:1" in {tag.split("/")[-1] for tag in image.repo_tags}
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_pull_stream_logs(ctr_client: DockerClient):
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove("busybox:1", force=True)
+    logs = ctr_client.image.pull("busybox:1", stream_logs=True)
+    lines = [line.decode().strip() for _, line in logs]
+    assert len(lines) > 0
+    assert any("busybox:1" in line for line in lines)
 
 
 @pytest.mark.parametrize(
@@ -207,6 +261,82 @@ def test_pull_not_quiet_multiple_images_break(ctr_client: DockerClient):
     assert f"{ctr_client.client_config.client_call[0]} image pull hellstuff" in str(
         err.value
     )
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_pull_stream_logs_multiple_images_break(ctr_client: DockerClient):
+    images_names = ["busybox:1", "hellstuff"]
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove(images_names, force=True)
+
+    with pytest.raises(DockerException) as err:
+        logs = ctr_client.pull(images_names, stream_logs=True)
+        for _ in logs:
+            pass
+    assert f"{ctr_client.client_config.client_call[0]} image pull hellstuff" in str(
+        err.value
+    )
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_push_validation_error(ctr_client: DockerClient):
+    with pytest.raises(ValueError) as err:
+        ctr_client.push(ANY, quiet=True, stream_logs=True)
+    assert (
+        "It's not possible to have stream_logs=True and quiet=True at the same time"
+        in str(err.value)
+    )
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_push_nothing(ctr_client: DockerClient):
+    result = ctr_client.push([], quiet=True)
+    assert result is None
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_push_nothing_stream_logs(ctr_client: DockerClient):
+    result = ctr_client.push([], stream_logs=True)
+    assert result is None
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_push_duplicate_images(ctr_client: DockerClient):
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove("busybox:1", force=True)
+    images = ["busybox:1", "busybox:1", "busybox:1"]
+    with patch(
+        "python_on_whales.components.image.cli_wrapper.Image"
+    ) as image, patch.object(
+        ctr_client.image, "_push_single_tag"
+    ) as push_single_tag, patch.object(
+        ctr_client.image, "_push_multiple_tags"
+    ) as push_multiple_tags:
+        image.return_value = MagicMock()
+        push_single_tag.return_value = None
+        ctr_client.image.push(images, quiet=True)
+        push_multiple_tags.assert_not_called()
+        push_single_tag.assert_called_once()
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_push_not_quiet_multiple_images_break(ctr_client: DockerClient):
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove("busybox:1", force=True)
+    ctr_client.image.pull("busybox:1", quiet=True)
+    with pytest.raises(NoSuchImage):
+        ctr_client.push(["busybox:1", "hellstuff"])
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_push_stream_logs_multiple_images_break(ctr_client: DockerClient):
+    with contextlib.suppress(DockerException):
+        ctr_client.image.remove("busybox:1", force=True)
+    ctr_client.image.pull("busybox:1", quiet=True)
+    with pytest.raises(NoSuchImage):
+        logs = ctr_client.push(["busybox:1", "hellstuff"])
+        for _ in logs:
+            pass
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
@@ -286,6 +416,19 @@ def test_no_such_image_push(ctr_client: DockerClient):
     image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
     with pytest.raises(NoSuchImage) as err:
         ctr_client.push(image_name_that_does_not_exists)
+
+    assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
+
+
+@pytest.mark.parametrize(
+    "ctr_client",
+    ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
+    indirect=True,
+)
+def test_no_such_image_push_stream_logs(ctr_client: DockerClient):
+    image_name_that_does_not_exists = "dueizhguizhfezaezagrthyh"
+    with pytest.raises(NoSuchImage) as err:
+        ctr_client.push(image_name_that_does_not_exists, stream_logs=True)
 
     assert f"No such image: {image_name_that_does_not_exists}" in str(err.value)
 
