@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import warnings
+from collections import OrderedDict
 from concurrent.futures.thread import ThreadPoolExecutor
 from datetime import datetime
 from multiprocessing.pool import ThreadPool
@@ -556,7 +557,7 @@ class ImageCLI(DockerCLICaller):
             )
             return result if stream_logs else Image(self.client_config, x)
 
-        images = list(set(x))
+        images = list(OrderedDict.fromkeys(x))
         if len(images) == 0:
             return (_ for _ in []) if stream_logs else []
         if len(images) == 1:
@@ -695,7 +696,7 @@ class ImageCLI(DockerCLICaller):
                 "Only one can be activated at a time."
             )
 
-        images = list(dict.fromkeys(to_list(x)))
+        images = list(OrderedDict.fromkeys(to_list(x)))
 
         # this is just to raise a correct exception if the images don't exist
         self.inspect(images)
