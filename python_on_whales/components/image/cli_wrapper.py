@@ -542,7 +542,7 @@ class ImageCLI(DockerCLICaller):
             )
             return result if stream_logs else Image(self.client_config, x)
 
-        images = list(dict.fromkeys(x))
+        images = list(x)
         if len(images) == 0:
             return (_ for _ in []) if stream_logs else []
         if len(images) == 1:
