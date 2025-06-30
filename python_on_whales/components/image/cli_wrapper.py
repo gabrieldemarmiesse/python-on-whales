@@ -523,8 +523,6 @@ class ImageCLI(DockerCLICaller):
                 where the first element corresponds to the image name that a pull is being done for.
                 The second element is the log statement related to pull progress, as `bytes`.
                 You'll need to call `.decode()` if you want the logs as `str`.
-                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
-                if you are not familiar with the streaming of logs in Python-on-whales.
             platform: If you want to enforce a platform.
         """
         if quiet and stream_logs:
@@ -671,8 +669,6 @@ class ImageCLI(DockerCLICaller):
                 corresponds to the image or repository name that a push is being done for.
                 The second element is the log statement related to push progress, as `bytes`.
                 You'll need to call `.decode()` if you want the logs as `str`.
-                See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
-                if you are not familiar with the streaming of logs in Python-on-whales.
 
         # Raises
             `python_on_whales.exceptions.NoSuchImage` if one of the images does not exist.
