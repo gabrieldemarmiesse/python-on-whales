@@ -93,9 +93,7 @@ class ComposeConfigService(BaseModel):
     labels: Annotated[Optional[Dict[str, str]], Field(default_factory=dict)]
     ports: Optional[List[ComposeServicePort]] = None
     volumes: Optional[List[ComposeServiceVolume]] = None
-    networks: Optional[Union[List[str], Dict[str, Optional[ComposeServiceNetwork]]]] = (
-        None
-    )
+    networks: Optional[Dict[str, Optional[ComposeServiceNetwork]]] = None
 
 
 class ComposeConfigNetwork(BaseModel):

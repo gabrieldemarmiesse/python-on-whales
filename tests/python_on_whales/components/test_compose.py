@@ -660,11 +660,12 @@ def test_entrypoint_loaded_in_config():
 def test_config_complexe_compose():
     """Checking that the pydantic model does its job"""
     compose_file = (
-        PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
+        PROJECT_ROOT / "tests/python_on_whales/components/complex-compose.yml"
     )
     docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     config = docker.compose.config()
 
+    # Test my_service
     assert config.services["my_service"].build.context == (
         PROJECT_ROOT / "tests/python_on_whales/components/my_service_build"
     )
@@ -685,6 +686,13 @@ def test_config_complexe_compose():
     assert config.services["my_service"].volumes[1].target == "/dodo"
 
     assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
+    # Test networks for my_service (Docker Compose normalizes list to dict)
+    assert isinstance(config.services["my_service"].networks, dict)
+    assert "some-network" in config.services["my_service"].networks
+    assert "other-network" in config.services["my_service"].networks
+    assert config.services["my_service"].networks["some-network"] is None
+    assert config.services["my_service"].networks["other-network"] is None
+
     assert config.services["my_service"].deploy.placement.constraints == [
         "node.labels.hello-world == yes"
     ]
@@ -698,12 +706,92 @@ def test_config_complexe_compose():
 
     assert config.services["my_service"].deploy.replicas == 4
 
+    # Test network_service with complex network configurations
+    assert config.services["network_service"].image == "some_random_image"
+    assert config.services["network_service"].command == [
+        "ping",
+        "-c",
+        "2",
+        "www.google.com",
+    ]
+
+    # Test network configurations for network_service
+    app_net_1_config = config.services["network_service"].networks["app_net_1"]
+    assert app_net_1_config.aliases == ["app-1-service", "app-1-server"]
+    assert app_net_1_config.ipv4_address == "172.16.238.10"
+    assert app_net_1_config.ipv6_address == "2001:3984:3989::10"
+    assert app_net_1_config.interface_name == "eth999"
+    assert app_net_1_config.priority == 1000
+
+    app_net_2_config = config.services["network_service"].networks["app_net_2"]
+    assert app_net_2_config.aliases == ["app-2-service"]
+    assert app_net_2_config.driver_opts == {
+        "foo": "bar",
+        "baz": "1",
+    }  # Docker normalizes to strings
+    assert app_net_2_config.gw_priority == 1
+
+    app_net_3_config = config.services["network_service"].networks["app_net_3"]
+    assert app_net_3_config.link_local_ips == ["169.254.22.11", "169.254.22.13"]
+    assert app_net_3_config.mac_address == "02:42:ac:11:00:02"
+    assert app_net_3_config.priority == 100
+
+    # Test network definitions
+    assert config.networks["some-network"].driver == "bridge"
+    assert config.networks["some-network"].attachable
+    assert config.networks["some-network"].labels["type"] == "frontend"
+
+    assert config.networks["other-network"].internal
+    assert config.networks["app_net_1"].ipam["config"][0]["subnet"] == "172.16.238.0/24"
+    assert config.networks["app_net_3"].enable_ipv6
+
     assert not config.volumes["dodo"].external
+
+
+def test_compose_down_networks():
+    compose_file = (
+        PROJECT_ROOT / "tests/python_on_whales/components/complex-compose.yml"
+    )
+    docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
+
+    # Start services to create networks
+    docker.compose.up(
+        ["my_service", "network_service"],
+        detach=True,
+        scales=dict(my_service=1),
+        build=True,
+    )
+
+    # Check that networks are created
+    networks = docker.network.list()
+    network_names = [network.name for network in networks]
+    assert "components_some-network" in network_names
+    assert "components_other-network" in network_names
+    assert "components_app_net_1" in network_names
+    assert "components_app_net_2" in network_names
+    assert "components_app_net_3" in network_names
+    assert "components_app_net_4" in network_names
+    assert "components_app_net_5" in network_names
+
+    # Stop services - Docker Compose automatically removes unused networks
+    docker.compose.down()
+
+    # Networks should be removed when no containers are using them (normal Docker Compose behavior)
+    networks_after_down = docker.network.list()
+    network_names_after = [network.name for network in networks_after_down]
+
+    # Verify the networks have been cleaned up as expected
+    assert "components_some-network" not in network_names_after
+    assert "components_other-network" not in network_names_after
+    assert "components_app_net_1" not in network_names_after
+
+    # Default network should still exist for potential future use
+    assert "components_default" in network_names_after
 
 
 def test_compose_down_volumes():
     compose_file = (
-        PROJECT_ROOT / "tests/python_on_whales/components/complexe-compose.yml"
+        PROJECT_ROOT / "tests/python_on_whales/components/complex-compose.yml"
     )
     docker = DockerClient(compose_files=[compose_file], compose_compatibility=True)
     docker.compose.up(
