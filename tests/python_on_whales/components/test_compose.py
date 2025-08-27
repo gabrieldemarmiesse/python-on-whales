@@ -736,6 +736,12 @@ def test_config_complexe_compose():
     assert app_net_3_config.mac_address == "02:42:ac:11:00:02"
     assert app_net_3_config.priority == 100
 
+    app_net_4_config = config.services["network_service"].networks["app_net_4"]
+    assert app_net_4_config is None
+
+    app_net_5_config = config.services["network_service"].networks["app_net_5"]
+    assert app_net_5_config is None
+
     # Test network definitions
     assert config.networks["some-network"].driver == "bridge"
     assert config.networks["some-network"].attachable
