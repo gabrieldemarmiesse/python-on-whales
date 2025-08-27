@@ -57,6 +57,18 @@ class ComposeServiceVolume(BaseModel):
     type: Optional[str] = None
 
 
+class ComposeServiceNetwork(BaseModel):
+    aliases: Optional[List[str]] = None
+    interface_name: Optional[str] = None
+    ipv4_address: Optional[str] = None
+    ipv6_address: Optional[str] = None
+    link_local_ips: Optional[List[str]] = None
+    mac_address: Optional[str] = None
+    driver_opts: Optional[Dict[str, Any]] = None
+    gw_priority: Optional[int] = None
+    priority: Optional[int] = None
+
+
 class ComposeConfigService(BaseModel):
     deploy: Optional[ServiceDeployConfig] = None
     blkio_config: Optional[Any] = None
@@ -81,6 +93,9 @@ class ComposeConfigService(BaseModel):
     labels: Annotated[Optional[Dict[str, str]], Field(default_factory=dict)]
     ports: Optional[List[ComposeServicePort]] = None
     volumes: Optional[List[ComposeServiceVolume]] = None
+    networks: Optional[Union[List[str], Dict[str, Optional[ComposeServiceNetwork]]]] = (
+        None
+    )
 
 
 class ComposeConfigNetwork(BaseModel):
