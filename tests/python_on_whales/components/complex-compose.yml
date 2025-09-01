@@ -39,7 +39,6 @@ services:
           - app-1-server
         ipv4_address: 172.16.238.10
         ipv6_address: 2001:3984:3989::10
-        interface_name: eth999
         priority: 1000
       app_net_2:
         aliases:

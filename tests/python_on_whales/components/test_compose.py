@@ -720,7 +720,6 @@ def test_config_complexe_compose():
     assert app_net_1_config.aliases == ["app-1-service", "app-1-server"]
     assert app_net_1_config.ipv4_address == "172.16.238.10"
     assert app_net_1_config.ipv6_address == "2001:3984:3989::10"
-    assert app_net_1_config.interface_name == "eth999"
     assert app_net_1_config.priority == 1000
 
     app_net_2_config = config.services["network_service"].networks["app_net_2"]

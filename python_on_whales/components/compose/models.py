@@ -59,7 +59,6 @@ class ComposeServiceVolume(BaseModel):
 
 class ComposeServiceNetwork(BaseModel):
     aliases: Optional[List[str]] = None
-    interface_name: Optional[str] = None
     ipv4_address: Optional[str] = None
     ipv6_address: Optional[str] = None
     link_local_ips: Optional[List[str]] = None
