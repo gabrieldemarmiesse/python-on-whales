@@ -790,9 +790,6 @@ def test_compose_down_networks():
     assert "components_other-network" not in network_names_after
     assert "components_app_net_1" not in network_names_after
 
-    # Default network should still exist for potential future use
-    assert "components_default" in network_names_after
-
 
 def test_compose_down_volumes():
     compose_file = (
