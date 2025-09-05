@@ -676,6 +676,7 @@ def test_config_complexe_compose():
         "2",
         "www.google.com",
     ]
+    assert config.services["my_service"].hostname == "my_service_hostname"
 
     assert config.services["my_service"].ports[0].published == 5000
     assert config.services["my_service"].ports[0].target == 5000
@@ -714,6 +715,7 @@ def test_config_complexe_compose():
         "2",
         "www.google.com",
     ]
+    assert config.services["network_service"].hostname == "network_service_hostname"
 
     # Test network configurations for network_service
     app_net_1_config = config.services["network_service"].networks["app_net_1"]

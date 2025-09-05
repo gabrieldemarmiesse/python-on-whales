@@ -5,6 +5,7 @@ services:
     build:
       context: my_service_build
     image: some_random_image
+    hostname: my_service_hostname
     command: ping -c 2 www.google.com
     ports:
      - "5000:5000"
@@ -31,6 +32,7 @@ services:
 
   network_service:
     image: some_random_image
+    hostname: network_service_hostname
     command: ping -c 2 www.google.com
     networks:
       app_net_1:

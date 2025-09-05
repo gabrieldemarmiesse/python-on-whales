@@ -88,6 +88,7 @@ class ComposeConfigService(BaseModel):
     environment: Union[Dict[str, Union[str, int, None]], List[str], None] = None
     expose: Annotated[Union[List[int], List[str]], Field(default_factory=list)]
     entrypoint: Union[List[str], str, None] = None
+    hostname: Optional[str] = None
     image: Optional[str] = None
     labels: Annotated[Optional[Dict[str, str]], Field(default_factory=dict)]
     ports: Optional[List[ComposeServicePort]] = None
