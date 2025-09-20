@@ -1,0 +1,99 @@
+version: "3.7"
+
+services:
+  my_service:
+    build:
+      context: my_service_build
+    image: some_random_image
+    hostname: my_service_hostname
+    command: ping -c 2 www.google.com
+    ports:
+     - "5000:5000"
+    volumes:
+     - /tmp:/tmp
+     - dodo:/dodo
+    environment:
+     - DATADOG_HOST=something
+    networks:
+     - some-network
+     - other-network
+    deploy:
+      placement:
+        constraints:
+          - node.labels.hello-world == yes
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 20M
+        limits:
+          cpus: '2'
+          memory: 40M
+      replicas: 4
+
+  network_service:
+    image: some_random_image
+    hostname: network_service_hostname
+    command: ping -c 2 www.google.com
+    networks:
+      app_net_1:
+        aliases:
+          - app-1-service
+          - app-1-server
+        ipv4_address: 172.16.238.10
+        ipv6_address: 2001:3984:3989::10
+        priority: 1000
+      app_net_2:
+        aliases:
+          - app-2-service
+        driver_opts:
+          foo: "bar"
+          baz: 1
+        gw_priority: 1
+      app_net_3:
+        link_local_ips:
+          - 169.254.22.11
+          - 169.254.22.13
+        mac_address: "02:42:ac:11:00:02"
+        priority: 100
+      app_net_4:
+      app_net_5:
+
+networks:
+  some-network:
+    driver: bridge
+    attachable: true
+    labels:
+      type: "frontend"
+      purpose: "web-traffic"
+  other-network:
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.name: "other-bridge"
+  app_net_1:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"
+        - subnet: "2001:3984:3989::/64"
+  app_net_2:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+  app_net_3:
+    driver: bridge
+    enable_ipv6: true
+    labels:
+      env: "development"
+      network_type: "link-local"
+  app_net_4:
+    driver: bridge
+    external: false
+  app_net_5:
+    driver: bridge
+    attachable: false
+
+volumes:
+  dodo: {}
