@@ -17,12 +17,13 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    TypedDict,
     Union,
     overload,
 )
 
 import pydantic
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, Unpack
 
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.network.cli_wrapper
@@ -441,6 +442,106 @@ class Container(ReloadableObjectFromJson):
 
 ContainerPath = Tuple[Union[Container, str], ValidPath]
 ValidContainer = Union[Container, str]
+
+
+class RunArgs(TypedDict, total=False):
+    add_hosts: Iterable[Tuple[str, str]]
+    blkio_weight: Optional[int]
+    blkio_weight_device: Iterable[str]
+    cap_add: Iterable[str]
+    cap_drop: Iterable[str]
+    cgroup_parent: Optional[str]
+    cgroupns: Optional[str]
+    cidfile: Optional[ValidPath]
+    cpu_period: Optional[int]
+    cpu_quota: Optional[int]
+    cpu_rt_period: Optional[int]
+    cpu_rt_runtime: Optional[int]
+    cpu_shares: Optional[int]
+    cpus: Optional[float]
+    cpuset_cpus: Optional[List[int]]
+    cpuset_mems: Optional[List[int]]
+    devices: Iterable[str]
+    device_cgroup_rules: Iterable[str]
+    device_read_bps: Iterable[str]
+    device_read_iops: Iterable[str]
+    device_write_bps: Iterable[str]
+    device_write_iops: Iterable[str]
+    content_trust: bool
+    dns: Iterable[str]
+    dns_options: Iterable[str]
+    dns_search: Iterable[str]
+    domainname: Optional[str]
+    entrypoint: Optional[str]
+    envs: Mapping[str, str]
+    env_files: Union[ValidPath, Iterable[ValidPath]]
+    env_host: bool
+    expose: Union[int, Iterable[int]]
+    gpus: Union[int, str, None]
+    groups_add: Iterable[str]
+    healthcheck: bool
+    health_cmd: Optional[str]
+    health_interval: Union[None, int, timedelta]
+    health_retries: Optional[int]
+    health_start_period: Union[None, int, timedelta]
+    health_timeout: Union[None, int, timedelta]
+    hostname: Optional[str]
+    init: bool
+    interactive: bool
+    ip: Optional[str]
+    ip6: Optional[str]
+    ipc: Optional[str]
+    isolation: Optional[str]
+    kernel_memory: Union[int, str, None]
+    labels: Mapping[str, str]
+    label_files: Iterable[ValidPath]
+    link: Iterable[ValidContainer]
+    link_local_ip: Iterable[str]
+    log_driver: Optional[str]
+    log_options: Iterable[str]
+    mac_address: Optional[str]
+    memory: Union[int, str, None]
+    memory_reservation: Union[int, str, None]
+    memory_swap: Union[int, str, None]
+    memory_swappiness: Optional[int]
+    mounts: Iterable[List[str]]
+    name: Optional[str]
+    networks: Iterable[python_on_whales.components.network.cli_wrapper.ValidNetwork]
+    network_aliases: Iterable[str]
+    oom_kill: bool
+    oom_score_adj: Optional[int]
+    pid: Optional[str]
+    pids_limit: Optional[int]
+    platform: Optional[str]
+    pod: Optional[python_on_whales.components.pod.cli_wrapper.ValidPod]
+    preserve_fds: Optional[int]
+    privileged: bool
+    publish: Iterable[ValidPortMapping]
+    publish_all: bool
+    pull: str
+    read_only: bool
+    restart: Optional[str]
+    remove: bool
+    runtime: Optional[str]
+    security_options: Iterable[str]
+    shm_size: Union[int, str, None]
+    sig_proxy: bool
+    stop_signal: Optional[Union[int, str]]
+    stop_timeout: Optional[int]
+    storage_options: Iterable[str]
+    sysctl: Mapping[str, str]
+    systemd: Optional[Union[bool, Literal["always"]]]
+    tmpfs: Iterable[ValidPath]
+    tty: bool
+    tz: Optional[str]
+    ulimit: Iterable[str]
+    user: Optional[str]
+    userns: Optional[str]
+    uts: Optional[str]
+    volumes: Iterable[python_on_whales.components.volume.cli_wrapper.VolumeDefinition]
+    volume_driver: Optional[str]
+    volumes_from: Iterable[ValidContainer]
+    workdir: Optional[ValidPath]
 
 
 class ContainerCLI(DockerCLICaller):
@@ -1357,6 +1458,39 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.extend(containers)
 
         run(full_cmd)
+
+    @overload
+    def run(
+        self,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
+        command: Sequence[str] = ...,
+        *,
+        detach: Literal[True],
+        stream: bool = ...,
+        **kwargs: Unpack[RunArgs],
+    ) -> Container: ...
+
+    @overload
+    def run(
+        self,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
+        command: Sequence[str] = ...,
+        *,
+        detach: Literal[False] = ...,
+        stream: Literal[True],
+        **kwargs: Unpack[RunArgs],
+    ) -> Iterable[Tuple[str, bytes]]: ...
+
+    @overload
+    def run(
+        self,
+        image: python_on_whales.components.image.cli_wrapper.ValidImage,
+        command: Sequence[str] = ...,
+        *,
+        detach: Literal[False] = ...,
+        stream: Literal[False] = ...,
+        **kwargs: Unpack[RunArgs],
+    ) -> str: ...
 
     def run(
         self,
