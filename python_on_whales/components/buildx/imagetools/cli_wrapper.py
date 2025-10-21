@@ -20,6 +20,7 @@ class ImagetoolsCLI(DockerCLICaller):
         sources: List[str] = [],
         tags: List[str] = [],
         append: bool = False,
+        annotations: List[str] = [],
         files: List[Union[str, Path]] = [],
         dry_run: bool = False,
         builder: Optional[str] = None,
@@ -36,6 +37,7 @@ class ImagetoolsCLI(DockerCLICaller):
         Parameters:
             sources: The sources manifest to create, change
             append: Append to existing manifest
+            annotations: Add annotations to the image
             dry_run: Show final image instead of pushing
             files: Read source descriptor from file
             builder: The builder to use.
@@ -52,10 +54,16 @@ class ImagetoolsCLI(DockerCLICaller):
             raise TypeError(
                 "The argument 'files' of the function docker.buildx.imagetools.create() must be a list of strings."
             )
+        if not isinstance(annotations, list):
+            raise TypeError(
+                "The argument 'annotations' of the function docker.buildx.imagetools.create() must be a list of strings."
+            )
 
         full_cmd = self.docker_cmd + ["buildx", "imagetools", "create"]
         for tag in tags:
             full_cmd.add_simple_arg("--tag", tag)
+        for annotation in annotations:
+            full_cmd.add_simple_arg("--annotation", annotation)
         for file in files:
             full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--builder", builder)
