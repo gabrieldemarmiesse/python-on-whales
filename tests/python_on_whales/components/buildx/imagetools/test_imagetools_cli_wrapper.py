@@ -77,9 +77,7 @@ def test_imagetools_append(docker_registry):
 def test_imagetools_create_annotations_type_validation():
     with pytest.raises(TypeError) as err:
         docker.buildx.imagetools.create(
-            ["python:3.13.0"],
-            annotations="not-a-dict",
-            dry_run=True
+            ["python:3.13.0"], annotations="not-a-dict", dry_run=True
         )
     assert "must be a dict" in str(err.value)
 
@@ -91,14 +89,14 @@ def test_imagetools_create_with_annotations_command_construction(mock_run):
 
     annotations = {
         "org.opencontainers.image.source": "https://github.com/user/repo",
-        "org.opencontainers.image.description": "Test image"
+        "org.opencontainers.image.description": "Test image",
     }
 
     docker.buildx.imagetools.create(
         sources=["python:3.13.0"],
         tags=["myrepo/myimage:latest"],
         annotations=annotations,
-        dry_run=True
+        dry_run=True,
     )
 
     # Verify the command was called
@@ -107,11 +105,15 @@ def test_imagetools_create_with_annotations_command_construction(mock_run):
 
     # Check that the command contains the annotations
     assert "--annotation" in called_command
-    assert "org.opencontainers.image.source=https://github.com/user/repo" in called_command
+    assert (
+        "org.opencontainers.image.source=https://github.com/user/repo" in called_command
+    )
     assert "org.opencontainers.image.description=Test image" in called_command
 
     # Verify both annotations are present
-    annotation_indices = [i for i, x in enumerate(called_command) if x == "--annotation"]
+    annotation_indices = [
+        i for i, x in enumerate(called_command) if x == "--annotation"
+    ]
     assert len(annotation_indices) == 2
 
     # Check other expected flags and arguments are present
