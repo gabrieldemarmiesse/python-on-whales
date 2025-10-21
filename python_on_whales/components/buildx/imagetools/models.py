@@ -38,3 +38,4 @@ class Manifest(pydantic.BaseModel):
     layers: Optional[List[ManifestLayer]] = None
     manifests: Optional[List[ImageVariantManifest]] = None
     config: Optional[ManifestConfig] = None
+    annotations: Optional[dict] = None
