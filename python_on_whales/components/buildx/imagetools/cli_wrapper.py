@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.utils import run
@@ -20,7 +20,7 @@ class ImagetoolsCLI(DockerCLICaller):
         sources: List[str] = [],
         tags: List[str] = [],
         append: bool = False,
-        annotations: List[str] = [],
+        annotations: Optional[Dict[str, str]] = None,
         files: List[Union[str, Path]] = [],
         dry_run: bool = False,
         builder: Optional[str] = None,
@@ -37,7 +37,7 @@ class ImagetoolsCLI(DockerCLICaller):
         Parameters:
             sources: The sources manifest to create, change
             append: Append to existing manifest
-            annotations: Add annotations to the image
+            annotations: Add annotations to the image as a dict of key-value pairs
             dry_run: Show final image instead of pushing
             files: Read source descriptor from file
             builder: The builder to use.
@@ -54,16 +54,17 @@ class ImagetoolsCLI(DockerCLICaller):
             raise TypeError(
                 "The argument 'files' of the function docker.buildx.imagetools.create() must be a list of strings."
             )
-        if not isinstance(annotations, list):
+        if annotations is not None and not isinstance(annotations, dict):
             raise TypeError(
-                "The argument 'annotations' of the function docker.buildx.imagetools.create() must be a list of strings."
+                "The argument 'annotations' of the function docker.buildx.imagetools.create() must be a dict."
             )
 
         full_cmd = self.docker_cmd + ["buildx", "imagetools", "create"]
         for tag in tags:
             full_cmd.add_simple_arg("--tag", tag)
-        for annotation in annotations:
-            full_cmd.add_simple_arg("--annotation", annotation)
+        if annotations:
+            for key, value in annotations.items():
+                full_cmd.add_simple_arg("--annotation", f"{key}={value}")
         for file in files:
             full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--builder", builder)
