@@ -334,7 +334,7 @@ def test_docker_compose_pause_unpause():
 
 
 def test_docker_compose_create_down():
-    create_result = docker.compose.create()
+    create_result = docker.compose.create(pull="missing")
     assert create_result is None
     docker.compose.down()
 
