@@ -82,42 +82,20 @@ def test_imagetools_create_annotations_type_validation():
     assert "must be a dict" in str(err.value)
 
 
-@patch("python_on_whales.components.buildx.imagetools.cli_wrapper.run")
-def test_imagetools_create_with_annotations_command_construction(mock_run):
-    """Test that annotations are properly passed to the Docker CLI command"""
-    mock_run.return_value = '{"mediaType": "application/vnd.docker.distribution.manifest.v2+json", "schemaVersion": 2}'
-
+def test_imagetools_create_with_annotations_command_construction():
     annotations = {
-        "org.opencontainers.image.source": "https://github.com/user/repo",
-        "org.opencontainers.image.description": "Test image",
+        "index:org.opencontainers.image.source": "https://github.com/user/repo",
+        "index:org.opencontainers.image.description": "Test image",
     }
 
-    docker.buildx.imagetools.create(
+    manifest = docker.buildx.imagetools.create(
         sources=["python:3.13.0"],
         tags=["myrepo/myimage:latest"],
         annotations=annotations,
         dry_run=True,
     )
 
-    # Verify the command was called
-    assert mock_run.called
-    called_command = mock_run.call_args[0][0]
+    assert len(manifest.annotations) == 2
+    assert manifest.annotations["org.opencontainers.image.source"] == "https://github.com/user/repo"
+    assert manifest.annotations["org.opencontainers.image.description"] == "Test image"
 
-    # Check that the command contains the annotations
-    assert "--annotation" in called_command
-    assert (
-        "org.opencontainers.image.source=https://github.com/user/repo" in called_command
-    )
-    assert "org.opencontainers.image.description=Test image" in called_command
-
-    # Verify both annotations are present
-    annotation_indices = [
-        i for i, x in enumerate(called_command) if x == "--annotation"
-    ]
-    assert len(annotation_indices) == 2
-
-    # Check other expected flags and arguments are present
-    assert "--dry-run" in called_command
-    assert "--tag" in called_command
-    assert "myrepo/myimage:latest" in called_command
-    assert "python:3.13.0" in called_command
