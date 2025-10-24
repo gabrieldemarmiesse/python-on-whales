@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import pytest
 
 from python_on_whales import docker
@@ -96,6 +94,8 @@ def test_imagetools_create_with_annotations_command_construction():
     )
 
     assert len(manifest.annotations) == 2
-    assert manifest.annotations["org.opencontainers.image.source"] == "https://github.com/user/repo"
+    assert (
+        manifest.annotations["org.opencontainers.image.source"]
+        == "https://github.com/user/repo"
+    )
     assert manifest.annotations["org.opencontainers.image.description"] == "Test image"
-
