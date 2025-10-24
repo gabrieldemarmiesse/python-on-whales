@@ -195,7 +195,7 @@ class ComposeCLI(DockerCLICaller):
             no_build: Don't build an image, even if it's missing.
             no_recreate: If containers already exist, don't recreate them.
                 Incompatible with `force_recreate=True`.
-            pull: Pull image before running (“always”|”missing”|”never”|”build”).
+            pull: Pull image before running ("always"|"missing"|"never"|"build").
             stream_logs: If `False` this function returns None. If `True`, this
                 function returns an Iterable of `Tuple[str, bytes]` where the first element
                 is the type of log (`"stdin"` or `"stdout"`). The second element is the log itself,
