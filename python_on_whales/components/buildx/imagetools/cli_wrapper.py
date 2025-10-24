@@ -20,7 +20,7 @@ class ImagetoolsCLI(DockerCLICaller):
         sources: List[str] = [],
         tags: List[str] = [],
         append: bool = False,
-        annotations: Optional[Dict[str, str]] = None,
+        annotations: Dict[str, str] = {},
         files: List[Union[str, Path]] = [],
         dry_run: bool = False,
         builder: Optional[str] = None,
@@ -54,7 +54,7 @@ class ImagetoolsCLI(DockerCLICaller):
             raise TypeError(
                 "The argument 'files' of the function docker.buildx.imagetools.create() must be a list of strings."
             )
-        if annotations is not None and not isinstance(annotations, dict):
+        if not isinstance(annotations, dict):
             raise TypeError(
                 "The argument 'annotations' of the function docker.buildx.imagetools.create() must be a dict."
             )
@@ -62,9 +62,8 @@ class ImagetoolsCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "imagetools", "create"]
         for tag in tags:
             full_cmd.add_simple_arg("--tag", tag)
-        if annotations:
-            for key, value in annotations.items():
-                full_cmd.add_simple_arg("--annotation", f"{key}={value}")
+        for key, value in annotations.items():
+            full_cmd.add_simple_arg("--annotation", f"{key}={value}")
         for file in files:
             full_cmd.add_simple_arg("--file", file)
         full_cmd.add_simple_arg("--builder", builder)
