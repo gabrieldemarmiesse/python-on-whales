@@ -1,3 +1,5 @@
+import pytest
+
 from python_on_whales import docker
 from python_on_whales.utils import PROJECT_ROOT
 
@@ -68,3 +70,32 @@ def test_imagetools_append(docker_registry):
     docker.buildx.imagetools.create([base_image_busybox], tags=[new_image])
     docker.buildx.imagetools.create([base_image_alpine], tags=[new_image], append=True)
     docker.pull(new_image)
+
+
+def test_imagetools_create_annotations_type_validation():
+    with pytest.raises(TypeError) as err:
+        docker.buildx.imagetools.create(
+            ["python:3.13.0"], annotations="not-a-dict", dry_run=True
+        )
+    assert "must be a dict" in str(err.value)
+
+
+def test_imagetools_create_with_annotations_command_construction():
+    annotations = {
+        "index:org.opencontainers.image.source": "https://github.com/user/repo",
+        "index:org.opencontainers.image.description": "Test image",
+    }
+
+    manifest = docker.buildx.imagetools.create(
+        sources=["python:3.13.0"],
+        tags=["myrepo/myimage:latest"],
+        annotations=annotations,
+        dry_run=True,
+    )
+
+    assert len(manifest.annotations) == 2
+    assert (
+        manifest.annotations["org.opencontainers.image.source"]
+        == "https://github.com/user/repo"
+    )
+    assert manifest.annotations["org.opencontainers.image.description"] == "Test image"
