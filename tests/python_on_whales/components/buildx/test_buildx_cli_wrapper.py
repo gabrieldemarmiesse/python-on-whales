@@ -1,8 +1,10 @@
+import json
 import os
 import tarfile
 
 import pytest
 
+import python_on_whales.components.buildx.cli_wrapper
 from python_on_whales import docker
 from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import set_cache_validity_period
@@ -115,12 +117,20 @@ def test_legacy_build_simple_case(tmp_path):
 @pytest.mark.usefixtures("with_docker_driver")
 def test_buildx_build_push_registry(tmp_path, docker_registry):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    metadata_path = tmp_path / "metadata.json"
     with docker.buildx.create(use=True, driver_options=dict(network="host")):
-        output = docker.buildx.build(
-            tmp_path, push=True, tags=f"{docker_registry}/dodo"
+        result = docker.buildx.build(
+            tmp_path,
+            push=True,
+            tags=f"{docker_registry}/dodo",
+            metadata_file=metadata_path,
         )
-    assert output is None
+    assert result is None
     docker.pull(f"{docker_registry}/dodo")
+    assert metadata_path.is_file()
+    metadata_content = metadata_path.read_text().strip()
+    assert metadata_content
+    json.loads(metadata_content)
 
 
 @pytest.mark.usefixtures("with_docker_driver")
@@ -724,6 +734,83 @@ def test_prune_cache_mode_max(tmp_path):
         assert "Total:" in table_total_freed_space
         assert "true" in random_row_with_reclaimable
         assert len(logs) >= 2  # table header plus at least one freed file
+
+
+def test_buildx_build_metadata_file(monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True):
+        recorded["cmd"] = list(cmd)
+        return ""
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+    monkeypatch.setattr(
+        python_on_whales.components.buildx.cli_wrapper.BuildxCLI,
+        "_build_will_load_image",
+        lambda self, builder, push, load, output: False,
+    )
+
+    metadata_path = tmp_path / "metadata.json"
+    context_dir = tmp_path / "context"
+    context_dir.mkdir()
+    docker.buildx.build(
+        context_dir,
+        metadata_file=metadata_path,
+        push=True,
+    )
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" in cmd
+    assert metadata_path in cmd or str(metadata_path) in map(str, cmd)
+
+
+def test_buildx_build_without_metadata_file(monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True):
+        recorded["cmd"] = list(cmd)
+        return ""
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+    monkeypatch.setattr(
+        python_on_whales.components.buildx.cli_wrapper.BuildxCLI,
+        "_build_will_load_image",
+        lambda self, builder, push, load, output: False,
+    )
+
+    context_dir = tmp_path / "context"
+    context_dir.mkdir()
+    docker.buildx.build(context_dir)
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" not in cmd
+
+
+def test_buildx_build_metadata_file_str_path(monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True):
+        recorded["cmd"] = list(cmd)
+        return ""
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+    monkeypatch.setattr(
+        python_on_whales.components.buildx.cli_wrapper.BuildxCLI,
+        "_build_will_load_image",
+        lambda self, builder, push, load, output: False,
+    )
+
+    metadata_path = tmp_path / "metadata.json"
+    context_dir = tmp_path / "context"
+    context_dir.mkdir()
+    docker.buildx.build(
+        context_dir,
+        metadata_file=str(metadata_path),
+    )
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" in cmd
+    assert metadata_path in cmd or str(metadata_path) in map(str, cmd)
 
 
 def test_list():
