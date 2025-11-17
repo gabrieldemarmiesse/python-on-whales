@@ -686,6 +686,68 @@ def test_bake_stream_logs(monkeypatch):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_metadata_file(only_print, monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True):
+        recorded["cmd"] = list(cmd)
+        return ""
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    metadata_path = tmp_path / "metadata.json"
+
+    docker.buildx.bake(files=[bake_file], print=only_print, metadata_file=metadata_path)
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" in cmd
+    assert metadata_path in cmd or str(metadata_path) in map(str, cmd)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_without_metadata_file(only_print, monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True):
+        recorded["cmd"] = list(cmd)
+        return ""
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(files=[bake_file], print=only_print)
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" not in cmd
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_metadata_file_str_path(only_print, monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True):
+        recorded["cmd"] = list(cmd)
+        return ""
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    metadata_path = tmp_path / "metadata.json"
+
+    docker.buildx.bake(
+        files=[bake_file], print=only_print, metadata_file=str(metadata_path)
+    )
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" in cmd
+    assert metadata_path in cmd or str(metadata_path) in map(str, cmd)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("prune_all")
 def test_prune_all_empty():
     logs = docker.buildx.prune(all=True, stream_logs=True)
