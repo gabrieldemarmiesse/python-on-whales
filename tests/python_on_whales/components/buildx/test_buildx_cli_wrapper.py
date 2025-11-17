@@ -691,7 +691,7 @@ def test_bake_stream_logs(monkeypatch):
 def test_bake_metadata_file(only_print, monkeypatch, tmp_path):
     recorded = {}
 
-    def fake_run(cmd, capture_stderr=True):
+    def fake_run(cmd, capture_stderr=True, env={}):
         recorded["cmd"] = list(cmd)
         return ""
 
@@ -712,7 +712,7 @@ def test_bake_metadata_file(only_print, monkeypatch, tmp_path):
 def test_bake_without_metadata_file(only_print, monkeypatch, tmp_path):
     recorded = {}
 
-    def fake_run(cmd, capture_stderr=True):
+    def fake_run(cmd, capture_stderr=True, env={}):
         recorded["cmd"] = list(cmd)
         return ""
 
@@ -730,7 +730,7 @@ def test_bake_without_metadata_file(only_print, monkeypatch, tmp_path):
 def test_bake_metadata_file_str_path(only_print, monkeypatch, tmp_path):
     recorded = {}
 
-    def fake_run(cmd, capture_stderr=True):
+    def fake_run(cmd, capture_stderr=True, env={}):
         recorded["cmd"] = list(cmd)
         return ""
 
