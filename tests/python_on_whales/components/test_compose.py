@@ -39,12 +39,14 @@ def test_build_empty_list_of_services():
     docker.compose.build([])
     assert previous_images == set(docker.image.list())
 
+
 @patch("python_on_whales.components.compose.cli_wrapper.run")
 def test__build_with_dependencies(run_mock: Mock):
     test_services = ["test_a", "test_b"]
     docker.compose.build(services=test_services, with_dependencies=True)
     run_mock.assert_called_once()
     assert "--with-dependencies" in run_mock.call_args.args[0]
+
 
 def test_create_empty_list_of_services():
     previous_containers = set(docker.ps(all=True))
