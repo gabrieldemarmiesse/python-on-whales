@@ -38,7 +38,6 @@ class ComposeCLI(DockerCLICaller):
         with_dependencies: bool = ...,
         ssh: Optional[str] = ...,
         stream_logs: Literal[True] = ...,
-
     ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
@@ -106,7 +105,6 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--quiet", quiet)
         full_cmd.add_simple_arg("--ssh", ssh)
         full_cmd.add_flag("--with-dependencies", with_dependencies)
-
 
         if services == []:
             return
