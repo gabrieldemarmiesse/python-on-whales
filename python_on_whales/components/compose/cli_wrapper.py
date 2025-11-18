@@ -35,6 +35,7 @@ class ComposeCLI(DockerCLICaller):
         progress: Optional[str] = ...,
         pull: bool = ...,
         quiet: bool = ...,
+        with_dependencies: bool = ...,
         ssh: Optional[str] = ...,
         stream_logs: Literal[True] = ...,
     ) -> Iterable[Tuple[str, bytes]]: ...
@@ -48,6 +49,7 @@ class ComposeCLI(DockerCLICaller):
         progress: Optional[str] = ...,
         pull: bool = ...,
         quiet: bool = ...,
+        with_dependencies: bool = ...,
         ssh: Optional[str] = ...,
         stream_logs: Literal[False] = ...,
     ) -> None: ...
@@ -60,6 +62,7 @@ class ComposeCLI(DockerCLICaller):
         progress: Optional[str] = None,
         pull: bool = False,
         quiet: bool = False,
+        with_dependencies: bool = False,
         ssh: Optional[str] = None,
         stream_logs: bool = False,
     ) -> Union[Iterable[Tuple[str, bytes]], None]:
@@ -76,6 +79,7 @@ class ComposeCLI(DockerCLICaller):
             pull: Set to `True` to always attempt to pull a newer version of the
                 image (in the `FROM` statements for example).
             quiet: Don't print anything
+            with_dependencies: Also build dependencies (transitively)
             ssh: Set SSH authentications used when building service images.
                 (use `'default'` for using your default SSH Agent)
             stream_logs: If `False` this function returns None. If `True`, this
@@ -100,6 +104,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--pull", pull)
         full_cmd.add_flag("--quiet", quiet)
         full_cmd.add_simple_arg("--ssh", ssh)
+        full_cmd.add_flag("--with-dependencies", with_dependencies)
 
         if services == []:
             return
