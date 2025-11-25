@@ -1,5 +1,6 @@
 import logging
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -156,8 +157,7 @@ def run(
         print("command: " + " ".join(args))
         print(f"Env: {subprocess_env}")
         print("------------------------------")
-    else:
-        LOGGER.debug(" ".join(args))
+    LOGGER.debug("Running command: %s", shlex.join(args))
     completed_process = subprocess.run(
         args,
         input=input,
