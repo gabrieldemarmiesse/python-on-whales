@@ -1,3 +1,5 @@
+import logging
+
 from .client_config import ClientNotFoundError
 from .components.buildx.cli_wrapper import Builder
 from .components.config.cli_wrapper import Config
@@ -20,6 +22,10 @@ from .components.task.cli_wrapper import Task
 from .components.volume.cli_wrapper import Volume
 from .docker_client import DockerClient, Version
 from .exceptions import DockerException
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.NullHandler())
+LOGGER.setLevel(logging.DEBUG)
 
 # alias
 docker = DockerClient(client_type="docker")

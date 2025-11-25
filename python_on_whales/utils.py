@@ -1,3 +1,4 @@
+import logging
 import os
 import signal
 import subprocess
@@ -35,6 +36,8 @@ from python_on_whales.exceptions import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[1]
+
+LOGGER = logging.getLogger(__name__)
 
 
 def custom_parse_object_as(type_, obj: Any):
@@ -153,6 +156,8 @@ def run(
         print("command: " + " ".join(args))
         print(f"Env: {subprocess_env}")
         print("------------------------------")
+    else:
+        LOGGER.debug(" ".join(args))
     completed_process = subprocess.run(
         args,
         input=input,
