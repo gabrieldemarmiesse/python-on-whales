@@ -1,0 +1,12 @@
+services:
+  db:
+    build:
+      context: ./db
+    image: withdeps_db
+
+  app:
+    build:
+      context: ./app
+    image: withdeps_app
+    depends_on:
+      - db

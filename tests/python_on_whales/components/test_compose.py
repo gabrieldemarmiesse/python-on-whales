@@ -1,4 +1,5 @@
 import json
+import shutil
 import signal
 import tempfile
 import time
@@ -38,6 +39,14 @@ def test_build_empty_list_of_services():
     previous_images = set(docker.image.list())
     docker.compose.build([])
     assert previous_images == set(docker.image.list())
+
+
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test__build_with_dependencies(run_mock: Mock):
+    test_services = ["test_a", "test_b"]
+    docker.compose.build(services=test_services, with_dependencies=True)
+    run_mock.assert_called_once()
+    assert "--with-dependencies" in run_mock.call_args.args[0]
 
 
 def test_create_empty_list_of_services():
@@ -1360,3 +1369,73 @@ def test_build_args():
     assert config.services["my_service"].volumes[1].target == "/dodo"
 
     assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
+
+
+COMPOSE_WD_FIXTURE_DIR = (
+    PROJECT_ROOT / "tests/python_on_whales/components/build_with_dependencies_test"
+)
+WD_DB_IMAGE = "withdeps_db"
+WD_APP_IMAGE = "withdeps_app"
+
+
+@pytestmark
+def test_compose_build_with_dependencies(tmp_path: Path):
+    """
+    This test demonstrates that the python-on-whales `compose.build` wrapper
+    correctly passes through `--with-dependencies` to `docker compose`.
+
+    It uses a tiny compose project with:
+      - `db` service (image: withdeps_db)
+      - `app` service (image: withdeps_app, depends_on: db)
+
+    We check that:
+      1. Building only `app` does NOT build `db`.
+      2. Building `app` WITH dependencies builds BOTH `app` and `db`.
+    """
+
+    # Copy the small compose project into a temp directory so the project name
+    # is stable & isolated per test run.
+    project_dir = tmp_path / "compose-project"
+    project_dir.mkdir()
+
+    shutil.copytree(COMPOSE_WD_FIXTURE_DIR, project_dir, dirs_exist_ok=True)
+    compose_file = project_dir / "compose.yaml"
+
+    # Create a dedicated client for this compose project
+    client = DockerClient(
+        compose_files=[str(compose_file)],
+        compose_project_name="withdeps-test",
+        compose_project_directory=str(project_dir),
+    )
+
+    # Make sure we start from a clean slate re: images
+    for tag in (WD_DB_IMAGE, WD_APP_IMAGE):
+        if docker.image.exists(tag):
+            docker.image.remove(tag, force=True, prune=True)
+        assert not docker.image.exists(tag), f"image {tag} should have been removed"
+
+    # Build only the app service (no dependencies)
+    client.compose.build(services=["app"])
+
+    assert docker.image.exists(WD_APP_IMAGE), "app image should have been built"
+    assert not docker.image.exists(WD_DB_IMAGE), (
+        "db image should NOT have been built when building only 'app' "
+        "without --with-dependencies"
+    )
+
+    # Clean up app image before the second build to make assertions clearer
+    docker.image.remove(WD_APP_IMAGE, force=True, prune=True)
+    assert not docker.image.exists(WD_APP_IMAGE)
+
+    # Build app *with* dependencies
+    client.compose.build(services=["app"], with_dependencies=True)
+
+    assert docker.image.exists(
+        WD_APP_IMAGE
+    ), "app image should have been built with dependencies"
+    assert docker.image.exists(
+        WD_DB_IMAGE
+    ), "db image should have been built as a dependency"
+
+    # just in case leave it all clean
+    docker.image.remove([WD_APP_IMAGE, WD_DB_IMAGE], force=True, prune=True)
