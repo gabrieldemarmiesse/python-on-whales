@@ -1,4 +1,6 @@
+import logging
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -35,6 +37,8 @@ from python_on_whales.exceptions import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[1]
+
+LOGGER = logging.getLogger(__name__)
 
 
 def custom_parse_object_as(type_, obj: Any):
@@ -153,6 +157,7 @@ def run(
         print("command: " + " ".join(args))
         print(f"Env: {subprocess_env}")
         print("------------------------------")
+    LOGGER.debug("Running command: %s", shlex.join(args))
     completed_process = subprocess.run(
         args,
         input=input,
