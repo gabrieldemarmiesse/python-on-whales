@@ -8,7 +8,7 @@ from typing import Generator, List
 import pydantic
 import pytest
 
-from python_on_whales import DockerClient
+from python_on_whales import DockerClient, PodmanClient
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ def docker_client(pytestconfig: pytest.Config) -> DockerClient:
 @pytest.fixture(scope="session")
 def podman_client(
     pytestconfig: pytest.Config, request: pytest.FixtureRequest
-) -> DockerClient:
+) -> PodmanClient:
     return _get_ctr_client("podman", pytestconfig)
 
 

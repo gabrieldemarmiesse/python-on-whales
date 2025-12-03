@@ -390,14 +390,8 @@ class DockerClient(ContainerClient):
 
 
 class PodmanClient(ContainerClient):
-    """Podman client.
-
-    Example:
-    ```python
-    from python_on_whales import PodmanClient
-    podman = PodmanClient()
-    print(podman.run("hello-world"))
-    ```
+    """
+    Podman client for Podman specific interactions.
     """
 
     _runtime = "podman"
