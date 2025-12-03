@@ -16,9 +16,10 @@ from .components.secret.cli_wrapper import Secret
 from .components.service.cli_wrapper import Service
 from .components.stack.cli_wrapper import Stack
 from .components.system.cli_wrapper import SystemInfo
+from .components.system.models import PodmanSystemInfo
 from .components.task.cli_wrapper import Task
 from .components.volume.cli_wrapper import Volume
-from .docker_client import DockerClient, Version
+from .docker_client import DockerClient, PodmanClient, Version
 from .exceptions import DockerException
 
 # alias
@@ -40,6 +41,8 @@ __all__ = [
     "Node",
     "Plugin",
     "Pod",
+    "PodmanClient",
+    "PodmanSystemInfo",
     "Secret",
     "Service",
     "Stack",

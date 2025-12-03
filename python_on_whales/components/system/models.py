@@ -219,3 +219,121 @@ class SystemInfo(DockerCamelModel):
     product_license: Optional[str] = None
     warnings: Optional[List[str]] = None
     client_info: Optional[ClientInfo] = None
+
+
+# Podman-specific models
+
+
+class PodmanIdMapping(DockerCamelModel):
+    container_id: Optional[int] = None
+    host_id: Optional[int] = None
+    size: Optional[int] = None
+
+
+class PodmanConmonInfo(DockerCamelModel):
+    package: Optional[str] = None
+    path: Optional[str] = None
+    version: Optional[str] = None
+
+
+class PodmanDistributionInfo(DockerCamelModel):
+    distribution: Optional[str] = None
+    version: Optional[str] = None
+
+
+class PodmanOciRuntime(DockerCamelModel):
+    name: Optional[str] = None
+    package: Optional[str] = None
+    path: Optional[str] = None
+    version: Optional[str] = None
+
+
+class PodmanSecurityInfo(DockerCamelModel):
+    apparmor_enabled: Optional[bool] = None
+    capabilities: Optional[str] = None
+    rootless: Optional[bool] = None
+    seccomp_enabled: Optional[bool] = None
+    seccomp_profile_path: Optional[str] = None
+    selinux_enabled: Optional[bool] = None
+
+
+class PodmanHostInfo(DockerCamelModel):
+    arch: Optional[str] = None
+    buildah_version: Optional[str] = None
+    cgroup_manager: Optional[str] = None
+    cgroup_version: Optional[str] = None
+    cgroup_controllers: Optional[List[str]] = None
+    conmon: Optional[PodmanConmonInfo] = None
+    cpus: Optional[int] = None
+    distribution: Optional[PodmanDistributionInfo] = None
+    event_logger: Optional[str] = None
+    hostname: Optional[str] = None
+    id_mappings: Optional[Dict[str, List[PodmanIdMapping]]] = None
+    kernel: Optional[str] = None
+    log_driver: Optional[str] = None
+    mem_free: Optional[int] = None
+    mem_total: Optional[int] = None
+    network_backend: Optional[str] = None
+    network_backend_info: Optional[Dict[str, Any]] = None
+    oci_runtime: Optional[PodmanOciRuntime] = None
+    os: Optional[str] = None
+    remote_socket: Optional[Dict[str, Any]] = None
+    security: Optional[PodmanSecurityInfo] = None
+    service_is_remote: Optional[bool] = None
+    slirp4netns: Optional[Dict[str, Any]] = None
+    pasta: Optional[Dict[str, Any]] = None
+    swap_free: Optional[int] = None
+    swap_total: Optional[int] = None
+    uptime: Optional[str] = None
+    linkmode: Optional[str] = None
+
+
+class PodmanContainerStore(DockerCamelModel):
+    number: Optional[int] = None
+    paused: Optional[int] = None
+    running: Optional[int] = None
+    stopped: Optional[int] = None
+
+
+class PodmanImageStore(DockerCamelModel):
+    number: Optional[int] = None
+
+
+class PodmanStoreInfo(DockerCamelModel):
+    config_file: Optional[str] = None
+    container_store: Optional[PodmanContainerStore] = None
+    graph_driver_name: Optional[str] = None
+    graph_options: Optional[Dict[str, Any]] = None
+    graph_root: Optional[str] = None
+    graph_status: Optional[Dict[str, str]] = None
+    image_copy_tmp_dir: Optional[str] = None
+    image_store: Optional[PodmanImageStore] = None
+    run_root: Optional[str] = None
+    volume_path: Optional[str] = None
+    transient_store: Optional[bool] = None
+
+
+class PodmanPlugins(DockerCamelModel):
+    volume: Optional[List[str]] = None
+    network: Optional[List[str]] = None
+    log: Optional[List[str]] = None
+
+
+class PodmanVersionInfo(DockerCamelModel):
+    api_version: Annotated[Optional[str], pydantic.Field(alias="APIVersion")] = None
+    version: Optional[str] = None
+    go_version: Optional[str] = None
+    git_commit: Optional[str] = None
+    built_time: Optional[str] = None
+    built: Optional[int] = None
+    os_arch: Optional[str] = None
+
+
+class PodmanSystemInfo(DockerCamelModel):
+    """System info model for Podman's output format."""
+
+    host: Optional[PodmanHostInfo] = None
+    store: Optional[PodmanStoreInfo] = None
+    registries: Optional[Dict[str, Any]] = None
+    plugins: Optional[PodmanPlugins] = None
+    version: Optional[PodmanVersionInfo] = None

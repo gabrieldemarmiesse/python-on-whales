@@ -89,20 +89,8 @@ class Version(DockerCamelModel):
     server: Optional[ServerVersion] = None
 
 
-class DockerClient(DockerCLICaller):
-    """Creates a Docker client
-
-    Note that
-    ```python
-    from python_on_whales import docker
-    print(docker.run("hello-world"))
-    ```
-    is equivalent to
-    ```python
-    from python_on_whales import DockerClient
-    docker = DockerClient()
-    print(docker.run("hello-world")
-    ```
+class ContainerClient(DockerCLICaller):
+    """Base client for container runtimes. Use DockerClient or PodmanClient.
 
     Parameters:
         config: Location of client config files (default "~/.docker")
@@ -151,6 +139,8 @@ class DockerClient(DockerCLICaller):
             a behavior and `client_type` is `"unknown"`, it will raise an exception and ask you to specify
             what kind of client you're working with. Valid values are `"docker"`, `"podman"`, "`nerdctl"` and `"unknown"`.
     """
+
+    _runtime: str = "unknown"
 
     def __init__(
         self,
@@ -222,7 +212,7 @@ class DockerClient(DockerCLICaller):
         self.service = ServiceCLI(self.client_config)
         self.stack = StackCLI(self.client_config)
         self.swarm = SwarmCLI(self.client_config)
-        self.system = SystemCLI(self.client_config)
+        self.system = SystemCLI(self.client_config, runtime=self._runtime)
         self.task = TaskCLI(self.client_config)
         self.trust = TrustCLI(self.client_config)
         self.volume = VolumeCLI(self.client_config)
@@ -373,3 +363,46 @@ class DockerClient(DockerCLICaller):
         if registry is None:
             registry = response["proxyEndpoint"]
         self.login(registry, username, password)
+
+
+class DockerClient(ContainerClient):
+    """Docker client.
+
+    Note that
+    ```python
+    from python_on_whales import docker
+    print(docker.run("hello-world"))
+    ```
+    is equivalent to
+    ```python
+    from python_on_whales import DockerClient
+    docker = DockerClient()
+    print(docker.run("hello-world"))
+    ```
+    """
+
+    _runtime = "docker"
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("client_call", [self._runtime])
+        kwargs.setdefault("client_type", self._runtime)
+        super().__init__(**kwargs)
+
+
+class PodmanClient(ContainerClient):
+    """Podman client.
+
+    Example:
+    ```python
+    from python_on_whales import PodmanClient
+    podman = PodmanClient()
+    print(podman.run("hello-world"))
+    ```
+    """
+
+    _runtime = "podman"
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("client_call", [self._runtime])
+        kwargs.setdefault("client_type", self._runtime)
+        super().__init__(**kwargs)
