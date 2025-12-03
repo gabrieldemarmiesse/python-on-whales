@@ -91,10 +91,32 @@ def to_docker_camel(string):
         return "".join(title_if_necessary(x) for x in string.split("_"))
 
 
+def to_podman_camel(string: str) -> str:
+    """Convert snake_case to camelCase (first letter lowercase).
+
+    Podman uses camelCase (e.g., 'volumePath') but Docker uses
+    PascalCase (e.g., 'BuildahVersion').
+    """
+    parts = string.split("_")
+    if len(parts) == 1:
+        return string
+    return parts[0].lower() + "".join(word.title() for word in parts[1:])
+
+
 class DockerCamelModel(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(
         populate_by_name=True,
         alias_generator=to_docker_camel,
+        defer_build=True,
+    )
+
+
+class PodmanCamelModel(pydantic.BaseModel):
+    """Base model for Podman-specific structures that use camelCase keys."""
+
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True,
+        alias_generator=to_podman_camel,
         defer_build=True,
     )
 

@@ -6,7 +6,7 @@ import pydantic
 from typing_extensions import Annotated
 
 import python_on_whales.components.node.models
-from python_on_whales.utils import DockerCamelModel
+from python_on_whales.utils import DockerCamelModel, PodmanCamelModel
 
 
 class DockerEventActor(DockerCamelModel):
@@ -224,31 +224,31 @@ class SystemInfo(DockerCamelModel):
 # Podman-specific models
 
 
-class PodmanIdMapping(DockerCamelModel):
+class PodmanIdMapping(pydantic.BaseModel):
     container_id: Optional[int] = None
     host_id: Optional[int] = None
     size: Optional[int] = None
 
 
-class PodmanConmonInfo(DockerCamelModel):
+class PodmanConmonInfo(PodmanCamelModel):
     package: Optional[str] = None
     path: Optional[str] = None
     version: Optional[str] = None
 
 
-class PodmanDistributionInfo(DockerCamelModel):
+class PodmanDistributionInfo(PodmanCamelModel):
     distribution: Optional[str] = None
     version: Optional[str] = None
 
 
-class PodmanOciRuntime(DockerCamelModel):
+class PodmanOciRuntime(PodmanCamelModel):
     name: Optional[str] = None
     package: Optional[str] = None
     path: Optional[str] = None
     version: Optional[str] = None
 
 
-class PodmanSecurityInfo(DockerCamelModel):
+class PodmanSecurityInfo(PodmanCamelModel):
     apparmor_enabled: Optional[bool] = None
     capabilities: Optional[str] = None
     rootless: Optional[bool] = None
@@ -257,7 +257,13 @@ class PodmanSecurityInfo(DockerCamelModel):
     selinux_enabled: Optional[bool] = None
 
 
-class PodmanHostInfo(DockerCamelModel):
+class PodmanCpuUtilization(PodmanCamelModel):
+    user_percent: Optional[float] = None
+    system_percent: Optional[float] = None
+    idle_percent: Optional[float] = None
+
+
+class PodmanHostInfo(PodmanCamelModel):
     arch: Optional[str] = None
     buildah_version: Optional[str] = None
     cgroup_manager: Optional[str] = None
@@ -265,8 +271,11 @@ class PodmanHostInfo(DockerCamelModel):
     cgroup_controllers: Optional[List[str]] = None
     conmon: Optional[PodmanConmonInfo] = None
     cpus: Optional[int] = None
+    cpu_utilization: Optional[PodmanCpuUtilization] = None
+    database_backend: Optional[str] = None
     distribution: Optional[PodmanDistributionInfo] = None
     event_logger: Optional[str] = None
+    free_locks: Optional[int] = None
     hostname: Optional[str] = None
     id_mappings: Optional[Dict[str, List[PodmanIdMapping]]] = None
     kernel: Optional[str] = None
@@ -285,26 +294,29 @@ class PodmanHostInfo(DockerCamelModel):
     swap_free: Optional[int] = None
     swap_total: Optional[int] = None
     uptime: Optional[str] = None
+    variant: Optional[str] = None
     linkmode: Optional[str] = None
 
 
-class PodmanContainerStore(DockerCamelModel):
+class PodmanContainerStore(PodmanCamelModel):
     number: Optional[int] = None
     paused: Optional[int] = None
     running: Optional[int] = None
     stopped: Optional[int] = None
 
 
-class PodmanImageStore(DockerCamelModel):
+class PodmanImageStore(PodmanCamelModel):
     number: Optional[int] = None
 
 
-class PodmanStoreInfo(DockerCamelModel):
+class PodmanStoreInfo(PodmanCamelModel):
     config_file: Optional[str] = None
     container_store: Optional[PodmanContainerStore] = None
     graph_driver_name: Optional[str] = None
     graph_options: Optional[Dict[str, Any]] = None
     graph_root: Optional[str] = None
+    graph_root_allocated: Optional[int] = None
+    graph_root_used: Optional[int] = None
     graph_status: Optional[Dict[str, str]] = None
     image_copy_tmp_dir: Optional[str] = None
     image_store: Optional[PodmanImageStore] = None
@@ -313,23 +325,25 @@ class PodmanStoreInfo(DockerCamelModel):
     transient_store: Optional[bool] = None
 
 
-class PodmanPlugins(DockerCamelModel):
+class PodmanPlugins(PodmanCamelModel):
     volume: Optional[List[str]] = None
     network: Optional[List[str]] = None
     log: Optional[List[str]] = None
+    authorization: Any = None
 
 
-class PodmanVersionInfo(DockerCamelModel):
+class PodmanVersionInfo(PodmanCamelModel):
     api_version: Annotated[Optional[str], pydantic.Field(alias="APIVersion")] = None
-    version: Optional[str] = None
-    go_version: Optional[str] = None
-    git_commit: Optional[str] = None
-    built_time: Optional[str] = None
-    built: Optional[int] = None
-    os_arch: Optional[str] = None
+    version: Annotated[Optional[str], pydantic.Field(alias="Version")] = None
+    go_version: Annotated[Optional[str], pydantic.Field(alias="GoVersion")] = None
+    git_commit: Annotated[Optional[str], pydantic.Field(alias="GitCommit")] = None
+    built_time: Annotated[Optional[str], pydantic.Field(alias="BuiltTime")] = None
+    built: Annotated[Optional[int], pydantic.Field(alias="Built")] = None
+    os_arch: Annotated[Optional[str], pydantic.Field(alias="OsArch")] = None
+    os: Annotated[Optional[str], pydantic.Field(alias="Os")] = None
 
 
-class PodmanSystemInfo(DockerCamelModel):
+class PodmanSystemInfo(PodmanCamelModel):
     """System info model for Podman's output format."""
 
     host: Optional[PodmanHostInfo] = None
