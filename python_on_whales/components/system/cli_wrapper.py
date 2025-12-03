@@ -2,11 +2,10 @@ import datetime
 import json
 from typing import Dict, Iterator, Union
 
-from python_on_whales.client_config import ClientConfig, DockerCLICaller
+from python_on_whales.client_config import DockerCLICaller
 from python_on_whales.components.system.models import (
     DockerEvent,
     DockerItemsSummary,
-    PodmanSystemInfo,
     SystemInfo,
 )
 from python_on_whales.utils import (
@@ -42,10 +41,6 @@ class DiskFreeResult:
 
 
 class SystemCLI(DockerCLICaller):
-    def __init__(self, client_config: ClientConfig, runtime: str = "unknown"):
-        super().__init__(client_config)
-        self._runtime = runtime
-
     def disk_free(self) -> DiskFreeResult:
         """Give information about the disk usage of the Docker daemon.
 
@@ -135,12 +130,11 @@ class SystemCLI(DockerCLICaller):
             if stream_origin == "stdout":
                 yield DockerEvent(**json.loads(stream_content))
 
-    def info(self) -> Union[SystemInfo, PodmanSystemInfo]:
-        """Returns diverse information about the container client and daemon.
+    def info(self) -> SystemInfo:
+        """Returns diverse information about the Docker client and daemon.
 
         # Returns
-            A `python_on_whales.SystemInfo` object for Docker,
-            or `python_on_whales.PodmanSystemInfo` for Podman.
+            A `python_on_whales.SystemInfo` object
 
         As an example
 
@@ -159,11 +153,7 @@ class SystemCLI(DockerCLICaller):
         system info](https://docs.docker.com/engine/api/v1.40/#operation/SystemInfo).
         """
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
-        json_output = json.loads(run(full_cmd))
-
-        if self._runtime == "podman":
-            return PodmanSystemInfo(**json_output)
-        return SystemInfo(**json_output)
+        return SystemInfo(**json.loads(run(full_cmd)))
 
     def prune(
         self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}

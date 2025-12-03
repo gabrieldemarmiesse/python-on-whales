@@ -6,12 +6,8 @@ from time import sleep
 
 import pytest
 
-from python_on_whales import DockerClient, PodmanClient
-from python_on_whales.components.system.models import (
-    DockerEvent,
-    PodmanSystemInfo,
-    SystemInfo,
-)
+from python_on_whales import DockerClient
+from python_on_whales.components.system.models import DockerEvent, SystemInfo
 from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import get_all_jsons, random_name
 
@@ -41,12 +37,6 @@ def test_disk_free(ctr_client: DockerClient):
 def test_info(ctr_client: DockerClient):
     info = ctr_client.system.info()
     assert "local" in info.plugins.volume
-
-
-def test_info_podman(podman_client: PodmanClient):
-    info = podman_client.system.info()
-    assert isinstance(info, PodmanSystemInfo)
-    assert info.host is not None
 
 
 def test_events(docker_client: DockerClient):
@@ -99,12 +89,7 @@ def test_events_no_arguments(docker_client: DockerClient):
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     SystemInfo(**json.loads(json_as_txt))
-
-
-@pytest.mark.parametrize("json_file", get_all_jsons("podman_system_info"))
-def test_load_podman_json(json_file):
-    json_as_txt = json_file.read_text()
-    PodmanSystemInfo(**json.loads(json_as_txt))
+    # we could do more checks here if needed
 
 
 def test_parsing_events():
