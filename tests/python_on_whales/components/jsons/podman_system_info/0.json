@@ -11,11 +11,18 @@
       "version": "conmon version 2.0.29, commit: "
     },
     "cpus": 8,
+    "cpuUtilization": {
+      "userPercent": 7.7,
+      "systemPercent": 1.98,
+      "idlePercent": 90.32
+    },
+    "databaseBackend": "sqlite",
     "distribution": {
       "distribution": "fedora",
       "version": "34"
     },
     "eventLogger": "journald",
+    "freeLocks": 1795,
     "hostname": "localhost.localdomain",
     "idMappings": {
       "gidmap": [
@@ -74,6 +81,7 @@
     "swapFree": 15687475200,
     "swapTotal": 16886259712,
     "uptime": "47h 17m 29.75s (Approximately 1.96 days)",
+    "variant": "",
     "linkmode": "dynamic"
   },
   "store": {
@@ -87,6 +95,8 @@
     "graphDriverName": "overlay",
     "graphOptions": {},
     "graphRoot": "/home/dwalsh/.local/share/containers/storage",
+    "graphRootAllocated": 1038956064768,
+    "graphRootUsed": 230132768768,
     "graphStatus": {
       "Backing Filesystem": "extfs",
       "Native Overlay Diff": "true",
@@ -112,7 +122,8 @@
   "plugins": {
     "volume": ["local"],
     "network": ["bridge", "macvlan"],
-    "log": ["k8s-file", "none", "journald"]
+    "log": ["k8s-file", "none", "journald"],
+    "authorization": null
   },
   "version": {
     "APIVersion": "4.0.0",
@@ -121,7 +132,7 @@
     "GitCommit": "23677f92dd83e96d2bc8f0acb611865fb8b1a56d",
     "BuiltTime": "Tue Sep 14 15:45:22 2021",
     "Built": 1631648722,
-    "OsArch": "linux/amd64"
+    "OsArch": "linux/amd64",
+    "Os": "linux"
   }
 }
-

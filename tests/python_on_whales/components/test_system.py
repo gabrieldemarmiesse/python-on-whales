@@ -103,8 +103,37 @@ def test_load_json(json_file):
 
 @pytest.mark.parametrize("json_file", get_all_jsons("podman_system_info"))
 def test_load_podman_json(json_file):
-    json_as_txt = json_file.read_text()
-    PodmanSystemInfo(**json.loads(json_as_txt))
+    """
+    Test that PodmanSystemInfo correctly parses camelCase
+    JSON keys into nested classes with snake_case keys.
+    """
+    json_data = json.loads(json_file.read_text())
+    info = PodmanSystemInfo(**json_data)
+
+    assert info.host.buildah_version == json_data["host"]["buildahVersion"]
+    assert info.host.cgroup_manager == json_data["host"]["cgroupManager"]
+    assert info.host.mem_total == json_data["host"]["memTotal"]
+
+    assert info.host.oci_runtime.name == json_data["host"]["ociRuntime"]["name"]
+    assert (
+        info.host.security.seccomp_enabled
+        == json_data["host"]["security"]["seccompEnabled"]
+    )
+
+    first_gidmap = info.host.id_mappings["gidmap"][0]
+    assert (
+        first_gidmap.container_id
+        == json_data["host"]["idMappings"]["gidmap"][0]["container_id"]
+    )
+
+    assert info.store.graph_driver_name == json_data["store"]["graphDriverName"]
+    assert (
+        info.store.container_store.number
+        == json_data["store"]["containerStore"]["number"]
+    )
+
+    assert info.version.api_version == json_data["version"]["APIVersion"]
+    assert info.version.version == json_data["version"]["Version"]
 
 
 def test_parsing_events():
