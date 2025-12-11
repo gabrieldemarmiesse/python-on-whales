@@ -688,7 +688,48 @@ def test_bake_stream_logs(monkeypatch):
 @pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
-def test_bake_metadata_file(only_print, monkeypatch, tmp_path):
+def test_bake_metadata_file_output(only_print, tmp_path):
+    metadata_path = tmp_path / "metadata.json"
+
+    config = docker.buildx.bake(
+        files=[bake_file], metadata_file=metadata_path, print=only_print
+    )
+    assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
+        "target": {
+            "my_out1": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image1:1.0.0"],
+                "target": "out1",
+            },
+            "my_out2": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:1.0.0"],
+                "target": "out2",
+            },
+        },
+    }
+    if not only_print:
+        assert metadata_path.is_file()
+        with open(metadata_path, "r") as f:
+            metadata = json.load(f)
+        assert len(metadata.keys()) == len(
+            config["target"]
+        )  # two target builds expected
+        for target_name, target_metadata in metadata.items():
+            assert target_name in config["target"]
+            assert (
+                "docker.io/library/{}".format(config["target"][target_name]["tags"][0])
+                in target_metadata["image.name"]
+            )
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_metadata_file_option(only_print, monkeypatch, tmp_path):
     recorded = {}
 
     def fake_run(cmd, capture_stderr=True, env={}):
@@ -709,7 +750,7 @@ def test_bake_metadata_file(only_print, monkeypatch, tmp_path):
 @pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
-def test_bake_without_metadata_file(only_print, monkeypatch, tmp_path):
+def test_bake_without_metadata_file_option(only_print, monkeypatch, tmp_path):
     recorded = {}
 
     def fake_run(cmd, capture_stderr=True, env={}):
@@ -727,7 +768,7 @@ def test_bake_without_metadata_file(only_print, monkeypatch, tmp_path):
 @pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("change_cwd")
 @pytest.mark.parametrize("only_print", [True, False])
-def test_bake_metadata_file_str_path(only_print, monkeypatch, tmp_path):
+def test_bake_metadata_file_str_path_option(only_print, monkeypatch, tmp_path):
     recorded = {}
 
     def fake_run(cmd, capture_stderr=True, env={}):
