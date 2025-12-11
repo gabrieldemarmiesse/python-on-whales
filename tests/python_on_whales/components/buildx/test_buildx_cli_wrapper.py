@@ -693,7 +693,7 @@ def test_bake_metadata_file(only_print, monkeypatch, tmp_path):
 
     def fake_run(cmd, capture_stderr=True, env={}):
         recorded["cmd"] = list(cmd)
-        return ""
+        return "{}"
 
     monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
 
@@ -714,7 +714,7 @@ def test_bake_without_metadata_file(only_print, monkeypatch, tmp_path):
 
     def fake_run(cmd, capture_stderr=True, env={}):
         recorded["cmd"] = list(cmd)
-        return ""
+        return "{}"
 
     monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
 
@@ -732,7 +732,7 @@ def test_bake_metadata_file_str_path(only_print, monkeypatch, tmp_path):
 
     def fake_run(cmd, capture_stderr=True, env={}):
         recorded["cmd"] = list(cmd)
-        return ""
+        return "{}"
 
     monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
 
