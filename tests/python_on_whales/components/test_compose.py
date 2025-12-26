@@ -6,6 +6,7 @@ import time
 from datetime import datetime, timedelta
 from os import makedirs, remove
 from pathlib import Path
+from typing import Iterable, Tuple, Union
 from unittest.mock import Mock, patch
 
 import pytest
@@ -915,6 +916,68 @@ def test_compose_run_volume_with_parameter():
             remove=True,
             tty=False,
         )
+
+
+def test_compose_run_service_ports_flag():
+    """Test that --service-ports flag is included in the command."""
+
+    with patch("python_on_whales.components.compose.cli_wrapper.run") as mock_run:
+        mock_run.return_value = ""
+        docker.compose.run(
+            "my_service",
+            command=["echo", "hello"],
+            service_ports=True,
+            detach=True,
+            tty=False,
+        )
+
+        call_args = mock_run.call_args[0][0]
+        assert "--service-ports" in call_args
+
+
+@pytest.mark.parametrize("service_ports", [True, False])
+def test_compose_run_service_ports_integration(service_ports):
+    """Test that service ports are correctly mapped when using --service-ports."""
+
+    docker_client = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/service_ports.yml"
+        ],
+        compose_compatibility=True,
+    )
+    container: Union[
+        str,
+        python_on_whales.components.container.cli_wrapper.Container,
+        Iterable[Tuple[str, bytes]],
+    ] = ""
+    try:
+        container = docker_client.compose.run(
+            "web",
+            detach=True,
+            service_ports=service_ports,
+            remove=False,
+            tty=False,
+        )
+
+        # Verify the container has the port mapping
+        container_info = docker.container.inspect(container)
+        port_bindings = container_info.host_config.port_bindings
+        assert port_bindings is not None
+        if service_ports:
+            assert "80/tcp" in port_bindings
+            assert any(
+                binding.host_port == "8074" if hasattr(binding, "host_port") else False
+                for binding in port_bindings["80/tcp"]
+            )
+        else:
+            assert len(port_bindings) == 0
+    finally:
+        # be sensible before calling cleanup
+        if container and isinstance(
+            container, python_on_whales.components.container.cli_wrapper.Container
+        ):
+            container.stop()
+            container.remove(force=True)
 
 
 def test_compose_version():
