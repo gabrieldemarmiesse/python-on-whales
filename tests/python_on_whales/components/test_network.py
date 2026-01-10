@@ -3,6 +3,7 @@ import json
 import pytest
 
 from python_on_whales import DockerClient
+from python_on_whales.components.container.models import ContainerEndpointIPAMConfig
 from python_on_whales.components.network.cli_wrapper import NetworkInspectResult
 from python_on_whales.exceptions import DockerException
 from python_on_whales.test_utils import get_all_jsons, random_name
@@ -114,3 +115,24 @@ def test_list_filters_old_signature(docker_client: DockerClient):
         with pytest.warns(DeprecationWarning, match=expected_warning):
             networks_listed = docker_client.network.list(filters={"name": name})
     assert networks_listed == [network]
+
+
+def test_correct_ipam_config(docker_client: DockerClient):
+    """Test that we can create a network with a specific IPAM configuration."""
+    with docker_client.network.create(random_name(), subnet="172.20.0.0/16") as net:
+        with docker_client.container.run(
+            "busybox",
+            ["sleep", "infinity"],
+            detach=True,
+            networks=[net],
+            ip="172.20.0.5",
+        ) as ctr:
+            inspect = docker_client.container.inspect(ctr)
+            assert (
+                inspect.network_settings.networks[net.name].ip_address == "172.20.0.5"
+            )
+            assert inspect.network_settings.networks[
+                net.name
+            ].ipam_config == ContainerEndpointIPAMConfig(
+                ipv4_address="172.20.0.5", ipv6_address=None, link_local_ips=None
+            )
