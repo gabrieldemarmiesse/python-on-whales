@@ -1,0 +1,2505 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Python on whales docs">
+      
+      
+      
+      
+        <link rel="prev" href="../configs/">
+      
+      
+        <link rel="next" href="../images/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+    
+    
+      
+        <title>Containers - Python on whales</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#docker-containers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Python on whales" class="md-header__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Python on whales
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Containers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Python on whales" class="md-nav__button md-logo" aria-label="Python on whales" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Python on whales
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/gabrieldemarmiesse/python-on-whales" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docker_client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Sub-commands
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Sub-commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/buildx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker buildx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/compose/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker config
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/context/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker context
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/image/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker image
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/manifest/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker manifest
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/network/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker network
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/node/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker node
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/secret/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker secret
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/service/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker service
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/swarm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker swarm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/system/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker system
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/task/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker task
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/trust/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker trust
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/volume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker volume
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sub-commands/pod/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    podman pod
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Objects
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Objects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Containers
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Containers
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.Container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Container
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Container">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.attach" class="md-nav__link">
+    <span class="md-ellipsis">
+      attach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      commit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.diff" class="md-nav__link">
+    <span class="md-ellipsis">
+      diff
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.export" class="md-nav__link">
+    <span class="md-ellipsis">
+      export
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.init" class="md-nav__link">
+    <span class="md-ellipsis">
+      init
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.kill" class="md-nav__link">
+    <span class="md-ellipsis">
+      kill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.pause" class="md-nav__link">
+    <span class="md-ellipsis">
+      pause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      remove
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.rename" class="md-nav__link">
+    <span class="md-ellipsis">
+      rename
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.restart" class="md-nav__link">
+    <span class="md-ellipsis">
+      restart
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.unpause" class="md-nav__link">
+    <span class="md-ellipsis">
+      unpause
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Images
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../networks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nodes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nodes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plugins
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Services
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stacks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stacks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tasks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../volumes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Volumes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/docker_run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    docker.run() guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/generic_resources/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Swarm generic resources
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/running_python_on_whales_inside_a_container/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Running python-on-whales inside a container
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user_guide/exceptions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    dealing with exceptions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python_on_whales.Container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Container
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Container">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.attach" class="md-nav__link">
+    <span class="md-ellipsis">
+      attach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      commit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.diff" class="md-nav__link">
+    <span class="md-ellipsis">
+      diff
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.export" class="md-nav__link">
+    <span class="md-ellipsis">
+      export
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.init" class="md-nav__link">
+    <span class="md-ellipsis">
+      init
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.kill" class="md-nav__link">
+    <span class="md-ellipsis">
+      kill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.pause" class="md-nav__link">
+    <span class="md-ellipsis">
+      pause
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      remove
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.rename" class="md-nav__link">
+    <span class="md-ellipsis">
+      rename
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.restart" class="md-nav__link">
+    <span class="md-ellipsis">
+      restart
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python_on_whales.Container.unpause" class="md-nav__link">
+    <span class="md-ellipsis">
+      unpause
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="docker-containers">Docker containers</h1>
+<p>Don't use the constructor directly. Instead use 
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">python_on_whales</span><span class="w"> </span><span class="kn">import</span> <span class="n">docker</span>
+
+<span class="n">my_container</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">inspect</span><span class="p">(</span><span class="s2">&quot;my-container-name&quot;</span><span class="p">)</span>
+
+<span class="c1"># for example:</span>
+<span class="k">if</span> <span class="n">my_container</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+    <span class="n">my_container</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+</code></pre></div>
+For type hints, use this</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">python_on_whales</span><span class="w"> </span><span class="kn">import</span> <span class="n">Container</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print_dodo</span><span class="p">(</span><span class="n">container</span><span class="p">:</span> <span class="n">Container</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">execute</span><span class="p">([</span><span class="s2">&quot;echo&quot;</span><span class="p">,</span> <span class="s2">&quot;dodo&quot;</span><span class="p">]))</span>
+</code></pre></div>
+<h2 id="attributes">Attributes</h2>
+<p>It attributes are the same that you get with the command line:
+<code>docker container inspect ...</code></p>
+<p>If you want to know the exact structure, you can go to the 
+<a href="https://docs.docker.com/engine/api/v1.40/#operation/ContainerInspect"><code>docker container inspect</code> reference page</a>
+and click on "200 no error".
+An example is worth many lines of descriptions.</p>
+<div class="highlight"><pre><span></span><code>In [1]: from python_on_whales import docker
+
+In [2]: container = docker.run(&quot;ubuntu&quot;, [&quot;sleep&quot;, &quot;infinity&quot;], detach=True)
+
+In [4]: def super_print(obj):
+   ...:     print(f&quot;type={type(obj)}, value={obj}&quot;)
+   ...:
+
+In [4]: super_print(container.id)
+type = &lt;class &#39;str&#39;&gt;, value = 1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958
+
+In [5]: super_print(container.created)
+type = &lt;class &#39;datetime.datetime&#39;&gt;, value = 2026-01-10 18:01:17.926936+00:00
+
+In [6]: super_print(container.path)
+type = &lt;class &#39;str&#39;&gt;, value = sleep
+
+In [7]: super_print(container.args)
+type = &lt;class &#39;list&#39;&gt;, value = [&#39;infinity&#39;]
+
+In [8]: super_print(container.state.status)
+type = &lt;class &#39;str&#39;&gt;, value = running
+
+In [9]: super_print(container.state.running)
+type = &lt;class &#39;bool&#39;&gt;, value = True
+
+In [10]: super_print(container.state.paused)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [11]: super_print(container.state.restarting)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [12]: super_print(container.state.oom_killed)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [13]: super_print(container.state.dead)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [14]: super_print(container.state.pid)
+type = &lt;class &#39;int&#39;&gt;, value = 2988
+
+In [15]: super_print(container.state.exit_code)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [16]: super_print(container.state.error)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [17]: super_print(container.state.started_at)
+type = &lt;class &#39;datetime.datetime&#39;&gt;, value = 2026-01-10 18:01:17.943432+00:00
+
+In [18]: super_print(container.state.finished_at)
+type = &lt;class &#39;datetime.datetime&#39;&gt;, value = 0001-01-01 00:00:00+00:00
+
+In [19]: super_print(container.state.health)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [20]: super_print(container.image)
+type = &lt;class &#39;str&#39;&gt;, value = sha256:c3a134f2ace4f6d480733efcfef27c60ea8ed48be1cd36f2c17ec0729775b2c8
+
+In [21]: super_print(container.resolv_conf_path)
+type = &lt;class &#39;str&#39;&gt;, value = /var/lib/docker/containers/1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958/resolv.conf
+
+In [22]: super_print(container.hostname_path)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = /var/lib/docker/containers/1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958/hostname
+
+In [23]: super_print(container.hosts_path)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = /var/lib/docker/containers/1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958/hosts
+
+In [24]: super_print(container.log_path)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = /var/lib/docker/containers/1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958/1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958-json.log
+
+In [25]: super_print(container.node)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [26]: super_print(container.name)
+type = &lt;class &#39;str&#39;&gt;, value = inspiring_kepler
+
+In [27]: super_print(container.restart_count)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [28]: super_print(container.driver)
+type = &lt;class &#39;str&#39;&gt;, value = overlay2
+
+In [29]: super_print(container.platform)
+type = &lt;class &#39;str&#39;&gt;, value = linux
+
+In [30]: super_print(container.mount_label)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [31]: super_print(container.process_label)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [32]: super_print(container.app_armor_profile)
+type = &lt;class &#39;str&#39;&gt;, value = docker-default
+
+In [33]: super_print(container.exec_ids)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [34]: super_print(container.host_config.cpu_shares)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [35]: super_print(container.host_config.memory)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [36]: super_print(container.host_config.cgroup_parent)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = .
+
+In [37]: super_print(container.host_config.blkio_weight)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [38]: super_print(container.host_config.blkio_weight_device)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [39]: super_print(container.host_config.blkio_device_read_bps)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [40]: super_print(container.host_config.blkio_device_write_bps)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [41]: super_print(container.host_config.blkio_device_read_iops)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [42]: super_print(container.host_config.blkio_device_write_iops)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [43]: super_print(container.host_config.cpu_period)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [44]: super_print(container.host_config.cpu_quota)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [45]: super_print(container.host_config.cpu_realtime_period)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [46]: super_print(container.host_config.cpu_realtime_runtime)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [47]: super_print(container.host_config.cpuset_cpus)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [48]: super_print(container.host_config.cpuset_mems)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [49]: super_print(container.host_config.devices)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [50]: super_print(container.host_config.device_cgroup_rules)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [51]: super_print(container.host_config.device_requests)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [52]: super_print(container.host_config.kernel_memory)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [53]: super_print(container.host_config.kernel_memory_tcp)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [54]: super_print(container.host_config.memory_reservation)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [55]: super_print(container.host_config.memory_swap)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [56]: super_print(container.host_config.memory_swappiness)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [57]: super_print(container.host_config.nano_cpus)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [58]: super_print(container.host_config.oom_kill_disable)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [59]: super_print(container.host_config.init)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [60]: super_print(container.host_config.pids_limit)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [61]: super_print(container.host_config.ulimits)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [62]: super_print(container.host_config.cpu_count)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [63]: super_print(container.host_config.cpu_percent)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [64]: super_print(container.host_config.binds)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [65]: super_print(container.host_config.container_id_file)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = .
+
+In [66]: super_print(container.host_config.log_config.type)
+type = &lt;class &#39;str&#39;&gt;, value = json-file
+
+In [67]: super_print(container.host_config.log_config.config)
+type = &lt;class &#39;dict&#39;&gt;, value = {}
+
+In [68]: super_print(container.host_config.network_mode)
+type = &lt;class &#39;str&#39;&gt;, value = bridge
+
+In [69]: super_print(container.host_config.port_bindings)
+type = &lt;class &#39;dict&#39;&gt;, value = {}
+
+In [70]: super_print(container.host_config.restart_policy.name)
+type = &lt;class &#39;str&#39;&gt;, value = no
+
+In [71]: super_print(container.host_config.restart_policy.maximum_retry_count)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [72]: super_print(container.host_config.auto_remove)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [73]: super_print(container.host_config.volume_driver)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [74]: super_print(container.host_config.volumes_from)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [75]: super_print(container.host_config.mounts)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [76]: super_print(container.host_config.capabilities)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [77]: super_print(container.host_config.cap_add)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [78]: super_print(container.host_config.cap_drop)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [79]: super_print(container.host_config.dns)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [80]: super_print(container.host_config.dns_options)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [81]: super_print(container.host_config.dns_search)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [82]: super_print(container.host_config.extra_hosts)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [83]: super_print(container.host_config.group_add)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [84]: super_print(container.host_config.ipc_mode)
+type = &lt;class &#39;str&#39;&gt;, value = private
+
+In [85]: super_print(container.host_config.cgroup)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [86]: super_print(container.host_config.links)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [87]: super_print(container.host_config.oom_score_adj)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [88]: super_print(container.host_config.pid_mode)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [89]: super_print(container.host_config.privileged)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [90]: super_print(container.host_config.publish_all_ports)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [91]: super_print(container.host_config.readonly_rootfs)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [92]: super_print(container.host_config.security_opt)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [93]: super_print(container.host_config.storage_opt)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [94]: super_print(container.host_config.tmpfs)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [95]: super_print(container.host_config.uts_mode)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [96]: super_print(container.host_config.userns_mode)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [97]: super_print(container.host_config.shm_size)
+type = &lt;class &#39;int&#39;&gt;, value = 67108864
+
+In [98]: super_print(container.host_config.sysctls)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [99]: super_print(container.host_config.runtime)
+type = &lt;class &#39;str&#39;&gt;, value = runc
+
+In [100]: super_print(container.host_config.console_size)
+type = &lt;class &#39;tuple&#39;&gt;, value = (0, 0)
+
+In [101]: super_print(container.host_config.isolation)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [102]: super_print(container.host_config.masked_paths)
+type = &lt;class &#39;list&#39;&gt;, value = [PosixPath(&#39;/proc/asound&#39;), PosixPath(&#39;/proc/acpi&#39;), PosixPath(&#39;/proc/interrupts&#39;), PosixPath(&#39;/proc/kcore&#39;), PosixPath(&#39;/proc/keys&#39;), PosixPath(&#39;/proc/latency_stats&#39;), PosixPath(&#39;/proc/timer_list&#39;), PosixPath(&#39;/proc/timer_stats&#39;), PosixPath(&#39;/proc/sched_debug&#39;), PosixPath(&#39;/proc/scsi&#39;), PosixPath(&#39;/sys/firmware&#39;), PosixPath(&#39;/sys/devices/virtual/powercap&#39;)]
+
+In [103]: super_print(container.host_config.readonly_paths)
+type = &lt;class &#39;list&#39;&gt;, value = [PosixPath(&#39;/proc/bus&#39;), PosixPath(&#39;/proc/fs&#39;), PosixPath(&#39;/proc/irq&#39;), PosixPath(&#39;/proc/sys&#39;), PosixPath(&#39;/proc/sysrq-trigger&#39;)]
+
+In [104]: super_print(container.graph_driver.name)
+type = &lt;class &#39;str&#39;&gt;, value = overlay2
+
+In [105]: super_print(container.graph_driver.data)
+type = &lt;class &#39;dict&#39;&gt;, value = {&#39;ID&#39;: &#39;1630696d5602099b60584f20c5efba9e8bbe0cbb001514fddbda5be6d3dcf958&#39;, &#39;LowerDir&#39;: &#39;/var/lib/docker/overlay2/2a94fed82b90ea4c93da82528d6b3d93994120727eff23e374fd9da50bec11e1-init/diff:/var/lib/docker/overlay2/3786069d7460046b721dbac179aad0e4008a56d56f80d5ab07b4ef47559497bf/diff&#39;, &#39;MergedDir&#39;: &#39;/var/lib/docker/overlay2/2a94fed82b90ea4c93da82528d6b3d93994120727eff23e374fd9da50bec11e1/merged&#39;, &#39;UpperDir&#39;: &#39;/var/lib/docker/overlay2/2a94fed82b90ea4c93da82528d6b3d93994120727eff23e374fd9da50bec11e1/diff&#39;, &#39;WorkDir&#39;: &#39;/var/lib/docker/overlay2/2a94fed82b90ea4c93da82528d6b3d93994120727eff23e374fd9da50bec11e1/work&#39;}
+
+In [106]: super_print(container.size_rw)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [107]: super_print(container.size_root_fs)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [108]: super_print(container.mounts)
+type = &lt;class &#39;list&#39;&gt;, value = []
+
+In [109]: super_print(container.config.hostname)
+type = &lt;class &#39;str&#39;&gt;, value = 1630696d5602
+
+In [110]: super_print(container.config.domainname)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [111]: super_print(container.config.user)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [112]: super_print(container.config.attach_stdin)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [113]: super_print(container.config.attach_stdout)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [114]: super_print(container.config.attach_stderr)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [115]: super_print(container.config.exposed_ports)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [116]: super_print(container.config.tty)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [117]: super_print(container.config.open_stdin)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [118]: super_print(container.config.stdin_once)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [119]: super_print(container.config.env)
+type = &lt;class &#39;list&#39;&gt;, value = [&#39;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&#39;]
+
+In [120]: super_print(container.config.cmd)
+type = &lt;class &#39;list&#39;&gt;, value = [&#39;sleep&#39;, &#39;infinity&#39;]
+
+In [121]: super_print(container.config.healthcheck)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [122]: super_print(container.config.args_escaped)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [123]: super_print(container.config.image)
+type = &lt;class &#39;str&#39;&gt;, value = ubuntu
+
+In [124]: super_print(container.config.volumes)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [125]: super_print(container.config.working_dir)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = .
+
+In [126]: super_print(container.config.entrypoint)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [127]: super_print(container.config.network_disabled)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [128]: super_print(container.config.mac_address)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [129]: super_print(container.config.on_build)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [130]: super_print(container.config.labels)
+type = &lt;class &#39;dict&#39;&gt;, value = {&#39;org.opencontainers.image.ref.name&#39;: &#39;ubuntu&#39;, &#39;org.opencontainers.image.version&#39;: &#39;24.04&#39;}
+
+In [131]: super_print(container.config.stop_signal)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [132]: super_print(container.config.stop_timeout)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [133]: super_print(container.config.shell)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [134]: super_print(container.network_settings.bridge)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [135]: super_print(container.network_settings.sandbox_id)
+type = &lt;class &#39;str&#39;&gt;, value = a75d2036fddbaca78dcc79ab388d40aa356db2eee6485df63d4833fa595fbea0
+
+In [136]: super_print(container.network_settings.hairpin_mode)
+type = &lt;class &#39;bool&#39;&gt;, value = False
+
+In [137]: super_print(container.network_settings.link_local_ipv6_address)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [138]: super_print(container.network_settings.link_local_ipv6_prefix_length)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [139]: super_print(container.network_settings.ports)
+type = &lt;class &#39;dict&#39;&gt;, value = {}
+
+In [140]: super_print(container.network_settings.sandbox_key)
+type = &lt;class &#39;pathlib.PosixPath&#39;&gt;, value = /var/run/docker/netns/a75d2036fddb
+
+In [141]: super_print(container.network_settings.secondary_ip_addresses)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [142]: super_print(container.network_settings.secondary_ipv6_addresses)
+type = &lt;class &#39;NoneType&#39;&gt;, value = None
+
+In [143]: super_print(container.network_settings.endpoint_id)
+type = &lt;class &#39;str&#39;&gt;, value = 02b3353cc3e6c6830cbf402ef6095764593067cfdbafa11fcf6bbce51c256447
+
+In [144]: super_print(container.network_settings.gateway)
+type = &lt;class &#39;str&#39;&gt;, value = 172.17.0.1
+
+In [145]: super_print(container.network_settings.global_ipv6_address)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [146]: super_print(container.network_settings.global_ipv6_prefix_length)
+type = &lt;class &#39;int&#39;&gt;, value = 0
+
+In [147]: super_print(container.network_settings.ip_address)
+type = &lt;class &#39;str&#39;&gt;, value = 172.17.0.2
+
+In [148]: super_print(container.network_settings.ip_prefix_length)
+type = &lt;class &#39;int&#39;&gt;, value = 16
+
+In [149]: super_print(container.network_settings.ipv6_gateway)
+type = &lt;class &#39;str&#39;&gt;, value = 
+
+In [150]: super_print(container.network_settings.mac_address)
+type = &lt;class &#39;str&#39;&gt;, value = ea:18:6b:c3:f3:94
+
+In [151]: super_print(container.network_settings.networks)
+type = &lt;class &#39;dict&#39;&gt;, value = {&#39;bridge&#39;: NetworkInspectResult(ipam_config=None, links=None, aliases=None, network_id=&#39;16444f2550bdc799ca4b22992d385067763ef5ab7d5b72eeb4dbd754482a9572&#39;, endpoint_id=&#39;02b3353cc3e6c6830cbf402ef6095764593067cfdbafa11fcf6bbce51c256447&#39;, gateway=&#39;172.17.0.1&#39;, ip_address=&#39;172.17.0.2&#39;, ip_prefix_length=16, ipv6_gateway=&#39;&#39;, global_ipv6_address=&#39;&#39;, global_ipv6_prefix_length=0, mac_address=&#39;ea:18:6b:c3:f3:94&#39;, driver_options=None)}
+</code></pre></div>
+<h2 id="methods">Methods</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="python_on_whales.Container" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Container</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.attach" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">attach</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">attach</span><span class="p">(</span><span class="n">detach_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sig_proxy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Attach local standard input, output, and error streams to a running container.</p>
+<p>Alias: <code>docker.attach(...)</code></p>
+<p>See the <a href="../../sub-commands/container/#attach"><code>docker.container.attach</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.commit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">commit</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">commit</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pause</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Create a new image from the container's changes.</p>
+<p>Alias: <code>docker.commit(...)</code></p>
+<p>See the <a href="../../sub-commands/container/"><code>docker.container.commit</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.diff" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">diff</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">diff</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the diff of this container filesystem.</p>
+<p>See the <a href="../../sub-commands/container/"><code>docker.container.diff</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.execute" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">execute</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">execute</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">detach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">envs</span><span class="o">=</span><span class="p">{},</span> <span class="n">env_files</span><span class="o">=</span><span class="p">(),</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">privileged</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detach_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute a command in this container</p>
+<p>See the <a href="../../sub-commands/container/#execute"><code>docker.container.execute</code></a>
+command for information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.exists" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">exists</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">exists</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns <code>True</code> if the docker container exists and <code>False</code> if it doesn't exists.</p>
+<p>If it doesn't exists, it most likely mean that it was removed.</p>
+<p>See the <code>docker.container.exists</code> command for information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.export" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">export</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">export</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Export this container filesystem.</p>
+<p>See the <a href="../../sub-commands/container/"><code>docker.container.export</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.init" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">init</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">init</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize this container.</p>
+<p>See the <a href="../../sub-commands/container/#init"><code>docker.container.init</code></a> command.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.kill" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">kill</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">kill</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Kill this container</p>
+<p>See the <a href="../../sub-commands/container/#kill"><code>docker.container.kill</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.logs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">logs</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">logs</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">details</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tail</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Returns the logs of the container</p>
+<p>See the <a href="../../sub-commands/container/#logs"><code>docker.container.logs</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.pause" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pause</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">pause</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Pause this container.</p>
+<p>See the <a href="../../sub-commands/container/#pause"><code>docker.container.pause</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.remove" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">remove</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">remove</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">volumes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Remove this container.</p>
+<p>See the <a href="../../sub-commands/container/#remove"><code>docker.container.remove</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.rename" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">rename</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">rename</span><span class="p">(</span><span class="n">new_name</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Rename this container</p>
+<p>See the <a href="../../sub-commands/container/#rename"><code>docker.container.rename</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.restart" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">restart</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">restart</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Restarts this container.</p>
+<p>See the <a href="../../sub-commands/container/#restart"><code>docker.container.restart</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.start" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">start</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">start</span><span class="p">(</span><span class="n">attach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">detach_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Starts this container.</p>
+<p>See the <a href="../../sub-commands/container/#start"><code>docker.container.start</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.stop" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">stop</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Stops this container.</p>
+<p>See the <a href="../../sub-commands/container/#stop"><code>docker.container.stop</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="python_on_whales.Container.unpause" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">unpause</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">unpause</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Unpause the container</p>
+<p>See the <a href="../../sub-commands/container/#unpause"><code>docker.container.unpause</code></a> command for
+information about the arguments.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      
+    
+  </body>
+</html>
