@@ -1,5 +1,6 @@
 # This workflows will upload a Python Package to Pypi when a release is created on the Github UI
-
+# We've set github as a truster PyPi publisher, see https://docs.pypi.org/trusted-publishers/
+# so we don't need any key or secret.
 name: Upload Python Package
 
 on:
@@ -8,20 +9,18 @@ on:
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
 
     steps:
     - uses: actions/checkout@v2
     - name: Setup uv
-      run: ./scripts/install-uv.sh
+      run:  ./scripts/install-uv.sh
     - name: Build and publish
-      env:
-        UV_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        uv build
-        uv publish
+      run:  uv build
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
     - name: Testing the uploaded wheel
       run: |
         uv run --with python-on-whales --no-project -- python -c "import python_on_whales"

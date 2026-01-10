@@ -1,6 +1,8 @@
 import json
 import os
 import tarfile
+from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -84,6 +86,24 @@ def test_buildx_build_streaming_logs(tmp_path):
     assert len(output) > 1
     for line in output:
         assert line != ""
+
+
+@patch("python_on_whales.components.buildx.cli_wrapper.stream_stdout_and_stderr")
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_secrets(ssas: Mock, tmp_path: Path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    list(docker.buildx.build(tmp_path, stream_logs=True))
+    assert "--secret" not in ssas.call_args[0][0]
+    list(docker.buildx.build(tmp_path, secrets="secret1", stream_logs=True))
+    assert "--secret" in ssas.call_args[0][0] and "secret1" in ssas.call_args[0][0]
+    list(
+        docker.buildx.build(tmp_path, secrets=["secret1", "secret2"], stream_logs=True)
+    )
+    assert (
+        "--secret" in ssas.call_args[0][0]
+        and "secret1" in ssas.call_args[0][0]
+        and "secret2" in ssas.call_args[0][0]
+    )
 
 
 @pytest.mark.usefixtures("with_docker_driver")
