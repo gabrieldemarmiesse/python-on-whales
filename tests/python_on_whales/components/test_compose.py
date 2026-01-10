@@ -960,24 +960,17 @@ def test_compose_run_service_ports_integration(service_ports):
         )
 
         # Verify the container has the port mapping
-        container_info = docker.container.inspect(container)
-        port_bindings = container_info.host_config.port_bindings
+        port_bindings = container.host_config.port_bindings
         assert port_bindings is not None
         if service_ports:
-            assert "80/tcp" in port_bindings
-            assert any(
-                binding.host_port == "8074" if hasattr(binding, "host_port") else False
-                for binding in port_bindings["80/tcp"]
-            )
+            assert len(port_bindings["80/tcp"]) == 1
+            assert port_bindings["80/tcp"][0].host_ports == "8074"
+
         else:
             assert len(port_bindings) == 0
     finally:
-        # be sensible before calling cleanup
-        if container and isinstance(
-            container, python_on_whales.components.container.cli_wrapper.Container
-        ):
-            container.stop()
-            container.remove(force=True)
+        container.stop()
+        container.remove(force=True)
 
 
 def test_compose_version():
