@@ -964,7 +964,7 @@ def test_compose_run_service_ports_integration(service_ports):
         assert port_bindings is not None
         if service_ports:
             assert len(port_bindings["80/tcp"]) == 1
-            assert port_bindings["80/tcp"][0].host_ports == "8074"
+            assert port_bindings["80/tcp"][0].host_port == "8074"
 
         else:
             assert len(port_bindings) == 0
