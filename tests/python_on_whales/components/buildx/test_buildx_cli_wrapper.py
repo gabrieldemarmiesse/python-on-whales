@@ -1,6 +1,8 @@
 import json
 import os
 import tarfile
+from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -84,6 +86,24 @@ def test_buildx_build_streaming_logs(tmp_path):
     assert len(output) > 1
     for line in output:
         assert line != ""
+
+
+@patch("python_on_whales.components.buildx.cli_wrapper.stream_stdout_and_stderr")
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_secrets(ssas: Mock, tmp_path: Path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    list(docker.buildx.build(tmp_path, stream_logs=True))
+    assert "--secret" not in ssas.call_args[0][0]
+    list(docker.buildx.build(tmp_path, secrets="secret1", stream_logs=True))
+    assert "--secret" in ssas.call_args[0][0] and "secret1" in ssas.call_args[0][0]
+    list(
+        docker.buildx.build(tmp_path, secrets=["secret1", "secret2"], stream_logs=True)
+    )
+    assert (
+        "--secret" in ssas.call_args[0][0]
+        and "secret1" in ssas.call_args[0][0]
+        and "secret2" in ssas.call_args[0][0]
+    )
 
 
 @pytest.mark.usefixtures("with_docker_driver")
@@ -683,6 +703,109 @@ def test_bake_stream_logs(monkeypatch):
     output = list(output)
     assert output[0].startswith("#")
     assert output[-1].startswith("#")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_metadata_file_output(only_print, tmp_path):
+    metadata_path = tmp_path / "metadata.json"
+
+    config = docker.buildx.bake(
+        files=[bake_file], metadata_file=metadata_path, print=only_print
+    )
+    assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
+        "target": {
+            "my_out1": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image1:1.0.0"],
+                "target": "out1",
+            },
+            "my_out2": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:1.0.0"],
+                "target": "out2",
+            },
+        },
+    }
+    if not only_print:
+        assert metadata_path.is_file()
+        with open(metadata_path, "r") as f:
+            metadata = json.load(f)
+        assert len(metadata.keys()) == len(
+            config["target"]
+        )  # two target builds expected
+        for target_name, target_metadata in metadata.items():
+            assert target_name in config["target"]
+            assert (
+                "docker.io/library/{}".format(config["target"][target_name]["tags"][0])
+                in target_metadata["image.name"]
+            )
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_metadata_file_option(only_print, monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    metadata_path = tmp_path / "metadata.json"
+
+    docker.buildx.bake(files=[bake_file], print=only_print, metadata_file=metadata_path)
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" in cmd
+    assert metadata_path in cmd or str(metadata_path) in map(str, cmd)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_without_metadata_file_option(only_print, monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(files=[bake_file], print=only_print)
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" not in cmd
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_metadata_file_str_path_option(only_print, monkeypatch, tmp_path):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    metadata_path = tmp_path / "metadata.json"
+
+    docker.buildx.bake(
+        files=[bake_file], print=only_print, metadata_file=str(metadata_path)
+    )
+
+    cmd = recorded.get("cmd", [])
+    assert "--metadata-file" in cmd
+    assert metadata_path in cmd or str(metadata_path) in map(str, cmd)
 
 
 @pytest.mark.usefixtures("with_docker_driver")

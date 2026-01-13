@@ -135,6 +135,7 @@ class BuildxCLI(DockerCLICaller):
         push: bool = False,
         set: Dict[str, str] = {},
         variables: Dict[str, str] = {},
+        metadata_file: Optional[ValidPath] = None,
         stream_logs: bool = False,
         remote_definition: Union[str, None] = None,
     ) -> Union[Dict[str, Dict[str, Dict[str, Any]]], Iterator[str]]:
@@ -159,6 +160,7 @@ class BuildxCLI(DockerCLICaller):
             set: A list of overrides in the form `"targetpattern.key=value"`.
             variables: A dict containing the values of the variables defined in the
                 hcl file. See <https://github.com/docker/buildx#hcl-variables-and-functions>
+            metadata_file: Write build results metadata to the given file
             remote_definition: Remote context in which to find bake files
 
         # Returns
@@ -211,6 +213,8 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_iterable_or_single("--set", format_mapping_for_cli(set))
         if remote_definition is not None:
             full_cmd.append(remote_definition)
+        if metadata_file is not None:
+            full_cmd.add_simple_arg("--metadata-file", metadata_file)
         targets = to_list(targets)
         env = dict(variables)
         if print:
