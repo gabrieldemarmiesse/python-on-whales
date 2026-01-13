@@ -100,16 +100,6 @@ class DockerCamelModel(pydantic.BaseModel):
     )
 
 
-class PodmanCamelModel(pydantic.BaseModel):
-    """Base model for Podman-specific structures that use camelCase keys."""
-
-    model_config = pydantic.ConfigDict(
-        populate_by_name=True,
-        alias_generator=to_podman_camel,
-        defer_build=True,
-    )
-
-
 def raise_decoded_docker_exception(args: List[str], returncode: int, stdout: [bytes], stderr: [bytes]):
     decoded_stderr = stderr.decode().lower()
     if "no such image" in stderr or "image not known" in stderr:
