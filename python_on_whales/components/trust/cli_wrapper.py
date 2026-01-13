@@ -1,7 +1,7 @@
-from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.client_config import CLICaller
 
 
-class TrustCLI(DockerCLICaller):
+class TrustCLI(CLICaller):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.key = None

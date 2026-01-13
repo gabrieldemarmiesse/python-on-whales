@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.service.cli_wrapper
 import python_on_whales.components.task.cli_wrapper
-from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.client_config import CLICaller
 from python_on_whales.utils import ValidPath, read_env_files, run, to_list
 
 
@@ -39,7 +39,7 @@ class Stack:
 ValidStack = Union[str, Stack]
 
 
-class StackCLI(DockerCLICaller):
+class StackCLI(CLICaller):
     def deploy(
         self,
         name: str,

@@ -20,8 +20,8 @@ from typing_extensions import TypeAlias
 
 import python_on_whales.components.container.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.network.models import (
@@ -165,7 +165,7 @@ class Network(ReloadableObjectFromJson):
 ValidNetwork = Union[Network, str]
 
 
-class NetworkCLI(DockerCLICaller):
+class NetworkCLI(CLICaller):
     def connect(
         self,
         network: ValidNetwork,

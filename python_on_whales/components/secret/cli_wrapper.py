@@ -16,8 +16,8 @@ from typing import (
 from typing_extensions import TypeAlias
 
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.secret.models import SecretInspectResult, SecretSpec
@@ -82,7 +82,7 @@ class Secret(ReloadableObjectFromJson):
 ValidSecret = Union[Secret, str]
 
 
-class SecretCLI(DockerCLICaller):
+class SecretCLI(CLICaller):
     def create(
         self,
         name: str,

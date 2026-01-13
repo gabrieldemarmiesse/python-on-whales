@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.context.models import (
@@ -135,7 +135,7 @@ class KubernetesContextConfig:
         return ",".join(list_of_args)
 
 
-class ContextCLI(DockerCLICaller):
+class ContextCLI(CLICaller):
     def create(
         self,
         context_name: str,

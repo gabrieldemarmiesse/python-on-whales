@@ -135,7 +135,7 @@ class SwarmInfo(DockerCamelModel):
     cluster: Optional[ClusterInfo] = None
 
 
-class ClientPlugin(DockerCamelModel):
+class DockerClientPlugin(DockerCamelModel):
     schema_version: Optional[str] = None
     vendor: Optional[str] = None
     version: Optional[str] = None
@@ -145,13 +145,13 @@ class ClientPlugin(DockerCamelModel):
     shadowed_paths: Optional[List[Path]] = None
 
 
-class ClientInfo(DockerCamelModel):
+class DockerClientInfo(DockerCamelModel):
     debug: Optional[bool] = None
-    plugins: Optional[List[ClientPlugin]] = None
+    plugins: Optional[List[DockerClientPlugin]] = None
     warnings: Optional[List[str]] = None
 
 
-class SystemInfo(DockerCamelModel):
+class DockerSystemInfo(DockerCamelModel):
     id: Annotated[Optional[str], pydantic.Field(alias="ID")] = None
     containers: Optional[int] = None
     containers_running: Optional[int] = None
@@ -218,7 +218,7 @@ class SystemInfo(DockerCamelModel):
     security_options: Optional[List[str]] = None
     product_license: Optional[str] = None
     warnings: Optional[List[str]] = None
-    client_info: Optional[ClientInfo] = None
+    client_info: Optional[DockerClientInfo] = None
 
 
 # Podman-specific models

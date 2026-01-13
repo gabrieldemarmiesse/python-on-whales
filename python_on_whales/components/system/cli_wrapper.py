@@ -1,13 +1,13 @@
 import datetime
 import json
-from typing import Dict, Iterator, Union
+from typing import Any, Dict, Iterator, Union
 
-from python_on_whales.client_config import ClientConfig, DockerCLICaller
+from python_on_whales.client_config import CLICaller, ClientConfig
 from python_on_whales.components.system.models import (
     DockerEvent,
     DockerItemsSummary,
+    DockerSystemInfo,
     PodmanSystemInfo,
-    SystemInfo,
 )
 from python_on_whales.utils import (
     format_mapping_for_cli,
@@ -41,10 +41,9 @@ class DiskFreeResult:
         self.build_cache = DockerItemsSummary(**docker_items["Build Cache"])
 
 
-class SystemCLI(DockerCLICaller):
-    def __init__(self, client_config: ClientConfig, runtime: str = "unknown"):
+class _BaseSystemCLI(CLICaller):
+    def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
-        self._runtime = runtime
 
     def disk_free(self) -> DiskFreeResult:
         """Give information about the disk usage of the Docker daemon.
@@ -135,7 +134,7 @@ class SystemCLI(DockerCLICaller):
             if stream_origin == "stdout":
                 yield DockerEvent(**json.loads(stream_content))
 
-    def info(self) -> Union[SystemInfo, PodmanSystemInfo]:
+    def info(self) -> Any:
         """Returns diverse information about the container client and daemon.
 
         # Returns
@@ -159,11 +158,7 @@ class SystemCLI(DockerCLICaller):
         system info](https://docs.docker.com/engine/api/v1.40/#operation/SystemInfo).
         """
         full_cmd = self.docker_cmd + ["system", "info", "--format", "{{json .}}"]
-        json_output = json.loads(run(full_cmd))
-
-        if self._runtime == "podman":
-            return PodmanSystemInfo(**json_output)
-        return SystemInfo(**json_output)
+        return json.loads(run(full_cmd))
 
     def prune(
         self, all: bool = False, volumes: bool = False, filters: Dict[str, str] = {}
@@ -184,3 +179,13 @@ class SystemCLI(DockerCLICaller):
             "--filter", format_mapping_for_cli(filters)
         )
         run(full_cmd)
+
+
+class DockerSystemCLI(_BaseSystemCLI):
+    def info(self) -> DockerSystemInfo:
+        return DockerSystemInfo(**super().info())
+
+
+class PodmanSystemCLI(_BaseSystemCLI):
+    def info(self) -> PodmanSystemInfo:
+        return PodmanSystemInfo(**super().info())

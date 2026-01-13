@@ -6,7 +6,7 @@ from typing import Dict, List, Literal, Optional
 import pydantic
 from typing_extensions import Annotated
 
-from python_on_whales.client_config import ClientConfig, DockerCLICaller
+from python_on_whales.client_config import CLICaller, ClientConfig
 from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
 from python_on_whales.components.compose.cli_wrapper import ComposeCLI
 from python_on_whales.components.config.cli_wrapper import ConfigCLI
@@ -22,7 +22,10 @@ from python_on_whales.components.secret.cli_wrapper import SecretCLI
 from python_on_whales.components.service.cli_wrapper import ServiceCLI
 from python_on_whales.components.stack.cli_wrapper import StackCLI
 from python_on_whales.components.swarm.cli_wrapper import SwarmCLI
-from python_on_whales.components.system.cli_wrapper import SystemCLI
+from python_on_whales.components.system.cli_wrapper import (
+    DockerSystemCLI,
+    PodmanSystemCLI,
+)
 from python_on_whales.components.task.cli_wrapper import TaskCLI
 from python_on_whales.components.trust.cli_wrapper import TrustCLI
 from python_on_whales.components.volume.cli_wrapper import VolumeCLI
@@ -89,7 +92,7 @@ class Version(DockerCamelModel):
     server: Optional[ServerVersion] = None
 
 
-class ContainerClient(DockerCLICaller):
+class _BaseContainerEngineClient(CLICaller):
     """Base client for container runtimes. Use DockerClient or PodmanClient.
 
     Parameters:
@@ -197,7 +200,6 @@ class ContainerClient(DockerCLICaller):
             )
         super().__init__(client_config)
 
-        self.buildx = BuildxCLI(self.client_config)
         self.compose = ComposeCLI(self.client_config)
         self.config = ConfigCLI(self.client_config)
         self.container = ContainerCLI(self.client_config)
@@ -205,21 +207,12 @@ class ContainerClient(DockerCLICaller):
         self.image = ImageCLI(self.client_config)
         self.manifest = ManifestCLI(self.client_config)
         self.network = NetworkCLI(self.client_config)
-        self.node = NodeCLI(self.client_config)
-        self.plugin = PluginCLI(self.client_config)
-        self.pod = PodCLI(self.client_config)
         self.secret = SecretCLI(self.client_config)
-        self.service = ServiceCLI(self.client_config)
         self.stack = StackCLI(self.client_config)
-        self.swarm = SwarmCLI(self.client_config)
-        self.system = SystemCLI(self.client_config, runtime=self._runtime)
-        self.task = TaskCLI(self.client_config)
-        self.trust = TrustCLI(self.client_config)
         self.volume = VolumeCLI(self.client_config)
 
         # aliases
         self.attach = self.container.attach
-        self.build = self.buildx.build
         self.legacy_build = self.image.legacy_build
         self.commit = self.container.commit
         self.copy = self.container.copy
@@ -365,7 +358,7 @@ class ContainerClient(DockerCLICaller):
         self.login(registry, username, password)
 
 
-class DockerClient(ContainerClient):
+class DockerClient(_BaseContainerEngineClient):
     """Docker client.
 
     Note that
@@ -381,22 +374,30 @@ class DockerClient(ContainerClient):
     ```
     """
 
-    _runtime = "docker"
-
-    def __init__(self, **kwargs):
-        kwargs.setdefault("client_call", [self._runtime])
-        kwargs.setdefault("client_type", self._runtime)
+    def __init__(self, kwargs):
+        kwargs.setdefault("client_type", "docker")
         super().__init__(**kwargs)
+        self.buildx = BuildxCLI(self.client_config)
+        self.node = NodeCLI(self.client_config)
+        self.plugin = PluginCLI(self.client_config)
+        self.service = ServiceCLI(self.client_config)
+        self.swarm = SwarmCLI(self.client_config)
+        self.system = DockerSystemCLI(self.client_config)
+        self.task = TaskCLI(self.client_config)
+        self.trust = TrustCLI(self.client_config)
+        self.build = self.buildx.build
 
 
-class PodmanClient(ContainerClient):
+class PodmanClient(_BaseContainerEngineClient):
     """
     Podman client for Podman specific interactions.
     """
 
-    _runtime = "podman"
-
-    def __init__(self, **kwargs):
-        kwargs.setdefault("client_call", [self._runtime])
-        kwargs.setdefault("client_type", self._runtime)
+    def __init__(self, kwargs):
+        kwargs.setdefault("client_type", "podman")
         super().__init__(**kwargs)
+        self.pod = PodCLI(self.client_config)
+        self.system = PodmanSystemCLI(self.client_config)
+
+
+ContainerEngineClient = DockerClient | PodmanClient

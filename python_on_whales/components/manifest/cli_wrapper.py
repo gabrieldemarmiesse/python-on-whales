@@ -2,8 +2,8 @@ import json
 from typing import Any, Dict, List, Optional, Union
 
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.buildx.imagetools.models import ImageVariantManifest
@@ -69,7 +69,7 @@ class ManifestList(ReloadableObjectFromJson):
 ValidManifestList = Union[ManifestList, str]
 
 
-class ManifestCLI(DockerCLICaller):
+class ManifestCLI(CLICaller):
     def annotate(
         self,
         name: str,

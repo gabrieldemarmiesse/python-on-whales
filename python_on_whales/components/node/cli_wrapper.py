@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional, Union, overload
 
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.node.models import (
@@ -102,7 +102,7 @@ class Node(ReloadableObjectFromJson):
 ValidNode = Union[Node, str]
 
 
-class NodeCLI(DockerCLICaller):
+class NodeCLI(CLICaller):
     def demote(self, x: Union[ValidNode, List[ValidNode]]):
         """Demote one or more nodes from manager in the swarm
 

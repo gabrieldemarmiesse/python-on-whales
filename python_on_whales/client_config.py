@@ -154,7 +154,7 @@ class ClientConfig:
         return base_cmd
 
 
-class DockerCLICaller:
+class CLICaller:
     def __init__(self, client_config: ClientConfig):
         self.client_config = client_config
 
@@ -167,7 +167,7 @@ class DockerCLICaller:
         return self.client_config.docker_compose_cmd
 
 
-class ReloadableObject(DockerCLICaller):
+class ReloadableObject(CLICaller):
     def __init__(
         self,
         client_config: ClientConfig,
