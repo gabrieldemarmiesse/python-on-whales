@@ -103,15 +103,7 @@ class DockerCamelModel(pydantic.BaseModel):
 def raise_decoded_docker_exception(
     args: List[str], returncode: int, stdout: Optional[bytes], stderr: Optional[bytes]
 ):
-    if stderr is None:
-        raise DockerException(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
-
-    decoded_stderr = stderr.decode().lower()
+    decoded_stderr = stderr.decode().lower() if stderr else ""
     if "no such image" in decoded_stderr or "image not known" in decoded_stderr:
         raise NoSuchImage(
             args,
@@ -163,6 +155,12 @@ def raise_decoded_docker_exception(
             stdout,
             stderr,
         )
+    raise DockerException(
+        args,
+        returncode,
+        stdout,
+        stderr,
+    )
 
 
 @overload
