@@ -7,8 +7,7 @@ from python_on_whales.generic import ContainerEngineClient, Image, Network
 ```
 """
 
-from ..components.system.models import SystemInfo
-from .generic_client import ContainerEngineClient
+from .generic_client import ContainerEngineClient, SystemInfo
 
 __all__ = [
     "ContainerEngineClient",
