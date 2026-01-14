@@ -105,22 +105,22 @@ class DockerCamelModel(pydantic.BaseModel):
 def get_docker_exception_type(output: Optional[bytes]) -> type[DockerException]:
     if not output:
         return DockerException
-    decoded_stderr = output.decode().lower()
-    if "no such image" in decoded_stderr or "image not known" in decoded_stderr:
+    decoded = output.decode().lower()
+    if "no such image" in decoded or "image not known" in decoded:
         return NoSuchImage
-    if "no such service" in decoded_stderr or (
-        "service" in decoded_stderr and "not found" in decoded_stderr
+    if "no such service" in decoded or (
+        "service" in decoded and "not found" in decoded
     ):
         return NoSuchService
-    if "no such container" in decoded_stderr:
+    if "no such container" in decoded:
         return NoSuchContainer
-    if "no such pod" in decoded_stderr:
+    if "no such pod" in decoded:
         return NoSuchPod
-    if "this node is not a swarm manager" in decoded_stderr:
+    if "this node is not a swarm manager" in decoded:
         return NotASwarmManager
-    if "no such volume" in decoded_stderr:
+    if "no such volume" in decoded:
         return NoSuchVolume
-    if "network" in decoded_stderr and "not found" in decoded_stderr:
+    if "network" in decoded and "not found" in decoded:
         return NoSuchNetwork
     return DockerException
 
