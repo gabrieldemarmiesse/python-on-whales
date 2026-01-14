@@ -100,67 +100,27 @@ class DockerCamelModel(pydantic.BaseModel):
     )
 
 
-def raise_decoded_docker_exception(
-    args: List[str], returncode: int, stdout: Optional[bytes], stderr: Optional[bytes]
-):
-    decoded_stderr = stderr.decode().lower() if stderr else ""
+def get_docker_exception_type(output: Optional[bytes]) -> type[DockerException]:
+    if not output:
+        return DockerException
+    decoded_stderr = output.decode().lower()
     if "no such image" in decoded_stderr or "image not known" in decoded_stderr:
-        raise NoSuchImage(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
+        return NoSuchImage
     if "no such service" in decoded_stderr or (
         "service" in decoded_stderr and "not found" in decoded_stderr
     ):
-        raise NoSuchService(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
+        return NoSuchService
     if "no such container" in decoded_stderr:
-        raise NoSuchContainer(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
+        return NoSuchContainer
     if "no such pod" in decoded_stderr:
-        raise NoSuchPod(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
+        return NoSuchPod
     if "this node is not a swarm manager" in decoded_stderr:
-        raise NotASwarmManager(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
+        return NotASwarmManager
     if "no such volume" in decoded_stderr:
-        raise NoSuchVolume(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
+        return NoSuchVolume
     if "network" in decoded_stderr and "not found" in decoded_stderr:
-        raise NoSuchNetwork(
-            args,
-            returncode,
-            stdout,
-            stderr,
-        )
-    raise DockerException(
-        args,
-        returncode,
-        stdout,
-        stderr,
-    )
+        return NoSuchNetwork
+    return DockerException
 
 
 @overload
@@ -232,7 +192,8 @@ def run(
     )
 
     if completed_process.returncode != 0:
-        raise_decoded_docker_exception(
+        exception_type = get_docker_exception_type(completed_process.stdout)
+        raise exception_type(
             args,
             completed_process.returncode,
             completed_process.stdout,
@@ -330,8 +291,9 @@ def stream_stdout_and_stderr(
 
     exit_code = process.wait()
     if exit_code != 0:
-        raise_decoded_docker_exception(
-            args=full_cmd, returncode=exit_code, stdout=b"", stderr=full_stderr
+        exception_type = get_docker_exception_type(full_stderr)
+        raise exception_type(
+            command_launched=full_cmd, return_code=exit_code, stderr=full_stderr
         )
 
 
