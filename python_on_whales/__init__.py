@@ -1,3 +1,4 @@
+from . import generic, podman
 from .client_config import ClientNotFoundError
 from .components.buildx.cli_wrapper import Builder
 from .components.config.cli_wrapper import Config
@@ -15,15 +16,17 @@ from .components.pod.cli_wrapper import Pod
 from .components.secret.cli_wrapper import Secret
 from .components.service.cli_wrapper import Service
 from .components.stack.cli_wrapper import Stack
-from .components.system.cli_wrapper import SystemInfo
-from .components.system.models import PodmanSystemInfo
+from .components.system.cli_wrapper import DockerSystemInfo
 from .components.task.cli_wrapper import Task
 from .components.volume.cli_wrapper import Volume
-from .docker_client import DockerClient, PodmanClient, Version
+from .docker_client import DockerClient, Version
 from .exceptions import DockerException
 
 # alias
 docker = DockerClient(client_type="docker")
+
+# Backwards-compatible alias
+SystemInfo = DockerSystemInfo
 
 __all__ = [
     "Builder",
@@ -35,18 +38,19 @@ __all__ = [
     "DockerClient",
     "DockerContextConfig",
     "DockerException",
+    "generic",
     "Image",
     "KubernetesContextConfig",
     "Network",
     "Node",
     "Plugin",
     "Pod",
-    "PodmanClient",
-    "PodmanSystemInfo",
+    "podman",
     "Secret",
     "Service",
     "Stack",
     "SystemInfo",
+    "DockerSystemInfo",
     "Task",
     "Version",
     "Volume",

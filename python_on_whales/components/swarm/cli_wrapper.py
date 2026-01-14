@@ -1,11 +1,11 @@
 from datetime import timedelta
 from typing import Optional, Union
 
-from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.client_config import CLICaller
 from python_on_whales.utils import ValidPath, run
 
 
-class SwarmCLI(DockerCLICaller):
+class SwarmCLI(CLICaller):
     def ca(
         self,
         ca_certificate: Optional[ValidPath] = None,

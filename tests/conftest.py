@@ -8,7 +8,8 @@ from typing import Generator, List, Union
 import pydantic
 import pytest
 
-from python_on_whales import DockerClient, PodmanClient
+from python_on_whales import DockerClient
+from python_on_whales.podman import PodmanClient
 
 logger = logging.getLogger(__name__)
 

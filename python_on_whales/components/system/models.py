@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import pydantic
 from typing_extensions import Annotated
@@ -351,3 +351,6 @@ class PodmanSystemInfo(PodmanCamelModel):
     registries: Optional[Dict[str, Any]] = None
     plugins: Optional[PodmanPlugins] = None
     version: Optional[PodmanVersionInfo] = None
+
+
+SystemInfo = Union[DockerSystemInfo, PodmanSystemInfo]

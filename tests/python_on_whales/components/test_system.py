@@ -6,13 +6,10 @@ from time import sleep
 
 import pytest
 
-from python_on_whales import DockerClient, PodmanClient
-from python_on_whales.components.system.models import (
-    DockerEvent,
-    PodmanSystemInfo,
-    SystemInfo,
-)
+from python_on_whales import DockerClient
+from python_on_whales.components.system.models import DockerEvent, SystemInfo
 from python_on_whales.exceptions import DockerException
+from python_on_whales.podman import PodmanClient, PodmanSystemInfo
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
