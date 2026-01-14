@@ -373,7 +373,7 @@ class DockerClient(_BaseContainerEngineClient):
     """
 
     def __init__(self, **kwargs):
-        if kwargs["client_type"] == "podman":
+        if kwargs.get("client_type") == "podman":
             warnings.warn(
                 "The usage of DockerClient(client_type=['podman']) is deprecated, use `PodmanClient` instead. For "
                 "example from `python_on_whales import podman.PodmanClient`."
