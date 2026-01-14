@@ -189,3 +189,6 @@ class DockerSystemCLI(_BaseSystemCLI):
 class PodmanSystemCLI(_BaseSystemCLI):
     def info(self) -> PodmanSystemInfo:
         return PodmanSystemInfo(**super().info())
+
+
+SystemCLI = DockerSystemCLI | PodmanSystemCLI
