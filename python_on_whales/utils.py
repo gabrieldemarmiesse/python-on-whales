@@ -101,7 +101,7 @@ class DockerCamelModel(pydantic.BaseModel):
 
 
 def raise_decoded_docker_exception(
-    args: List[str], returncode: int, stdout: bytes | None, stderr: bytes | None
+    args: List[str], returncode: int, stdout: Optional[bytes], stderr: Optional[bytes]
 ):
     if stderr is None:
         raise DockerException(
