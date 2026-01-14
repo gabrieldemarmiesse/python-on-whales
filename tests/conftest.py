@@ -3,13 +3,12 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from typing import Generator, List, Union
+from typing import Generator, List
 
 import pydantic
 import pytest
 
 from python_on_whales import DockerClient
-from python_on_whales.podman import PodmanClient
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +17,9 @@ logger = logging.getLogger(__name__)
 # Fixtures
 
 
-def _get_ctr_client(
-    client_type: str, pytestconfig: pytest.Config
-) -> Union[DockerClient, PodmanClient]:
+def _get_ctr_client(client_type: str, pytestconfig: pytest.Config) -> DockerClient:
     ctr_exe = pytestconfig.getoption(f"--{client_type}-exe")
-    if client_type == "podman":
-        client = PodmanClient(client_call=[ctr_exe], client_type=client_type)
-    else:
-        client = DockerClient(client_call=[ctr_exe], client_type=client_type)
+    client = DockerClient(client_call=[ctr_exe], client_type=client_type)
     try:
         # TODO: Implement 'DockerClient.version' and use that instead.
         subprocess.run(
@@ -69,7 +63,7 @@ def docker_client(pytestconfig: pytest.Config) -> DockerClient:
 @pytest.fixture(scope="session")
 def podman_client(
     pytestconfig: pytest.Config, request: pytest.FixtureRequest
-) -> PodmanClient:
+) -> DockerClient:
     return _get_ctr_client("podman", pytestconfig)
 
 
