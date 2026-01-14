@@ -194,7 +194,7 @@ def run(
     )
 
     if completed_process.returncode != 0:
-        exception_type = get_docker_exception_type(completed_process.stdout)
+        exception_type = get_docker_exception_type(completed_process.stderr)
         raise exception_type(
             args,
             completed_process.returncode,
