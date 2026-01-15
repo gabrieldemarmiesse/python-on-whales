@@ -9,6 +9,7 @@ import pydantic
 import pytest
 
 from python_on_whales import DockerClient
+from python_on_whales.podman import PodmanClient
 
 logger = logging.getLogger(__name__)
 
@@ -60,11 +61,18 @@ def docker_client(pytestconfig: pytest.Config) -> DockerClient:
     return _get_ctr_client("docker", pytestconfig)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", params=["legacy", "native"])
 def podman_client(
     pytestconfig: pytest.Config, request: pytest.FixtureRequest
 ) -> DockerClient:
-    return _get_ctr_client("podman", pytestconfig)
+    if request.param == "legacy":
+        return _get_ctr_client("podman", pytestconfig)
+    return PodmanClient()
+
+
+@pytest.fixture(scope="session")
+def podman_native_client() -> PodmanClient:
+    return PodmanClient()
 
 
 # This is function-scoped so that all of a testcase's parameterisations run

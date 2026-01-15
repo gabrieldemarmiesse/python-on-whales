@@ -40,8 +40,8 @@ def test_info(ctr_client: DockerClient):
     assert "local" in info.plugins.volume
 
 
-def test_info_podman(podman_client: PodmanClient):
-    info = podman_client.system.info()
+def test_info_podman(podman_native_client: PodmanClient):
+    info = podman_native_client.system.info()
     assert isinstance(info, PodmanSystemInfo)
     assert info.host is not None
 
