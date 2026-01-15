@@ -25,8 +25,8 @@ import python_on_whales.components.buildx
 import python_on_whales.components.container
 import python_on_whales.components.image
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.volume.models import VolumeInspectResult
@@ -139,7 +139,7 @@ ValidVolume = Union[Volume, str]
 VolumePath = Tuple[Union[Volume, str], ValidPath]
 
 
-class VolumeCLI(DockerCLICaller):
+class VolumeCLI(CLICaller):
     def create(
         self,
         volume_name: Optional[str] = None,

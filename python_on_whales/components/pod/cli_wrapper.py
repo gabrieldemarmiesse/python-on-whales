@@ -21,8 +21,8 @@ import python_on_whales.components.container.cli_wrapper
 import python_on_whales.components.image.cli_wrapper
 import python_on_whales.components.network.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.pod.models import (
@@ -251,7 +251,7 @@ class Pod(ReloadableObjectFromJson):
 ValidPod = Union[str, Pod]
 
 
-class PodCLI(DockerCLICaller):
+class PodCLI(CLICaller):
     def create(
         self,
         name: Optional[str] = None,

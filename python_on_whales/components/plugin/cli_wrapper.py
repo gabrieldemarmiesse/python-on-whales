@@ -4,8 +4,8 @@ import json
 from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.plugin.models import (
@@ -105,7 +105,7 @@ class Plugin(ReloadableObjectFromJson):
 ValidPlugin = Union[Plugin, str]
 
 
-class PluginCLI(DockerCLICaller):
+class PluginCLI(CLICaller):
     def create(
         self, plugin_name: str, plugin_data_directory: ValidPath, compress: bool = False
     ) -> Plugin:

@@ -1,0 +1,138 @@
+{
+  "host": {
+    "arch": "amd64",
+    "buildahVersion": "1.23.0",
+    "cgroupManager": "systemd",
+    "cgroupVersion": "v2",
+    "cgroupControllers": [],
+    "conmon": {
+      "package": "conmon-2.0.29-2.fc34.x86_64",
+      "path": "/usr/bin/conmon",
+      "version": "conmon version 2.0.29, commit: "
+    },
+    "cpus": 8,
+    "cpuUtilization": {
+      "userPercent": 7.7,
+      "systemPercent": 1.98,
+      "idlePercent": 90.32
+    },
+    "databaseBackend": "sqlite",
+    "distribution": {
+      "distribution": "fedora",
+      "version": "34"
+    },
+    "eventLogger": "journald",
+    "freeLocks": 1795,
+    "hostname": "localhost.localdomain",
+    "idMappings": {
+      "gidmap": [
+        {"container_id": 0, "host_id": 3267, "size": 1},
+        {"container_id": 1, "host_id": 100000, "size": 65536}
+      ],
+      "uidmap": [
+        {"container_id": 0, "host_id": 3267, "size": 1},
+        {"container_id": 1, "host_id": 100000, "size": 65536}
+      ]
+    },
+    "kernel": "5.13.13-200.fc34.x86_64",
+    "logDriver": "journald",
+    "memFree": 1785753600,
+    "memTotal": 16401895424,
+    "networkBackend": "cni",
+    "networkBackendInfo": {
+      "backend": "cni",
+      "package": "containernetworking-plugins-1.0.1-1.fc34.x86_64\npodman-plugins-3.4.4-1.fc34.x86_64",
+      "path": "/usr/libexec/cni",
+      "dns": {
+        "version": "CNI dnsname plugin\nversion: 1.3.1\ncommit: unknown",
+        "package": "podman-plugins-3.4.4-1.fc34.x86_64",
+        "path": "/usr/libexec/cni/dnsname"
+      }
+    },
+    "ociRuntime": {
+      "name": "crun",
+      "package": "crun-1.0-1.fc34.x86_64",
+      "path": "/usr/bin/crun",
+      "version": "crun version 1.0\ncommit: 139dc6971e2f1d931af520188763e984d6cdfbf8\nspec: 1.0.0\n+SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +CRIU +YAJL"
+    },
+    "os": "linux",
+    "remoteSocket": {
+      "path": "/run/user/3267/podman/podman.sock"
+    },
+    "serviceIsRemote": false,
+    "security": {
+      "apparmorEnabled": false,
+      "capabilities": "CAP_CHOWN,CAP_DAC_OVERRIDE,CAP_FOWNER,CAP_FSETID,CAP_KILL,CAP_NET_BIND_SERVICE,CAP_SETFCAP,CAP_SETGID,CAP_SETPCAP,CAP_SETUID",
+      "rootless": true,
+      "seccompEnabled": true,
+      "seccompProfilePath": "/usr/share/containers/seccomp.json",
+      "selinuxEnabled": true
+    },
+    "slirp4netns": {
+      "executable": "/bin/slirp4netns",
+      "package": "slirp4netns-1.1.12-2.fc34.x86_64",
+      "version": "slirp4netns version 1.1.12\ncommit: 7a104a101aa3278a2152351a082a6df71f57c9a3\nlibslirp: 4.4.0\nSLIRP_CONFIG_VERSION_MAX: 3\nlibseccomp: 2.5.0"
+    },
+    "pasta": {
+      "executable": "/usr/bin/passt",
+      "package": "passt-0^20221116.gace074c-1.fc34.x86_64",
+      "version": "passt 0^20221116.gace074c-1.fc34.x86_64\nCopyright Red Hat\nGNU Affero GPL version 3 or later <https://www.gnu.org/licenses/agpl-3.0.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n"
+    },
+    "swapFree": 15687475200,
+    "swapTotal": 16886259712,
+    "uptime": "47h 17m 29.75s (Approximately 1.96 days)",
+    "variant": "",
+    "linkmode": "dynamic"
+  },
+  "store": {
+    "configFile": "/home/dwalsh/.config/containers/storage.conf",
+    "containerStore": {
+      "number": 9,
+      "paused": 0,
+      "running": 1,
+      "stopped": 8
+    },
+    "graphDriverName": "overlay",
+    "graphOptions": {},
+    "graphRoot": "/home/dwalsh/.local/share/containers/storage",
+    "graphRootAllocated": 1038956064768,
+    "graphRootUsed": 230132768768,
+    "graphStatus": {
+      "Backing Filesystem": "extfs",
+      "Native Overlay Diff": "true",
+      "Supports d_type": "true",
+      "Using metacopy": "false"
+    },
+    "imageCopyTmpDir": "/home/dwalsh/.local/share/containers/storage/tmp",
+    "imageStore": {
+      "number": 5
+    },
+    "runRoot": "/run/user/3267/containers",
+    "volumePath": "/home/dwalsh/.local/share/containers/storage/volumes",
+    "transientStore": false
+  },
+  "registries": {
+    "search": [
+      "registry.fedoraproject.org",
+      "registry.access.redhat.com",
+      "docker.io",
+      "quay.io"
+    ]
+  },
+  "plugins": {
+    "volume": ["local"],
+    "network": ["bridge", "macvlan"],
+    "log": ["k8s-file", "none", "journald"],
+    "authorization": null
+  },
+  "version": {
+    "APIVersion": "4.0.0",
+    "Version": "4.0.0",
+    "GoVersion": "go1.16.6",
+    "GitCommit": "23677f92dd83e96d2bc8f0acb611865fb8b1a56d",
+    "BuiltTime": "Tue Sep 14 15:45:22 2021",
+    "Built": 1631648722,
+    "OsArch": "linux/amd64",
+    "Os": "linux"
+  }
+}

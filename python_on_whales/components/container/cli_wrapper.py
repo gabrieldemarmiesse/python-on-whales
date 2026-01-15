@@ -30,8 +30,8 @@ import python_on_whales.components.network.cli_wrapper
 import python_on_whales.components.pod.cli_wrapper
 import python_on_whales.components.volume.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.container.models import (
@@ -544,7 +544,7 @@ class RunArgs(TypedDict, total=False):
     workdir: Optional[ValidPath]
 
 
-class ContainerCLI(DockerCLICaller):
+class ContainerCLI(CLICaller):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.remove = self.remove

@@ -20,8 +20,8 @@ from typing_extensions import TypeAlias
 
 import python_on_whales.components.task.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.container.cli_wrapper import to_seconds
@@ -165,7 +165,7 @@ class Service(ReloadableObjectFromJson):
 ValidService = Union[str, Service]
 
 
-class ServiceCLI(DockerCLICaller):
+class ServiceCLI(CLICaller):
     def create(
         self,
         image: str,

@@ -27,8 +27,8 @@ from typing_extensions import TypeAlias
 
 import python_on_whales.components.buildx.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.container.cli_wrapper import (
@@ -236,7 +236,7 @@ class Image(ReloadableObjectFromJson):
 ValidImage = Union[str, Image]
 
 
-class ImageCLI(DockerCLICaller):
+class ImageCLI(CLICaller):
     def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
         self.build = python_on_whales.components.buildx.cli_wrapper.BuildxCLI(

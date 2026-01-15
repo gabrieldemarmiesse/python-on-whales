@@ -6,7 +6,7 @@ from typing import Dict, List, Literal, Optional
 import pydantic
 from typing_extensions import Annotated
 
-from python_on_whales.client_config import ClientConfig, DockerCLICaller
+from python_on_whales.client_config import CLICaller, ClientConfig
 from python_on_whales.components.buildx.cli_wrapper import BuildxCLI
 from python_on_whales.components.compose.cli_wrapper import ComposeCLI
 from python_on_whales.components.config.cli_wrapper import ConfigCLI
@@ -22,7 +22,7 @@ from python_on_whales.components.secret.cli_wrapper import SecretCLI
 from python_on_whales.components.service.cli_wrapper import ServiceCLI
 from python_on_whales.components.stack.cli_wrapper import StackCLI
 from python_on_whales.components.swarm.cli_wrapper import SwarmCLI
-from python_on_whales.components.system.cli_wrapper import SystemCLI
+from python_on_whales.components.system.cli_wrapper import DockerSystemCLI
 from python_on_whales.components.task.cli_wrapper import TaskCLI
 from python_on_whales.components.trust.cli_wrapper import TrustCLI
 from python_on_whales.components.volume.cli_wrapper import VolumeCLI
@@ -89,20 +89,8 @@ class Version(DockerCamelModel):
     server: Optional[ServerVersion] = None
 
 
-class DockerClient(DockerCLICaller):
-    """Creates a Docker client
-
-    Note that
-    ```python
-    from python_on_whales import docker
-    print(docker.run("hello-world"))
-    ```
-    is equivalent to
-    ```python
-    from python_on_whales import DockerClient
-    docker = DockerClient()
-    print(docker.run("hello-world")
-    ```
+class _BaseContainerEngineClient(CLICaller):
+    """Base client for container runtimes. Use DockerClient or PodmanClient.
 
     Parameters:
         config: Location of client config files (default "~/.docker")
@@ -151,6 +139,8 @@ class DockerClient(DockerCLICaller):
             a behavior and `client_type` is `"unknown"`, it will raise an exception and ask you to specify
             what kind of client you're working with. Valid values are `"docker"`, `"podman"`, "`nerdctl"` and `"unknown"`.
     """
+
+    _runtime: str = "unknown"
 
     def __init__(
         self,
@@ -207,7 +197,6 @@ class DockerClient(DockerCLICaller):
             )
         super().__init__(client_config)
 
-        self.buildx = BuildxCLI(self.client_config)
         self.compose = ComposeCLI(self.client_config)
         self.config = ConfigCLI(self.client_config)
         self.container = ContainerCLI(self.client_config)
@@ -215,21 +204,14 @@ class DockerClient(DockerCLICaller):
         self.image = ImageCLI(self.client_config)
         self.manifest = ManifestCLI(self.client_config)
         self.network = NetworkCLI(self.client_config)
-        self.node = NodeCLI(self.client_config)
-        self.plugin = PluginCLI(self.client_config)
+        # Should be moved to podman_client in the future
         self.pod = PodCLI(self.client_config)
         self.secret = SecretCLI(self.client_config)
-        self.service = ServiceCLI(self.client_config)
         self.stack = StackCLI(self.client_config)
-        self.swarm = SwarmCLI(self.client_config)
-        self.system = SystemCLI(self.client_config)
-        self.task = TaskCLI(self.client_config)
-        self.trust = TrustCLI(self.client_config)
         self.volume = VolumeCLI(self.client_config)
 
         # aliases
         self.attach = self.container.attach
-        self.build = self.buildx.build
         self.legacy_build = self.image.legacy_build
         self.commit = self.container.commit
         self.copy = self.container.copy
@@ -240,7 +222,6 @@ class DockerClient(DockerCLICaller):
         self.export = self.container.export
         self.images = self.image.list
         self.import_ = self.image.import_
-        self.info = self.system.info
         # self.inspect -> too hard to implement
         self.kill = self.container.kill
         self.load = self.image.load
@@ -373,3 +354,39 @@ class DockerClient(DockerCLICaller):
         if registry is None:
             registry = response["proxyEndpoint"]
         self.login(registry, username, password)
+
+
+class DockerClient(_BaseContainerEngineClient):
+    """Docker client.
+
+    Note that
+    ```python
+    from python_on_whales import docker
+    print(docker.run("hello-world"))
+    ```
+    is equivalent to
+    ```python
+    from python_on_whales import DockerClient
+    docker = DockerClient()
+    print(docker.run("hello-world"))
+    ```
+    """
+
+    def __init__(self, **kwargs):
+        if kwargs.get("client_type") == "podman":
+            warnings.warn(
+                "The usage of DockerClient(client_type=['podman']) is deprecated, use `PodmanClient` instead. For "
+                "example from `python_on_whales import podman.PodmanClient`."
+            )
+        kwargs.setdefault("client_type", "docker")
+        super().__init__(**kwargs)
+        self.buildx = BuildxCLI(self.client_config)
+        self.node = NodeCLI(self.client_config)
+        self.plugin = PluginCLI(self.client_config)
+        self.service = ServiceCLI(self.client_config)
+        self.swarm = SwarmCLI(self.client_config)
+        self.system = DockerSystemCLI(self.client_config)
+        self.task = TaskCLI(self.client_config)
+        self.trust = TrustCLI(self.client_config)
+        self.build = self.buildx.build
+        self.info = self.system.info

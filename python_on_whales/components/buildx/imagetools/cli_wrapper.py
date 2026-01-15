@@ -2,13 +2,13 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.client_config import CLICaller
 from python_on_whales.utils import run
 
 from .models import Manifest
 
 
-class ImagetoolsCLI(DockerCLICaller):
+class ImagetoolsCLI(CLICaller):
     def inspect(self, name: str) -> Manifest:
         """Returns the manifest of a Docker image in a registry without pulling it"""
         full_cmd = self.docker_cmd + ["buildx", "imagetools", "inspect", "--raw", name]

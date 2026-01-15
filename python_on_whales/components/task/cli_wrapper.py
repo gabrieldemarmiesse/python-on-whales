@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import python_on_whales.components.service.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.task.models import (
@@ -93,7 +93,7 @@ class Task(ReloadableObjectFromJson):
         return f"python_on_whales.Task(id='{self.id[:12]}', name={self.name})"
 
 
-class TaskCLI(DockerCLICaller):
+class TaskCLI(CLICaller):
     def list(self) -> List[Task]:
         """Returns all tasks in the swarm
 

@@ -20,8 +20,8 @@ from typing import (
 
 import python_on_whales.components.image.cli_wrapper
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObject,
 )
 from python_on_whales.components.buildx.imagetools.cli_wrapper import ImagetoolsCLI
@@ -117,7 +117,7 @@ class Builder(ReloadableObject):
 ValidBuilder = Union[str, Builder]
 
 
-class BuildxCLI(DockerCLICaller):
+class BuildxCLI(CLICaller):
     def __init__(self, client_config: ClientConfig):
         super().__init__(client_config)
         self.imagetools = ImagetoolsCLI(self.client_config)

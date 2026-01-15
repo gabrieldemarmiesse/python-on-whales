@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, overload
 
 from python_on_whales.client_config import (
+    CLICaller,
     ClientConfig,
-    DockerCLICaller,
     ReloadableObjectFromJson,
 )
 from python_on_whales.components.config.models import (
@@ -73,7 +73,7 @@ class Config(ReloadableObjectFromJson):
 ValidConfig = Union[Config, str]
 
 
-class ConfigCLI(DockerCLICaller):
+class ConfigCLI(CLICaller):
     def create(
         self,
         name: str,

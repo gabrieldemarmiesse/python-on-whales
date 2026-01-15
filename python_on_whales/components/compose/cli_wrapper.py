@@ -9,7 +9,7 @@ from typing_extensions import Literal
 
 import python_on_whales.components.container.cli_wrapper
 import python_on_whales.components.volume.cli_wrapper
-from python_on_whales.client_config import DockerCLICaller
+from python_on_whales.client_config import CLICaller
 from python_on_whales.components.compose.models import (
     ComposeConfig,
     ComposeEvent,
@@ -25,7 +25,7 @@ from python_on_whales.utils import (
 )
 
 
-class ComposeCLI(DockerCLICaller):
+class ComposeCLI(CLICaller):
     @overload
     def build(
         self,

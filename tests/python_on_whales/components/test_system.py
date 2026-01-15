@@ -9,6 +9,7 @@ import pytest
 from python_on_whales import DockerClient
 from python_on_whales.components.system.models import DockerEvent, SystemInfo
 from python_on_whales.exceptions import DockerException
+from python_on_whales.podman import PodmanClient, PodmanSystemInfo
 from python_on_whales.test_utils import get_all_jsons, random_name
 
 
@@ -37,6 +38,12 @@ def test_disk_free(ctr_client: DockerClient):
 def test_info(ctr_client: DockerClient):
     info = ctr_client.system.info()
     assert "local" in info.plugins.volume
+
+
+def test_info_podman(native_podman_client: PodmanClient):
+    info = native_podman_client.system.info()
+    assert isinstance(info, PodmanSystemInfo)
+    assert info.host is not None
 
 
 def test_events(docker_client: DockerClient):
@@ -89,7 +96,41 @@ def test_events_no_arguments(docker_client: DockerClient):
 def test_load_json(json_file):
     json_as_txt = json_file.read_text()
     SystemInfo(**json.loads(json_as_txt))
-    # we could do more checks here if needed
+
+
+@pytest.mark.parametrize("json_file", get_all_jsons("podman_system_info"))
+def test_load_podman_json(json_file):
+    """
+    Test that PodmanSystemInfo correctly parses camelCase
+    JSON keys into nested classes with snake_case keys.
+    """
+    json_data = json.loads(json_file.read_text())
+    info = PodmanSystemInfo(**json_data)
+
+    assert info.host.buildah_version == json_data["host"]["buildahVersion"]
+    assert info.host.cgroup_manager == json_data["host"]["cgroupManager"]
+    assert info.host.mem_total == json_data["host"]["memTotal"]
+
+    assert info.host.oci_runtime.name == json_data["host"]["ociRuntime"]["name"]
+    assert (
+        info.host.security.seccomp_enabled
+        == json_data["host"]["security"]["seccompEnabled"]
+    )
+
+    first_gidmap = info.host.id_mappings["gidmap"][0]
+    assert (
+        first_gidmap.container_id
+        == json_data["host"]["idMappings"]["gidmap"][0]["container_id"]
+    )
+
+    assert info.store.graph_driver_name == json_data["store"]["graphDriverName"]
+    assert (
+        info.store.container_store.number
+        == json_data["store"]["containerStore"]["number"]
+    )
+
+    assert info.version.api_version == json_data["version"]["APIVersion"]
+    assert info.version.version == json_data["version"]["Version"]
 
 
 def test_parsing_events():
