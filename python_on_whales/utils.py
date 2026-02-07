@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import shlex
@@ -100,6 +102,29 @@ class DockerCamelModel(pydantic.BaseModel):
     )
 
 
+def get_docker_exception_type(output: Optional[bytes]) -> type[DockerException]:
+    if not output:
+        return DockerException
+    decoded = output.decode().lower()
+    if "no such image" in decoded or "image not known" in decoded:
+        return NoSuchImage
+    if "no such service" in decoded or (
+        "service" in decoded and "not found" in decoded
+    ):
+        return NoSuchService
+    if "no such container" in decoded:
+        return NoSuchContainer
+    if "no such pod" in decoded:
+        return NoSuchPod
+    if "this node is not a swarm manager" in decoded:
+        return NotASwarmManager
+    if "no such volume" in decoded:
+        return NoSuchVolume
+    if "network" in decoded and "not found" in decoded:
+        return NoSuchNetwork
+    return DockerException
+
+
 @overload
 def run(
     args: List[Any],
@@ -169,61 +194,8 @@ def run(
     )
 
     if completed_process.returncode != 0:
-        if completed_process.stderr is not None:
-            decoded_stderr = completed_process.stderr.decode().lower()
-            if "no such image" in decoded_stderr or "image not known" in decoded_stderr:
-                raise NoSuchImage(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-            if "no such service" in decoded_stderr or (
-                "service" in decoded_stderr and "not found" in decoded_stderr
-            ):
-                raise NoSuchService(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-            if "no such container" in decoded_stderr:
-                raise NoSuchContainer(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-            if "no such pod" in decoded_stderr:
-                raise NoSuchPod(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-            if "this node is not a swarm manager" in decoded_stderr:
-                raise NotASwarmManager(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-            if "no such volume" in decoded_stderr:
-                raise NoSuchVolume(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-            if "network" in decoded_stderr and "not found" in decoded_stderr:
-                raise NoSuchNetwork(
-                    args,
-                    completed_process.returncode,
-                    completed_process.stdout,
-                    completed_process.stderr,
-                )
-
-        raise DockerException(
+        exception_type = get_docker_exception_type(completed_process.stderr)
+        raise exception_type(
             args,
             completed_process.returncode,
             completed_process.stdout,
@@ -321,7 +293,10 @@ def stream_stdout_and_stderr(
 
     exit_code = process.wait()
     if exit_code != 0:
-        raise DockerException(full_cmd, exit_code, stderr=full_stderr)
+        exception_type = get_docker_exception_type(full_stderr)
+        raise exception_type(
+            command_launched=full_cmd, return_code=exit_code, stderr=full_stderr
+        )
 
 
 def format_mapping_for_cli(mapping: Mapping[str, str], separator="="):
