@@ -1579,6 +1579,7 @@ class ContainerCLI(DockerCLICaller):
         remove: bool = False,
         runtime: Optional[str] = None,
         security_options: Iterable[str] = (),
+        service_ports: bool = False,
         shm_size: Union[int, str, None] = None,
         sig_proxy: bool = True,
         stop_signal: Optional[Union[int, str]] = None,
@@ -1745,6 +1746,7 @@ class ContainerCLI(DockerCLICaller):
             remove: Automatically remove the container when it exits.
             runtime: Runtime to use for this container.
             security_options: Security options
+            service_ports: Enable service’s ports to be created and mapped to the host (disabled by default)
             shm_size: Size of /dev/shm. `int` is for bytes. But you can use `"512m"` or
                 `"4g"` for example.
             stop_timeout: Signal to stop a container (default "SIGTERM")
@@ -1909,6 +1911,8 @@ class ContainerCLI(DockerCLICaller):
 
         full_cmd.add_simple_arg("--runtime", runtime)
         full_cmd.add_args_iterable("--security-opt", security_options)
+
+        full_cmd.add_flag("--service-ports", service_ports)
 
         full_cmd.add_simple_arg("--shm-size", shm_size)
         if sig_proxy is False:

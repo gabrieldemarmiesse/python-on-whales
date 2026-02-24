@@ -6,6 +6,7 @@ import time
 from datetime import datetime, timedelta
 from os import makedirs, remove
 from pathlib import Path
+from typing import Iterable, Tuple, Union
 from unittest.mock import Mock, patch
 
 import pytest
@@ -915,6 +916,61 @@ def test_compose_run_volume_with_parameter():
             remove=True,
             tty=False,
         )
+
+
+def test_compose_run_service_ports_flag():
+    """Test that --service-ports flag is included in the command."""
+
+    with patch("python_on_whales.components.compose.cli_wrapper.run") as mock_run:
+        mock_run.return_value = ""
+        docker.compose.run(
+            "my_service",
+            command=["echo", "hello"],
+            service_ports=True,
+            detach=True,
+            tty=False,
+        )
+
+        call_args = mock_run.call_args[0][0]
+        assert "--service-ports" in call_args
+
+
+@pytest.mark.parametrize("service_ports", [True, False])
+def test_compose_run_service_ports_integration(service_ports):
+    """Test that service ports are correctly mapped when using --service-ports."""
+
+    docker_client = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/service_ports.yml"
+        ],
+        compose_compatibility=True,
+    )
+    container: Union[
+        str,
+        python_on_whales.components.container.cli_wrapper.Container,
+        Iterable[Tuple[str, bytes]],
+    ] = ""
+    try:
+        container = docker_client.compose.run(
+            "web",
+            detach=True,
+            service_ports=service_ports,
+            remove=False,
+            tty=False,
+        )
+
+        # Verify the container has the port mapping
+        port_bindings = container.host_config.port_bindings
+        assert port_bindings is not None
+        if service_ports:
+            assert len(port_bindings["80/tcp"]) == 1
+            assert port_bindings["80/tcp"][0].host_port == "8074"
+
+        else:
+            assert len(port_bindings) == 0
+    finally:
+        container.stop()
+        container.remove(force=True)
 
 
 def test_compose_version():
