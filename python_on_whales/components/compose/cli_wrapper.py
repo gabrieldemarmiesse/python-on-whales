@@ -968,6 +968,7 @@ class ComposeCLI(DockerCLICaller):
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[True] = ...,
         wait_timeout: Optional[int] = ...,
+        dependencies: bool = True,
     ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
@@ -993,6 +994,7 @@ class ComposeCLI(DockerCLICaller):
         pull: Literal["always", "missing", "never", None] = ...,
         stream_logs: Literal[False] = ...,
         wait_timeout: Optional[int] = ...,
+        dependencies: bool = True,
     ) -> None: ...
 
     def up(
@@ -1017,6 +1019,7 @@ class ComposeCLI(DockerCLICaller):
         pull: Literal["always", "missing", "never", None] = None,
         stream_logs: bool = False,
         wait_timeout: Optional[int] = None,
+        dependencies: bool = True,
     ):
         """Start the containers.
 
@@ -1062,6 +1065,7 @@ class ComposeCLI(DockerCLICaller):
                 See [the streaming guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output) if you are
                 not familiar with the streaming of logs in Python-on-whales.
             wait_timeout: Maximum duration to wait for the project to be running|healthy
+            dependencies: Also start linked services.
         """
         if quiet and stream_logs:
             raise ValueError(
@@ -1085,6 +1089,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--no-start", not start)
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_flag("--renew-anon-volumes", renew_anon_volumes)
+        full_cmd.add_flag("--no-deps", not dependencies)
         full_cmd.add_simple_arg("--pull", pull)
 
         if no_attach_services is not None:
