@@ -190,6 +190,32 @@ def test_docker_compose_up_down():
     assert docker.compose.ps() == []
 
 
+@pytest.mark.parametrize(
+    "dependencies_value, expected_running_containers", [(True, 2), (False, 1)]
+)
+def test_docker_compose_up_dependencies(
+    dependencies_value, expected_running_containers
+):
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT / "tests/python_on_whales/components/dummy_compose.yml"
+        ],
+        compose_compatibility=True,
+    )
+
+    try:
+        docker.compose.up(
+            ["busybox-2-electric-boogaloo"],
+            dependencies=dependencies_value,
+            detach=True,
+        )
+        running_containers = docker.compose.ps()
+    finally:
+        docker.compose.down(timeout=1)
+
+    assert len(running_containers) == expected_running_containers
+
+
 def test_docker_compose_up_down_streaming():
     docker = DockerClient(
         compose_files=[
