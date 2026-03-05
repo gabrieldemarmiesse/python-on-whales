@@ -13,7 +13,11 @@ from python_on_whales.utils import run, to_list
 
 class ManifestList(ReloadableObjectFromJson):
     def __init__(
-        self, client_config: ClientConfig, reference: str, is_immutable_id=False, insecure: bool = False
+        self,
+        client_config: ClientConfig,
+        reference: str,
+        is_immutable_id=False,
+        insecure: bool = False,
     ):
         self.reference = reference
         self.insecure = insecure
@@ -27,7 +31,7 @@ class ManifestList(ReloadableObjectFromJson):
 
     def _fetch_inspect_result_json(self, reference):
         cmd = self.docker_cmd + ["manifest", "inspect", reference]
-        cmd.add_flag('--insecure', self.insecure)
+        cmd.add_flag("--insecure", self.insecure)
         json_str = run(cmd)
         return json.loads(json_str)
 
