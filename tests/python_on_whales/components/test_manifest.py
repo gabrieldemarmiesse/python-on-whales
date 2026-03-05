@@ -1,9 +1,10 @@
 import json
 import os
 from typing import Generator
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
+
 from python_on_whales import DockerClient, Image
 from python_on_whales.components.manifest.cli_wrapper import (
     ManifestList,
