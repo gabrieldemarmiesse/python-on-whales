@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Generator
+from unittest.mock import patch
 
 import pytest
 
@@ -70,3 +71,28 @@ def test_manifest_platform_variant(platform_variant_manifest: Image):
     assert "linux" in repr(platform_variant_manifest.os)
     assert "arm" in repr(platform_variant_manifest.architecture)
     assert "v7" in repr(platform_variant_manifest.variant)
+
+
+@pytest.mark.parametrize("insecure", [False, True])
+def test_manifest_inspect_insecure_flag(docker_client: DockerClient, insecure: bool):
+    ref = "busybox:latest"
+
+    fake_json = {
+        "schemaVersion": 2,
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "manifests": [],
+    }
+
+    with patch("python_on_whales.components.manifest.cli_wrapper.run") as mock_run:
+        mock_run.return_value = json.dumps(fake_json)
+
+        manifest: ManifestList = docker_client.manifest.inspect(ref, insecure=insecure)
+
+        assert manifest.insecure == insecure
+
+        cmd = list(mock_run.call_args[0][0])
+
+        if insecure:
+            assert "--insecure" in cmd
+        else:
+            assert "--insecure" not in cmd
