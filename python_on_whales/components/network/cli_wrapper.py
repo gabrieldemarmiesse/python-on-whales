@@ -202,6 +202,7 @@ class NetworkCLI(DockerCLICaller):
         self,
         name: str,
         attachable: bool = False,
+        disable_dns: bool = False,
         driver: Optional[str] = None,
         gateway: Optional[str] = None,
         subnet: Optional[str] = None,
@@ -218,6 +219,7 @@ class NetworkCLI(DockerCLICaller):
         """
         full_cmd = self.docker_cmd + ["network", "create"]
         full_cmd.add_flag("--attachable", attachable)
+        full_cmd.add_flag("--disable-dns", disable_dns)
         full_cmd.add_simple_arg("--driver", driver)
         full_cmd.add_simple_arg("--gateway", gateway)
         full_cmd.add_simple_arg("--subnet", subnet)
