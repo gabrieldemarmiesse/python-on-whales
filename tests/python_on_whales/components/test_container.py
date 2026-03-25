@@ -514,9 +514,7 @@ def test_execute_interactive_stream(ctr_client: DockerClient):
     my_container = ctr_client.run(
         "busybox:1", ["sleep", "infinity"], detach=True, remove=True
     )
-    proc = ctr_client.execute(
-        my_container, ["cat"], interactive=True, stream=True
-    )
+    proc = ctr_client.execute(my_container, ["cat"], interactive=True, stream=True)
     proc.stdin.write(b"hello\n")
     proc.stdin.close()
     output = list(proc)

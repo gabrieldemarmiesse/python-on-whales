@@ -12,9 +12,9 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 from typing import (
+    IO,
     Any,
     Dict,
-    IO,
     Iterable,
     Iterator,
     List,
