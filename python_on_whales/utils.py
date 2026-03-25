@@ -12,9 +12,11 @@ from queue import Queue
 from subprocess import PIPE, Popen
 from threading import Thread
 from typing import (
+    IO,
     Any,
     Dict,
     Iterable,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -263,9 +265,31 @@ def reader(pipe, pipe_name, queue):
         queue.put(None)
 
 
-def stream_stdout_and_stderr(
-    full_cmd: list, env: Dict[str, str] = None, pass_fds: Sequence[int] = ()
-) -> Iterable[Tuple[str, bytes]]:
+class ProcessStream(Iterable[Tuple[str, bytes]]):
+    """Wrapper around a streaming subprocess that also exposes stdin.
+
+    Iterating over a ``ProcessStream`` yields ``(source, line)`` tuples.
+    """
+
+    def __init__(
+        self,
+        iterator: Iterable[Tuple[str, bytes]],
+        stdin: Optional[IO[bytes]] = None,
+    ) -> None:
+        self.iterator: Iterable[Tuple[str, bytes]] = iterator
+        self.stdin: Optional[IO[bytes]] = stdin
+
+    def __iter__(self) -> Iterator[Tuple[str, bytes]]:
+        return iter(self.iterator)
+
+
+def _start_process(
+    full_cmd: list,
+    env: Dict[str, str] = None,
+    pass_fds: Sequence[int] = (),
+    pipe_stdin: bool = False,
+) -> Tuple[Popen, Queue]:
+    """Start a subprocess and wire up reader threads for stdout/stderr."""
     if env is None:
         subprocess_env = None
     else:
@@ -274,10 +298,14 @@ def stream_stdout_and_stderr(
 
     full_cmd = list(map(str, full_cmd))
     process = Popen(
-        full_cmd, stdout=PIPE, stderr=PIPE, env=subprocess_env, pass_fds=pass_fds
+        full_cmd,
+        stdin=PIPE if pipe_stdin else None,
+        stdout=PIPE,
+        stderr=PIPE,
+        env=subprocess_env,
+        pass_fds=pass_fds,
     )
-    q = Queue()
-    full_stderr = b""  # for the error message
+    q: Queue = Queue()
     # we use deamon threads to avoid hanging if the user uses ctrl+c
     th = Thread(target=reader, args=[process.stdout, "stdout", q])
     th.daemon = True
@@ -285,6 +313,14 @@ def stream_stdout_and_stderr(
     th = Thread(target=reader, args=[process.stderr, "stderr", q])
     th.daemon = True
     th.start()
+    return process, q
+
+
+def _iter_process(
+    process: Popen, q: Queue, full_cmd: list
+) -> Iterable[Tuple[str, bytes]]:
+    """Iterate stdout/stderr from a non-interactive process."""
+    full_stderr = b""
     for _ in range(2):
         for source, line in iter(q.get, None):
             yield source, line
@@ -297,6 +333,24 @@ def stream_stdout_and_stderr(
         raise exception_type(
             command_launched=full_cmd, return_code=exit_code, stderr=full_stderr
         )
+
+
+def stream_stdout_and_stderr(
+    full_cmd: list,
+    env: Dict[str, str] = None,
+    pass_fds: Sequence[int] = (),
+    pipe_stdin: bool = False,
+) -> Iterable[Tuple[str, bytes]]:
+    """Stream stdout/stderr from a subprocess.
+
+    Always returns a :class:`ProcessStream`.  When *pipe_stdin* is
+    ``True`` the subprocess is started with ``stdin=PIPE`` so that
+    ``result.stdin`` is available for writing.  Otherwise ``result.stdin``
+    is ``None``.
+    """
+    process, q = _start_process(full_cmd, env, pass_fds, pipe_stdin)
+    full_cmd = list(map(str, full_cmd))
+    return ProcessStream(_iter_process(process, q, full_cmd), process.stdin)
 
 
 def format_mapping_for_cli(mapping: Mapping[str, str], separator="="):
