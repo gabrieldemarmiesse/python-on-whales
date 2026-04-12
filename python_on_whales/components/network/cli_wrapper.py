@@ -128,6 +128,10 @@ class Network(ReloadableObjectFromJson):
     def config_only(self) -> bool:
         return self._get_inspect_result().config_only
 
+    @property
+    def dns_enabled(self) -> bool:
+        return self._get_inspect_result().dns_enabled
+
     def __repr__(self):
         return f"python_on_whales.Network(id='{self.id[:12]}', name={self.name})"
 
@@ -213,6 +217,7 @@ class NetworkCLI(DockerCLICaller):
 
         Parameters:
             name: The name of the network
+            disable_dns: A podman only option to disable the dns plugin
 
         # Returns
             A `python_on_whales.Network`.
