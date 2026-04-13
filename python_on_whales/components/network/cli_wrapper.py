@@ -128,6 +128,10 @@ class Network(ReloadableObjectFromJson):
     def config_only(self) -> bool:
         return self._get_inspect_result().config_only
 
+    @property
+    def dns_enabled(self) -> bool:
+        return self._get_inspect_result().dns_enabled
+
     def __repr__(self):
         return f"python_on_whales.Network(id='{self.id[:12]}', name={self.name})"
 
@@ -202,6 +206,7 @@ class NetworkCLI(DockerCLICaller):
         self,
         name: str,
         attachable: bool = False,
+        disable_dns: bool = False,
         driver: Optional[str] = None,
         gateway: Optional[str] = None,
         subnet: Optional[str] = None,
@@ -212,12 +217,14 @@ class NetworkCLI(DockerCLICaller):
 
         Parameters:
             name: The name of the network
+            disable_dns: A podman only option to disable the dns plugin
 
         # Returns
             A `python_on_whales.Network`.
         """
         full_cmd = self.docker_cmd + ["network", "create"]
         full_cmd.add_flag("--attachable", attachable)
+        full_cmd.add_flag("--disable-dns", disable_dns)
         full_cmd.add_simple_arg("--driver", driver)
         full_cmd.add_simple_arg("--gateway", gateway)
         full_cmd.add_simple_arg("--subnet", subnet)
