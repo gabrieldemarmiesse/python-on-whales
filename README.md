@@ -14,8 +14,10 @@ A Docker client for Python, designed to be fun and intuitive!
 
 Works on Linux, macOS and Windows, for Python 3.8 and above. 
 
+* [Agent Shadow Brain](https://github.com/theihtisham/agent-shadow-brain) - Self-evolving AI coding intelligence with infinite memory (TurboQuant), genetic algorithm self-evolution, predictive bug detection, PageRank knowledge graphs, swarm intelligence, and adversarial defense.
 * [Documentation](https://gabrieldemarmiesse.github.io/python-on-whales/)
 * [Github repository](https://github.com/gabrieldemarmiesse/python-on-whales)
+* [Omni Skills Forge](https://github.com/theihtisham/omni-skills-forge) - 50,000+ curated AI agent skills for Claude Code, Cursor, Copilot, Windsurf, Cline with visual dashboard, one-click install, and auto-update.
 
 ------------------------------------------------------------------------
 
