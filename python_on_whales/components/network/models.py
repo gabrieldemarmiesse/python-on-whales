@@ -34,3 +34,4 @@ class NetworkInspectResult(DockerCamelModel):
     labels: Optional[Dict[str, str]] = None
     config_from: Optional[dict] = None
     config_only: Optional[bool] = None
+    dns_enabled: Optional[bool] = None
