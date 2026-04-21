@@ -136,3 +136,15 @@ def test_correct_ipam_config(docker_client: DockerClient):
             ].ipam_config == ContainerEndpointIPAMConfig(
                 ipv4_address="172.20.0.5", ipv6_address=None, link_local_ips=None
             )
+
+
+def test_disable_dns(podman_client: DockerClient):
+    with podman_client.network.create(random_name(), disable_dns=False) as net:
+        assert net.dns_enabled is True
+        inspect_result = podman_client.network.inspect(net.name)
+        assert inspect_result.dns_enabled is True
+
+    with podman_client.network.create(random_name(), disable_dns=True) as net:
+        assert net.dns_enabled is False
+        inspect_result = podman_client.network.inspect(net.name)
+        assert inspect_result.dns_enabled is False
