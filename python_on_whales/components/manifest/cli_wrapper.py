@@ -13,9 +13,14 @@ from python_on_whales.utils import run, to_list
 
 class ManifestList(ReloadableObjectFromJson):
     def __init__(
-        self, client_config: ClientConfig, reference: str, is_immutable_id=False
+        self,
+        client_config: ClientConfig,
+        reference: str,
+        is_immutable_id=False,
+        insecure: bool = False,
     ):
         self.reference = reference
+        self.insecure = insecure
         super().__init__(client_config, "name", reference, is_immutable_id)
 
     def __enter__(self):
@@ -25,7 +30,9 @@ class ManifestList(ReloadableObjectFromJson):
         self.remove()
 
     def _fetch_inspect_result_json(self, reference):
-        json_str = run(self.docker_cmd + ["manifest", "inspect", reference])
+        cmd = self.docker_cmd + ["manifest", "inspect", reference]
+        cmd.add_flag("--insecure", self.insecure)
+        json_str = run(cmd)
         return json.loads(json_str)
 
     def _parse_json_object(
@@ -126,9 +133,9 @@ class ManifestCLI(DockerCLICaller):
             self.client_config, run(full_cmd)[22:], is_immutable_id=True
         )
 
-    def inspect(self, x: str) -> ManifestList:
+    def inspect(self, x: str, insecure: bool = False) -> ManifestList:
         """Returns a Docker manifest list object."""
-        return ManifestList(self.client_config, x)
+        return ManifestList(self.client_config, x, insecure=insecure)
 
     def push(self, x: str, purge: bool = False, quiet: bool = False):
         """Push a manifest list to a repository.
