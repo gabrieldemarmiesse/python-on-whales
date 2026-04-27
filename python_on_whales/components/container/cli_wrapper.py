@@ -1002,8 +1002,9 @@ class ContainerCLI(DockerCLICaller):
             env_files: Read one or more files of environment variables
             interactive: Leave stdin open during the duration of the process
                 to allow communication with the parent process.
-                Currently only works with `tty=True` for interactive use
-                on the terminal.
+                Can be combined with `stream=True` to get an
+                `ProcessStream` that allows writing to stdin while
+                iterating over stdout/stderr.
             preserve_fds: The number of additional file descriptors to pass
                 through to the container. Only supported by podman.
             privileged: Give extended privileges to the container.
@@ -1041,12 +1042,6 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_args_mapping("--env", envs)
         full_cmd.add_args_iterable_or_single("--env-file", env_files)
 
-        if interactive and stream:
-            raise ValueError(
-                "You can't set interactive=True and stream=True at the same"
-                "time. Their purpose are not compatible."
-            )
-
         if tty and stream:
             raise ValueError(
                 "You can't set tty=True and stream=True at the same"
@@ -1077,7 +1072,9 @@ class ContainerCLI(DockerCLICaller):
         else:
             pass_fds = ()
         if stream:
-            return stream_stdout_and_stderr(full_cmd, pass_fds=pass_fds)
+            return stream_stdout_and_stderr(
+                full_cmd, pass_fds=pass_fds, pipe_stdin=interactive
+            )
         else:
             result = run(full_cmd, tty=tty, pass_fds=pass_fds)
             if detach:

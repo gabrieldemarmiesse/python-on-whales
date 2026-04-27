@@ -509,6 +509,19 @@ def test_execute_stream(ctr_client: DockerClient):
     ctr_client.kill(my_container)
 
 
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_execute_interactive_stream(ctr_client: DockerClient):
+    my_container = ctr_client.run(
+        "busybox:1", ["sleep", "infinity"], detach=True, remove=True
+    )
+    proc = ctr_client.execute(my_container, ["cat"], interactive=True, stream=True)
+    proc.stdin.write(b"hello\n")
+    proc.stdin.close()
+    output = list(proc)
+    assert ("stdout", b"hello\n") in output
+    ctr_client.kill(my_container)
+
+
 @pytest.mark.parametrize(
     "ctr_client",
     ["docker", pytest.param("podman", marks=pytest.mark.xfail)],
