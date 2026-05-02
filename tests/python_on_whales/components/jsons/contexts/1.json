@@ -1,0 +1,20 @@
+{
+    "Name": "default",
+    "Metadata": {
+        "StackOrchestrator": "swarm",
+        "otel": {
+            "OTEL_EXPORTER_OTLP_ENDPOINT": "unix:///Users/me/.docker/run/user-analytics.otlp.grpc.sock"
+        }
+    },
+    "Endpoints": {
+        "docker": {
+            "Host": "unix:///var/run/docker.sock",
+            "SkipTLSVerify": false
+        }
+    },
+    "TLSMaterial": {},
+    "Storage": {
+        "MetadataPath": "<IN MEMORY>",
+        "TLSPath": "<IN MEMORY>"
+    }
+}
