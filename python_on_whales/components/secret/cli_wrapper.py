@@ -11,6 +11,7 @@ from typing import (
     Optional,
     Tuple,
     Union,
+    overload,
 )
 
 from typing_extensions import TypeAlias
@@ -88,7 +89,7 @@ class SecretCLI(DockerCLICaller):
         name: str,
         file: ValidPath,
         driver: Optional[str] = None,
-        labels: Dict[str, str] = {},
+        labels: Mapping[str, str] = {},
         template_driver: Optional[str] = None,
     ) -> Secret:
         """Creates a `python_on_whales.Secret`.
@@ -103,16 +104,24 @@ class SecretCLI(DockerCLICaller):
         full_cmd += [name, file]
         return Secret(self.client_config, run(full_cmd), is_immutable_id=True)
 
-    def inspect(self, x: Union[str, List[str]]) -> Union[Secret, List[Secret]]:
+    @overload
+    def inspect(self, x: str) -> Secret: ...
+
+    @overload
+    def inspect(self, x: Iterable[str]) -> List[Secret]: ...
+
+    def inspect(
+        self, x: Union[str, Iterable[str]]
+    ) -> Union[Secret, List[Secret]]:
         """Returns one or more `python_on_whales.Secret` based on an ID or name.
 
         Parameters:
             x: One or more IDs/names.
         """
-        if isinstance(x, list):
-            return [Secret(self.client_config, reference) for reference in x]
-        else:
+        if isinstance(x, str):
             return Secret(self.client_config, x)
+        else:
+            return [Secret(self.client_config, reference) for reference in x]
 
     def list(
         self, filters: Union[Iterable[SecretListFilter], Mapping[str, Any]] = ()
@@ -131,14 +140,15 @@ class SecretCLI(DockerCLICaller):
         ids = run(full_cmd).splitlines()
         return [Secret(self.client_config, id_, is_immutable_id=True) for id_ in ids]
 
-    def remove(self, x: Union[ValidSecret, List[ValidSecret]]) -> None:
+    def remove(self, x: Union[ValidSecret, Iterable[ValidSecret]]) -> None:
         """Removes one or more secrets
 
         Parameters:
             x: One or more secrets.
                 Name, ids or `python_on_whales.Secret` objects are valid inputs.
         """
-        if x == []:
+        secrets = to_list(x)
+        if not secrets:
             return
-        full_cmd = self.docker_cmd + ["secret", "remove"] + to_list(x)
+        full_cmd = self.docker_cmd + ["secret", "remove"] + secrets
         run(full_cmd)
