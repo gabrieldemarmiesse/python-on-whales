@@ -351,6 +351,19 @@ def test_simple_logs(ctr_client: DockerClient):
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
+def test_logs_encoding_errors(ctr_client: DockerClient):
+    with ctr_client.run(
+        "busybox:1", ["printf", "\\xff\\xfeabc"], detach=True
+    ) as c:
+        time.sleep(0.3)
+        replaced = ctr_client.container.logs(c, errors="replace")
+        assert "�" in replaced
+        assert replaced.endswith("abc")
+        with pytest.raises(UnicodeDecodeError):
+            ctr_client.container.logs(c)
+
+
+@pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_simple_logs_stderr(ctr_client: DockerClient):
     with ctr_client.run("busybox:1", ["sh", "-c", ">&2 echo dodo"], detach=True) as c:
         time.sleep(0.3)
