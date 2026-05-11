@@ -352,15 +352,19 @@ def test_simple_logs(ctr_client: DockerClient):
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
 def test_logs_encoding_errors(ctr_client: DockerClient):
-    with ctr_client.run(
-        "busybox:1", ["printf", "\\xff\\xfeabc"], detach=True
-    ) as c:
-        time.sleep(0.3)
-        replaced = ctr_client.container.logs(c, errors="replace")
+    container_cli = ctr_client.container
+    with patch.object(container_cli, "inspect"), patch(
+        "python_on_whales.components.container.cli_wrapper.stream_stdout_and_stderr",
+        side_effect=[
+            iter([("stdout", b"\xff\xfeabc")]),
+            iter([("stdout", b"\xff\xfeabc")]),
+        ],
+    ):
+        replaced = container_cli.logs(Mock(), errors="replace")
         assert "�" in replaced
         assert replaced.endswith("abc")
         with pytest.raises(UnicodeDecodeError):
-            ctr_client.container.logs(c)
+            container_cli.logs(Mock())
 
 
 @pytest.mark.parametrize("ctr_client", ["docker", "podman"], indirect=True)
