@@ -110,9 +110,7 @@ class SecretCLI(DockerCLICaller):
     @overload
     def inspect(self, x: Iterable[str]) -> List[Secret]: ...
 
-    def inspect(
-        self, x: Union[str, Iterable[str]]
-    ) -> Union[Secret, List[Secret]]:
+    def inspect(self, x: Union[str, Iterable[str]]) -> Union[Secret, List[Secret]]:
         """Returns one or more `python_on_whales.Secret` based on an ID or name.
 
         Parameters:
