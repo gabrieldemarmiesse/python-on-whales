@@ -39,7 +39,6 @@ from python_on_whales.utils import (
     format_port_arg,
     format_signal_arg,
     format_time_arg,
-    join_if_not_none,
     run,
     stream_stdout_and_stderr,
     to_list,
