@@ -48,6 +48,7 @@ from python_on_whales.utils import (
     ValidPath,
     ValidPortMapping,
     custom_parse_object_as,
+    format_cpuset,
     format_port_arg,
     format_signal_arg,
     format_time_arg,
@@ -459,8 +460,8 @@ class RunArgs(TypedDict, total=False):
     cpu_rt_runtime: Optional[int]
     cpu_shares: Optional[int]
     cpus: Optional[float]
-    cpuset_cpus: Optional[List[int]]
-    cpuset_mems: Optional[List[int]]
+    cpuset_cpus: Union[List[int], str, None]
+    cpuset_mems: Union[List[int], str, None]
     devices: Iterable[str]
     device_cgroup_rules: Iterable[str]
     device_read_bps: Iterable[str]
@@ -678,8 +679,8 @@ class ContainerCLI(DockerCLICaller):
         cpu_rt_runtime: Optional[int] = None,
         cpu_shares: Optional[int] = None,
         cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
+        cpuset_cpus: Union[List[int], str, None] = None,
+        cpuset_mems: Union[List[int], str, None] = None,
         detach: bool = False,
         devices: Iterable[str] = (),
         device_cgroup_rules: Iterable[str] = (),
@@ -823,8 +824,8 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
         full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
         full_cmd.add_simple_arg("--cpus", cpus)
-        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
-        full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(cpuset_mems))
+        full_cmd.add_simple_arg("--cpuset-cpus", format_cpuset(cpuset_cpus))
+        full_cmd.add_simple_arg("--cpuset-mems", format_cpuset(cpuset_mems))
 
         full_cmd.add_flag("--detach", detach)
 
@@ -1508,8 +1509,8 @@ class ContainerCLI(DockerCLICaller):
         cpu_rt_runtime: Optional[int] = None,
         cpu_shares: Optional[int] = None,
         cpus: Optional[float] = None,
-        cpuset_cpus: Optional[List[int]] = None,
-        cpuset_mems: Optional[List[int]] = None,
+        cpuset_cpus: Union[List[int], str, None] = None,
+        cpuset_mems: Union[List[int], str, None] = None,
         detach: bool = False,
         devices: Iterable[str] = (),
         device_cgroup_rules: Iterable[str] = (),
@@ -1681,8 +1682,12 @@ class ContainerCLI(DockerCLICaller):
             cpu_shares: CPU shares (relative weight)
             cpus: The maximal amount of cpu the container can use.
                 `1` means one cpu core.
-            cpuset_cpus: CPUs in which to allow execution. Must be given as a list.
-            cpuset_mems: MEMs in which to allow execution. Must be given as a list.
+            cpuset_cpus: CPUs in which to allow execution. Accepts a list of
+                CPU indices (e.g. `[0, 2]`) or a cpuset string as understood by
+                the docker CLI (e.g. `"0-3"`, `"0,2"`, `"0-3,7"`).
+            cpuset_mems: MEMs in which to allow execution. Accepts a list of
+                memory-node indices or a cpuset string (same format as
+                `cpuset_cpus`).
             detach: If `False`, returns the ouput of the container as a string.
                 If `True`, returns a `python_on_whales.Container` object.
             dns_search: Set custom DNS search domains
@@ -1809,8 +1814,8 @@ class ContainerCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--cpu-rt-runtime", cpu_rt_runtime)
         full_cmd.add_simple_arg("--cpu-shares", cpu_shares)
         full_cmd.add_simple_arg("--cpus", cpus)
-        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
-        full_cmd.add_simple_arg("--cpuset-mems", join_if_not_none(cpuset_mems))
+        full_cmd.add_simple_arg("--cpuset-cpus", format_cpuset(cpuset_cpus))
+        full_cmd.add_simple_arg("--cpuset-mems", format_cpuset(cpuset_mems))
 
         full_cmd.add_flag("--detach", detach)
 
@@ -2151,8 +2156,11 @@ class ContainerCLI(DockerCLICaller):
             cpu_shares: CPU shares (relative weight)
             cpus: The maximal amount of cpu the container can use.
                 `1` means one cpu core.
-            cpuset_cpus: CPUs in which to allow execution. Must be given as a list.
-            cpuset_mems: MEMs in which to allow execution. Must be given as a list.
+            cpuset_cpus: CPUs in which to allow execution, as a cpuset string
+                understood by the docker CLI (e.g. `"0-3"`, `"0,2"`,
+                `"0-3,7"`).
+            cpuset_mems: MEMs in which to allow execution, as a cpuset string
+                (same format as `cpuset_cpus`).
             memory:  Memory limit, valid values are `1024` (ints are bytes) or
                 `"43m"` or `"6g"`.
             memory_reservation: Memory soft limit
