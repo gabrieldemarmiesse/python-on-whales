@@ -358,6 +358,8 @@ class Container(ReloadableObjectFromJson):
         tail: Optional[int] = None,
         timestamps: bool = False,
         until: Union[None, datetime, timedelta] = None,
+        encoding: Optional[str] = None,
+        errors: str = "strict",
     ) -> str:
         """Returns the logs of the container
 
@@ -371,6 +373,8 @@ class Container(ReloadableObjectFromJson):
             tail=tail,
             timestamps=timestamps,
             until=until,
+            encoding=encoding,
+            errors=errors,
         )
 
     def pause(self) -> None:
@@ -1216,6 +1220,8 @@ class ContainerCLI(DockerCLICaller):
         until: Union[None, datetime, timedelta] = None,
         follow: bool = False,
         stream: bool = False,
+        encoding: Optional[str] = None,
+        errors: str = "strict",
     ) -> Union[str, Iterable[Tuple[str, bytes]]]:
         """Returns the logs of a container as a string or an iterator.
 
@@ -1243,6 +1249,12 @@ class ContainerCLI(DockerCLICaller):
                 `"stdout"`. `content` is the content of the line as bytes.
                 Take a look at [the user guide](https://gabrieldemarmiesse.github.io/python-on-whales/user_guide/docker_run/#stream-the-output)
                 to have an example of the output.
+            encoding: The codec used to decode the raw log bytes into a `str`.
+                Defaults to `utf-8`. Only applies when `stream=False`; when
+                `stream=True` the iterator yields raw `bytes`.
+            errors: Error-handling scheme used when decoding bytes (e.g.
+                `"strict"`, `"replace"`, `"ignore"`). Defaults to `"strict"`,
+                matching `bytes.decode()`. Only applies when `stream=False`.
 
         # Returns
             `str` if `stream=False` (the default), `Iterable[Tuple[str, bytes]]`
@@ -1276,7 +1288,8 @@ class ContainerCLI(DockerCLICaller):
         if stream:
             return iterator
         else:
-            return "".join(x[1].decode() for x in iterator)
+            decode_encoding = encoding if encoding is not None else "utf-8"
+            return "".join(x[1].decode(decode_encoding, errors) for x in iterator)
 
     def list(
         self,
