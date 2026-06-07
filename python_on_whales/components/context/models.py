@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import pydantic
 from typing_extensions import Annotated
@@ -20,7 +20,7 @@ class ContextStorage(DockerCamelModel):
 
 class ContextInspectResult(DockerCamelModel):
     name: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
+    metadata: Optional[Dict[str, Any]] = None
     endpoints: Optional[Dict[str, ContextEndpoint]] = None
     tls_material: Annotated[Optional[dict], pydantic.Field(alias="TLSMaterial")] = None
     storage: Optional[ContextStorage] = None
