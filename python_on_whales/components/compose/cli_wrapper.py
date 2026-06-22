@@ -531,6 +531,32 @@ class ComposeCLI(DockerCLICaller):
             for proj in json.loads(run(full_cmd))
         ]
 
+    def publish(
+        self,
+        repository: str,
+        oci_version: Optional[str] = None,
+        resolve_image_digests: bool = False,
+        with_env: bool = False,
+        yes: bool = False,
+    ) -> None:
+        """Publish compose application.
+
+        Parameters:
+            repository: Repository to publish compose application
+            oci_version: OCI image/artifact specification version (automatically determined by default)
+            resolve_image_digests: Pin image tags to digests
+            with_env: Include environment variables in the published OCI artifact
+            yes: Assume "yes" as answer to all prompts
+        """
+        full_cmd = self.docker_compose_cmd + ["publish"]
+        if oci_version is not None:
+            full_cmd.add_simple_arg("--oci-version", oci_version)
+        full_cmd.add_flag("--resolve-image-digests", resolve_image_digests)
+        full_cmd.add_flag("--with-env", with_env)
+        full_cmd.add_flag("--yes", yes)
+        full_cmd.append(repository)
+        run(full_cmd, capture_stderr=False, capture_stdout=False)
+
     @overload
     def pull(
         self,
@@ -969,6 +995,7 @@ class ComposeCLI(DockerCLICaller):
         stream_logs: Literal[True] = ...,
         wait_timeout: Optional[int] = ...,
         dependencies: bool = True,
+        yes: bool = ...,
     ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
@@ -995,6 +1022,7 @@ class ComposeCLI(DockerCLICaller):
         stream_logs: Literal[False] = ...,
         wait_timeout: Optional[int] = ...,
         dependencies: bool = True,
+        yes: bool = ...,
     ) -> None: ...
 
     def up(
@@ -1020,6 +1048,7 @@ class ComposeCLI(DockerCLICaller):
         stream_logs: bool = False,
         wait_timeout: Optional[int] = None,
         dependencies: bool = True,
+        yes: bool = False,
     ):
         """Start the containers.
 
@@ -1066,6 +1095,7 @@ class ComposeCLI(DockerCLICaller):
                 not familiar with the streaming of logs in Python-on-whales.
             wait_timeout: Maximum duration to wait for the project to be running|healthy
             dependencies: Also start linked services.
+            yes: If `True` assume "yes" as answer to all prompts and run non-interactively.
         """
         if quiet and stream_logs:
             raise ValueError(
@@ -1090,6 +1120,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_flag("--renew-anon-volumes", renew_anon_volumes)
         full_cmd.add_flag("--no-deps", not dependencies)
+        full_cmd.add_flag("--yes", yes)
         full_cmd.add_simple_arg("--pull", pull)
 
         if no_attach_services is not None:
