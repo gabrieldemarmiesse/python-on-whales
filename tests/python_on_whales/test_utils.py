@@ -1,5 +1,33 @@
 import python_on_whales.utils
-from python_on_whales.utils import ProcessStream, stream_stdout_and_stderr
+from python_on_whales.utils import (
+    ProcessStream,
+    format_cpuset,
+    stream_stdout_and_stderr,
+)
+
+
+def test_format_cpuset_none():
+    assert format_cpuset(None) is None
+
+
+def test_format_cpuset_list_of_ints():
+    assert format_cpuset([0, 2, 3]) == "0,2,3"
+
+
+def test_format_cpuset_empty_list():
+    assert format_cpuset([]) == ""
+
+
+def test_format_cpuset_string_passthrough():
+    # cpuset strings accepted by the CLI must be passed through unmodified so
+    # ranges like "0-3" and mixes like "0-3,7" reach docker as-is.
+    assert format_cpuset("0-3") == "0-3"
+    assert format_cpuset("0,2") == "0,2"
+    assert format_cpuset("0-3,7") == "0-3,7"
+
+
+def test_format_cpuset_generator():
+    assert format_cpuset(iter([1, 4])) == "1,4"
 
 
 def test_environment_variables_propagation(monkeypatch):

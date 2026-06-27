@@ -442,6 +442,12 @@ def join_if_not_none(sequence: Optional[list]) -> Optional[str]:
     return ",".join(sequence)
 
 
+def format_cpuset(value: Union[Iterable[int], str, None]) -> Optional[str]:
+    if value is None or isinstance(value, str):
+        return value
+    return ",".join(str(x) for x in value)
+
+
 def to_seconds(duration: Optional[Union[int, timedelta]]) -> Optional[str]:
     if duration is None:
         return None
