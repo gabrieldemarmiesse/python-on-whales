@@ -35,10 +35,10 @@ from python_on_whales.exceptions import NoSuchPod
 from python_on_whales.utils import (
     ValidPath,
     ValidPortMapping,
+    format_cpuset,
     format_port_arg,
     format_signal_arg,
     format_time_arg,
-    join_if_not_none,
     run,
     stream_stdout_and_stderr,
     to_list,
@@ -259,7 +259,7 @@ class PodCLI(DockerCLICaller):
         add_hosts: Iterable[Tuple[str, str]] = (),
         cgroup_parent: Optional[str] = None,
         cpus: Optional[float] = None,
-        cpuset_cpus: Optional[Iterable[int]] = None,
+        cpuset_cpus: Union[Iterable[int], str, None] = None,
         devices: Iterable[str] = (),
         device_read_bps: Iterable[str] = (),
         dns: Iterable[str] = (),
@@ -319,7 +319,9 @@ class PodCLI(DockerCLICaller):
                 be relative to the cgroups path of the init process.
             cpus: Set the total number of CPUs delegated to the pod. The default
                 is 0.0 indicating that there is no limit on computation power.
-            cpuset_cpus: CPUs in which to allow execution.
+            cpuset_cpus: CPUs in which to allow execution. Accepts a list of
+                CPU indices (e.g. `[0, 2]`) or a cpuset string as understood by
+                the CLI (e.g. `"0-3"`, `"0,2"`, `"0-3,7"`).
             devices: List of device names to pass from the host to containers
                 in the pod.
             device_read_bps: Limit read rate (in bytes per second) from a device
@@ -403,7 +405,7 @@ class PodCLI(DockerCLICaller):
         )
         full_cmd.add_simple_arg("--cgroup-parent", cgroup_parent)
         full_cmd.add_simple_arg("--cpus", cpus)
-        full_cmd.add_simple_arg("--cpuset-cpus", join_if_not_none(cpuset_cpus))
+        full_cmd.add_simple_arg("--cpuset-cpus", format_cpuset(cpuset_cpus))
         full_cmd.add_args_iterable("--device", devices)
         full_cmd.add_args_iterable("--device-read-bps", device_read_bps)
         full_cmd.add_args_iterable("--dns", dns)
