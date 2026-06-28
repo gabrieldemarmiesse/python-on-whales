@@ -537,7 +537,7 @@ class ComposeCLI(DockerCLICaller):
         oci_version: Optional[str] = None,
         resolve_image_digests: bool = False,
         with_env: bool = False,
-        yes: bool = False,
+        allow_publishing_sensitive_data: bool = False,
     ) -> None:
         """Publish compose application.
 
@@ -546,14 +546,14 @@ class ComposeCLI(DockerCLICaller):
             oci_version: OCI image/artifact specification version (automatically determined by default)
             resolve_image_digests: Pin image tags to digests
             with_env: Include environment variables in the published OCI artifact
-            yes: Assume "yes" as answer to all prompts
+            allow_publishing_sensitive_data: Assume "yes" as answer to all prompts
         """
         full_cmd = self.docker_compose_cmd + ["publish"]
         if oci_version is not None:
             full_cmd.add_simple_arg("--oci-version", oci_version)
         full_cmd.add_flag("--resolve-image-digests", resolve_image_digests)
         full_cmd.add_flag("--with-env", with_env)
-        full_cmd.add_flag("--yes", yes)
+        full_cmd.add_flag("--yes", allow_publishing_sensitive_data)
         full_cmd.append(repository)
         run(full_cmd, capture_stderr=False, capture_stdout=False)
 

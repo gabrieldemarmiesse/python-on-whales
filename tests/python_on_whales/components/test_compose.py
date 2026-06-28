@@ -1475,7 +1475,7 @@ def test_compose_publish_cli_all_flags(run_mock: Mock):
         oci_version="1.1.0",
         resolve_image_digests=True,
         with_env=True,
-        yes=True,
+        allow_publishing_sensitive_data=True,
     )
 
     run_mock.assert_called_once_with(
@@ -1511,7 +1511,11 @@ def test_docker_compose_publish():
         detach=True,
         name="test_registry_container",
     ):
-        docker.compose.publish("localhost:5000/repo/app:tag", with_env=True, yes=True)
+        docker.compose.publish(
+            "localhost:5000/repo/app:tag",
+            with_env=True,
+            allow_publishing_sensitive_data=True,
+        )
 
         app_client = DockerClient(compose_files=["oci://localhost:5000/repo/app:tag"])
         app_client.compose.pull()
