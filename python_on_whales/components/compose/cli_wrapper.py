@@ -995,7 +995,7 @@ class ComposeCLI(DockerCLICaller):
         stream_logs: Literal[True] = ...,
         wait_timeout: Optional[int] = ...,
         dependencies: bool = True,
-        yes: bool = ...,
+        use_default_sensitive_values: bool = ...,
     ) -> Iterable[Tuple[str, bytes]]: ...
 
     @overload
@@ -1022,7 +1022,7 @@ class ComposeCLI(DockerCLICaller):
         stream_logs: Literal[False] = ...,
         wait_timeout: Optional[int] = ...,
         dependencies: bool = True,
-        yes: bool = ...,
+        use_default_sensitive_values: bool = ...,
     ) -> None: ...
 
     def up(
@@ -1048,7 +1048,7 @@ class ComposeCLI(DockerCLICaller):
         stream_logs: bool = False,
         wait_timeout: Optional[int] = None,
         dependencies: bool = True,
-        yes: bool = False,
+        use_default_sensitive_values: bool = False,
     ):
         """Start the containers.
 
@@ -1095,7 +1095,7 @@ class ComposeCLI(DockerCLICaller):
                 not familiar with the streaming of logs in Python-on-whales.
             wait_timeout: Maximum duration to wait for the project to be running|healthy
             dependencies: Also start linked services.
-            yes: If `True` assume "yes" as answer to all prompts and run non-interactively.
+            use_default_sensitive_values: If `True` assume "yes" as answer to all prompts and run non-interactively.
         """
         if quiet and stream_logs:
             raise ValueError(
@@ -1120,7 +1120,7 @@ class ComposeCLI(DockerCLICaller):
         full_cmd.add_flag("--remove-orphans", remove_orphans)
         full_cmd.add_flag("--renew-anon-volumes", renew_anon_volumes)
         full_cmd.add_flag("--no-deps", not dependencies)
-        full_cmd.add_flag("--yes", yes)
+        full_cmd.add_flag("--yes", use_default_sensitive_values)
         full_cmd.add_simple_arg("--pull", pull)
 
         if no_attach_services is not None:
