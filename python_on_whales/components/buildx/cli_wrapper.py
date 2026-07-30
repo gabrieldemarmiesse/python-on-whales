@@ -130,7 +130,9 @@ class BuildxCLI(DockerCLICaller):
         load: bool = False,
         cache: bool = True,
         print: bool = False,
-        progress: Literal["auto", "plain", "tty", False] = "auto",
+        progress: Literal[
+            "auto", "none", "plain", "quiet", "rawjson", "tty", False
+        ] = "auto",
         pull: bool = False,
         push: bool = False,
         set: Dict[str, str] = {},
@@ -153,8 +155,9 @@ class BuildxCLI(DockerCLICaller):
             load: Shorthand for `set=["*.output=type=docker"]`
             cache: Whether to use the cache or not.
             print: Do nothing, just returns the config.
-            progress: Set type of progress output (`"auto"`, `"plain"`, `"tty"`,
-                or `False`). Use plain to keep the container output on screen
+            progress: Set type of progress output (`"auto"`, `"none"`, `"plain"`,
+                `"quiet"`, `"rawjson"`, `"tty"`, or `False`).
+                Use plain to keep the container output on screen
             pull: Always try to pull the newer version of the image
             push: Shorthand for `set=["*.output=type=registry"]`
             set: A list of overrides in the form `"targetpattern.key=value"`.
@@ -251,7 +254,9 @@ class BuildxCLI(DockerCLICaller):
         network: Optional[str] = None,
         output: Dict[str, str] = {},
         platforms: Optional[List[str]] = None,
-        progress: Literal["auto", "plain", "tty", False] = "auto",
+        progress: Literal[
+            "auto", "none", "plain", "quiet", "rawjson", "tty", False
+        ] = "auto",
         provenance: Union[bool, Dict[str, str], None] = None,
         pull: bool = False,
         push: bool = False,
@@ -315,7 +320,8 @@ class BuildxCLI(DockerCLICaller):
                 for more details about each exporter.
             platforms: List of target platforms when building the image. Ex:
                 `platforms=["linux/amd64", "linux/arm64"]`
-            progress: Set type of progress output (auto, plain, tty, or False).
+            progress: Set type of progress output (`"auto"`, `"none"`, `"plain"`,
+                `"quiet"`, `"rawjson"`, `"tty"`, or `False`).
                 Use plain to keep the container output on screen
             provenance: Shortand for `attest={"type": "provenance"}`.
                 Eg `provenance=True` or `provenance=dict(mode="max")`. `provenance=False` might be needed
@@ -398,10 +404,11 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_args_iterable_or_single("--tag", tags)
 
         if stream_logs:
-            if progress in (False, "tty"):
+            if progress in (False, "tty", "none", "quiet"):
                 raise ValueError(
                     "You want to stream logs, but it's not possible if a tty is used "
-                    "as 'progress'. It's also not possible if 'progress' is False. "
+                    "as 'progress'. It's also not possible if 'progress' is False, "
+                    "'none' or 'quiet', since those modes emit no logs. "
                     "Make sure the function arguments of 'docker.build' are "
                     "coherent."
                 )
