@@ -809,6 +809,66 @@ def test_bake_metadata_file_str_path_option(only_print, monkeypatch, tmp_path):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_without_allow_option(only_print, monkeypatch):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(files=[bake_file], print=only_print)
+
+    assert "--allow" not in recorded.get("cmd", [])
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_allow_single_option(only_print, monkeypatch):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(files=[bake_file], print=only_print, allow="network.host")
+
+    cmd = list(map(str, recorded.get("cmd", [])))
+    assert cmd.count("--allow") == 1
+    assert cmd[cmd.index("--allow") + 1] == "network.host"
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_allow_multiple_options(only_print, monkeypatch):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(
+        files=[bake_file],
+        print=only_print,
+        allow=["fs.read=/tmp/some_file", "network.host"],
+    )
+
+    cmd = list(map(str, recorded.get("cmd", [])))
+    assert cmd.count("--allow") == 2
+    assert "fs.read=/tmp/some_file" in cmd
+    assert "network.host" in cmd
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("prune_all")
 def test_prune_all_empty():
     logs = docker.buildx.prune(all=True, stream_logs=True)
