@@ -255,6 +255,7 @@ class BuildxCLI(DockerCLICaller):
         provenance: Union[bool, Dict[str, str], None] = None,
         pull: bool = False,
         push: bool = False,
+        resource: Optional[Dict[str, str]] = None,
         sbom: Union[bool, Dict[str, str], None] = None,
         secrets: Union[str, List[str]] = [],
         # TODO shm_size
@@ -323,6 +324,12 @@ class BuildxCLI(DockerCLICaller):
                 issue [Default image output from buildx v0.10 cannot run on Google Cloud Run or AWS Lambda](https://github.com/docker/buildx/issues/1533)
             pull: Always attempt to pull a newer version of the image
             push: Shorthand for `output=dict(type="registry")`.
+            resource: Set CPU and memory limits for build containers.
+                (format: `{[resource]:[limit], ...}`)
+                See [the buildx build reference docs](https://github.com/docker/buildx/blob/master/docs/reference/buildx_build.md#resource)
+                for possible resource names and limits. For example
+                `resource={"memory": "512m", "cpuset-cpus": "0-3"}`. Note that
+                resource limits require buildx 0.29 and buildkitd 0.31.
             sbom: Shorthand for `attest={"type": "sbom"}`. Eg `sbom=True`.
             secrets: One or more secrets passed as string(s). For example
                 `secrets="id=aws,src=/home/my_user/.aws/credentials"`
@@ -396,6 +403,10 @@ class BuildxCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--network", network)
         full_cmd.add_flag("--no-cache", not cache)
         full_cmd.add_args_iterable_or_single("--tag", tags)
+        if resource is not None:
+            full_cmd.add_args_iterable_or_single(
+                "--resource", format_mapping_for_cli(resource)
+            )
 
         if stream_logs:
             if progress in (False, "tty"):

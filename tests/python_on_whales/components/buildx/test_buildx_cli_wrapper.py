@@ -319,6 +319,15 @@ def test_buildx_build_attestations(tmp_path, kwargs):
     docker.buildx.build(tmp_path, **kwargs)
 
 
+# Can be enabled once CI is using ubuntu-26.04 which includes Docker Engine
+# 29.4.2 (buildkitd 0.32.2) and buildx 0.36.1
+@pytest.mark.skipif(True, reason="requires buildx 0.29 and buildkitd 0.31")
+@pytest.mark.usefixtures("with_docker_driver")
+def test_buildx_build_resource_limits(tmp_path):
+    (tmp_path / "Dockerfile").write_text(dockerfile_content1)
+    docker.buildx.build(tmp_path, resource={"memory": "512m", "cpuset-cpus": "1"})
+
+
 # Does the build work when passing extra contexts
 # without making use of them in the Dockerfile
 @pytest.mark.usefixtures("with_container_driver")
