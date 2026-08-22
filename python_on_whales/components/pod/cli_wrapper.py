@@ -73,7 +73,11 @@ class Pod(ReloadableObjectFromJson):
 
     def _fetch_inspect_result_json(self, reference):
         json_str = run(self.docker_cmd + ["pod", "inspect", reference])
-        return json.loads(json_str)
+        json_object = json.loads(json_str)
+        if isinstance(json_object, list):
+            # podman >= 5.0 outputs a list from `pod inspect`
+            return json_object[0]
+        return json_object
 
     def _parse_json_object(self, json_object: Mapping[str, Any]) -> PodInspectResult:
         return PodInspectResult(**json_object)
