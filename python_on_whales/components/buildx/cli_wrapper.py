@@ -125,6 +125,7 @@ class BuildxCLI(DockerCLICaller):
     def bake(
         self,
         targets: Union[str, List[str]] = [],
+        allow: Union[str, List[str]] = [],
         builder: Optional[ValidBuilder] = None,
         files: Union[ValidPath, List[ValidPath]] = [],
         load: bool = False,
@@ -148,6 +149,10 @@ class BuildxCLI(DockerCLICaller):
 
         Parameters:
             targets: Targets or groups of targets to build.
+            allow: Entitlements to grant to the build, as a string or a list of
+                strings. Needed for example when a bake target reads a secret
+                outside of the build context.
+                Eg `allow=["fs.read=/home/my_user/.netrc", "network.host"]`
             builder: The builder to use.
             files: Build definition file(s)
             load: Shorthand for `set=["*.output=type=docker"]`
@@ -201,6 +206,7 @@ class BuildxCLI(DockerCLICaller):
         full_cmd = self.docker_cmd + ["buildx", "bake"]
 
         full_cmd.add_flag("--no-cache", not cache)
+        full_cmd.add_args_iterable_or_single("--allow", allow)
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_flag("--load", load)
         full_cmd.add_flag("--pull", pull)
