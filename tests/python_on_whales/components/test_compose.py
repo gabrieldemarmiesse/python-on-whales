@@ -1453,6 +1453,76 @@ def test_build_args():
     assert config.services["my_service"].environment == {"DATADOG_HOST": "something"}
 
 
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test_compose_publish_cli_basic(run_mock: Mock):
+    test_application = "repo/app:tag"
+    docker.compose.publish(test_application)
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_compose_cmd
+        + [
+            "publish",
+            test_application,
+        ],
+        capture_stderr=False,
+        capture_stdout=False,
+    )
+
+
+@patch("python_on_whales.components.compose.cli_wrapper.run")
+def test_compose_publish_cli_all_flags(run_mock: Mock):
+    docker.compose.publish(
+        repository="repo/image:tag",
+        oci_version="1.1.0",
+        resolve_image_digests=True,
+        with_env=True,
+        allow_publishing_sensitive_data=True,
+    )
+
+    run_mock.assert_called_once_with(
+        docker.client_config.docker_compose_cmd
+        + [
+            "publish",
+            "--oci-version",
+            "1.1.0",
+            "--resolve-image-digests",
+            "--with-env",
+            "--yes",
+            "repo/image:tag",
+        ],
+        capture_stderr=False,
+        capture_stdout=False,
+    )
+
+
+def test_docker_compose_publish():
+    docker = DockerClient(
+        compose_files=[
+            PROJECT_ROOT
+            / "tests/python_on_whales/components/dummy_compose_with_container_names.yml"
+        ],
+        compose_compatibility=True,
+    )
+
+    with docker.run(
+        "registry:3",
+        remove=True,
+        privileged=False,
+        publish=[(5000, 5000)],
+        detach=True,
+        name="test_registry_container",
+    ):
+        docker.compose.publish(
+            "localhost:5000/repo/app:tag",
+            with_env=True,
+            allow_publishing_sensitive_data=True,
+        )
+
+        app_client = DockerClient(compose_files=["oci://localhost:5000/repo/app:tag"])
+        app_client.compose.pull()
+        app_client.compose.up(detach=True)
+        app_client.compose.rm(stop=True)
+
+
 COMPOSE_WD_FIXTURE_DIR = (
     PROJECT_ROOT / "tests/python_on_whales/components/build_with_dependencies_test"
 )
