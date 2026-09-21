@@ -809,6 +809,146 @@ def test_bake_metadata_file_str_path_option(only_print, monkeypatch, tmp_path):
 
 
 @pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_without_allow_option(only_print, monkeypatch):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(files=[bake_file], print=only_print)
+
+    assert "--allow" not in recorded.get("cmd", [])
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_allow_single_option(only_print, monkeypatch):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(files=[bake_file], print=only_print, allow="network.host")
+
+    cmd = list(map(str, recorded.get("cmd", [])))
+    assert cmd.count("--allow") == 1
+    assert cmd[cmd.index("--allow") + 1] == "network.host"
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+def test_bake_allow_multiple_options(only_print, monkeypatch):
+    recorded = {}
+
+    def fake_run(cmd, capture_stderr=True, env={}):
+        recorded["cmd"] = list(cmd)
+        return "{}"
+
+    monkeypatch.setattr(python_on_whales.components.buildx.cli_wrapper, "run", fake_run)
+
+    docker.buildx.bake(
+        files=[bake_file],
+        print=only_print,
+        allow=["fs.read=/tmp/some_file", "network.host"],
+    )
+
+    cmd = list(map(str, recorded.get("cmd", [])))
+    assert cmd.count("--allow") == 2
+    assert "fs.read=/tmp/some_file" in cmd
+    assert "network.host" in cmd
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+@pytest.mark.parametrize("only_print", [True, False])
+@pytest.mark.parametrize(
+    "allow", ["network.host", ["network.host", f"fs.read={bake_test_dir}"]]
+)
+def test_bake_allow_with_real_docker_client(only_print, allow):
+    config = docker.buildx.bake(files=[bake_file], print=only_print, allow=allow)
+    assert config == {
+        "group": {"default": {"targets": ["my_out1", "my_out2"]}},
+        "target": {
+            "my_out1": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image1:1.0.0"],
+                "target": "out1",
+            },
+            "my_out2": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+                "tags": ["pretty_image2:1.0.0"],
+                "target": "out2",
+            },
+        },
+    }
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+@pytest.mark.usefixtures("change_cwd")
+def test_bake_invalid_allow_with_real_docker_client():
+    # proves the entitlements really reach the docker CLI: an unknown one is rejected.
+    with pytest.raises(DockerException):
+        docker.buildx.bake(
+            files=[bake_file], print=True, allow="not.a.real.entitlement"
+        )
+
+
+@pytest.fixture
+def bake_with_secret_outside_context(tmp_path):
+    (tmp_path / "secret.txt").write_text("topsecret")
+    context = tmp_path / "context"
+    context.mkdir()
+    (context / "Dockerfile").write_text(
+        "FROM busybox:1 AS out\n"
+        "RUN --mount=type=secret,id=mysecret cat /run/secrets/mysecret\n"
+    )
+    (context / "docker-bake.hcl").write_text(
+        'target "my_out" {\n'
+        '  context = "."\n'
+        '  target = "out"\n'
+        '  tags = ["bake_allow_test:1.0.0"]\n'
+        '  secret = ["id=mysecret,src=../secret.txt"]\n'
+        "}\n"
+    )
+    old_cwd = os.getcwd()
+    os.chdir(context)
+    yield tmp_path
+    os.chdir(old_cwd)
+
+
+@pytest.mark.usefixtures("with_docker_driver")
+def test_bake_allow_grants_entitlement(bake_with_secret_outside_context):
+    # buildx refuses to read the secret outside the context unless fs.read is granted.
+    try:
+        docker.buildx.bake(targets=["my_out"], cache=False)
+    except DockerException:
+        pass
+    else:
+        pytest.skip("this version of buildx does not enforce filesystem entitlements")
+
+    docker.buildx.bake(
+        targets=["my_out"],
+        cache=False,
+        load=True,
+        allow=f"fs.read={bake_with_secret_outside_context}",
+    )
+    assert docker.image.exists("bake_allow_test:1.0.0")
+    docker.image.remove("bake_allow_test:1.0.0")
+
+
+@pytest.mark.usefixtures("with_docker_driver")
 @pytest.mark.usefixtures("prune_all")
 def test_prune_all_empty():
     logs = docker.buildx.prune(all=True, stream_logs=True)
