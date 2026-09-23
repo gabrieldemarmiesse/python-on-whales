@@ -22,7 +22,7 @@ def print_dodo(image: Image):
 
 ## Attributes
 
-It attributes are the same that you get with the command line:
+The attributes are the same as with the command line:
 `docker image inspect ...`
 
 To get a complete description of those attributes, you 

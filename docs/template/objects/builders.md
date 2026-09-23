@@ -21,7 +21,7 @@ from python_on_whales import Builder
 
 ## Attributes
 
-It attributes are the same that you get with the command line:
+The attributes are the same as with the command line:
 `docker buildx inspect ...`
 
 Only a few are available at the moment

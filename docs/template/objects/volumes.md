@@ -28,7 +28,7 @@ def print_file(my_volume: Volume):
 
 ## Attributes
 
-It attributes are the same that you get with the command line:
+The attributes are the same as with the command line:
 `docker volume inspect ...`
 
 To get a complete description of those attributes, you 
