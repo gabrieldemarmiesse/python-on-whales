@@ -6,7 +6,7 @@ from python_on_whales import docker
 
 my_network = docker.network.create("some-network")
 
-my_network = docker.container.inspect("some-network")
+my_network = docker.network.inspect("some-network")
 ```
 For type hints, use this
 
@@ -19,7 +19,7 @@ def ping_hostname_in_network(my_network: Network):
 
 ## Attributes
 
-It attributes are the same that you get with the command line:
+The attributes are the same as with the command line:
 `docker network inspect ...`
 
 If you want to know the exact structure, you can go to the 

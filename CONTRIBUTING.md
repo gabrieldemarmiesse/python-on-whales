@@ -59,15 +59,15 @@ Then:
 uv run pytest -v ./tests/
 ```
 
-Feel free to explore the [pytes documentation](https://docs.pytest.org/en/6.2.x/usage.html) to 
+Feel free to explore the [pytest documentation](https://docs.pytest.org/en/6.2.x/usage.html) to
 learn how to run a subset of the test suite.
 
 
 ## Pre-commit
 
-We use a pre-commit to make sure the formatting and linting are correct before pushing changes.
+We use pre-commit to make sure the formatting and linting are correct before pushing changes.
 
-Install the pre-commit by running:
+Install pre-commit by running:
 ```bash
 uvx --with=pre-commit pre-commit install
 ```
@@ -133,7 +133,7 @@ As an example, those kind of diff will get rejected during code reviews:
 + my_list = [... for i in range(10) if ...]
 ```
 
-If the diff lowers the complexity of the statement by using less operations/functions, then it's ok. For 
+If the diff lowers the complexity of the statement by using fewer operations/functions, then it's ok. For
 example, this kind of diff is welcome:
 
 ```
@@ -142,7 +142,7 @@ example, this kind of diff is welcome:
 + old_list.extends(my_list)
 ```
 
-This is to ensure that, as maintainers, we have a little code to review as possible. The first programmer
+This is to ensure that, as maintainers, we have as little code to review as possible. The first programmer
 who writes a line of code chooses the style. If you need to change a line for another reason than the code style,
 then you can change the code style.
 

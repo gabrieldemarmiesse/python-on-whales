@@ -23,7 +23,7 @@ def print_creation_time(some_service: Service):
 
 ## Attributes
 
-It attributes are the same that you get with the command line:
+The attributes are the same as with the command line:
 `docker service inspect ...`
 
 To get a complete description of those attributes, you 
