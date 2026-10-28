@@ -238,10 +238,8 @@ def test_buildx_build_push_registry_multiple_tags(tmp_path, docker_registry):
 @pytest.mark.usefixtures("with_container_driver")
 def test_buildx_build_load_container_driver(tmp_path):
     (tmp_path / "Dockerfile").write_text(dockerfile_content1)
-    my_image = docker.buildx.build(tmp_path, load=True)
-
-    # can only be fixed by fixing https://github.com/docker/buildx/issues/420
-    assert my_image is None
+    with docker.buildx.build(tmp_path, load=True) as my_image:
+        assert my_image.repo_tags == []
 
 
 @pytest.mark.usefixtures("with_container_driver")

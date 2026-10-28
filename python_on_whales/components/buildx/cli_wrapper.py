@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime as dt
 import json
 import tempfile
-from enum import Enum
 from pathlib import Path
 from typing import (
     Any,
@@ -33,11 +32,6 @@ from python_on_whales.utils import (
     stream_stdout_and_stderr,
     to_list,
 )
-
-
-class GetImageMethod(Enum):
-    TAG = 1
-    IIDFILE = 2
 
 
 class Builder(ReloadableObject):
@@ -417,15 +411,6 @@ class BuildxCLI(DockerCLICaller):
             return stream_buildx_logs(full_cmd)
 
         will_load_image = self._build_will_load_image(builder, push, load, output)
-        # very special_case, must be fixed https://github.com/docker/buildx/issues/420
-        if (
-            will_load_image
-            and not tags
-            and self.inspect(builder).driver == "docker-container"
-        ):
-            # we have no way of fetching the image because iidfile is wrong in this case.
-            will_load_image = False
-
         if not will_load_image:
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)
@@ -434,19 +419,14 @@ class BuildxCLI(DockerCLICaller):
         docker_image = python_on_whales.components.image.cli_wrapper.ImageCLI(
             self.client_config
         )
-        if self._method_to_get_image(builder) == GetImageMethod.TAG:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_dir = Path(tmp_dir)
+            iidfile = tmp_dir / "id_file.txt"
+            full_cmd.add_simple_arg("--iidfile", iidfile)
             full_cmd.append(context_path)
             run(full_cmd, capture_stderr=progress is False)
-            return docker_image.inspect(tags[0])
-        else:
-            with tempfile.TemporaryDirectory() as tmp_dir:
-                tmp_dir = Path(tmp_dir)
-                iidfile = tmp_dir / "id_file.txt"
-                full_cmd.add_simple_arg("--iidfile", iidfile)
-                full_cmd.append(context_path)
-                run(full_cmd, capture_stderr=progress is False)
-                image_id = iidfile.read_text()
-                return docker_image.inspect(image_id)
+            image_id = iidfile.read_text()
+            return docker_image.inspect(image_id)
 
     def _build_will_load_image(
         self,
@@ -470,14 +450,6 @@ class BuildxCLI(DockerCLICaller):
             return True
 
         return False
-
-    def _method_to_get_image(self, builder: Optional[str]) -> GetImageMethod:
-        """Getting around https://github.com/docker/buildx/issues/420"""
-        builder = self.inspect(builder)
-        if builder.driver == "docker":
-            return GetImageMethod.IIDFILE
-        else:
-            return GetImageMethod.TAG
 
     def create(
         self,
