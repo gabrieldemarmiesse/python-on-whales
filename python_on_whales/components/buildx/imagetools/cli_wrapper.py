@@ -24,12 +24,12 @@ class ImagetoolsCLI(DockerCLICaller):
         files: List[Union[str, Path]] = [],
         dry_run: bool = False,
         builder: Optional[str] = None,
+        prefer_index: Optional[bool] = None,
     ) -> Optional[Manifest]:
         """
         Create a new manifest list based on source manifests.
         The source manifests can be manifest lists or single platform distribution manifests and
         must already exist in the registry where the new manifest is created.
-        If only one source is specified, create performs a carbon copy.
 
         The CLI docs is [here](https://docs.docker.com/engine/reference/commandline/buildx_imagetools_create/)
         and it contains a lot more information.
@@ -41,6 +41,7 @@ class ImagetoolsCLI(DockerCLICaller):
             dry_run: Show final image instead of pushing
             files: Read source descriptor from file
             builder: The builder to use.
+            prefer_index: Prefer an image index over a carbon copy when there is a single source
         """
         if not isinstance(sources, list):
             raise TypeError(
@@ -69,6 +70,8 @@ class ImagetoolsCLI(DockerCLICaller):
         full_cmd.add_simple_arg("--builder", builder)
         full_cmd.add_flag("--append", append)
         full_cmd.add_flag("--dry-run", dry_run)
+        if prefer_index is not None:
+            full_cmd.append(f"--prefer-index={str(prefer_index).lower()}")
         full_cmd += sources
 
         result = run(full_cmd)
