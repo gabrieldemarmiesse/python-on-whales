@@ -36,6 +36,34 @@ def test_imagetools_create_single_image_with_hash():
     assert a.media_type.startswith("application/")
 
 
+def test_imagetools_create_prefer_index_false():
+    a = docker.buildx.imagetools.create(
+        [
+            "python@sha256:6bb74b8212b18a54d1a3cc03811beccf5497e87d13c2796ce23de76944494829"
+        ],
+        prefer_index=False,
+        dry_run=True,
+    )
+    assert a.config is not None
+    assert a.manifests is None
+
+
+def test_imagetools_create_prefer_index_true():
+    a = docker.buildx.imagetools.create(
+        [
+            "python@sha256:6bb74b8212b18a54d1a3cc03811beccf5497e87d13c2796ce23de76944494829"
+        ],
+        prefer_index=True,
+        dry_run=True,
+    )
+    assert a.config is None
+    assert len(a.manifests) == 1
+    assert (
+        a.manifests[0].digest
+        == "sha256:6bb74b8212b18a54d1a3cc03811beccf5497e87d13c2796ce23de76944494829"
+    )
+
+
 def test_imagetools_create_new_image_with_tag(docker_registry):
     busybox = docker.pull("busybox:1")
     base_image = f"{docker_registry}/test:image1"
